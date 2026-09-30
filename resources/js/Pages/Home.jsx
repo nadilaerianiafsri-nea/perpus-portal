@@ -1,26 +1,26 @@
-import { Head } from '@inertiajs/react';
-
+import { Head, Link, usePage } from "@inertiajs/react";
 export default function Home() {
+    const { auth } = usePage().props;
     const books = [
         {
-            title: 'Hukum Administrasi Negara',
-            author: 'Dr. Ridwan HR',
-            category: 'Hukum',
+            title: "Hukum Administrasi Negara",
+            author: "Dr. Ridwan HR",
+            category: "Hukum",
         },
         {
-            title: 'Pengantar Ilmu Hukum',
-            author: 'Prof. Sudikno',
-            category: 'Hukum',
+            title: "Pengantar Ilmu Hukum",
+            author: "Prof. Sudikno",
+            category: "Hukum",
         },
         {
-            title: 'Hak Asasi Manusia',
-            author: 'Tim Kemenkum',
-            category: 'HAM',
+            title: "Hak Asasi Manusia",
+            author: "Tim Kemenkum",
+            category: "HAM",
         },
         {
-            title: 'Hukum Perdata Indonesia',
-            author: 'Subekti',
-            category: 'Hukum Perdata',
+            title: "Hukum Perdata Indonesia",
+            author: "Subekti",
+            category: "Hukum Perdata",
         },
     ];
 
@@ -29,11 +29,9 @@ export default function Home() {
             <Head title="Perpustakaan Kemenkum Riau" />
 
             <div className="min-h-screen bg-[#f8faf9] text-slate-800">
-
                 {/* NAVBAR */}
                 <header className="bg-white border-b border-slate-200">
                     <div className="max-w-7xl mx-auto px-6 lg:px-8 h-20 flex items-center justify-between">
-
                         <div className="flex items-center gap-3">
                             <div className="w-11 h-11 rounded-xl bg-emerald-700 flex items-center justify-center text-white font-bold text-lg">
                                 P
@@ -67,16 +65,27 @@ export default function Home() {
                             </a>
                         </nav>
 
-                        <button className="bg-emerald-700 hover:bg-emerald-800 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition">
-                            Masuk
-                        </button>
+                        {auth?.user ? (
+                            <Link
+                                href={route("dashboard")}
+                                className="bg-emerald-700 hover:bg-emerald-800 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition"
+                            >
+                                Dashboard
+                            </Link>
+                        ) : (
+                            <Link
+                                href={route("login")}
+                                className="bg-emerald-700 hover:bg-emerald-800 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition"
+                            >
+                                Masuk
+                            </Link>
+                        )}
                     </div>
                 </header>
 
                 {/* HERO */}
                 <section className="bg-gradient-to-br from-emerald-800 via-emerald-700 to-teal-600 text-white">
                     <div className="max-w-7xl mx-auto px-6 lg:px-8 py-20 lg:py-28">
-
                         <div className="max-w-3xl">
                             <p className="uppercase tracking-[0.25em] text-emerald-100 text-sm font-semibold mb-4">
                                 Perpustakaan Digital
@@ -90,8 +99,9 @@ export default function Home() {
                             </h2>
 
                             <p className="mt-6 text-lg text-emerald-50 max-w-2xl leading-relaxed">
-                                Jelajahi koleksi buku, e-book, referensi hukum, dan
-                                berbagai sumber pengetahuan Perpustakaan Kemenkum Riau.
+                                Jelajahi koleksi buku, e-book, referensi hukum,
+                                dan berbagai sumber pengetahuan Perpustakaan
+                                Kemenkum Riau.
                             </p>
 
                             {/* SEARCH */}
@@ -113,9 +123,7 @@ export default function Home() {
                 {/* QUICK MENU */}
                 <section className="-mt-10 relative z-10">
                     <div className="max-w-7xl mx-auto px-6 lg:px-8">
-
                         <div className="bg-white rounded-2xl shadow-lg border border-slate-100 grid grid-cols-2 md:grid-cols-4 overflow-hidden">
-
                             <QuickMenu
                                 title="Koleksi Buku"
                                 description="Jelajahi koleksi perpustakaan"
@@ -135,14 +143,12 @@ export default function Home() {
                                 title="Hibah Buku"
                                 description="Informasi donasi buku"
                             />
-
                         </div>
                     </div>
                 </section>
 
                 {/* COLLECTION */}
                 <section className="max-w-7xl mx-auto px-6 lg:px-8 py-20">
-
                     <div className="flex items-end justify-between mb-8">
                         <div>
                             <p className="text-emerald-700 font-semibold text-sm uppercase tracking-wider">
@@ -154,7 +160,8 @@ export default function Home() {
                             </h3>
 
                             <p className="text-slate-500 mt-2">
-                                Temukan buku terbaru yang tersedia di perpustakaan.
+                                Temukan buku terbaru yang tersedia di
+                                perpustakaan.
                             </p>
                         </div>
 
@@ -176,7 +183,6 @@ export default function Home() {
                             />
                         ))}
                     </div>
-
                 </section>
             </div>
         </>
@@ -190,13 +196,9 @@ function QuickMenu({ title, description }) {
                 →
             </div>
 
-            <h4 className="font-bold text-lg">
-                {title}
-            </h4>
+            <h4 className="font-bold text-lg">{title}</h4>
 
-            <p className="text-sm text-slate-500 mt-1">
-                {description}
-            </p>
+            <p className="text-sm text-slate-500 mt-1">{description}</p>
         </div>
     );
 }
@@ -204,12 +206,9 @@ function QuickMenu({ title, description }) {
 function BookCard({ title, author, category }) {
     return (
         <article className="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-lg transition">
-
             <div className="aspect-[3/4] bg-gradient-to-br from-emerald-100 to-emerald-200 flex items-center justify-center p-8">
                 <div className="bg-white shadow-md rounded-lg w-full h-full flex items-center justify-center text-center p-5">
-                    <span className="font-bold text-emerald-800">
-                        {title}
-                    </span>
+                    <span className="font-bold text-emerald-800">{title}</span>
                 </div>
             </div>
 
@@ -218,15 +217,10 @@ function BookCard({ title, author, category }) {
                     {category}
                 </span>
 
-                <h4 className="font-bold text-lg leading-snug">
-                    {title}
-                </h4>
+                <h4 className="font-bold text-lg leading-snug">{title}</h4>
 
-                <p className="text-sm text-slate-500 mt-2">
-                    {author}
-                </p>
+                <p className="text-sm text-slate-500 mt-2">{author}</p>
             </div>
-
         </article>
     );
 }
