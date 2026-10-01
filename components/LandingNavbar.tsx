@@ -18,8 +18,8 @@ export default function LandingNavbar() {
         </nav>
 
         <div className="nav-actions">
-          <a className="login-link" href="#">Masuk</a>
-          <a className="member-btn" href="#">Daftar Anggota</a>
+          <a className="login-link" href="/login">Masuk</a>
+          <a className="member-btn" href="/register">Daftar Anggota</a>
         </div>
 
         <details className="mobile-menu">
@@ -33,8 +33,8 @@ export default function LandingNavbar() {
             <a href="#panduan">Panduan</a>
             <a href="#faq">FAQ</a>
             <a href="#kontak">Kontak</a>
-            <a href="#">Masuk</a>
-            <a className="member-btn" href="#">Daftar Anggota</a>
+            <a href="/login">Masuk</a>
+            <a className="member-btn" href="/register">Daftar Anggota</a>
           </div>
         </details>
       </div>

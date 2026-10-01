@@ -14,14 +14,21 @@ enum Role {
   PENGUNJUNG
 }
 
+enum MemberType {
+  UMUM
+  MAHASISWA
+  PEGAWAI
+}
+
 model User {
-  id           Int      @id @default(autoincrement())
+  id           Int         @id @default(autoincrement())
   name         String
-  email        String   @unique
+  email        String      @unique
   passwordHash String
-  role         Role     @default(PENGUNJUNG)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  role         Role        @default(PENGUNJUNG)
+  memberType   MemberType?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 
   @@map("users")
 }
