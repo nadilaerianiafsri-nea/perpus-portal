@@ -1,107 +1,49 @@
 import Image from "next/image";
+import {
+  FiArrowRight,
+  FiBell,
+  FiBookOpen,
+  FiCalendar,
+  FiCheckCircle,
+  FiClock,
+  FiList,
+  FiMail,
+  FiMapPin,
+  FiPhone,
+  FiSearch,
+} from "react-icons/fi";
 import LandingNavbar from "../components/LandingNavbar";
 import LandingFooter from "../components/LandingFooter";
 
-const services = [
-  {
-    number: "01",
-    title: "Pencarian Koleksi",
-    description:
-      "Cari buku berdasarkan judul, penulis, kategori, atau kata kunci dengan lebih cepat.",
-  },
-  {
-    number: "02",
-    title: "Informasi Ketersediaan",
-    description:
-      "Lihat informasi koleksi dan status ketersediaan buku sebelum melakukan peminjaman.",
-  },
-  {
-    number: "03",
-    title: "Riwayat Peminjaman",
-    description:
-      "Pantau aktivitas peminjaman dan pengembalian buku dari akun pengguna.",
-  },
+const books = [
+  { title: "Koleksi Buku Contoh 1", category: "Umum", image: "/images/ASSET PERPUS/asset buku terbuka.png" },
+  { title: "Koleksi Buku Contoh 2", category: "Hukum", image: "/images/ASSET PERPUS/asset tumpukan buku.png" },
+  { title: "Koleksi Buku Contoh 3", category: "Referensi", image: "/images/ASSET PERPUS/asset buku.png" },
+  { title: "Koleksi Buku Contoh 4", category: "Literasi", image: "/images/ASSET PERPUS/asset rak buku.png" },
+  { title: "Koleksi Buku Contoh 5", category: "Arsip", image: "/images/ASSET PERPUS/asset list.png" },
+  { title: "Koleksi Buku Contoh 6", category: "Hukum", image: "/images/ASSET PERPUS/asset buku kaca pembesar.png" },
 ];
 
-const featuredBooks = [
-  {
-    title: "Pengantar Hukum Indonesia",
-    author: "Koleksi Perpustakaan",
-    category: "Hukum",
-    image: "/images/landing/book-placeholder-1.svg",
-  },
-  {
-    title: "Administrasi dan Pelayanan Publik",
-    author: "Koleksi Perpustakaan",
-    category: "Referensi",
-    image: "/images/landing/book-placeholder-2.svg",
-  },
-  {
-    title: "Literasi Digital",
-    author: "Koleksi Perpustakaan",
-    category: "Literasi",
-    image: "/images/landing/book-placeholder-3.svg",
-  },
-  {
-    title: "Pengetahuan Umum",
-    author: "Koleksi Perpustakaan",
-    category: "Umum",
-    image: "/images/landing/book-placeholder-4.svg",
-  },
+const subjects = [
+  "Hukum & Perundang-undangan",
+  "Administrasi Publik",
+  "Sosial & Politik",
+  "Ekonomi",
+  "Teknologi Informasi",
+  "Agama",
+  "Referensi Umum",
+  "Karya Ilmiah",
 ];
 
-function ArrowIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        d="M5 12h14M13 6l6 6-6 6"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.9"
-      />
-    </svg>
-  );
-}
-
-function SearchIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <circle
-        cx="11"
-        cy="11"
-        r="6.5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      />
-
-      <path
-        d="m16 16 4 4"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="1.8"
-      />
-    </svg>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        d="m5 12 4 4L19 7"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-      />
-    </svg>
-  );
-}
+const steps = [
+  ["01", "Cari Buku", "Telusuri koleksi yang tersedia."],
+  ["02", "Ajukan Peminjaman", "Pilih buku dan ajukan pinjam."],
+  ["03", "Reservasi Buku", "Reservasi jika buku sedang dipinjam."],
+  ["04", "Ambil di Perpustakaan", "Datang sesuai jadwal pengambilan."],
+  ["05", "Baca & Kembalikan", "Nikmati buku selama masa pinjam."],
+  ["06", "Perpanjang 7 Hari", "Perpanjang bila masih dibutuhkan."],
+  ["07", "Kembalikan", "Kembalikan sebelum jatuh tempo."],
+];
 
 export default function Home() {
   return (
@@ -109,189 +51,80 @@ export default function Home() {
       <LandingNavbar />
 
       <main>
-        <section className="hero-section" id="beranda">
-          <div className="shell hero-card">
-            <div className="hero-content">
-              <div className="eyebrow">
-                <span className="eyebrow-dot" />
-                Perpustakaan Digital
-              </div>
-
-              <h1>
-                Temukan pengetahuan untuk
-                <span> membuka lebih banyak peluang.</span>
-              </h1>
-
-              <p className="hero-description">
-                Jelajahi koleksi perpustakaan, temukan buku yang Anda perlukan,
-                dan akses layanan perpustakaan dalam satu portal yang sederhana.
+        <section className="hero" id="beranda">
+          <div className="landing-shell hero-grid">
+            <div className="hero-copy">
+              <span className="micro-badge">PORTAL RESMI PERPUSTAKAAN KEMENKUM RIAU</span>
+              <h1>Temukan<br />Pengetahuan,<br />dalam Satu Akses</h1>
+              <p>
+                Jelajahi ribuan koleksi fisik dan e-book, reservasi buku,
+                serta kelola keanggotaan Anda — semua dari satu portal yang mudah diakses.
               </p>
 
-              <div className="hero-buttons">
-                <a className="btn btn-primary btn-large" href="#koleksi">
-                  Jelajahi Koleksi
-                  <ArrowIcon />
-                </a>
-
-                <a className="btn btn-light btn-large" href="#tentang">
-                  Tentang Perpustakaan
-                </a>
-              </div>
-
-              <form className="search-box">
-                <span className="search-icon">
-                  <SearchIcon />
-                </span>
-
-                <input
-                  type="search"
-                  placeholder="Cari judul, penulis, atau kategori buku..."
-                  aria-label="Cari buku"
-                />
-
-                <button type="button">Cari</button>
+              <form className="hero-search">
+                <input placeholder="Cari judul, penulis, topik, ISBN..." />
+                <button type="button" aria-label="Cari"><FiSearch /></button>
               </form>
 
-              <div className="hero-mini-stats">
-                <div>
-                  <strong>1.000+</strong>
-                  <span>Koleksi buku</span>
-                </div>
-
-                <i />
-
-                <div>
-                  <strong>20+</strong>
-                  <span>Kategori</span>
-                </div>
-
-                <i />
-
-                <div>
-                  <strong>Digital</strong>
-                  <span>Akses lebih mudah</span>
-                </div>
+              <div className="hero-actions">
+                <a className="navy-btn" href="#koleksi"><FiSearch /> Cari Koleksi</a>
+                <a className="soft-link" href="#ebook"><FiBookOpen /> Jelajahi E-Book</a>
               </div>
             </div>
 
-            <div className="hero-visual">
-              <div className="hero-image-frame">
-                <Image
-                  src="/images/landing/hero-placeholder.svg"
-                  alt="Foto utama perpustakaan"
-                  fill
-                  sizes="(max-width: 900px) 100vw, 46vw"
-                  className="cover-image"
-                  priority
-                />
-
-                <div className="photo-label">
-                  <small>Tempat foto Anda</small>
-                  <strong>Hero / Foto Perpustakaan</strong>
-                </div>
-              </div>
-
-              <div className="floating-info floating-info-top">
-                <span className="mini-icon">B</span>
-
-                <div>
-                  <strong>Koleksi lengkap</strong>
-                  <small>Mudah ditemukan</small>
-                </div>
-              </div>
-
-              <div className="floating-info floating-info-bottom">
-                <strong>24/7</strong>
-                <small>Akses informasi</small>
-              </div>
+            <div className="hero-art">
+              <Image
+                src="/images/ASSET PERPUS/Asset banyak burung ikon.jpg"
+                alt="Ilustrasi perpustakaan Kemenkum Riau"
+                fill
+                priority
+                sizes="(max-width: 900px) 100vw, 50vw"
+              />
             </div>
           </div>
         </section>
 
-        <section className="service-section section" id="layanan">
-          <div className="shell">
-            <div className="section-heading centered-heading">
-              <span className="section-label">Layanan Utama</span>
-
-              <h2>Perpustakaan yang lebih mudah digunakan.</h2>
-
-              <p>
-                Informasi penting dibuat ringkas dan mudah ditemukan agar
-                pengunjung dapat fokus pada kebutuhan mereka.
-              </p>
-            </div>
-
-            <div className="service-grid">
-              {services.map((service) => (
-                <article className="service-card" key={service.number}>
-                  <span className="service-number">
-                    {service.number}
-                  </span>
-
-                  <div className="service-line" />
-
-                  <h3>{service.title}</h3>
-
-                  <p>{service.description}</p>
-
-                  <a href="#koleksi">
-                    Pelajari layanan
-                    <ArrowIcon />
-                  </a>
-                </article>
-              ))}
-            </div>
+        <section className="stats-wrap">
+          <div className="landing-shell stats-card">
+            <div><strong>5.000+</strong><span>Judul Koleksi</span></div>
+            <div><strong>800+</strong><span>E-Book Digital</span></div>
+            <div><strong>24 Jam</strong><span>Portal Akses Aktif</span></div>
           </div>
         </section>
 
-        <section className="collection-section section" id="koleksi">
-          <div className="shell">
-            <div className="collection-header">
-              <div className="section-heading">
-                <span className="section-label">
-                  Koleksi Pilihan
-                </span>
+        <section className="quick-section">
+          <div className="landing-shell quick-grid">
+            <a href="#koleksi"><span><FiSearch /></span><div><strong>Cari Buku</strong><small>Telusuri koleksi & ketersediaan</small></div></a>
+            <a href="#layanan"><span><FiList /></span><div><strong>Peminjaman Saya</strong><small>Reservasi & riwayat aktif Anda</small></div></a>
+            <a href="#ebook"><span><FiBookOpen /></span><div><strong>E-Book</strong><small>Baca koleksi digital kapan saja</small></div></a>
+            <a href="#layanan"><span><FiCalendar /></span><div><strong>Panduan Peminjaman</strong><small>Alur dan aturan layanan</small></div></a>
+          </div>
+        </section>
 
-                <h2>Temukan bacaan yang Anda cari.</h2>
-
-                <p>
-                  Tampilan sementara menggunakan gambar pengganti. Nantinya
-                  Anda cukup mengganti file gambar di folder public.
-                </p>
+        <section className="collection section-pad" id="koleksi">
+          <div className="landing-shell">
+            <div className="section-head row-head">
+              <div>
+                <span className="section-kicker">KOLEKSI</span>
+                <h2>Koleksi Terbaru</h2>
+                <p>Temukan koleksi yang baru ditambahkan.</p>
               </div>
-
-              <a className="text-link" href="#koleksi">
-                Lihat semua koleksi
-                <ArrowIcon />
-              </a>
+              <a href="#">Lihat semua koleksi <FiArrowRight /></a>
             </div>
 
             <div className="book-grid">
-              {featuredBooks.map((book) => (
+              {books.map((book, index) => (
                 <article className="book-card" key={book.title}>
-                  <div className="book-cover-wrap">
-                    <Image
-                      src={book.image}
-                      alt={`Cover ${book.title}`}
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1000px) 50vw, 25vw"
-                      className="book-cover-image"
-                    />
-
-                    <span className="book-category">
-                      {book.category}
-                    </span>
+                  <div className="book-image">
+                    <Image src={book.image} alt={book.title} fill sizes="220px" />
+                    <span>{index + 1 < 10 ? `0${index + 1}` : index + 1}</span>
                   </div>
-
-                  <div className="book-content">
+                  <div className="book-body">
+                    <small>{book.category}</small>
                     <h3>{book.title}</h3>
-
-                    <p>{book.author}</p>
-
-                    <a href="#koleksi">
-                      Lihat detail
-                      <ArrowIcon />
-                    </a>
+                    <p>Perpustakaan Digital Kemenkum Riau</p>
+                    <div className="availability"><FiCheckCircle /> Tersedia</div>
+                    <a href="#">Lihat Detail</a>
                   </div>
                 </article>
               ))}
@@ -299,128 +132,193 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="about-section section" id="tentang">
-          <div className="shell about-grid">
-            <div className="about-visual">
-              <div className="about-image-frame">
-                <Image
-                  src="/images/landing/about-placeholder.svg"
-                  alt="Foto perpustakaan"
-                  fill
-                  sizes="(max-width: 900px) 100vw, 48vw"
-                  className="cover-image"
-                />
-              </div>
-
-              <div className="about-accent-card">
-                <strong>Ruang untuk belajar</strong>
-
-                <span>
-                  Lebih dekat, sederhana, dan mudah diakses.
-                </span>
+        <section className="subject-section section-pad">
+          <div className="landing-shell subject-grid">
+            <div>
+              <span className="section-kicker">KATEGORI KOLEKSI</span>
+              <h2>Jelajahi Berdasarkan Subjek</h2>
+              <p>Temukan buku yang tepat sesuai bidang dan kebutuhan Anda.</p>
+              <div className="subject-list">
+                {subjects.map((item) => <a href="#" key={item}>{item}<FiArrowRight /></a>)}
               </div>
             </div>
-
-            <div className="about-content">
-              <span className="section-label">
-                Tentang Perpustakaan
-              </span>
-
-              <h2>
-                Informasi dan koleksi dalam satu ruang digital.
-              </h2>
-
-              <p>
-                Portal ini dirancang untuk membantu pengunjung memperoleh
-                informasi mengenai perpustakaan, menelusuri koleksi, dan
-                menggunakan layanan secara lebih praktis.
-              </p>
-
-              <div className="check-list">
-                <div className="check-item">
-                  <span>
-                    <CheckIcon />
-                  </span>
-
-                  <div>
-                    <strong>Pencarian lebih cepat</strong>
-
-                    <p>
-                      Temukan koleksi tanpa pencarian manual yang panjang.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="check-item">
-                  <span>
-                    <CheckIcon />
-                  </span>
-
-                  <div>
-                    <strong>
-                      Informasi lebih terorganisasi
-                    </strong>
-
-                    <p>
-                      Koleksi, kategori, dan informasi layanan ditampilkan
-                      dengan struktur yang konsisten.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="check-item">
-                  <span>
-                    <CheckIcon />
-                  </span>
-
-                  <div>
-                    <strong>
-                      Nyaman di berbagai perangkat
-                    </strong>
-
-                    <p>
-                      Tampilan menyesuaikan desktop, tablet, maupun
-                      perangkat mobile.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <a className="btn btn-primary btn-large" href="#koleksi">
-                Mulai Jelajahi
-                <ArrowIcon />
-              </a>
+            <div className="subject-art">
+              <Image
+                src="/images/ASSET PERPUS/asset buku kaca pembesar.png"
+                alt="Ilustrasi pencarian buku"
+                fill
+                sizes="320px"
+              />
             </div>
           </div>
         </section>
 
-        <section className="cta-section">
-          <div className="shell cta-card">
-            <div>
-              <span className="section-label section-label-light">
-                Mulai Sekarang
-              </span>
+        <section className="service-dark section-pad" id="layanan">
+          <div className="landing-shell">
+            <div className="section-head centered light">
+              <span className="section-kicker yellow">LAYANAN KAMI</span>
+              <h2>Layanan Perpustakaan dalam Satu Platform</h2>
+              <p>Dua layanan utama untuk pengalaman yang nyaman — cari dan reservasi buku serta perpanjangan otomatis.</p>
+            </div>
 
-              <h2>
-                Temukan koleksi yang Anda butuhkan.
-              </h2>
+            <div className="feature-row">
+              <div className="feature-copy">
+                <span className="mini-tag">Layanan 01</span>
+                <h3>Cari Koleksi & Reservasi Buku</h3>
+                <p>
+                  Telusuri koleksi lengkap perpustakaan, cek status ketersediaan,
+                  lalu reservasi langsung sebelum datang.
+                </p>
+                <div className="pill-row">
+                  <span><FiSearch /> Katalog lengkap</span>
+                  <span><FiClock /> Reservasi 24 jam</span>
+                  <span><FiMapPin /> Cek rak buku</span>
+                </div>
+              </div>
+              <div className="feature-art">
+                <Image src="/images/ASSET PERPUS/Hero pegang buku.png" alt="Cari koleksi dan reservasi" fill sizes="460px" />
+              </div>
+            </div>
 
+            <div className="feature-row reverse">
+              <div className="feature-art">
+                <Image src="/images/ASSET PERPUS/Hero peminjaman.png" alt="Perpanjangan peminjaman" fill sizes="460px" />
+              </div>
+              <div className="feature-copy">
+                <span className="mini-tag">Layanan 02</span>
+                <h3>Perpanjang Pinjaman & Reminder Otomatis</h3>
+                <p>
+                  Perpanjang pinjaman hingga 7 hari tanpa datang ke perpustakaan dan
+                  dapatkan pengingat sebelum jatuh tempo.
+                </p>
+                <div className="pill-row">
+                  <span><FiCalendar /> Perpanjang 7 hari</span>
+                  <span><FiBell /> Reminder otomatis</span>
+                  <span><FiMail /> Info via email</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="borrow-flow section-pad">
+          <div className="landing-shell">
+            <div className="section-head centered">
+              <span className="section-kicker">PANDUAN LAYANAN</span>
+              <h2>Cara Peminjaman Fisik</h2>
+              <p>Tujuh langkah dari pencarian hingga pengembalian buku.</p>
+            </div>
+            <div className="step-grid">
+              {steps.map(([no, title, text], idx) => (
+                <article className={idx === 5 ? "active" : ""} key={no}>
+                  <span>{no}</span>
+                  <strong>{title}</strong>
+                  <small>{text}</small>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="ebook-section section-pad" id="ebook">
+          <div className="landing-shell ebook-grid">
+            <div className="ebook-art">
+              <Image src="/images/ASSET PERPUS/Asset banyak burung ikon.jpg" alt="Karakter perpustakaan" fill sizes="480px" />
+            </div>
+            <div className="ebook-copy">
+              <span className="section-kicker">KOLEKSI DIGITAL</span>
+              <h2>Baca E-Book Perpustakaan</h2>
               <p>
-                Masuk ke akun Anda untuk mendapatkan akses ke fitur
-                perpustakaan yang tersedia.
+                Nikmati koleksi e-book untuk berbagai kebutuhan langsung dari perangkat Anda.
+                Tidak perlu antre dan dapat diakses kapan saja.
               </p>
+              <ul>
+                <li><FiCheckCircle /> Baca langsung di browser</li>
+                <li><FiCheckCircle /> Akses dengan akun anggota</li>
+                <li><FiCheckCircle /> Tersedia untuk perangkat mobile</li>
+              </ul>
+              <div className="hero-actions">
+                <a className="navy-btn" href="#"><FiBookOpen /> Jelajahi E-Book</a>
+                <a className="outline-btn" href="#">Lihat Semua</a>
+              </div>
             </div>
+          </div>
+        </section>
 
-            <div className="cta-actions">
-              <a className="btn btn-white btn-large" href="#">
-                Masuk
-                <ArrowIcon />
-              </a>
-
-              <a className="btn btn-outline-light btn-large" href="#">
-                Buat Akun
-              </a>
+        <section className="reminder-section section-pad">
+          <div className="landing-shell">
+            <div className="section-head centered">
+              <span className="section-kicker">PENGINGAT PEMINJAMAN</span>
+              <h2>Tidak Pernah Terlewat Jatuh Tempo</h2>
+              <p>Reminder otomatis membantu Anda mengelola pinjaman.</p>
             </div>
+            <div className="reminder-grid">
+              <article>
+                <div className="reminder-icon"><FiCalendar /></div>
+                <div><span>Perpanjangan</span><h3>Perpanjang Pinjaman +7 Hari</h3><p>Ajukan perpanjangan langsung dari akun tanpa harus datang.</p><a href="#">Kelola Pinjaman <FiArrowRight /></a></div>
+              </article>
+              <article>
+                <div className="reminder-icon"><FiBell /></div>
+                <div><span>Reminder Otomatis</span><h3>Reminder via Email</h3><p>Notifikasi sebelum masa pinjaman Anda berakhir.</p><a href="#">Lihat Panduan <FiArrowRight /></a></div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section className="donation-section section-pad">
+          <div className="landing-shell donation-grid">
+            <div>
+              <span className="section-kicker">TRANSPARANSI & HIBAH</span>
+              <h2>Informasi Hibah Buku</h2>
+              <p>
+                Perpustakaan menerima hibah buku dan menampilkan informasi penerimaan
+                secara transparan untuk mendukung pengembangan koleksi.
+              </p>
+              <div className="donation-list">
+                <div><FiBookOpen /><span><strong>Judul Buku Hibah A</strong><small>Penerimaan hibah koleksi</small></span><b>Diterima</b></div>
+                <div><FiBookOpen /><span><strong>Judul Buku Hibah B</strong><small>Penerimaan hibah koleksi</small></span><b>Dalam Proses</b></div>
+                <div><FiBookOpen /><span><strong>Judul Buku Hibah C</strong><small>Penerimaan hibah koleksi</small></span><b>Diterima</b></div>
+              </div>
+              <a className="outline-btn" href="#">Lihat Informasi Hibah <FiArrowRight /></a>
+            </div>
+            <div className="donation-art">
+              <Image src="/images/ASSET PERPUS/asset buku kaca pembesar.png" alt="Informasi hibah buku" fill sizes="330px" />
+            </div>
+          </div>
+        </section>
+
+        <section className="member-cta section-pad">
+          <div className="landing-shell member-grid">
+            <div>
+              <span className="section-kicker yellow">KEANGGOTAAN PERPUSTAKAAN</span>
+              <h2>Mulai Akses Layanan Perpustakaan</h2>
+              <p>Daftarkan diri sebagai anggota dan nikmati seluruh layanan perpustakaan.</p>
+              <ul>
+                <li><FiCheckCircle /> Koleksi fisik dengan reservasi</li>
+                <li><FiCheckCircle /> E-book yang bisa dibaca kapan saja</li>
+                <li><FiCheckCircle /> Reminder jatuh tempo otomatis</li>
+                <li><FiCheckCircle /> Riwayat pinjaman terintegrasi</li>
+              </ul>
+              <div className="hero-actions">
+                <a className="yellow-btn" href="#">Daftar Anggota</a>
+                <a className="dark-outline-btn" href="#">Masuk</a>
+              </div>
+            </div>
+            <div className="member-art">
+              <Image src="/images/ASSET PERPUS/Hero pegang buku.png" alt="Keanggotaan perpustakaan" fill sizes="380px" />
+            </div>
+          </div>
+        </section>
+
+        <section className="info-section section-pad">
+          <div className="landing-shell">
+            <div className="section-head"><h2>Informasi Layanan</h2></div>
+            <div className="info-grid">
+              <article><FiClock /><div><span>JAM LAYANAN</span><strong>Senin - Jumat</strong></div></article>
+              <article><FiMapPin /><div><span>ALAMAT</span><strong>Kemenkum Riau</strong></div></article>
+              <article><FiPhone /><div><span>KONTAK</span><strong>Layanan Perpustakaan</strong></div></article>
+            </div>
+            <div className="contact-center"><a className="outline-btn" href="#"><FiMail /> Hubungi Kami</a></div>
           </div>
         </section>
       </main>

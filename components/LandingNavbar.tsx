@@ -1,63 +1,40 @@
-import Image from "next/image";
-
 export default function LandingNavbar() {
   return (
     <header className="site-header">
-      <div className="shell navbar">
-        <a
-          className="brand"
-          href="#beranda"
-          aria-label="Kembali ke beranda"
-        >
-          <span className="brand-mark">
-            <Image
-              src="/images/landing/logo-placeholder.svg"
-              alt="Logo perpustakaan"
-              width={46}
-              height={46}
-              priority
-            />
-          </span>
-
-          <span className="brand-copy">
-            <strong>Perpustakaan Digital</strong>
-            <small>Kementerian Hukum Riau</small>
-          </span>
+      <div className="landing-shell top-nav">
+        <a className="wordmark" href="#beranda" aria-label="PerpusRiau">
+          <span className="wordmark-box">P</span>
         </a>
 
-        <nav className="desktop-nav" aria-label="Navigasi utama">
-          <a href="#beranda">Beranda</a>
-          <a href="#layanan">Layanan</a>
+        <nav className="main-nav" aria-label="Navigasi utama">
+          <a className="nav-active" href="#beranda">Beranda</a>
           <a href="#koleksi">Koleksi</a>
+          <a href="#ebook">E-Book</a>
+          <a href="#layanan">Hibah Buku</a>
           <a href="#tentang">Tentang</a>
+          <a href="#panduan">Panduan</a>
+          <a href="#faq">FAQ</a>
+          <a href="#kontak">Kontak</a>
         </nav>
 
-        <div className="desktop-actions">
-          <a className="btn btn-ghost" href="#koleksi">
-            Jelajahi
-          </a>
-
-          <a className="btn btn-primary" href="#">
-            Masuk
-          </a>
+        <div className="nav-actions">
+          <a className="login-link" href="#">Masuk</a>
+          <a className="member-btn" href="#">Daftar Anggota</a>
         </div>
 
         <details className="mobile-menu">
-          <summary aria-label="Buka menu">
-            <span />
-            <span />
-            <span />
-          </summary>
-
-          <div className="mobile-menu-panel">
+          <summary aria-label="Buka menu"><span /><span /><span /></summary>
+          <div>
             <a href="#beranda">Beranda</a>
-            <a href="#layanan">Layanan</a>
             <a href="#koleksi">Koleksi</a>
+            <a href="#ebook">E-Book</a>
+            <a href="#layanan">Hibah Buku</a>
             <a href="#tentang">Tentang</a>
-
-            <a className="btn btn-primary" href="#">
-              Masuk
-            </a>
+            <a href="#panduan">Panduan</a>
+            <a href="#faq">FAQ</a>
+            <a href="#kontak">Kontak</a>
+            <a href="#">Masuk</a>
+            <a className="member-btn" href="#">Daftar Anggota</a>
           </div>
         </details>
       </div>
