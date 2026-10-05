@@ -49,3 +49,54 @@ model MemberProfile {
 
   @@map("member_profiles")
 }
+
+enum CollectionType {
+  FISIK
+  EBOOK
+}
+
+enum CopyStatus {
+  TERSEDIA
+  DIRESERVASI
+  DIPINJAM
+}
+
+model Book {
+  id          Int            @id @default(autoincrement())
+  code        String         @unique @db.VarChar(64)
+  title       String
+  author      String
+  isbnIssn    String?        @db.VarChar(64)
+  publisher   String
+  year        Int
+  edition     String?
+  language    String         @db.VarChar(64)
+  subject     String
+  type        CollectionType
+  format      String         @db.VarChar(64)
+  description String         @db.Text
+  coverUrl    String
+  shelf       String?
+  ebookUrl    String?
+  isDemo      Boolean        @default(false)
+  copies      BookCopy[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([type, year])
+  @@index([language])
+  @@index([subject])
+  @@map("books")
+}
+
+model BookCopy {
+  id       Int        @id @default(autoincrement())
+  bookId   Int
+  book     Book       @relation(fields: [bookId], references: [id], onDelete: Restrict)
+  code     String     @unique @db.VarChar(80)
+  status   CopyStatus @default(TERSEDIA)
+  location String
+
+  @@index([bookId, status])
+  @@map("book_copies")
+}

@@ -1,40 +1,75 @@
-export default function LandingNavbar() {
+import Link from "next/link";
+type NavbarProps = {
+  active?: "beranda" | "koleksi" | "ebook";
+  user?: { name: string; role: "ADMIN" | "PENGUNJUNG" } | null;
+};
+export default function LandingNavbar({
+  active = "beranda",
+  user,
+}: NavbarProps) {
+  const links = [
+    ["Beranda", "/", "beranda"],
+    ["Koleksi", "/koleksi", "koleksi"],
+    ["E-Book", "/e-book", "ebook"],
+    ["Hibah Buku", "/#layanan", "hibah"],
+    ["Tentang", "/#tentang", "tentang"],
+    ["Panduan", "/#panduan", "panduan"],
+    ["FAQ", "/#faq", "faq"],
+    ["Kontak", "/#kontak", "kontak"],
+  ];
+  const actions = user ? (
+    <Link
+      className="member-btn"
+      href={user.role === "ADMIN" ? "/admin" : "/pengunjung"}
+    >
+      Dashboard Saya
+    </Link>
+  ) : (
+    <>
+      <Link className="login-link" href="/login">
+        Masuk
+      </Link>
+      <Link className="member-btn" href="/register">
+        Daftar Anggota
+      </Link>
+    </>
+  );
   return (
     <header className="site-header">
       <div className="landing-shell top-nav">
-        <a className="wordmark" href="#beranda" aria-label="PerpusRiau">
+        <Link className="wordmark" href="/" aria-label="Beranda Perpustakaan">
           <span className="wordmark-box">P</span>
-        </a>
-
+        </Link>
         <nav className="main-nav" aria-label="Navigasi utama">
-          <a className="nav-active" href="#beranda">Beranda</a>
-          <a href="#koleksi">Koleksi</a>
-          <a href="#ebook">E-Book</a>
-          <a href="#layanan">Hibah Buku</a>
-          <a href="#tentang">Tentang</a>
-          <a href="#panduan">Panduan</a>
-          <a href="#faq">FAQ</a>
-          <a href="#kontak">Kontak</a>
+          {links.map(([label, href, key]) => (
+            <Link
+              key={key}
+              href={href}
+              className={active === key ? "nav-active" : undefined}
+              aria-current={active === key ? "page" : undefined}
+            >
+              {label}
+            </Link>
+          ))}
         </nav>
-
-        <div className="nav-actions">
-          <a className="login-link" href="/login">Masuk</a>
-          <a className="member-btn" href="/register">Daftar Anggota</a>
-        </div>
-
+        <div className="nav-actions">{actions}</div>
         <details className="mobile-menu">
-          <summary aria-label="Buka menu"><span /><span /><span /></summary>
+          <summary aria-label="Buka menu">
+            <span />
+            <span />
+            <span />
+          </summary>
           <div>
-            <a href="#beranda">Beranda</a>
-            <a href="#koleksi">Koleksi</a>
-            <a href="#ebook">E-Book</a>
-            <a href="#layanan">Hibah Buku</a>
-            <a href="#tentang">Tentang</a>
-            <a href="#panduan">Panduan</a>
-            <a href="#faq">FAQ</a>
-            <a href="#kontak">Kontak</a>
-            <a href="/login">Masuk</a>
-            <a className="member-btn" href="/register">Daftar Anggota</a>
+            {links.map(([label, href, key]) => (
+              <Link
+                key={key}
+                href={href}
+                aria-current={active === key ? "page" : undefined}
+              >
+                {label}
+              </Link>
+            ))}
+            {actions}
           </div>
         </details>
       </div>

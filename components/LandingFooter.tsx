@@ -1,35 +1,108 @@
-import { FiBookOpen, FiMail, FiMapPin, FiPhone } from "react-icons/fi";
+import Link from "next/link";
+import { FiBookOpen, FiClock, FiMail, FiMapPin, FiPhone } from "react-icons/fi";
 
-export default function LandingFooter() {
+export default function LandingFooter({
+  catalog = false,
+}: {
+  catalog?: boolean;
+}) {
+  if (catalog)
+    return (
+      <footer className="landing-footer">
+        <div className="landing-shell footer-top">
+          <div className="footer-about">
+            <div className="footer-logo">
+              <span className="wordmark-box">P</span>
+              <div>
+                <strong>Perpustakaan</strong>
+                <small>[LOGO KEMENKUM RIAU]</small>
+              </div>
+            </div>
+            <p>
+              Portal digital library institusi. Data berlabel contoh digunakan
+              untuk keperluan pengembangan.
+            </p>
+            <span className="catalog-demo">Data Contoh</span>
+          </div>
+          <div className="footer-col">
+            <strong>Jelajahi</strong>
+            <Link href="/koleksi">Koleksi</Link>
+            <Link href="/e-book">E-Book</Link>
+            <Link href="/#layanan">Hibah Buku</Link>
+            <Link href="/#panduan">Panduan</Link>
+          </div>
+          <div className="footer-col">
+            <strong>Bantuan</strong>
+            <Link href="/#tentang">Tentang</Link>
+            <Link href="/#faq">FAQ</Link>
+            <Link href="/#kontak">Kontak</Link>
+            <Link href="/#panduan">Panduan Peminjaman</Link>
+          </div>
+          <div className="footer-col">
+            <strong>Informasi Layanan</strong>
+            <span>
+              <FiMapPin /> [Alamat Perpustakaan]
+            </span>
+            <span>
+              <FiClock /> [Jam Layanan]
+            </span>
+            <span>
+              <FiPhone /> [Kontak Telepon]
+            </span>
+            <span>
+              <FiMail /> [Email Perpustakaan]
+            </span>
+          </div>
+        </div>
+        <div className="landing-shell footer-bottom">
+          <span>© 2026 Perpustakaan Kemenkum Riau — Data Contoh.</span>
+          <span>Kebijakan Privasi · Syarat Layanan</span>
+        </div>
+      </footer>
+    );
   return (
     <footer className="landing-footer">
       <div className="landing-shell footer-top">
         <div className="footer-about">
-          <div className="footer-logo"><FiBookOpen /><strong>PerpusRiau</strong></div>
-          <p>Portal digital layanan informasi, koleksi, dan peminjaman perpustakaan Kementerian Hukum Riau.</p>
-          <a href="#"><FiMail /> Email Layanan</a>
+          <div className="footer-logo">
+            <FiBookOpen />
+            <strong>PerpusRiau</strong>
+          </div>
+          <p>
+            Portal digital layanan informasi, koleksi, dan peminjaman
+            perpustakaan Kementerian Hukum Riau.
+          </p>
+          <Link href="#">
+            <FiMail /> Email Layanan
+          </Link>
         </div>
 
         <div className="footer-col">
           <strong>Jelajahi</strong>
-          <a href="#koleksi">Koleksi</a>
-          <a href="#ebook">E-Book</a>
-          <a href="#layanan">Hibah Buku</a>
-          <a href="#layanan">Panduan</a>
+          <Link href="/koleksi">Koleksi</Link>
+          <Link href="/e-book">E-Book</Link>
+          <Link href="#layanan">Hibah Buku</Link>
+          <Link href="#layanan">Panduan</Link>
         </div>
 
         <div className="footer-col">
           <strong>Bantuan</strong>
-          <a href="#layanan">FAQ</a>
-          <a href="#layanan">Kontak</a>
-          <a href="#layanan">Panduan Peminjaman</a>
+          <Link href="#layanan">FAQ</Link>
+          <Link href="#layanan">Kontak</Link>
+          <Link href="#layanan">Panduan Peminjaman</Link>
         </div>
 
         <div className="footer-col">
           <strong>Informasi Layanan</strong>
-          <span><FiClockIcon /> Jam Layanan</span>
-          <span><FiMapPin /> Kemenkum Riau</span>
-          <span><FiPhone /> Layanan Perpustakaan</span>
+          <span>
+            <FiClockIcon /> Jam Layanan
+          </span>
+          <span>
+            <FiMapPin /> Kemenkum Riau
+          </span>
+          <span>
+            <FiPhone /> Layanan Perpustakaan
+          </span>
         </div>
       </div>
 
