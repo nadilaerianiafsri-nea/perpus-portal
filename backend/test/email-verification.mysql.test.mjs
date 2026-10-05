@@ -1,3 +1,4 @@
+import cookieParser from 'cookie-parser';
 import { before, after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
@@ -64,6 +65,8 @@ const settings = {
   JWT_SECRET: randomUUID() + randomUUID(),
   EMAIL_VERIFICATION_SECRET: secret,
   EMAIL_VERIFICATION_URL: 'http://localhost:3001/auth/verify-email',
+  PASSWORD_RESET_SECRET: randomUUID() + randomUUID(),
+  PASSWORD_RESET_URL: 'http://localhost:3000/reset-password',
   SMTP_HOST: '127.0.0.1',
   SMTP_PORT: '',
   SMTP_SECURE: 'false',
@@ -94,9 +97,11 @@ before(async () => {
     })
     .compile();
   app = module.createNestApplication({ logger: false });
+  app.use(cookieParser());
   prisma = module.get(PrismaService);
   jwt = module.get(JwtService);
   await app.init();
+  if (process.env.AUTH_FRONTEND_SMOKE === '1') await app.listen(3001, '127.0.0.1');
 });
 await test('registration delivers to local SMTP; pending user cannot login', async () => {
   const email = `verification-${marker}@example.com`;
@@ -200,6 +205,63 @@ await test('valid link activates MySQL user; repeat is safe; verified member and
     .expect(200);
   assert.equal(messages.length, 2);
 });
+if (process.env.AUTH_FRONTEND_SMOKE === '1') await test('frontend pages, API proxies and server role protection', async () => {
+  const base = 'http://localhost:3000';
+  const email = `verification-${marker}@example.com`;
+  const call = (path, body, cookie) => fetch(`${base}${path}`, { method: body ? 'POST' : 'GET', headers: { ...(body ? { 'Content-Type': 'application/json' } : {}), ...(cookie ? { Cookie: cookie } : {}) }, body: body ? JSON.stringify(body) : undefined, redirect: 'manual' });
+  for (const path of ['/forgot-password', '/reset-password?token=invalid', '/verify-email?token=invalid', '/check-email']) assert.equal((await call(path)).status, 200);
+  for (const path of ['/admin', '/pengunjung']) {
+    const result = await call(path);
+    assert.equal(result.status, 307); assert.ok(result.headers.get('location').endsWith('/login'));
+  }
+  await prisma.user.update({ where: { id: ids[0] }, data: { role: 'PENGUNJUNG' } });
+  const login = await call('/api/auth/login', { email, password });
+  assert.equal(login.status, 201);
+  const cookie = login.headers.get('set-cookie').split(';')[0];
+  const me = await call('/api/auth/me', undefined, cookie);
+  assert.equal(me.status, 200); assert.equal((await me.json()).emailVerified, true);
+  assert.equal((await call('/pengunjung', undefined, cookie)).status, 200);
+  const denied = await call('/admin', undefined, cookie);
+  assert.equal(denied.status, 307); assert.ok(denied.headers.get('location').endsWith('/pengunjung'));
+  await prisma.user.update({ where: { id: ids[0] }, data: { role: 'ADMIN' } });
+  assert.equal((await call('/admin', undefined, cookie)).status, 200);
+  const verify = await call(`/api/auth/verify-email?token=${receivedToken()}`);
+  assert.equal(verify.status, 200); assert.equal((await verify.json()).alreadyVerified, true);
+  assert.equal((await call('/api/auth/verify-email?token=invalid')).status, 400);
+  assert.equal((await call('/api/auth/resend-verification', { email })).status, 200);
+  const logout = await call('/api/auth/logout', {} , cookie);
+  assert.equal(logout.status, 200); assert.ok(logout.headers.get('set-cookie').includes('Expires='));
+  assert.equal((await call('/api/auth/me')).status, 401);
+});
+await test('session, logout and one-use reset work with MySQL and the existing mailer', async () => {
+  const email = `verification-${marker}@example.com`;
+  const agent = request.agent(app.getHttpServer());
+  await agent.post('/auth/login').send({ email, password }).expect(201);
+  const me = await agent.get('/auth/me').expect(200);
+  assert.equal(me.body.emailVerified, true);
+  assert.equal(me.body.role, 'ADMIN');
+  assert.equal(me.body.passwordHash, undefined);
+  const logout = await agent.post('/auth/logout').expect(201);
+  assert.ok(logout.headers['set-cookie'][0].includes('Expires='));
+  await agent.get('/auth/me').expect(401);
+  const oldSession = request.agent(app.getHttpServer());
+  await oldSession.post('/auth/login').send({ email, password }).expect(201);
+  await request(app.getHttpServer()).post('/auth/forgot-password').send({ email }).expect(200);
+  const token = receivedToken();
+  const newPassword = randomUUID();
+  await request(app.getHttpServer()).post('/auth/reset-password').send({ token, password: 'short' }).expect(400);
+  await request(app.getHttpServer()).post('/auth/reset-password').send({ token: 'invalid', password: newPassword }).expect(400);
+  const expired = await jwt.signAsync({ sub: ids[0], email, purpose: 'password-reset' }, { secret: settings.PASSWORD_RESET_SECRET, expiresIn: -1, audience: 'perpus-password-reset', issuer: 'perpus-api' });
+  await request(app.getHttpServer()).post('/auth/reset-password').send({ token: expired, password: newPassword }).expect(400);
+  await request(app.getHttpServer()).post('/auth/reset-password').send({ token, password: newPassword }).expect(200);
+  await request(app.getHttpServer()).post('/auth/reset-password').send({ token, password: newPassword }).expect(400);
+  await oldSession.get('/auth/me').expect(401);
+  const saved = await prisma.user.findUnique({ where: { id: ids[0] } });
+  assert.notEqual(saved.passwordHash, newPassword);
+  assert.ok(await bcrypt.compare(newPassword, saved.passwordHash));
+  await request(app.getHttpServer()).post('/auth/login').send({ email, password }).expect(401);
+  await request(app.getHttpServer()).post('/auth/login').send({ email, password: newPassword }).expect(201);
+});
 await test('SMTP unavailable preserves new pending account and never claims delivery', async () => {
   await new Promise((resolve) => smtp.close(resolve));
   const email = `verification-${marker}-unavailable@example.com`;
@@ -217,6 +279,7 @@ await test('SMTP unavailable preserves new pending account and never claims deli
     })
     .expect(201);
   ids.push(response.body.data.id);
+  await request(app.getHttpServer()).post('/auth/forgot-password').send({ email }).expect(503);
   assert.equal(response.body.verificationEmailSent, false);
   assert.equal(response.body.data.emailVerified, false);
   const saved = await prisma.user.findUnique({ where: { email } });

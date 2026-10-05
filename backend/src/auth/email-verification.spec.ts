@@ -1,3 +1,4 @@
+import { PasswordResetService } from './password-reset.service';
 import { Test } from '@nestjs/testing';
 import type { INestApplication } from '@nestjs/common';
 import { JwtModule, JwtService } from '@nestjs/jwt';
@@ -58,6 +59,7 @@ describe('Email verification HTTP flow', () => {
       imports: [JwtModule.register({ secret: 'session-test-secret' })],
       controllers: [AuthController],
       providers: [
+        { provide: PasswordResetService, useValue: {} },
         AuthService,
         EmailVerificationService,
         JwtAuthGuard,

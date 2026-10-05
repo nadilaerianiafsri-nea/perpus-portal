@@ -7,6 +7,16 @@ export class MailService {
   constructor(private readonly config: ConfigService) {}
 
   async sendVerificationEmail(email: string, link: string): Promise<boolean> {
+    return this.send(email, link, false);
+  }
+  async sendPasswordResetEmail(email: string, link: string): Promise<boolean> {
+    return this.send(email, link, true);
+  }
+  private async send(
+    email: string,
+    link: string,
+    reset: boolean,
+  ): Promise<boolean> {
     const host = this.config.get<string>('SMTP_HOST')?.trim();
     const port = Number(this.config.get<string>('SMTP_PORT'));
     const from = this.config.get<string>('MAIL_FROM')?.trim();
@@ -46,9 +56,15 @@ export class MailService {
       const result = await transporter.sendMail({
         from,
         to: email,
-        subject: 'Verifikasi Email — Perpustakaan Kemenkum Riau',
-        text: `Pendaftaran Anda berhasil. Verifikasi alamat email untuk mengaktifkan akun Perpustakaan Kemenkum Riau.\n\n${link}\n\nLink berlaku selama 24 jam. Jika Anda tidak melakukan pendaftaran, abaikan email ini.`,
-        html: `<p>Pendaftaran Anda berhasil.</p><p>Verifikasi alamat email untuk mengaktifkan akun Perpustakaan Kemenkum Riau.</p><p><a href="${escapedLink}">Verifikasi Email</a></p><p>Link berlaku selama 24 jam.</p><p>Jika Anda tidak melakukan pendaftaran, abaikan email ini.</p>`,
+        subject: reset
+          ? 'Reset Kata Sandi — Perpustakaan Kemenkum Riau'
+          : 'Verifikasi Email — Perpustakaan Kemenkum Riau',
+        text: reset
+          ? `Ubah kata sandi akun Perpustakaan Kemenkum Riau.\n\n${link}\n\nLink berlaku selama 1 jam dan hanya sekali pakai. Jika Anda tidak meminta reset, abaikan email ini.`
+          : `Pendaftaran Anda berhasil. Verifikasi alamat email untuk mengaktifkan akun Perpustakaan Kemenkum Riau.\n\n${link}\n\nLink berlaku selama 24 jam. Jika Anda tidak melakukan pendaftaran, abaikan email ini.`,
+        html: reset
+          ? `<p>Ubah kata sandi akun Perpustakaan Kemenkum Riau.</p><p><a href="${escapedLink}">Reset Kata Sandi</a></p><p>Link berlaku selama 1 jam dan hanya sekali pakai. Jika Anda tidak meminta reset, abaikan email ini.</p>`
+          : `<p>Pendaftaran Anda berhasil.</p><p>Verifikasi alamat email untuk mengaktifkan akun Perpustakaan Kemenkum Riau.</p><p><a href="${escapedLink}">Verifikasi Email</a></p><p>Link berlaku selama 24 jam.</p><p>Jika Anda tidak melakukan pendaftaran, abaikan email ini.</p>`,
       });
       return result.accepted.some(
         (recipient) =>

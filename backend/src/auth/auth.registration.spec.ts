@@ -1,3 +1,4 @@
+import { PasswordResetService } from './password-reset.service';
 import { Test } from '@nestjs/testing';
 import type { INestApplication } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
@@ -50,6 +51,7 @@ describe('Registration HTTP contract', () => {
       ],
       controllers: [AuthController],
       providers: [
+        { provide: PasswordResetService, useValue: {} },
         AuthService,
         {
           provide: EmailVerificationService,

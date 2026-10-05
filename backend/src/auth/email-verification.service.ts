@@ -115,10 +115,9 @@ export class EmailVerificationService {
         typeof payload.exp !== 'number'
       )
         throw new Error('Invalid verification claims');
-    } catch {
-      throw new BadRequestException(
-        'Token verifikasi tidak valid atau sudah kedaluwarsa.',
-      );
+    } catch (error) {
+      const expired = error instanceof Error && error.name === 'TokenExpiredError';
+      throw new BadRequestException({ message: expired ? 'Token verifikasi sudah kedaluwarsa.' : 'Token verifikasi tidak valid.', code: expired ? 'TOKEN_EXPIRED' : 'TOKEN_INVALID' });
     }
     const user = await this.prisma.user.findUnique({
       where: { id: payload.sub },
@@ -129,7 +128,7 @@ export class EmailVerificationService {
         'Token verifikasi tidak valid atau sudah kedaluwarsa.',
       );
     if (user.emailVerified)
-      return { message: 'Email sudah diverifikasi.', emailVerified: true };
+      return { message: 'Email sudah diverifikasi.', emailVerified: true, alreadyVerified: true };
     // The email predicate also prevents verification after a concurrent address change.
     const result = await this.prisma.user.updateMany({
       where: { id: user.id, email: payload.email, emailVerified: false },
@@ -144,7 +143,7 @@ export class EmailVerificationService {
         throw new BadRequestException(
           'Token verifikasi tidak valid atau sudah kedaluwarsa.',
         );
-      return { message: 'Email sudah diverifikasi.', emailVerified: true };
+      return { message: 'Email sudah diverifikasi.', emailVerified: true, alreadyVerified: true };
     }
     return {
       message: 'Email berhasil diverifikasi. Anda dapat masuk ke akun.',

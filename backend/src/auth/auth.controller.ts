@@ -1,3 +1,4 @@
+import { PasswordResetService } from './password-reset.service';
 import {
   BadRequestException,
   Body,
@@ -20,7 +21,10 @@ import { type AuthenticatedRequest, JwtAuthGuard } from './jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly passwordReset: PasswordResetService,
+  ) {}
 
   private setSessionCookie(
     response: Response,
@@ -49,7 +53,15 @@ export class AuthController {
     })
     response: Response,
   ) {
-    if (!body.email || !body.password) {
+    if (
+      !body ||
+      typeof body.email !== 'string' ||
+      typeof body.password !== 'string' ||
+      !body.email ||
+      !body.password ||
+      body.email.length > 191 ||
+      body.password.length > 1024
+    ) {
       throw new BadRequestException('Email dan kata sandi wajib diisi.');
     }
 
@@ -85,8 +97,23 @@ export class AuthController {
     return this.authService.resendVerification(body);
   }
 
+  @Post('forgot-password')
+  @HttpCode(200)
+  @Header('Cache-Control', 'no-store')
+  async forgotPassword(@Body() body: unknown) {
+    return this.passwordReset.forgot(body);
+  }
+
+  @Post('reset-password')
+  @HttpCode(200)
+  @Header('Cache-Control', 'no-store')
+  async resetPassword(@Body() body: unknown) {
+    return this.passwordReset.reset(body);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get('me')
+  @Header('Cache-Control', 'no-store')
   async me(
     @Req()
     request: AuthenticatedRequest,

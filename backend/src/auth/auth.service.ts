@@ -1,3 +1,5 @@
+import { ConfigService } from '@nestjs/config';
+import { createHmac } from 'node:crypto';
 import {
   ConflictException,
   ForbiddenException,
@@ -15,6 +17,7 @@ import { RegisterDto } from './dto/register.dto';
 import { EmailVerificationService } from './email-verification.service';
 
 export type SessionPayload = {
+  credentialVersion: string;
   sub: number;
   name: string;
   email: string;
@@ -26,6 +29,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly config: ConfigService,
     private readonly verification: EmailVerificationService,
   ) {}
 
@@ -35,8 +39,15 @@ export class AuthService {
     email: string;
     role: Role;
     memberType?: MemberType | null;
+    passwordHash: string;
   }) {
     const payload: SessionPayload = {
+      credentialVersion: createHmac(
+        'sha256',
+        this.config.getOrThrow<string>('JWT_SECRET'),
+      )
+        .update(user.passwordHash)
+        .digest('hex'),
       sub: user.id,
       name: user.name,
       email: user.email,
@@ -53,6 +64,7 @@ export class AuthService {
         email: user.email,
         role: user.role,
         memberType: user.memberType ?? null,
+        emailVerified: true,
       },
     };
   }
@@ -75,7 +87,10 @@ export class AuthService {
     }
 
     if (!user.emailVerified) {
-      throw new ForbiddenException('Akun menunggu verifikasi email.');
+      throw new ForbiddenException({
+        message: 'Email belum diverifikasi.',
+        code: 'EMAIL_NOT_VERIFIED',
+      });
     }
 
     return this.createSession(user);
@@ -182,6 +197,7 @@ export class AuthService {
       email: user.email,
       role: user.role,
       memberType: user.memberType,
+      emailVerified: user.emailVerified,
     };
   }
 }

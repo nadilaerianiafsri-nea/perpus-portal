@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
 
 export type CurrentUser = {
+  emailVerified: boolean;
   id: number;
   name: string;
   email: string;

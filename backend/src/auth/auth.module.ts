@@ -1,3 +1,4 @@
+import { PasswordResetService } from './password-reset.service';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
@@ -20,7 +21,7 @@ import { MailService } from '../mail/mail.service';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtAuthGuard, EmailVerificationService, MailService],
+  providers: [AuthService, JwtAuthGuard, EmailVerificationService, MailService, PasswordResetService],
   exports: [AuthService, JwtModule, JwtAuthGuard],
 })
 export class AuthModule {}

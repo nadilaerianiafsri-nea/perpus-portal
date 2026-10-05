@@ -4,6 +4,7 @@ import { type FormEvent, useRef, useState } from "react";
 import Link from "next/link";
 import { FiArrowLeft, FiBriefcase, FiEye, FiEyeOff, FiUser } from "react-icons/fi";
 import { PiStudent } from "react-icons/pi";
+import WaitingVerification from './WaitingVerification';
 import AuthShell from "./AuthShell";
 import { registerMember } from "./registrationApi";
 import { type MemberType, type RegistrationErrors, type RegistrationValues, validateRegistration } from "./registrationValidation";
@@ -91,6 +92,8 @@ export default function Register() {
   const field = (name: FieldProps["name"], label: string, placeholder: string, helper?: string, type?: FieldProps["type"], autoComplete?: string) =>
     <FormField key={name} name={name} label={label} placeholder={placeholder} helper={helper} type={type} autoComplete={autoComplete}
       value={values[name]} onChange={(value) => update(name, value)} error={errors[name]} disabled={loading || succeeded} />;
+
+  if (succeeded) return <WaitingVerification email={values.email.trim().toLowerCase()} notice={notice} />;
 
   return <AuthShell registration>
     <div className={`${styles.formWrap} ${styles.registerWrap}`}>

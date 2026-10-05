@@ -16,6 +16,7 @@ type LoginResponse = {
     role: "ADMIN" | "PENGUNJUNG";
   };
   message?: string;
+  code?: string;
 };
 
 export default function Login() {
@@ -26,12 +27,15 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [pendingEmail, setPendingEmail] = useState("");
   const [info, setInfo] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function handleLogin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    if (loading) return;
+    setPendingEmail("");
     setError("");
     setInfo("");
     setLoading(true);
@@ -52,6 +56,7 @@ export default function Login() {
       const data = (await response.json()) as LoginResponse;
 
       if (!response.ok || !data.user) {
+        if (data.code === "EMAIL_NOT_VERIFIED") setPendingEmail(email.trim().toLowerCase());
         setError(
           data.message ??
             "Login gagal. Periksa kembali email dan kata sandi.",
@@ -161,18 +166,7 @@ export default function Login() {
               <span>Ingat saya</span>
             </label>
 
-            <button
-              type="button"
-              className={styles.linkButton}
-              onClick={() => {
-                setError("");
-                setInfo(
-                  "Reset kata sandi akan diaktifkan setelah modul email dibuat.",
-                );
-              }}
-            >
-              Lupa kata sandi?
-            </button>
+            <Link className={styles.linkButton} href="/forgot-password">Lupa kata sandi?</Link>
           </div>
 
           <button
@@ -190,6 +184,8 @@ export default function Login() {
               {error}
             </p>
           )}
+
+          {pendingEmail && <Link className={styles.actionLink} href={`/check-email?email=${encodeURIComponent(pendingEmail)}`}>Kirim ulang email verifikasi</Link>}
 
           {info && (
             <p className={styles.inlineInfo}>

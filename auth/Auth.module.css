@@ -585,3 +585,7 @@
     font-size: 12px;
   }
 }
+
+/* Auth status and recovery pages reuse the existing split layout. */
+.statusCopy { margin: 0; line-height: 1.6; overflow-wrap: anywhere; }
+.actionLink { color: var(--navy); text-align: center; font-weight: 600; }
