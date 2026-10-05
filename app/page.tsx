@@ -74,7 +74,7 @@ export default function Home() {
 
             <div className="hero-art">
               <Image
-                src="/images/ASSET PERPUS/Asset banyak burung ikon.jpg"
+                src="/images/ASSET PERPUS/BG LANDING PAGE.png"
                 alt="Ilustrasi perpustakaan Kemenkum Riau"
                 fill
                 priority
