@@ -48,6 +48,10 @@ export class EmailVerificationService {
     id: number;
     email: string;
   }): Promise<boolean> {
+    if (!this.mail.isConfigured())
+      throw new ServiceUnavailableException(
+        'Layanan email belum dikonfigurasi.',
+      );
     const secret = this.secret();
     const endpoint = this.config.get<string>('EMAIL_VERIFICATION_URL');
     if (!endpoint)
@@ -116,8 +120,14 @@ export class EmailVerificationService {
       )
         throw new Error('Invalid verification claims');
     } catch (error) {
-      const expired = error instanceof Error && error.name === 'TokenExpiredError';
-      throw new BadRequestException({ message: expired ? 'Token verifikasi sudah kedaluwarsa.' : 'Token verifikasi tidak valid.', code: expired ? 'TOKEN_EXPIRED' : 'TOKEN_INVALID' });
+      const expired =
+        error instanceof Error && error.name === 'TokenExpiredError';
+      throw new BadRequestException({
+        message: expired
+          ? 'Token verifikasi sudah kedaluwarsa.'
+          : 'Token verifikasi tidak valid.',
+        code: expired ? 'TOKEN_EXPIRED' : 'TOKEN_INVALID',
+      });
     }
     const user = await this.prisma.user.findUnique({
       where: { id: payload.sub },
@@ -128,7 +138,11 @@ export class EmailVerificationService {
         'Token verifikasi tidak valid atau sudah kedaluwarsa.',
       );
     if (user.emailVerified)
-      return { message: 'Email sudah diverifikasi.', emailVerified: true, alreadyVerified: true };
+      return {
+        message: 'Email sudah diverifikasi.',
+        emailVerified: true,
+        alreadyVerified: true,
+      };
     // The email predicate also prevents verification after a concurrent address change.
     const result = await this.prisma.user.updateMany({
       where: { id: user.id, email: payload.email, emailVerified: false },
@@ -143,7 +157,11 @@ export class EmailVerificationService {
         throw new BadRequestException(
           'Token verifikasi tidak valid atau sudah kedaluwarsa.',
         );
-      return { message: 'Email sudah diverifikasi.', emailVerified: true, alreadyVerified: true };
+      return {
+        message: 'Email sudah diverifikasi.',
+        emailVerified: true,
+        alreadyVerified: true,
+      };
     }
     return {
       message: 'Email berhasil diverifikasi. Anda dapat masuk ke akun.',

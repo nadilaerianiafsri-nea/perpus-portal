@@ -17,6 +17,8 @@ Frontend pages: `/register`, `/login`, `/verify-email`, `/check-email`, `/forgot
 
 Reset tokens use a separate JWT purpose, issuer/audience and secret; a keyed fingerprint of the current password hash binds the token to that password. An atomic conditional update changes the hash once and invalidates all previous reset links. Session credentials are also bound to the hash, so password reset invalidates old sessions. Cookies issued before this change require a fresh login.
 
+Session JWT and cookie both expire after 8 hours, or 30 days when `remember` is explicitly `true`. Missing SMTP configuration does not prevent backend startup or registration; resend/forgot-password respond with a controlled configuration error. Frontend and backend TypeScript are checked separately; the frontend config excludes the backend project.
+
 ## Configuration
 
 Copy the variable names from `.env.example` and supply real values privately in `.env`. Keep `JWT_SECRET`, `EMAIL_VERIFICATION_SECRET` and `PASSWORD_RESET_SECRET` distinct and random; email/reset secrets require at least 32 characters.

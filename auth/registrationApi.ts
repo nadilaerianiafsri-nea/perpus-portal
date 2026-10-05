@@ -30,7 +30,7 @@ export async function registerMember(
     const body: unknown = await response.json();
     const data = body && typeof body === "object" ? body as Record<string, unknown> : {};
     if (response.status === 201) {
-      return { success: true, message: data.verificationEmailSent === false ? "Email verifikasi belum dapat dikirim. Silakan coba kirim ulang." : "Pendaftaran berhasil. Akun Anda menunggu verifikasi email." };
+      return { success: true, message: data.verificationEmailSent === false ? "Layanan email belum dikonfigurasi atau belum dapat mengirim email. Silakan coba kirim ulang." : "Pendaftaran berhasil. Akun Anda menunggu verifikasi email." };
     }
     const errors: RegistrationErrors = {};
     if (response.status === 400 && data.errors && typeof data.errors === "object") {

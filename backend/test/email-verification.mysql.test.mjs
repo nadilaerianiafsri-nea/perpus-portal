@@ -236,7 +236,10 @@ if (process.env.AUTH_FRONTEND_SMOKE === '1') await test('frontend pages, API pro
 await test('session, logout and one-use reset work with MySQL and the existing mailer', async () => {
   const email = `verification-${marker}@example.com`;
   const agent = request.agent(app.getHttpServer());
-  await agent.post('/auth/login').send({ email, password }).expect(201);
+  const remembered = await agent.post('/auth/login').send({ email, password, remember: true }).expect(201);
+  const sessionToken = decodeURIComponent(remembered.headers['set-cookie'][0].split(';')[0].slice('perpus_session='.length));
+  const sessionPayload = await jwt.verifyAsync(sessionToken);
+  assert.equal(sessionPayload.exp - sessionPayload.iat, 30 * 24 * 60 * 60);
   const me = await agent.get('/auth/me').expect(200);
   assert.equal(me.body.emailVerified, true);
   assert.equal(me.body.role, 'ADMIN');
@@ -253,7 +256,8 @@ await test('session, logout and one-use reset work with MySQL and the existing m
   await request(app.getHttpServer()).post('/auth/reset-password').send({ token: 'invalid', password: newPassword }).expect(400);
   const expired = await jwt.signAsync({ sub: ids[0], email, purpose: 'password-reset' }, { secret: settings.PASSWORD_RESET_SECRET, expiresIn: -1, audience: 'perpus-password-reset', issuer: 'perpus-api' });
   await request(app.getHttpServer()).post('/auth/reset-password').send({ token: expired, password: newPassword }).expect(400);
-  await request(app.getHttpServer()).post('/auth/reset-password').send({ token, password: newPassword }).expect(200);
+  const reset = await request(app.getHttpServer()).post('/auth/reset-password').send({ token, password: newPassword }).expect(200);
+  assert.equal(reset.body.message, 'Password berhasil diperbarui.');
   await request(app.getHttpServer()).post('/auth/reset-password').send({ token, password: newPassword }).expect(400);
   await oldSession.get('/auth/me').expect(401);
   const saved = await prisma.user.findUnique({ where: { id: ids[0] } });
@@ -289,6 +293,9 @@ await test('SMTP unavailable preserves new pending account and never claims deli
     .post('/auth/resend-verification')
     .send({ email })
     .expect(503);
+  settings.SMTP_HOST = '';
+  const unconfigured = await request(app.getHttpServer()).post('/auth/resend-verification').send({ email }).expect(503);
+  assert.equal(unconfigured.body.message, 'Layanan email belum dikonfigurasi.');
 });
 after(async () => {
   if (prisma && ids.length)

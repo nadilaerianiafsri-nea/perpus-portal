@@ -65,12 +65,17 @@ export class AuthController {
       throw new BadRequestException('Email dan kata sandi wajib diisi.');
     }
 
-    const result = await this.authService.login(body.email, body.password);
+    const remember = body.remember === true;
+    const result = await this.authService.login(
+      body.email,
+      body.password,
+      remember,
+    );
 
     this.setSessionCookie(
       response,
       result.token,
-      body.remember ? 30 * 24 * 60 * 60 * 1000 : 8 * 60 * 60 * 1000,
+      remember ? 30 * 24 * 60 * 60 * 1000 : 8 * 60 * 60 * 1000,
     );
 
     return {

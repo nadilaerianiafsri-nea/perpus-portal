@@ -33,14 +33,17 @@ export class AuthService {
     private readonly verification: EmailVerificationService,
   ) {}
 
-  private async createSession(user: {
-    id: number;
-    name: string;
-    email: string;
-    role: Role;
-    memberType?: MemberType | null;
-    passwordHash: string;
-  }) {
+  private async createSession(
+    user: {
+      id: number;
+      name: string;
+      email: string;
+      role: Role;
+      memberType?: MemberType | null;
+      passwordHash: string;
+    },
+    remember = false,
+  ) {
     const payload: SessionPayload = {
       credentialVersion: createHmac(
         'sha256',
@@ -54,7 +57,9 @@ export class AuthService {
       role: user.role,
     };
 
-    const token = await this.jwtService.signAsync(payload);
+    const token = await this.jwtService.signAsync(payload, {
+      expiresIn: remember ? '30d' : '8h',
+    });
 
     return {
       token,
@@ -69,7 +74,7 @@ export class AuthService {
     };
   }
 
-  async login(emailInput: string, password: string) {
+  async login(emailInput: string, password: string, remember = false) {
     const email = emailInput.trim().toLowerCase();
 
     const user = await this.prisma.user.findUnique({
@@ -93,7 +98,7 @@ export class AuthService {
       });
     }
 
-    return this.createSession(user);
+    return this.createSession(user, remember);
   }
 
   async register(body: unknown) {
@@ -144,7 +149,7 @@ export class AuthService {
       return {
         message: verificationEmailSent
           ? 'Pendaftaran berhasil. Email verifikasi telah dikirim; akun menunggu verifikasi email.'
-          : 'Pendaftaran berhasil dan akun menunggu verifikasi email. Email verifikasi belum dapat dikirim.',
+          : 'Pendaftaran berhasil dan akun menunggu verifikasi email. Layanan email belum dikonfigurasi atau belum dapat mengirim email.',
         verificationEmailSent,
         data: {
           id: user.id,

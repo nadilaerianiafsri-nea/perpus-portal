@@ -6,6 +6,19 @@ import nodemailer from 'nodemailer';
 export class MailService {
   constructor(private readonly config: ConfigService) {}
 
+  isConfigured(): boolean {
+    const port = Number(this.config.get<string>('SMTP_PORT'));
+    return (
+      !!this.config.get<string>('SMTP_HOST')?.trim() &&
+      !!this.config.get<string>('MAIL_FROM')?.trim() &&
+      Number.isInteger(port) &&
+      port >= 1 &&
+      port <= 65535 &&
+      !!this.config.get<string>('SMTP_USER') ===
+        !!this.config.get<string>('SMTP_PASS')
+    );
+  }
+
   async sendVerificationEmail(email: string, link: string): Promise<boolean> {
     return this.send(email, link, false);
   }
@@ -17,20 +30,12 @@ export class MailService {
     link: string,
     reset: boolean,
   ): Promise<boolean> {
-    const host = this.config.get<string>('SMTP_HOST')?.trim();
+    const host = this.config.get<string>('SMTP_HOST')?.trim() ?? '';
     const port = Number(this.config.get<string>('SMTP_PORT'));
     const from = this.config.get<string>('MAIL_FROM')?.trim();
     const user = this.config.get<string>('SMTP_USER');
     const pass = this.config.get<string>('SMTP_PASS');
-    if (
-      !host ||
-      !from ||
-      !Number.isInteger(port) ||
-      port < 1 ||
-      port > 65535 ||
-      !!user !== !!pass
-    )
-      return false;
+    if (!this.isConfigured()) return false;
     const secure =
       this.config.get<string>('SMTP_SECURE') === 'true' || port === 465;
     const local = ['localhost', '127.0.0.1', '::1'].includes(host);

@@ -26,6 +26,7 @@ describe('Email verification HTTP flow', () => {
     emailVerified: boolean;
   };
   const mail = {
+    isConfigured: () => true,
     sendVerificationEmail: jest.fn(
       async (_email: string, _link: string) => true,
     ),

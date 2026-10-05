@@ -54,6 +54,10 @@ export class PasswordResetService {
     if (email.length > 191 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
       throw new BadRequestException('Email tidak valid.');
     const secret = this.secret();
+    if (!this.mail.isConfigured())
+      throw new ServiceUnavailableException(
+        'Layanan email belum dikonfigurasi.',
+      );
     let url: URL;
     try {
       url = new URL(this.config.get<string>('PASSWORD_RESET_URL') ?? '');
@@ -174,6 +178,6 @@ export class PasswordResetService {
     });
     if (!result.count)
       throw new BadRequestException('Token reset sudah digunakan.');
-    return { message: 'Kata sandi berhasil diubah. Silakan masuk kembali.' };
+    return { message: 'Password berhasil diperbarui.' };
   }
 }

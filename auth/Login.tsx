@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FiEye, FiEyeOff } from "react-icons/fi";
@@ -30,11 +30,13 @@ export default function Login() {
   const [pendingEmail, setPendingEmail] = useState("");
   const [info, setInfo] = useState("");
   const [loading, setLoading] = useState(false);
+  const submissionLocked = useRef(false);
 
   async function handleLogin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (loading) return;
+    if (submissionLocked.current) return;
+    submissionLocked.current = true;
     setPendingEmail("");
     setError("");
     setInfo("");
@@ -51,6 +53,7 @@ export default function Login() {
           password,
           remember,
         }),
+        signal: AbortSignal.timeout(15000),
       });
 
       const data = (await response.json()) as LoginResponse;
@@ -58,7 +61,7 @@ export default function Login() {
       if (!response.ok || !data.user) {
         if (data.code === "EMAIL_NOT_VERIFIED") setPendingEmail(email.trim().toLowerCase());
         setError(
-          data.message ??
+          (typeof data.message === "string" ? data.message : undefined) ??
             "Login gagal. Periksa kembali email dan kata sandi.",
         );
         return;
@@ -73,10 +76,11 @@ export default function Login() {
       router.refresh();
     } catch {
       setError(
-        "Backend tidak dapat dihubungi. Pastikan NestJS berjalan di port 3001.",
+        "Server tidak dapat dihubungi. Silakan coba lagi.",
       );
     } finally {
       setLoading(false);
+      submissionLocked.current = false;
     }
   }
 
@@ -175,7 +179,7 @@ export default function Login() {
             disabled={loading}
           >
             {loading
-              ? "Memeriksa..."
+              ? "Masuk..."
               : "Masuk"}
           </button>
 
