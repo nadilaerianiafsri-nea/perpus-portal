@@ -12,6 +12,7 @@ import { MemberType, Prisma, Role } from '../generated/prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
+import { EmailVerificationService } from './email-verification.service';
 
 export type SessionPayload = {
   sub: number;
@@ -25,6 +26,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly verification: EmailVerificationService,
   ) {}
 
   private async createSession(user: {
@@ -122,8 +124,13 @@ export class AuthService {
         });
         return created;
       });
+      const verificationEmailSent =
+        await this.verification.sendRegistrationVerification(user);
       return {
-        message: 'Pendaftaran berhasil dan akun menunggu verifikasi email.',
+        message: verificationEmailSent
+          ? 'Pendaftaran berhasil. Email verifikasi telah dikirim; akun menunggu verifikasi email.'
+          : 'Pendaftaran berhasil dan akun menunggu verifikasi email. Email verifikasi belum dapat dikirim.',
+        verificationEmailSent,
         data: {
           id: user.id,
           email: user.email,
@@ -140,6 +147,14 @@ export class AuthService {
       }
       throw error;
     }
+  }
+
+  async verifyEmail(token: unknown) {
+    return this.verification.verifyEmail(token);
+  }
+
+  async resendVerification(body: unknown) {
+    return this.verification.resendVerification(body);
   }
 
   async getUserById(id: number) {

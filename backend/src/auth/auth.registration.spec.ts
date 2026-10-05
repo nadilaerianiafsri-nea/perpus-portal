@@ -10,6 +10,7 @@ import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma } from '../generated/prisma/client';
+import { EmailVerificationService } from './email-verification.service';
 
 describe('Registration HTTP contract', () => {
   let app: INestApplication;
@@ -50,6 +51,10 @@ describe('Registration HTTP contract', () => {
       controllers: [AuthController],
       providers: [
         AuthService,
+        {
+          provide: EmailVerificationService,
+          useValue: { sendRegistrationVerification: async () => false },
+        },
         JwtAuthGuard,
         { provide: PrismaService, useValue: prisma },
         {

@@ -35,7 +35,7 @@ HTTP 201:
 }
 ```
 
-Registrasi tidak membuat session cookie/token dan tidak mengirim email. Login dan `/auth/me` menolak akun pending dengan HTTP 403. Response tidak menyertakan password, hash, WhatsApp, alamat, atau identitas. Error validasi HTTP 400 berisi `message` dan `errors` per field; email duplikat HTTP 409, termasuk benturan dua request bersamaan.
+Registrasi tidak membuat session cookie/token. Sejak TUGAS 4, backend mencoba mengirim email verifikasi setelah akun tersimpan dan menyertakan `verificationEmailSent` pada response. Bila SMTP belum tersedia, akun tetap pending dan response menyatakan email belum dapat dikirim. Lihat [EMAIL-VERIFICATION.md](./EMAIL-VERIFICATION.md). Login dan `/auth/me` menolak akun pending dengan HTTP 403. Response tidak menyertakan password, hash, WhatsApp, alamat, atau identitas. Error validasi HTTP 400 berisi `message` dan `errors` per field; email duplikat HTTP 409, termasuk benturan dua request bersamaan.
 
 ## Database dan migration
 
@@ -78,4 +78,4 @@ Tes memeriksa HTTP, nilai User/Profile, hash bcrypt, status pending, duplicate/c
 
 ## Tahap berikutnya
 
-Hubungkan form melalui proxy `/api/auth/register` existing dengan nama field di atas, lalu tangani response `data` dan error per field. Jangan redirect ke dashboard sebagai akun aktif setelah registrasi. Sistem pengiriman/verifikasi email belum dibuat.
+Form telah dihubungkan melalui proxy `/api/auth/register` pada TUGAS 3. Backend verifikasi email ditambahkan pada TUGAS 4; konfigurasi SMTP dan secret dijelaskan di [EMAIL-VERIFICATION.md](./EMAIL-VERIFICATION.md). Registrasi tetap tidak otomatis masuk ke dashboard.

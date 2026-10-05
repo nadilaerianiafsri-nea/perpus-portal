@@ -11,6 +11,7 @@ import { AuthController } from '../dist/auth/auth.controller.js';
 import { AuthService } from '../dist/auth/auth.service.js';
 import { JwtAuthGuard } from '../dist/auth/jwt-auth.guard.js';
 import { PrismaService } from '../dist/prisma/prisma.service.js';
+import { EmailVerificationService } from '../dist/auth/email-verification.service.js';
 
 // Never run this write/rollback test against an application database.
 const databaseUrl = process.env.REGISTRATION_TEST_DATABASE_URL;
@@ -44,6 +45,7 @@ before(async () => {
     controllers: [AuthController],
     providers: [
       AuthService,
+      { provide: EmailVerificationService, useValue: { sendRegistrationVerification: async () => false } },
       PrismaService,
       JwtAuthGuard,
       {

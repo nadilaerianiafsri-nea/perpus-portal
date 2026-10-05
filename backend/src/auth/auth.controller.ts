@@ -3,7 +3,10 @@ import {
   Body,
   Controller,
   Get,
+  Header,
+  HttpCode,
   Post,
+  Query,
   Req,
   Res,
   UseGuards,
@@ -66,6 +69,20 @@ export class AuthController {
   @Post('register')
   async register(@Body() body: unknown) {
     return this.authService.register(body);
+  }
+
+  @Get('verify-email')
+  @Header('Cache-Control', 'no-store')
+  @Header('Referrer-Policy', 'no-referrer')
+  async verifyEmail(@Query('token') token: unknown) {
+    return this.authService.verifyEmail(token);
+  }
+
+  @Post('resend-verification')
+  @HttpCode(200)
+  @Header('Cache-Control', 'no-store')
+  async resendVerification(@Body() body: unknown) {
+    return this.authService.resendVerification(body);
   }
 
   @UseGuards(JwtAuthGuard)
