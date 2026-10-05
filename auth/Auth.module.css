@@ -350,6 +350,112 @@
   border: 6px solid var(--navyButton);
 }
 
+/* Registration overrides are scoped so the existing login retains its layout. */
+.registrationPage {
+  --navyButton: #2B3056;
+  align-items: start;
+  font-family: inherit;
+}
+.registrationPage .brandPanel {
+  height: 100dvh;
+  padding: 50px 48px;
+}
+.registrationPage .brandMark { width: 40px; height: 40px; }
+.registrationPage .brandCopy strong { font-size: 18px; }
+.registrationPage .brandCopy small { font-size: 12px; }
+.registrationPage .heroCopy h1 {
+  font-size: clamp(36px, 3.35vw, 48px);
+  line-height: 1.44;
+  letter-spacing: -0.025em;
+}
+.registrationPage .heroCopy p {
+  max-width: 440px;
+  margin-top: 20px;
+  font-size: 18px;
+  line-height: 1.5;
+}
+.registrationPage .formPanel {
+  padding: 44px 32px 32px;
+  background: #F5F5F5;
+}
+.registrationPage .registerWrap { width: min(100%, 448px); }
+.registrationPage .heading { margin-bottom: 28px; }
+.registrationPage .heading h2 { font-size: 34px; line-height: 1.15; }
+.registrationPage .heading p { margin-top: 12px; font-size: 16px; }
+.registrationPage .primaryButton { min-height: 48px; font-weight: 500; }
+.registrationPage .memberList { padding: 0; border: 0; min-width: 0; }
+.registrationPage .memberCard:focus-within { outline: 3px solid #FFD000; outline-offset: 3px; }
+.membershipRadio {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--navyButton);
+  cursor: pointer;
+}
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.backToMembership {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 18px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--navy);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.registrationCard {
+  gap: 20px;
+  padding: 26px 24px;
+  border-color: #E9E9E9;
+  border-radius: 12px;
+  box-shadow: none;
+}
+.registrationCard .field { min-width: 0; gap: 7px; }
+.registrationCard .field > label { color: #333; font-size: 14px; font-weight: 400; }
+.registrationCard .field b { color: #FF3B2F; font-weight: 400; }
+.registrationCard .field input { height: 44px; padding-left: 14px; border-color: #E1E1E1; border-radius: 8px; }
+.registrationCard .field input[aria-invalid="true"] { border-color: #FF3B2F; }
+.fieldHelper { color: #777; font-size: 12px; line-height: 1.5; }
+.fieldError { display: block; color: #B42318; font-size: 12px; line-height: 1.5; }
+.passwordColumns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.consent { display: flex; align-items: flex-start; gap: 10px; color: #444; font-size: 13px; line-height: 1.5; }
+.consent input { width: 18px; height: 18px; flex-shrink: 0; margin: 1px 0 0; accent-color: var(--navyButton); }
+.activationNote { margin: -4px 0 0; color: #777; text-align: center; font-size: 12px; line-height: 1.6; }
+.registrationNotice { margin: 0; padding: 12px; background: #FFFAE6; color: var(--navy); font-size: 13px; line-height: 1.6; }
+
+@media (max-width: 1180px) and (min-width: 821px) {
+  .registrationPage .brandPanel { padding-inline: 32px; }
+  .registrationPage .heroCopy h1 { font-size: 36px; }
+  .registrationPage .heroCopy p { font-size: 16px; }
+  .registrationPage .formPanel { padding-inline: 24px; }
+}
+@media (max-width: 820px) {
+  .registrationPage .brandPanel { height: auto; min-height: auto; padding: 24px; }
+  .registrationPage .heroCopy { margin: 24px 0 0; }
+  .registrationPage .heroCopy h1 { font-size: 30px; line-height: 1.2; }
+  .registrationPage .heroCopy p { margin-top: 12px; font-size: 14px; }
+  .registrationPage .formPanel { padding: 32px 24px 40px; }
+}
+@media (max-width: 520px) {
+  .registrationPage .brandPanel { padding: 20px; }
+  .registrationPage .heroCopy { display: none; }
+  .registrationPage .formPanel { padding: 28px 18px 36px; }
+  .registrationPage .heading h2 { font-size: 28px; }
+  .registrationPage .registrationCard { padding: 22px 16px; }
+  .passwordColumns { grid-template-columns: 1fr; gap: 20px; }
+}
+
 @media (max-width: 1180px) {
   .authPage {
     grid-template-columns: 43% 57%;

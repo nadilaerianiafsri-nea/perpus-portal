@@ -3,11 +3,12 @@ import styles from "./Auth.module.css";
 
 type AuthShellProps = {
   children: React.ReactNode;
+  registration?: boolean;
 };
 
-export default function AuthShell({ children }: AuthShellProps) {
+export default function AuthShell({ children, registration = false }: AuthShellProps) {
   return (
-    <main className={styles.authPage}>
+    <main className={`${styles.authPage} ${registration ? styles.registrationPage : ""}`}>
       <aside className={styles.brandPanel}>
         <Link href="/" className={styles.brand}>
           <span className={styles.brandMark}>P</span>

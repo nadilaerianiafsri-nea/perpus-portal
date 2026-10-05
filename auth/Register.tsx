@@ -1,487 +1,131 @@
-"use client";
+﻿"use client";
 
-import {
-  FormEvent,
-  useState,
-} from "react";
+import { type FormEvent, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-
-import {
-  FiBriefcase,
-  FiEye,
-  FiEyeOff,
-  FiUser,
-} from "react-icons/fi";
-
+import { FiArrowLeft, FiBriefcase, FiEye, FiEyeOff, FiUser } from "react-icons/fi";
 import { PiStudent } from "react-icons/pi";
-
 import AuthShell from "./AuthShell";
+import { type MemberType, type RegistrationErrors, type RegistrationValues, validateRegistration } from "./registrationValidation";
 import styles from "./Auth.module.css";
 
-type MemberType =
-  | "umum"
-  | "mahasiswa"
-  | "pegawai";
+const memberOptions = [
+  { value: "umum", title: "Masyarakat Umum", description: "Untuk pemustaka umum dengan identitas NIK/KTP.", icon: FiUser },
+  { value: "mahasiswa", title: "Mahasiswa", description: "Untuk mahasiswa dengan NIM/KTM dan perguruan tinggi.", icon: PiStudent },
+  { value: "pegawai", title: "Pegawai Internal", description: "Untuk pegawai internal Kemenkum Riau dengan unit kerja.", icon: FiBriefcase },
+] as const;
 
-type RegisterResponse = {
-  user?: {
-    id: number;
-    name: string;
-    email: string;
-    role: "ADMIN" | "PENGUNJUNG";
-  };
-  message?: string;
+type FieldProps = {
+  name: Exclude<keyof RegistrationValues, "consent">;
+  label: string; placeholder: string; value: string; onChange: (value: string) => void;
+  error?: string; helper?: string; type?: "text" | "email" | "tel" | "password"; autoComplete?: string;
 };
 
-const memberOptions = [
-  {
-    value: "umum" as MemberType,
-    title: "Masyarakat Umum",
-    description:
-      "Untuk pemustaka umum dengan identitas NIK/KTP.",
-    icon: FiUser,
-  },
-  {
-    value: "mahasiswa" as MemberType,
-    title: "Mahasiswa",
-    description:
-      "Untuk mahasiswa dengan NIM/KTM dan perguruan tinggi.",
-    icon: PiStudent,
-  },
-  {
-    value: "pegawai" as MemberType,
-    title: "Pegawai Internal",
-    description:
-      "Untuk pegawai internal Kemenkum Riau dengan unit kerja.",
-    icon: FiBriefcase,
-  },
-];
+function FormField({ name, label, placeholder, value, onChange, error, helper, type = "text", autoComplete }: FieldProps) {
+  const [visible, setVisible] = useState(false);
+  const password = type === "password";
+  const input = <input id={name} name={name} type={password && visible ? "text" : type} placeholder={placeholder}
+    autoComplete={autoComplete} value={value} onChange={(event) => onChange(event.target.value)} required
+    minLength={password ? 8 : undefined} aria-invalid={!!error}
+    aria-describedby={[helper ? `${name}-helper` : "", error ? `${name}-error` : ""].filter(Boolean).join(" ") || undefined} />;
+  return <div className={styles.field}>
+    <label htmlFor={name}>{label} <b>*</b></label>
+    {password ? <div className={styles.password}>{input}
+      <button type="button" aria-label={`${visible ? "Sembunyikan" : "Tampilkan"} ${label.toLowerCase()}`} aria-pressed={visible}
+        onClick={() => setVisible(!visible)}>{visible ? <FiEyeOff /> : <FiEye />}</button>
+    </div> : input}
+    {helper && <small id={`${name}-helper`} className={styles.fieldHelper}>{helper}</small>}
+    {error && <small id={`${name}-error`} className={styles.fieldError}>{error}</small>}
+  </div>;
+}
 
 export default function Register() {
-  const router = useRouter();
+  const [step, setStep] = useState<1 | 2>(1);
+  const [memberType, setMemberType] = useState<MemberType>("umum");
+  const [values, setValues] = useState<RegistrationValues>({ name: "", email: "", whatsapp: "", address: "", identity: "", university: "", division: "", password: "", confirmPassword: "", consent: false });
+  const [errors, setErrors] = useState<RegistrationErrors>({});
+  const [notice, setNotice] = useState("");
+  const heading = useRef<HTMLHeadingElement>(null);
+  const form = useRef<HTMLFormElement>(null);
+  const selected = memberOptions.find((option) => option.value === memberType)!;
 
-  const [step, setStep] =
-    useState<1 | 2>(1);
-
-  const [memberType, setMemberType] =
-    useState<MemberType>("umum");
-
-  const [name, setName] = useState("");
-  const [email, setEmail] =
-    useState("");
-  const [password, setPassword] =
-    useState("");
-  const [
-    confirmPassword,
-    setConfirmPassword,
-  ] = useState("");
-
-  const [
-    showPassword,
-    setShowPassword,
-  ] = useState(false);
-
-  const [loading, setLoading] =
-    useState(false);
-
-  const [error, setError] =
-    useState("");
-
-  async function handleRegister(
-    event: FormEvent<HTMLFormElement>,
-  ) {
-    event.preventDefault();
-
-    setError("");
-
-    if (name.trim().length < 3) {
-      setError(
-        "Nama lengkap minimal 3 karakter.",
-      );
-      return;
-    }
-
-    if (password.length < 8) {
-      setError(
-        "Kata sandi minimal 8 karakter.",
-      );
-      return;
-    }
-
-    if (
-      password !== confirmPassword
-    ) {
-      setError(
-        "Konfirmasi kata sandi tidak sama.",
-      );
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const response = await fetch(
-        "/api/auth/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-          body: JSON.stringify({
-            name,
-            email,
-            password,
-            memberType,
-          }),
-        },
-      );
-
-      const data =
-        (await response.json()) as RegisterResponse;
-
-      if (
-        !response.ok ||
-        !data.user
-      ) {
-        setError(
-          data.message ??
-            "Registrasi gagal. Silakan periksa kembali data Anda.",
-        );
-        return;
-      }
-
-      router.replace("/pengunjung");
-      router.refresh();
-    } catch {
-      setError(
-        "Registrasi tidak dapat diproses. Pastikan backend berjalan.",
-      );
-    } finally {
-      setLoading(false);
-    }
+  function update<K extends keyof RegistrationValues>(name: K, value: RegistrationValues[K]) {
+    setValues((previous) => ({ ...previous, [name]: value }));
+    setErrors((previous) => ({ ...previous, [name]: undefined }));
+    setNotice("");
   }
+  function changeStep(next: 1 | 2) {
+    setStep(next); setErrors({}); setNotice("");
+    requestAnimationFrame(() => {
+      heading.current?.focus({ preventScroll: true });
+      heading.current?.scrollIntoView({ block: "start" });
+    });
+  }
+  function handleRegister(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const nextErrors = validateRegistration(values, memberType);
+    setErrors(nextErrors); setNotice("");
+    if (Object.keys(nextErrors).length) {
+      requestAnimationFrame(() => form.current?.querySelector<HTMLInputElement>('[aria-invalid="true"]')?.focus());
+      return;
+    }
+    // The current API discards membership details and activates accounts before email verification.
+    setNotice("Data sudah valid, tetapi pendaftaran belum dikirim. Penyimpanan data keanggotaan dan verifikasi email belum tersedia pada layanan pendaftaran saat ini.");
+  }
+  const field = (name: FieldProps["name"], label: string, placeholder: string, helper?: string, type?: FieldProps["type"], autoComplete?: string) =>
+    <FormField key={name} name={name} label={label} placeholder={placeholder} helper={helper} type={type} autoComplete={autoComplete}
+      value={values[name]} onChange={(value) => update(name, value)} error={errors[name]} />;
 
-  return (
-    <AuthShell>
-      <div
-        className={`${styles.formWrap} ${styles.registerWrap}`}
-      >
-        {step === 1 ? (
-          <>
-            <header
-              className={styles.heading}
-            >
-              <h2>Daftar Anggota</h2>
-              <p>
-                Pilih jenis keanggotaan
-                Anda.
-              </p>
-            </header>
-
-            <div
-              className={
-                styles.memberList
-              }
-            >
-              {memberOptions.map(
-                (option) => {
-                  const Icon =
-                    option.icon;
-
-                  const active =
-                    memberType ===
-                    option.value;
-
-                  return (
-                    <button
-                      key={
-                        option.value
-                      }
-                      type="button"
-                      className={`${styles.memberCard} ${
-                        active
-                          ? styles.memberCardActive
-                          : ""
-                      }`}
-                      onClick={() => {
-                        setMemberType(
-                          option.value,
-                        );
-                        setError("");
-                      }}
-                    >
-                      <span
-                        className={
-                          styles.memberIcon
-                        }
-                      >
-                        <Icon />
-                      </span>
-
-                      <span
-                        className={
-                          styles.memberCopy
-                        }
-                      >
-                        <strong>
-                          {
-                            option.title
-                          }
-                        </strong>
-
-                        <small>
-                          {
-                            option.description
-                          }
-                        </small>
-                      </span>
-
-                      <span
-                        className={`${styles.radio} ${
-                          active
-                            ? styles.radioActive
-                            : ""
-                        }`}
-                      />
-                    </button>
-                  );
-                },
-              )}
-            </div>
-
-            <button
-              className={
-                styles.primaryButton
-              }
-              type="button"
-              onClick={() => {
-                setError("");
-                setStep(2);
-              }}
-            >
-              Lanjutkan
-            </button>
-
-            <p
-              className={
-                styles.switchText
-              }
-            >
-              Sudah punya akun?{" "}
-              <Link href="/login">
-                Masuk
-              </Link>
-            </p>
-          </>
-        ) : (
-          <>
-            <header
-              className={styles.heading}
-            >
-              <h2>Lengkapi Data</h2>
-              <p>
-                Isi data akun untuk
-                menyelesaikan pendaftaran.
-              </p>
-            </header>
-
-            <form
-              className={
-                styles.loginCard
-              }
-              onSubmit={
-                handleRegister
-              }
-            >
-              <label
-                className={
-                  styles.field
-                }
-              >
-                <span>
-                  Nama Lengkap{" "}
-                  <b>*</b>
-                </span>
-
-                <input
-                  type="text"
-                  placeholder="Nama lengkap"
-                  autoComplete="name"
-                  value={name}
-                  onChange={(event) =>
-                    setName(
-                      event.target
-                        .value,
-                    )
-                  }
-                  required
-                />
-              </label>
-
-              <label
-                className={
-                  styles.field
-                }
-              >
-                <span>
-                  Email <b>*</b>
-                </span>
-
-                <input
-                  type="email"
-                  placeholder="nama@email.com"
-                  autoComplete="email"
-                  value={email}
-                  onChange={(event) =>
-                    setEmail(
-                      event.target
-                        .value,
-                    )
-                  }
-                  required
-                />
-              </label>
-
-              <label
-                className={
-                  styles.field
-                }
-              >
-                <span>
-                  Kata Sandi{" "}
-                  <b>*</b>
-                </span>
-
-                <div
-                  className={
-                    styles.password
-                  }
-                >
-                  <input
-                    type={
-                      showPassword
-                        ? "text"
-                        : "password"
-                    }
-                    placeholder="Minimal 8 karakter"
-                    autoComplete="new-password"
-                    value={password}
-                    onChange={(
-                      event,
-                    ) =>
-                      setPassword(
-                        event.target
-                          .value,
-                      )
-                    }
-                    required
-                  />
-
-                  <button
-                    type="button"
-                    aria-label={
-                      showPassword
-                        ? "Sembunyikan kata sandi"
-                        : "Tampilkan kata sandi"
-                    }
-                    onClick={() =>
-                      setShowPassword(
-                        (value) =>
-                          !value,
-                      )
-                    }
-                  >
-                    {showPassword ? (
-                      <FiEyeOff />
-                    ) : (
-                      <FiEye />
-                    )}
-                  </button>
-                </div>
-              </label>
-
-              <label
-                className={
-                  styles.field
-                }
-              >
-                <span>
-                  Konfirmasi Kata
-                  Sandi <b>*</b>
-                </span>
-
-                <input
-                  type={
-                    showPassword
-                      ? "text"
-                      : "password"
-                  }
-                  placeholder="Ulangi kata sandi"
-                  autoComplete="new-password"
-                  value={
-                    confirmPassword
-                  }
-                  onChange={(event) =>
-                    setConfirmPassword(
-                      event.target
-                        .value,
-                    )
-                  }
-                  required
-                />
-              </label>
-
-              <button
-                className={
-                  styles.primaryButton
-                }
-                type="submit"
-                disabled={loading}
-              >
-                {loading
-                  ? "Mendaftarkan..."
-                  : "Daftar Anggota"}
-              </button>
-
-              <button
-                className={
-                  styles.googleButton
-                }
-                type="button"
-                onClick={() => {
-                  setError("");
-                  setStep(1);
-                }}
-              >
-                Kembali
-              </button>
-
-              {error && (
-                <p
-                  className={
-                    styles.inlineInfo
-                  }
-                >
-                  {error}
-                </p>
-              )}
-            </form>
-
-            <p
-              className={
-                styles.switchText
-              }
-            >
-              Sudah punya akun?{" "}
-              <Link href="/login">
-                Masuk
-              </Link>
-            </p>
-          </>
-        )}
-      </div>
-    </AuthShell>
-  );
+  return <AuthShell registration>
+    <div className={`${styles.formWrap} ${styles.registerWrap}`}>
+      <header className={styles.heading}>
+        <h2 ref={heading} tabIndex={-1}>{step === 1 ? "Daftar Anggota" : "Formulir Pendaftaran"}</h2>
+        <p>{step === 1 ? "Pilih jenis keanggotaan Anda." : `Jenis anggota: ${selected.title}`}</p>
+      </header>
+      {step === 1 ? <>
+        <fieldset className={styles.memberList}>
+          <legend className={styles.visuallyHidden}>Jenis keanggotaan</legend>
+          {memberOptions.map((option) => {
+            const Icon = option.icon;
+            const active = memberType === option.value;
+            return <label key={option.value} className={`${styles.memberCard} ${active ? styles.memberCardActive : ""}`}>
+              <span className={styles.memberIcon}><Icon aria-hidden="true" /></span>
+              <span className={styles.memberCopy}><strong>{option.title}</strong><small>{option.description}</small></span>
+              <input className={styles.membershipRadio} type="radio" name="memberType" value={option.value} checked={active}
+                onChange={() => { setMemberType(option.value); setErrors({}); setNotice(""); }} />
+            </label>;
+          })}
+        </fieldset>
+        <button className={styles.primaryButton} type="button" onClick={() => changeStep(2)}>Lanjutkan</button>
+        <p className={styles.switchText}>Sudah punya akun? <Link href="/login">Masuk</Link></p>
+      </> : <>
+        <button className={styles.backToMembership} type="button" onClick={() => changeStep(1)}><FiArrowLeft aria-hidden="true" /> Ubah jenis anggota</button>
+        <form ref={form} className={`${styles.loginCard} ${styles.registrationCard}`} onSubmit={handleRegister} noValidate>
+          {field("name", "Nama Lengkap", "Nama sesuai identitas", undefined, "text", "name")}
+          {field("email", "Email", "nama@email.com", "Digunakan untuk verifikasi & pengingat layanan.", "email", "email")}
+          {field("whatsapp", "Nomor WhatsApp", "+62 8xx-xxxx-xxxx", "Wajib. Digunakan untuk pengingat layanan (jatuh tempo, reservasi). Tidak dapat dinonaktifkan.", "tel", "tel")}
+          {field("address", "Alamat", "Alamat domisili", undefined, "text", "street-address")}
+          {field("identity", memberType === "pegawai" ? "Nomor Identitas Pegawai" : `Nomor Identitas (${memberType === "mahasiswa" ? "NIM/KTM" : "NIK/KTP"})`,
+            memberType === "pegawai" ? "Nomor identitas pegawai" : `Nomor ${memberType === "mahasiswa" ? "NIM/KTM" : "NIK/KTP"}`,
+            memberType === "pegawai" ? "Label dapat disesuaikan dengan nomenklatur resmi." : "Cukup ketik nomor. Tidak perlu unggah foto.")}
+          {memberType === "mahasiswa" && field("university", "Nama Perguruan Tinggi", "Nama perguruan tinggi")}
+          {memberType === "pegawai" && field("division", "Unit Kerja / Divisi", "Unit kerja / divisi")}
+          <div className={styles.passwordColumns}>
+            {field("password", "Kata Sandi", "Minimal 8 karakter", undefined, "password", "new-password")}
+            {field("confirmPassword", "Konfirmasi Kata Sandi", "Ulangi kata sandi", undefined, "password", "new-password")}
+          </div>
+          <div>
+            <label className={styles.consent}>
+              <input id="consent" name="consent" type="checkbox" checked={values.consent} onChange={(event) => update("consent", event.target.checked)}
+                required aria-invalid={!!errors.consent} aria-describedby={errors.consent ? "consent-error" : undefined} />
+              <span>Saya menyetujui [Syarat Layanan] dan [Kebijakan Privasi].</span>
+            </label>
+            {errors.consent && <small id="consent-error" className={styles.fieldError}>{errors.consent}</small>}
+          </div>
+          <button className={styles.primaryButton} type="submit">Daftar</button>
+          {notice && <p className={styles.registrationNotice} role="status">{notice}</p>}
+          <p className={styles.activationNote}>Akun langsung aktif setelah verifikasi email — tanpa persetujuan admin.</p>
+        </form>
+      </>}
+    </div>
+  </AuthShell>;
 }
