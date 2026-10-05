@@ -8,7 +8,7 @@ import {
   MemberType,
   PrismaClient,
   Role,
-} from "../generated/prisma/client";
+} from "../src/generated/prisma/client";
 
 function createAdapter() {
   const databaseUrl =
@@ -123,6 +123,7 @@ async function main() {
         role: user.role,
         memberType:
           user.memberType,
+        emailVerified: true,
       },
 
       create: {
@@ -132,6 +133,7 @@ async function main() {
         role: user.role,
         memberType:
           user.memberType,
+        emailVerified: true,
       },
     });
   }

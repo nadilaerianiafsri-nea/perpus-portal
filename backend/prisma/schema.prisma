@@ -21,14 +21,31 @@ enum MemberType {
 }
 
 model User {
-  id           Int         @id @default(autoincrement())
-  name         String
-  email        String      @unique
-  passwordHash String
-  role         Role        @default(PENGUNJUNG)
-  memberType   MemberType?
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  id            Int            @id @default(autoincrement())
+  name          String
+  email         String         @unique
+  passwordHash  String
+  role          Role           @default(PENGUNJUNG)
+  memberType    MemberType?
+  emailVerified Boolean        @default(false)
+  memberProfile MemberProfile?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 
   @@map("users")
+}
+
+model MemberProfile {
+  id             Int      @id @default(autoincrement())
+  userId         Int      @unique
+  user           User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  whatsapp       String   @db.VarChar(32)
+  address        String   @db.Text
+  identityNumber String
+  universityName String?
+  workUnit       String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("member_profiles")
 }

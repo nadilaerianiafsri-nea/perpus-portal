@@ -1,6 +1,6 @@
 import {
-  BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -8,25 +8,16 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcrypt';
 
-import {
-  MemberType,
-  Role,
-} from '../../generated/prisma/client';
+import { MemberType, Prisma, Role } from '../generated/prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
+import { RegisterDto } from './dto/register.dto';
 
 export type SessionPayload = {
   sub: number;
   name: string;
   email: string;
   role: 'ADMIN' | 'PENGUNJUNG';
-};
-
-type RegisterInput = {
-  name: string;
-  email: string;
-  password: string;
-  memberType: string;
 };
 
 @Injectable()
@@ -50,10 +41,7 @@ export class AuthService {
       role: user.role,
     };
 
-    const token =
-      await this.jwtService.signAsync(
-        payload,
-      );
+    const token = await this.jwtService.signAsync(payload);
 
     return {
       token,
@@ -62,164 +50,123 @@ export class AuthService {
         name: user.name,
         email: user.email,
         role: user.role,
-        memberType:
-          user.memberType ?? null,
+        memberType: user.memberType ?? null,
       },
     };
   }
 
-  async login(
-    emailInput: string,
-    password: string,
-  ) {
-    const email =
-      emailInput
-        .trim()
-        .toLowerCase();
+  async login(emailInput: string, password: string) {
+    const email = emailInput.trim().toLowerCase();
 
-    const user =
-      await this.prisma.user.findUnique({
-        where: { email },
-      });
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
 
     if (!user) {
-      throw new UnauthorizedException(
-        'Email atau kata sandi salah.',
-      );
+      throw new UnauthorizedException('Email atau kata sandi salah.');
     }
 
-    const validPassword =
-      await bcrypt.compare(
-        password,
-        user.passwordHash,
-      );
+    const validPassword = await bcrypt.compare(password, user.passwordHash);
 
     if (!validPassword) {
-      throw new UnauthorizedException(
-        'Email atau kata sandi salah.',
-      );
+      throw new UnauthorizedException('Email atau kata sandi salah.');
+    }
+
+    if (!user.emailVerified) {
+      throw new ForbiddenException('Akun menunggu verifikasi email.');
     }
 
     return this.createSession(user);
   }
 
-  async register(
-    input: RegisterInput,
-  ) {
-    const name =
-      input.name?.trim();
+  async register(body: unknown) {
+    const input = RegisterDto.from(body);
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email: input.email },
+      select: { id: true },
+    });
+    if (existingUser) throw new ConflictException('Email sudah terdaftar.');
 
-    const email =
-      input.email
-        ?.trim()
-        .toLowerCase();
-
-    const password =
-      input.password ?? '';
-
-    if (
-      !name ||
-      name.length < 3
-    ) {
-      throw new BadRequestException(
-        'Nama lengkap minimal 3 karakter.',
-      );
-    }
-
-    if (
-      !email ||
-      !email.includes('@')
-    ) {
-      throw new BadRequestException(
-        'Email tidak valid.',
-      );
-    }
-
-    if (
-      password.length < 8
-    ) {
-      throw new BadRequestException(
-        'Kata sandi minimal 8 karakter.',
-      );
-    }
-
-    const memberTypeMap: Record<
-      string,
-      MemberType
-    > = {
-      umum: MemberType.UMUM,
-      mahasiswa:
-        MemberType.MAHASISWA,
-      pegawai:
-        MemberType.PEGAWAI,
-    };
-
-    const memberType =
-      memberTypeMap[
-        input.memberType
-          ?.trim()
-          .toLowerCase()
-      ];
-
-    if (!memberType) {
-      throw new BadRequestException(
-        'Jenis keanggotaan tidak valid.',
-      );
-    }
-
-    const existingUser =
-      await this.prisma.user.findUnique({
-        where: { email },
-        select: { id: true },
+    const passwordHash = await bcrypt.hash(input.password, 12);
+    try {
+      const user = await this.prisma.$transaction(async (tx) => {
+        const created = await tx.user.create({
+          data: {
+            name: input.name,
+            email: input.email,
+            passwordHash,
+            memberType: input.memberType,
+            role: Role.PENGUNJUNG,
+            emailVerified: false,
+          },
+          select: {
+            id: true,
+            email: true,
+            memberType: true,
+            emailVerified: true,
+          },
+        });
+        await tx.memberProfile.create({
+          data: {
+            userId: created.id,
+            whatsapp: input.whatsapp,
+            address: input.address,
+            identityNumber: input.identity,
+            universityName:
+              input.memberType === MemberType.MAHASISWA
+                ? input.university
+                : null,
+            workUnit:
+              input.memberType === MemberType.PEGAWAI ? input.division : null,
+          },
+        });
+        return created;
       });
-
-    if (existingUser) {
-      throw new ConflictException(
-        'Email sudah terdaftar.',
-      );
-    }
-
-    const passwordHash =
-      await bcrypt.hash(
-        password,
-        12,
-      );
-
-    const user =
-      await this.prisma.user.create({
+      return {
+        message: 'Pendaftaran berhasil dan akun menunggu verifikasi email.',
         data: {
-          name,
-          email,
-          passwordHash,
-          memberType,
-          role: Role.PENGUNJUNG,
+          id: user.id,
+          email: user.email,
+          memberType: user.memberType,
+          emailVerified: user.emailVerified,
         },
-      });
-
-    return this.createSession(user);
+      };
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
+        throw new ConflictException('Email sudah terdaftar.');
+      }
+      throw error;
+    }
   }
 
-  async getUserById(
-    id: number,
-  ) {
-    const user =
-      await this.prisma.user.findUnique({
-        where: { id },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          role: true,
-          memberType: true,
-        },
-      });
+  async getUserById(id: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        memberType: true,
+        emailVerified: true,
+      },
+    });
 
     if (!user) {
-      throw new UnauthorizedException(
-        'Sesi tidak valid.',
-      );
+      throw new UnauthorizedException('Sesi tidak valid.');
     }
 
-    return user;
+    if (!user.emailVerified)
+      throw new ForbiddenException('Akun menunggu verifikasi email.');
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      memberType: user.memberType,
+    };
   }
 }
