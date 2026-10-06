@@ -7,6 +7,7 @@ exports.serviceInfo = Object.freeze({
   phone: '0811-6904-422',
   phoneUrl: 'tel:+628116904422',
   email: 'humaskumriau@gmail.com',
+  pickupLocation: 'Meja Layanan Sirkulasi',
   latitude,
   longitude,
   openStreetMapUrl: `https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}#map=18/${latitude}/${longitude}`,

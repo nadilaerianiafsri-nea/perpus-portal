@@ -24,6 +24,7 @@ const navigation = [
 
 export default function MemberShell({ user, children }: { user: CurrentUser; children: React.ReactNode }) {
   const pathname = usePathname();
+  const reservationPage = pathname === "/dashboard/reservasi";
   const router = useRouter();
   const resource = useMemberResource<MemberSummary>("dashboard");
   const { reload } = resource;
@@ -76,7 +77,7 @@ export default function MemberShell({ user, children }: { user: CurrentUser; chi
       <div className={styles.sidebarBottom}>{logoutError && <p className={styles.formError} role="alert">{logoutError}</p>}<button onClick={logout} disabled={loggingOut}><FiLogOut aria-hidden />{loggingOut ? "Sedang keluar..." : "Keluar"}</button></div></>;
   }
 
-  return <MemberContext.Provider value={{ user, summary: resource.data, loading: resource.loading, error: resource.error, refresh: resource.reload }}><div className={styles.shell}>
+  return <MemberContext.Provider value={{ user, summary: resource.data, loading: resource.loading, error: resource.error, refresh: resource.reload }}><div className={`${styles.shell} ${reservationPage ? styles.reservationShell : ""}`}>
     <a className={styles.skipLink} href="#member-content">Lewati ke konten</a>
     <aside className={styles.sidebar}>{sidebar()}</aside>
     <dialog ref={dialog} className={styles.drawer} aria-label="Menu anggota" onCancel={() => setDrawer(false)} onClick={event => { if (event.target === event.currentTarget) setDrawer(false); }}>{sidebar(true)}</dialog>
@@ -86,6 +87,6 @@ export default function MemberShell({ user, children }: { user: CurrentUser; chi
       <div className={styles.topActions}><form role="search" className={styles.search} onSubmit={event => { event.preventDefault(); const form = new FormData(event.currentTarget); router.push(`/koleksi?search=${encodeURIComponent(String(form.get("search") ?? "").trim())}`); }}><button aria-label="Cari koleksi" type="submit"><FiSearch /></button><input name="search" aria-label="Cari koleksi" placeholder="Cari koleksi..." /></form>
         <Link href="/dashboard/notifikasi" className={styles.iconButton} aria-label={`Notifikasi${unread !== undefined ? `, ${unread} belum dibaca` : ""}`}><FiBell />{unread !== undefined && unread > 0 && <span className={styles.bellDot} />}</Link>
         <Link className={styles.avatar} href="/dashboard/profil" aria-label="Profil saya">{initials(name)}</Link></div>
-    </header><div className={styles.contentGrid}><main id="member-content" className={styles.main} tabIndex={-1}>{children}</main><MemberRightPanel /></div></div>
+    </header><div className={styles.contentGrid}><main id="member-content" className={styles.main} tabIndex={-1}>{children}</main>{!reservationPage && <MemberRightPanel />}</div></div>
   </div></MemberContext.Provider>;
 }

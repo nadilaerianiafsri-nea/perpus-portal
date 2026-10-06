@@ -6,6 +6,7 @@ import { existsSync } from 'node:fs';
 // Only creates uniquely identified fixtures and removes those exact IDs. No SMTP.
 assert.ok(existsSync('dist/members/members.service.js'), 'Member circulation service must be implemented and built');
 const { MembersService } = await import('../dist/members/members.service.js');
+const { CollectionsService } = await import('../dist/collections/collections.service.js');
 const { PrismaService } = await import('../dist/prisma/prisma.service.js');
 const { jakartaDay, reminderMilestone } = await import('../dist/members/member.validation.js');
 assert.equal(jakartaDay(new Date('2026-10-06T17:00:00Z')) - jakartaDay(new Date('2026-10-06T16:59:59Z')), 1, 'Jakarta midnight determines calendar reminders');
@@ -15,6 +16,7 @@ for (const [days, expected] of [[-2, null], [-1, -1], [0, 0], [1, 1], [2, null],
 const key = `member-test-${randomUUID().slice(0, 8)}`;
 const prisma = new PrismaService({ getOrThrow: () => process.env.DATABASE_URL });
 const service = new MembersService(prisma, { isConfigured: () => false, sendMemberReminder: async () => { throw new Error('Tests must never send email'); } });
+const collections = new CollectionsService(prisma, service);
 const users = [], books = [];
 const day = 86400000;
 try {
@@ -27,6 +29,8 @@ try {
   const owner = (await prisma.reservation.findUnique({where: {id: reservation.id}})).userId;
   const other = users.find(u => u.id !== owner).id;
   assert.equal(new Date(reservation.expiresAt) - new Date(reservation.createdAt), day);
+  assert.equal(reservation.pickupLocation, 'Meja Layanan Sirkulasi', 'pickup desk comes from shared service configuration');
+  assert.equal(reservation.copy.status, 'DIRESERVASI', 'response includes the actual allocated copy status');
   assert.equal(await prisma.loan.count({where: {userId: owner}}), 0, 'reservation is not a loan');
   await assert.rejects(service.reserve(owner, {bookId: books[0].id}), /reservasi aktif/);
   await assert.rejects(service.cancel(other, reservation.id), /tidak ditemukan/);
@@ -41,6 +45,9 @@ try {
   await service.finishLoan(loan.id, false);
   reservation = (await service.reserve(owner, {bookId: books[0].id})).reservation;
   await prisma.reservation.update({where: {id: reservation.id}, data: {expiresAt: new Date(Date.now() - 1000)}});
+  const releasedCatalog = await collections.detail(String(books[0].id));
+  assert.equal(releasedCatalog.availableCopies, 1, 'reading availability expires reservation without waiting for the background interval');
+  assert.equal((await prisma.reservation.findUnique({where: {id: reservation.id}})).status, 'KEDALUWARSA');
   await Promise.allSettled([service.expireReservations(), service.pickup(reservation.id), service.cancel(owner, reservation.id)]);
   assert.equal((await prisma.reservation.findUnique({where: {id: reservation.id}})).status, 'KEDALUWARSA');
   assert.equal(await prisma.loan.count({where: {userId: owner}}), 1, 'expired pickup/expiry/cancellation race never creates a loan');

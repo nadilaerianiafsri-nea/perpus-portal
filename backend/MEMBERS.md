@@ -40,7 +40,9 @@ Extension, return dan lost mengunci baris loan yang sama. Setiap extension menam
 
 ## Expiry dan pengingat
 
-Interval ringan berjalan setiap 30 detik selama backend aktif, dengan `unref` dan pencegahan pekerjaan tumpang tindih dalam proses. Expiry juga dijalankan saat membaca ringkasan, reservasi/notifikasi serta membuat reservasi. Setiap transisi dan notifikasi ditulis dalam transaksi. Tidak ada infrastructure scheduler tambahan.
+Interval ringan berjalan setiap 30 detik selama backend aktif, dengan `unref` dan pencegahan pekerjaan tumpang tindih dalam proses. Expiry juga dijalankan saat membaca ringkasan, reservasi/notifikasi, daftar katalog fisik/campuran dan detail buku, serta membuat reservasi. Pembacaan stok katalog langsung melepas copy kedaluwarsa tanpa menunggu interval. Setiap transisi dan notifikasi ditulis dalam transaksi. Tidak ada infrastructure scheduler tambahan.
+
+Respons reservasi menyertakan buku, kode dan status copy nyata, serta `pickupLocation`. Lokasi layanan tetap menggunakan konfigurasi `PICKUP_LOCATION`; jika kosong, memakai `Meja Layanan Sirkulasi` dari konfigurasi layanan bersama. Lokasi tidak disimpan sebagai data contoh pada setiap reservasi. Halaman `/dashboard/reservasi` menampilkan seluruh reservasi aktif menurut `expiresAt` terdekat; countdown mencapai nol memuat ulang status backend dan membuka riwayat untuk menampilkan status akhir.
 
 Tanggal kalender `Asia/Jakarta` menentukan H-1, hari jatuh tempo, H+1, lalu H+3/H+5 dan seterusnya selama loan aktif. Status terlambat memakai timestamp dueAt sebenarnya. Deduplication key mencakup loan, dueAt dan milestone; extension membuat jadwal baru. Notifikasi reservasi hampir berakhir dibuat saat tersisa paling lama 2 jam. Pekerjaan yang tertunda ketika backend mati diproses pada startup untuk milestone hari berjalan; sistem tidak mengirim seluruh milestone historis sekaligus.
 

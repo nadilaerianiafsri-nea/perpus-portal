@@ -11,5 +11,6 @@ import { MembersService } from './members.service';
   imports: [AuthModule],
   controllers: [MembersController, MemberCirculationController],
   providers: [MembersService, MemberRoleGuard],
+  exports: [MembersService],
 })
 export class MembersModule {}

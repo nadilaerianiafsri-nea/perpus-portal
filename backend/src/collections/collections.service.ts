@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, CollectionType, CopyStatus } from '../generated/prisma/client';
+import { MembersService } from '../members/members.service';
 
 type CatalogRow = {
   id: number;
@@ -69,7 +70,7 @@ function status(
 
 @Injectable()
 export class CollectionsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService, private readonly members: MembersService) {}
 
   async filters() {
     const [subjects, languages, years] = await Promise.all([
@@ -167,6 +168,7 @@ export class CollectionsService {
     const sort = query.sort ?? 'relevance';
     if (typeof sort !== 'string' || !Object.hasOwn(orders, sort))
       throw new BadRequestException('Urutan tidak valid.');
+    if (!ebooksOnly) await this.members.expireReservations();
     const [count, rows] = await this.prisma.$transaction([
       this.prisma.$queryRaw<{ total: bigint }[]>(
         Prisma.sql`SELECT COUNT(*) AS total FROM books b WHERE ${where}`,
@@ -200,6 +202,7 @@ export class CollectionsService {
   async detail(input: string) {
     if (!/^\d+$/.test(input) || !Number.isSafeInteger(Number(input)))
       throw new NotFoundException('Koleksi tidak ditemukan.');
+    await this.members.expireReservations();
     const book = await this.prisma.book.findUnique({
       where: { id: Number(input) },
       include: { copies: { orderBy: { code: 'asc' } } },

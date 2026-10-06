@@ -8,7 +8,8 @@ export interface MemberProfile {
 export interface MemberBook { id: number; title: string; code: string; coverUrl: string; author: string; }
 export interface Reservation {
   id: number; status: "MENUNGGU_PENGAMBILAN" | "KEDALUWARSA" | "DIBATALKAN" | "DIAMBIL";
-  createdAt: string; expiresAt: string; book: MemberBook; copy: { id: number; code: string };
+  createdAt: string; expiresAt: string; pickupLocation: string; book: MemberBook;
+  copy: { id: number; code: string; status: "TERSEDIA" | "DIRESERVASI" | "DIPINJAM" | "HILANG" };
 }
 export interface Loan {
   id: number; status: "AKTIF" | "DIKEMBALIKAN" | "HILANG";

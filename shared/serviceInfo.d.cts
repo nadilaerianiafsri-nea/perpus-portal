@@ -4,6 +4,7 @@ export const serviceInfo: Readonly<{
   phone: string;
   phoneUrl: string;
   email: string;
+  pickupLocation: string;
   latitude: number;
   longitude: number;
   openStreetMapUrl: string;

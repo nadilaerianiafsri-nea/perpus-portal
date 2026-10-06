@@ -38,7 +38,7 @@ export default function BorrowAction({ available, bookId, role }: {
       {success ? "Reservasi Berhasil" : available ? "Ajukan Peminjaman" : "Tidak Tersedia"}
     </button>
     {role === "ADMIN" && <p className={styles.ctaNotice}>Reservasi tersedia untuk akun anggota.</p>}
-    {success && <p className={styles.ctaNotice} role="status">Reservasi berhasil. Ambil buku dalam 24 jam. <Link href="/dashboard/reservasi">Lihat Reservasi Saya</Link></p>}
+    {success && <p className={styles.ctaNotice} role="status">Reservasi berhasil dibuat. Ambil buku dalam 24 jam. <Link href="/dashboard/reservasi">Lihat Reservasi Saya</Link></p>}
     <dialog ref={dialog} className={styles.reservationDialog} aria-labelledby="reservation-title" onCancel={(event) => { if (pending) event.preventDefault(); }}>
       <h2 id="reservation-title">Konfirmasi Reservasi</h2>
       <p>Anda akan mereservasi buku ini selama <strong>24 jam</strong>. Buku harus diambil sebelum batas waktu reservasi berakhir.</p>

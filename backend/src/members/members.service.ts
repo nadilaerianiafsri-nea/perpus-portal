@@ -6,7 +6,10 @@ import {
   NotFoundException,
   OnModuleDestroy,
   OnModuleInit,
+  Optional,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { serviceInfo } from '../../../shared/serviceInfo.cjs';
 import { PrismaService } from '../prisma/prisma.service';
 import { MailService } from '../mail/mail.service';
 import { Prisma } from '../generated/prisma/client';
@@ -27,7 +30,7 @@ const bookSelect = {
 } as const;
 const circulationInclude = {
   book: { select: bookSelect },
-  copy: { select: { id: true, code: true } },
+  copy: { select: { id: true, code: true, status: true } },
 } as const;
 const notificationSelect = {
   id: true,
@@ -47,6 +50,7 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
   constructor(
     private readonly prisma: PrismaService,
     private readonly mail: MailService,
+    @Optional() private readonly config?: ConfigService,
   ) {}
 
   onModuleInit() {
@@ -135,6 +139,7 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
       status: row.status,
       createdAt: row.createdAt,
       expiresAt: row.expiresAt,
+      pickupLocation: this.config?.get<string>('PICKUP_LOCATION')?.trim() || serviceInfo.pickupLocation,
       book: row.book,
       copy: row.copy,
     };
@@ -297,7 +302,7 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
         tx,
         userId,
         `reservation:${reservation.id}:created`,
-        'Reservasi berhasil',
+        'Reservasi berhasil dibuat',
         `${book.title} telah direservasi. Ambil buku dalam 24 jam sebelum batas pengambilan.`,
         '/dashboard/reservasi',
       );

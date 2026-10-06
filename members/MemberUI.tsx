@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useCountdown } from "./useCountdown";
 import { FiBookOpen, FiRefreshCw } from "react-icons/fi";
 import type { MemberBook } from "./types";
 import styles from "./Members.module.css";
@@ -26,20 +26,7 @@ export function Badge({ children, tone = "neutral" }: { children: React.ReactNod
   return <span className={`${styles.badge} ${styles[tone] ?? ""}`}>{children}</span>;
 }
 export function Countdown({ deadline, onExpire }: { deadline: string; onExpire: () => void }) {
-  const [seconds, setSeconds] = useState<number | null>(null);
-  const notified = useRef(false);
-  const expireCallback = useRef(onExpire);
-  useEffect(() => { expireCallback.current = onExpire; }, [onExpire]);
-  useEffect(() => {
-    notified.current = false;
-    const update = () => {
-      const remaining = Math.max(0, Math.ceil((new Date(deadline).getTime() - Date.now()) / 1000));
-      setSeconds(remaining);
-      if (remaining === 0 && !notified.current) { notified.current = true; expireCallback.current(); }
-    };
-    update(); const timer = window.setInterval(update, 1000);
-    return () => window.clearInterval(timer);
-  }, [deadline]);
+  const seconds = useCountdown(deadline, onExpire);
   const value = seconds === null ? "— : — : —" : [Math.floor(seconds / 3600), Math.floor(seconds % 3600 / 60), seconds % 60].map(number => String(number).padStart(2, "0")).join(" : ");
   return <div className={styles.countdown}><small>Sisa waktu pengambilan</small><strong aria-label={`Sisa waktu pengambilan ${value}`}>{value}</strong></div>;
 }
