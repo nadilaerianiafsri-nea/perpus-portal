@@ -36,13 +36,23 @@ try {
   await assert.rejects(service.cancel(other, reservation.id), /tidak ditemukan/);
   const {loan} = await service.pickup(reservation.id);
   assert.equal(new Date(loan.dueAt) - new Date(loan.borrowedAt), 7 * day);
-  await Promise.all([service.extend(owner, loan.id), service.extend(owner, loan.id)]);
+  const extensionRequest = {expectedDueAt: new Date(loan.dueAt).toISOString()};
+  await Promise.all([service.extend(owner, loan.id, extensionRequest), service.extend(owner, loan.id, extensionRequest)]);
   const extended = await prisma.loan.findUnique({where: {id: loan.id}});
-  assert.equal(extended.extensionCount, 2);
-  assert.equal(extended.dueAt.getTime() - new Date(loan.dueAt).getTime(), 14 * day);
-  assert.equal(await prisma.loanExtension.count({where: {loanId: loan.id}}), 2);
-  await assert.rejects(service.extend(other, loan.id), /tidak ditemukan/);
+  assert.equal(extended.extensionCount, 1, 'concurrent retries of the same confirmed deadline extend only once');
+  assert.equal(extended.dueAt.getTime() - new Date(loan.dueAt).getTime(), 7 * day);
+  assert.equal(await prisma.loanExtension.count({where: {loanId: loan.id}}), 1);
+  await service.extend(owner, loan.id, extensionRequest);
+  assert.equal(await prisma.loanExtension.count({where: {loanId: loan.id}}), 1, 'network retry reuses the recorded extension');
+  for (let i = 0; i < 3; i++) {
+    const current = await prisma.loan.findUnique({where: {id: loan.id}});
+    await service.extend(owner, loan.id, {expectedDueAt: current.dueAt.toISOString()});
+  }
+  assert.equal((await prisma.loan.findUnique({where: {id: loan.id}})).extensionCount, 4, 'there is no artificial extension limit');
+  await assert.rejects(service.extend(other, loan.id, extensionRequest), /tidak ditemukan/);
+  await assert.rejects(service.extend(owner, loan.id, {expectedDueAt: 'invalid'}), /jatuh tempo/);
   await service.finishLoan(loan.id, false);
+  assert.equal((await service.loans(owner)).loans.length, 0, 'returned loans leave Pinjaman Saya');
   reservation = (await service.reserve(owner, {bookId: books[0].id})).reservation;
   await prisma.reservation.update({where: {id: reservation.id}, data: {expiresAt: new Date(Date.now() - 1000)}});
   const releasedCatalog = await collections.detail(String(books[0].id));
@@ -82,7 +92,7 @@ try {
   assert.ok(summary.unreadNotifications > 0);
   await service.readAll(owner);
   assert.equal((await service.dashboard(owner)).unreadNotifications, 0);
-  await service.extend(owner, currentLoan.id);
+  await service.extend(owner, currentLoan.id, {expectedDueAt: due.toISOString()});
   const invalidated = await prisma.notification.findUnique({where: {id: notice.id}});
   assert.equal(invalidated.emailDelivery, 'NOT_REQUIRED', 'extension cancels obsolete queued email');
   assert.equal(invalidated.whatsappDelivery, 'NOT_REQUIRED', 'extension cancels obsolete manual WhatsApp');
@@ -116,6 +126,8 @@ try {
     assert.equal(suppressed.whatsappDelivery, 'NOT_REQUIRED', 'old milestone manual WhatsApp suppressed');
   }
   await service.finishLoan(currentLoan.id, true);
+  assert.equal((await service.loans(owner)).loans[0].status, 'HILANG', 'lost books remain visible for replacement information');
+  await assert.rejects(service.extend(owner, currentLoan.id, {expectedDueAt: due.toISOString()}), /pinjaman aktif/);
   assert.equal((await service.dashboard(owner)).alerts.lost.length, 1);
   assert.equal((await prisma.bookCopy.findFirst({where: {bookId: books[0].id}})).status, 'HILANG');
   console.log('PASS members: locking, duplicate, ownership, 24h expiry, pickup, concurrent extensions, returns/lost, reminders, ebooks, profile, real summary');

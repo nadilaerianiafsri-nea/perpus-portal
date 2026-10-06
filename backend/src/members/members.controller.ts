@@ -58,8 +58,9 @@ export class MembersController {
   @Post('loans/:id/extend') extend(
     @Req() req: AuthenticatedRequest,
     @Param('id') id: string,
+    @Body() body: unknown,
   ) {
-    return this.members.extend(req.user!.sub, positiveId(id));
+    return this.members.extend(req.user!.sub, positiveId(id), body);
   }
   @Get('notifications') notifications(@Req() req: AuthenticatedRequest) {
     return this.members.notifications(req.user!.sub);

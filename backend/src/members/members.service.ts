@@ -15,6 +15,7 @@ import { MailService } from '../mail/mail.service';
 import { Prisma } from '../generated/prisma/client';
 import {
   bookInput,
+  extensionInput,
   jakartaDay,
   profileInput,
   reminderMilestone,
@@ -139,7 +140,9 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
       status: row.status,
       createdAt: row.createdAt,
       expiresAt: row.expiresAt,
-      pickupLocation: this.config?.get<string>('PICKUP_LOCATION')?.trim() || serviceInfo.pickupLocation,
+      pickupLocation:
+        this.config?.get<string>('PICKUP_LOCATION')?.trim() ||
+        serviceInfo.pickupLocation,
       book: row.book,
       copy: row.copy,
     };
@@ -439,14 +442,18 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
 
   async loans(userId: number, history = false) {
     const rows = await this.prisma.loan.findMany({
-      where: { userId, ...(history ? {} : { status: 'AKTIF' }) },
+      where: {
+        userId,
+        ...(history ? {} : { status: { in: ['AKTIF', 'HILANG'] as const } }),
+      },
       include: circulationInclude,
       orderBy: history ? { borrowedAt: 'desc' } : { dueAt: 'asc' },
     });
     return { loans: rows.map((row) => this.loanView(row)) };
   }
 
-  async extend(userId: number, id: number) {
+  async extend(userId: number, id: number, body: unknown) {
+    const expectedDueAt = extensionInput(body);
     const row = await this.transaction(async (tx) => {
       await tx.$queryRaw`SELECT id FROM loans WHERE id = ${id} AND userId = ${userId} FOR UPDATE`;
       const loan = await tx.loan.findFirst({
@@ -458,6 +465,17 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
         throw new ConflictException(
           'Hanya pinjaman aktif yang dapat diperpanjang.',
         );
+      if (loan.dueAt.getTime() !== expectedDueAt.getTime()) {
+        // A retry confirms the same previous deadline, including after a lost
+        // response. The loan row lock serializes check, update and event creation.
+        const applied = await tx.loanExtension.findFirst({
+          where: { loanId: id, previousDueAt: expectedDueAt },
+        });
+        if (applied) return loan;
+        throw new ConflictException(
+          'Jatuh tempo telah berubah. Muat ulang data pinjaman lalu konfirmasi kembali.',
+        );
+      }
       const dueAt = new Date(loan.dueAt.getTime() + 7 * DAY);
       const extended = await tx.loan.update({
         where: { id },
@@ -471,8 +489,8 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
         tx,
         userId,
         `extension:${extension.id}`,
-        'Perpanjangan berhasil',
-        `Jatuh tempo ${loan.book.title} ditambah 7 hari dari tenggat sebelumnya.`,
+        'Masa pinjam diperpanjang',
+        `Masa pinjam "${loan.book.title}" berhasil diperpanjang sampai ${new Intl.DateTimeFormat('id-ID', { timeZone: 'Asia/Jakarta', day: 'numeric', month: 'short', year: 'numeric' }).format(dueAt)}.`,
         '/dashboard/pinjaman',
       );
       // Queued reminders for the old deadline no longer apply after extension.

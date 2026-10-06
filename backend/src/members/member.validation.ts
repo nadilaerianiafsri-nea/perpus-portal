@@ -25,6 +25,25 @@ export function bookInput(body: unknown): number {
   return positiveId(input.bookId);
 }
 
+export function extensionInput(body: unknown): Date {
+  const input = objectInput(body);
+  const value = input.expectedDueAt;
+  if (
+    Object.keys(input).some((key) => key !== 'expectedDueAt') ||
+    typeof value !== 'string' ||
+    !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value)
+  )
+    throw new BadRequestException(
+      'Tanggal jatuh tempo konfirmasi tidak valid.',
+    );
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime()) || date.toISOString() !== value)
+    throw new BadRequestException(
+      'Tanggal jatuh tempo konfirmasi tidak valid.',
+    );
+  return date;
+}
+
 export function profileInput(body: unknown, memberType: string | null) {
   const input = objectInput(body);
   const allowed = [

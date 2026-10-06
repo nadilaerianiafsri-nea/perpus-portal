@@ -13,9 +13,9 @@ Prefix anggota: `/members/me`.
 | GET | `/reservations` | `{reservations}` milik sesi |
 | POST | `/reservations` | `{bookId}` → `{reservation}` |
 | PATCH | `/reservations/:id/cancel` | `{reservation}` |
-| GET | `/loans` | `{loans}` aktif |
+| GET | `/loans` | `{loans}` aktif dan hilang; pinjaman yang dikembalikan hanya di riwayat |
 | GET | `/loans/history` | `{loans}` seluruh riwayat, termasuk aktif |
-| POST | `/loans/:id/extend` | `{loan}` |
+| POST | `/loans/:id/extend` | `{expectedDueAt}` ISO UTC dari respons loan yang dikonfirmasi → `{loan}` |
 | GET | `/notifications` | `{notifications}` |
 | PATCH | `/notifications/read-all` | `{success: true}` |
 | PATCH | `/notifications/:id/read` | `{success: true}` |
@@ -37,6 +37,10 @@ Reservasi mengunci baris anggota dan buku di transaksi InnoDB `READ COMMITTED`, 
 Cancel, expiry dan pickup mengunci baris reservasi yang sama. Pickup pada atau setelah expiresAt ditolak dan expiry tetap disimpan; tidak ada loan yang dibuat. Pickup valid mengubah copy ke DIPINJAM dan memulai loan +7 hari dari waktu petugas mengonfirmasi.
 
 Extension, return dan lost mengunci baris loan yang sama. Setiap extension menambah +7 hari dari dueAt terakhir, menambah extensionCount dan menyimpan LoanExtension; tidak ada batas jumlah. Return melepas copy ke TERSEDIA; lost membuat copy HILANG supaya tidak tersedia untuk anggota lain. Tidak ada data/tagihan denda uang.
+
+Perpanjangan anggota wajib mengirim `expectedDueAt` (ISO UTC dengan milidetik, misalnya nilai `dueAt` dari GET). Di bawah lock loan, server memeriksa tenggat yang dikonfirmasi sebelum menambah 7 hari. Request berulang dengan tenggat lama yang sudah tercatat pada LoanExtension mengembalikan loan terkini tanpa menambah hari, counter, atau notifikasi lagi. Tenggat yang berubah tanpa catatan extension tersebut ditolak agar anggota memuat ulang dan mengonfirmasi kembali. Konfirmasi berikutnya memakai dueAt terbaru, sehingga perpanjangan berurutan tetap tidak dibatasi. Pinjaman terlambat yang masih AKTIF dapat diperpanjang; HILANG dan DIKEMBALIKAN ditolak.
+
+Halaman `/dashboard/pinjaman` menampilkan masalah paling mendesak terlebih dahulu, dengan status tanggal mengikuti `dueAt` dan kalender Asia/Jakarta: waktu melewati dueAt berarti terlambat, tanggal jatuh tempo hari ini belum terlambat sebelum tenggat, dan tanggal besok berarti H-1. Buku hilang menampilkan informasi penggantian dan kontak layanan existing; anggota tidak memiliki tindakan pengembalian atau penandaan hilang.
 
 ## Expiry dan pengingat
 
