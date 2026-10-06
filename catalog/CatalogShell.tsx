@@ -9,7 +9,7 @@ export default async function CatalogShell({
 }: {
   children: React.ReactNode;
   ebook?: boolean;
-  active?: "koleksi" | "ebook" | "hibah" | "tentang";
+  active?: "koleksi" | "ebook" | "hibah" | "tentang" | "panduan" | "faq";
 }) {
   const user = await getCurrentUser();
   return (

@@ -29,14 +29,14 @@ export default function LandingFooter({
             <Link href="/koleksi">Koleksi</Link>
             <Link href="/e-book">E-Book</Link>
             <Link href="/hibah-buku">Hibah Buku</Link>
-            <Link href="/#panduan">Panduan</Link>
+            <Link href="/panduan">Panduan</Link>
           </div>
           <div className="footer-col">
             <strong>Bantuan</strong>
             <Link href="/tentang">Tentang</Link>
-            <Link href="/#faq">FAQ</Link>
+            <Link href="/faq">FAQ</Link>
             <Link href="/#kontak">Kontak</Link>
-            <Link href="/#panduan">Panduan Peminjaman</Link>
+            <Link href="/panduan">Panduan Peminjaman</Link>
           </div>
           <div className="footer-col">
             <strong>Informasi Layanan</strong>
@@ -82,14 +82,14 @@ export default function LandingFooter({
           <Link href="/koleksi">Koleksi</Link>
           <Link href="/e-book">E-Book</Link>
           <Link href="/hibah-buku">Hibah Buku</Link>
-          <Link href="#layanan">Panduan</Link>
+          <Link href="/panduan">Panduan</Link>
         </div>
 
         <div className="footer-col">
           <strong>Bantuan</strong>
-          <Link href="#layanan">FAQ</Link>
+          <Link href="/faq">FAQ</Link>
           <Link href="#layanan">Kontak</Link>
-          <Link href="#layanan">Panduan Peminjaman</Link>
+          <Link href="/panduan">Panduan Peminjaman</Link>
         </div>
 
         <div className="footer-col">

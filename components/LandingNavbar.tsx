@@ -1,6 +1,6 @@
 import Link from "next/link";
 type NavbarProps = {
-  active?: "beranda" | "koleksi" | "ebook" | "hibah" | "tentang";
+  active?: "beranda" | "koleksi" | "ebook" | "hibah" | "tentang" | "panduan" | "faq";
   user?: { name: string; role: "ADMIN" | "PENGUNJUNG" } | null;
 };
 export default function LandingNavbar({
@@ -13,8 +13,8 @@ export default function LandingNavbar({
     ["E-Book", "/e-book", "ebook"],
     ["Hibah Buku", "/hibah-buku", "hibah"],
     ["Tentang", "/tentang", "tentang"],
-    ["Panduan", "/#panduan", "panduan"],
-    ["FAQ", "/#faq", "faq"],
+    ["Panduan", "/panduan", "panduan"],
+    ["FAQ", "/faq", "faq"],
     ["Kontak", "/#kontak", "kontak"],
   ];
   const actions = user ? (
@@ -64,6 +64,7 @@ export default function LandingNavbar({
               <Link
                 key={key}
                 href={href}
+                className={active === key ? "nav-active" : undefined}
                 aria-current={active === key ? "page" : undefined}
               >
                 {label}

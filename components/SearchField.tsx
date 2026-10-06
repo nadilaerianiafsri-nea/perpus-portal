@@ -7,11 +7,13 @@ export default function SearchField({
   onSearch,
   placeholder = "Cari judul, penulis, subjek, ISBN, atau kode buku",
   label = "Cari koleksi",
+  delayMs = 350,
 }: {
   initialValue: string;
   onSearch: (value: string) => void;
   placeholder?: string;
   label?: string;
+  delayMs?: number;
 }) {
   const [value, setValue] = useState(initialValue);
   const [previous, setPrevious] = useState(initialValue);
@@ -38,7 +40,8 @@ export default function SearchField({
           const next = e.target.value;
           setValue(next);
           if (timer.current) clearTimeout(timer.current);
-          timer.current = setTimeout(() => onSearch(next), 350);
+          if (delayMs === 0) onSearch(next);
+          else timer.current = setTimeout(() => onSearch(next), delayMs);
         }}
       />
     </label>

@@ -474,6 +474,11 @@
   outline: 3px solid #b79a00;
   outline-offset: 3px;
 }
+.shell :global(.mobile-menu .nav-active) {
+  background: #000633;
+  color: #fff;
+  border-radius: 8px;
+}
 @media (max-width: 1080px) {
   .shell :global(.mobile-menu) { grid-column: 3; justify-self: end; }
   .shell :global(.mobile-menu summary) { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
