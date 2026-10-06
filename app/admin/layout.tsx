@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 
+import AdminShell from "@/admin/AdminShell";
 import { getCurrentUser } from "@/auth/serverAuth";
 
 export default async function AdminLayout({
@@ -17,5 +18,9 @@ export default async function AdminLayout({
     redirect("/dashboard");
   }
 
-  return children;
+  return (
+    <AdminShell user={{ name: user.name, email: user.email }}>
+      {children}
+    </AdminShell>
+  );
 }
