@@ -4,6 +4,11 @@ import nodemailer from 'nodemailer';
 import type Mail from 'nodemailer/lib/mailer';
 import { serviceInfo } from '../../../shared/serviceInfo.cjs';
 import type { ContactInput } from '../../../shared/contactValidation.cjs';
+import {
+  emailTemplate,
+  loanReminderTemplate,
+  type LoanReminderDetails,
+} from './mail-template';
 
 @Injectable()
 export class MailService {
@@ -33,11 +38,17 @@ export class MailService {
     email: string,
     title: string,
     message: string,
+    details?: LoanReminderDetails,
   ): Promise<boolean> {
     return this.deliver({
       to: email,
       subject: `${title} — Perpustakaan Kemenkum Riau`,
-      text: `${message}\n\nBuka Dashboard Anggota untuk melihat tenggat terbaru. Tidak ada denda uang. Jika membutuhkan bantuan, hubungi petugas perpustakaan.`,
+      ...loanReminderTemplate(
+        title,
+        message,
+        details,
+        this.memberDashboardUrl(),
+      ),
     });
   }
   async sendContactEmail(input: ContactInput): Promise<boolean> {
@@ -45,19 +56,27 @@ export class MailService {
       this.config.get<string>('CONTACT_RECIPIENT_EMAIL')?.trim() ||
       serviceInfo.email;
     if (!/^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]+$/.test(recipient)) return false;
-    const escape = (value: string) =>
-      value
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#39;');
     return this.deliver({
       to: recipient,
       replyTo: { address: input.email, name: input.name },
       subject: `Pesan Website Perpustakaan — ${input.name}`,
-      text: `Pesan Baru dari Website Perpustakaan Kemenkum Riau\n\nNama:\n${input.name}\n\nEmail:\n${input.email}\n\nPesan:\n${input.message}\n\n----------------------------------------\n\nPesan ini dikirim melalui formulir Kontak website Perpustakaan Kemenkum Riau.\n\nGunakan tombol Balas pada email untuk membalas langsung kepada pengirim.`,
-      html: `<h2>Perpustakaan Kemenkum Riau</h2><h3>Pesan Baru dari Website</h3><p><strong>Nama</strong><br>${escape(input.name)}</p><p><strong>Email</strong><br>${escape(input.email)}</p><p><strong>Pesan</strong><br>${escape(input.message).replaceAll('\n', '<br>')}</p><hr><p>Pesan ini dikirim melalui formulir Kontak website Perpustakaan Kemenkum Riau.</p><p>Klik Balas untuk membalas langsung kepada pengirim.</p>`,
+      ...emailTemplate({
+        badge: 'PESAN KONTAK',
+        heading: 'Pesan Baru dari Website',
+        paragraphs: [
+          'Pesan baru diterima melalui formulir Kontak. Silakan tinjau informasi pengirim dan isi pesan berikut.',
+        ],
+        details: [
+          { label: 'Nama', value: input.name },
+          { label: 'Email', value: input.email },
+          { label: 'Pesan', value: input.message },
+        ],
+        action: {
+          label: 'Balas Pengirim',
+          url: `mailto:${encodeURIComponent(input.email)}`,
+        },
+        contact: true,
+      }),
     });
   }
   private async send(
@@ -65,23 +84,53 @@ export class MailService {
     link: string,
     reset: boolean,
   ): Promise<boolean> {
-    const escapedLink = link
-      .replaceAll('&', '&amp;')
-      .replaceAll('"', '&quot;')
-      .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;');
     return this.deliver({
       to: email,
       subject: reset
         ? 'Reset Kata Sandi — Perpustakaan Kemenkum Riau'
         : 'Verifikasi Email — Perpustakaan Kemenkum Riau',
-      text: reset
-        ? `Ubah kata sandi akun Perpustakaan Kemenkum Riau.\n\n${link}\n\nLink berlaku selama 1 jam dan hanya sekali pakai. Jika Anda tidak meminta reset, abaikan email ini.`
-        : `Pendaftaran Anda berhasil. Verifikasi alamat email untuk mengaktifkan akun Perpustakaan Kemenkum Riau.\n\n${link}\n\nLink berlaku selama 24 jam. Jika Anda tidak melakukan pendaftaran, abaikan email ini.`,
-      html: reset
-        ? `<p>Ubah kata sandi akun Perpustakaan Kemenkum Riau.</p><p><a href="${escapedLink}">Reset Kata Sandi</a></p><p>Link berlaku selama 1 jam dan hanya sekali pakai. Jika Anda tidak meminta reset, abaikan email ini.</p>`
-        : `<p>Pendaftaran Anda berhasil.</p><p>Verifikasi alamat email untuk mengaktifkan akun Perpustakaan Kemenkum Riau.</p><p><a href="${escapedLink}">Verifikasi Email</a></p><p>Link berlaku selama 24 jam.</p><p>Jika Anda tidak melakukan pendaftaran, abaikan email ini.</p>`,
+      ...emailTemplate({
+        badge: reset ? 'KEAMANAN AKUN' : 'AKTIVASI AKUN',
+        heading: reset
+          ? 'Atur Ulang Kata Sandi'
+          : 'Selamat Datang di Perpustakaan Kemenkum Riau',
+        paragraphs: reset
+          ? [
+              'Kami menerima permintaan untuk mengatur ulang kata sandi akun Anda.',
+            ]
+          : [
+              'Pendaftaran akun Anda berhasil.',
+              'Untuk mengaktifkan akun dan mulai menggunakan layanan perpustakaan, silakan verifikasi alamat email Anda.',
+            ],
+        action: {
+          label: reset ? 'Atur Ulang Kata Sandi' : 'Verifikasi Email',
+          url: link,
+        },
+        alert: reset
+          ? 'Link berlaku selama 1 jam dan hanya sekali pakai.'
+          : 'Link berlaku selama 24 jam.',
+        note: reset
+          ? 'Jika Anda tidak meminta perubahan kata sandi, abaikan email ini.'
+          : 'Jika Anda tidak melakukan pendaftaran ini, abaikan email ini.',
+      }),
     });
+  }
+  private memberDashboardUrl(): string | undefined {
+    const endpoint =
+      this.config.get<string>('FRONTEND_URL')?.split(',')[0]?.trim() ||
+      this.config.get<string>('EMAIL_VERIFICATION_URL');
+    try {
+      const url = new URL('/dashboard/pinjaman', endpoint);
+      if (
+        !['http:', 'https:'].includes(url.protocol) ||
+        url.username ||
+        url.password
+      )
+        return undefined;
+      return url.toString();
+    } catch {
+      return undefined;
+    }
   }
   private async deliver(
     options: Mail.Options & { to: string },

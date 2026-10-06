@@ -792,7 +792,11 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
       if (!claimed) continue;
       const current = await this.prisma.loan.findUnique({
         where: { id: loanId },
-        select: { status: true, dueAt: true },
+        select: {
+          status: true,
+          dueAt: true,
+          book: { select: { title: true, code: true } },
+        },
       });
       if (
         !current ||
@@ -815,6 +819,12 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
           notice.user.email,
           notice.title,
           notice.message,
+          {
+            bookTitle: current.book.title,
+            bookCode: current.book.code,
+            dueAt: current.dueAt,
+            milestone: Number(event[3]),
+          },
         );
       } catch {
         /* SMTP failures are persisted without sensitive logs. */
