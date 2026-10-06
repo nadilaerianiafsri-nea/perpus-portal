@@ -89,6 +89,17 @@ export class MembersController {
   ) {
     return this.members.openEBook(req.user!.sub, positiveId(bookId));
   }
+  @Patch('ebooks/:bookId/progress') updateEBookProgress(
+    @Req() req: AuthenticatedRequest,
+    @Param('bookId') bookId: string,
+    @Body() body: unknown,
+  ) {
+    return this.members.updateEBookProgress(
+      req.user!.sub,
+      positiveId(bookId),
+      body,
+    );
+  }
 }
 
 @Controller('members/admin')

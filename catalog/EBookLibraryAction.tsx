@@ -1,28 +1,18 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import styles from "./Catalog.module.css";
-export default function EBookLibraryAction({ bookId, role, opened = false }: {
-  bookId: number; role: "ADMIN" | "PENGUNJUNG" | null; opened?: boolean;
+export default function EBookLibraryAction({ bookId, role }: {
+  bookId: number; role: "ADMIN" | "PENGUNJUNG" | null;
 }) {
   const router = useRouter();
-  const started = useRef(false);
   const locked = useRef(false);
   const [pending, setPending] = useState(false);
   const [notice, setNotice] = useState("");
   const [saved, setSaved] = useState(false);
-  useEffect(() => {
-    if (!opened || role !== "PENGUNJUNG" || started.current) return;
-    started.current = true;
-    void fetch(`/api/members/me/ebooks/${bookId}/open`, { method: "POST", signal: AbortSignal.timeout(16000) })
-      .then((response) => {
-        if (response.ok) { setSaved(true); setNotice("Bacaan disimpan ke E-Book Saya."); }
-        else setNotice("Riwayat bacaan belum tersimpan. Anda dapat mencoba menyimpan kembali.");
-      }).catch(() => setNotice("Riwayat bacaan belum tersimpan. Anda dapat mencoba menyimpan kembali."));
-  }, [bookId, role, opened]);
   async function save() {
-    if (!role) { router.push(`/login?next=${encodeURIComponent(opened ? `/e-book/${bookId}/baca` : `/koleksi/${bookId}`)}`); return; }
+    if (!role) { router.push(`/login?next=${encodeURIComponent(`/koleksi/${bookId}`)}`); return; }
     if (locked.current) return;
     locked.current = true; setPending(true); setNotice("");
     try {

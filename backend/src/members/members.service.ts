@@ -16,6 +16,7 @@ import { Prisma } from '../generated/prisma/client';
 import {
   bookInput,
   extensionInput,
+  ebookProgressInput,
   jakartaDay,
   profileInput,
   reminderMilestone,
@@ -32,6 +33,9 @@ const bookSelect = {
 const circulationInclude = {
   book: { select: bookSelect },
   copy: { select: { id: true, code: true, status: true } },
+} as const;
+const ebookInclude = {
+  book: { select: { ...bookSelect, format: true } },
 } as const;
 const notificationSelect = {
   id: true,
@@ -573,17 +577,24 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
 
   async ebooks(userId: number) {
     const rows = await this.prisma.userEBook.findMany({
-      where: { userId },
-      include: { book: { select: bookSelect } },
-      orderBy: { addedAt: 'desc' },
+      where: { userId, book: { type: 'EBOOK' } },
+      include: ebookInclude,
+      orderBy: [{ lastOpenedAt: 'desc' }, { addedAt: 'desc' }],
     });
+    return { ebooks: rows.map((row) => this.ebookView(row)) };
+  }
+  private ebookView(
+    row: Prisma.UserEBookGetPayload<{ include: typeof ebookInclude }>,
+  ) {
     return {
-      ebooks: rows.map(({ id, book, addedAt, lastOpenedAt }) => ({
-        id,
-        book,
-        addedAt,
-        lastOpenedAt,
-      })),
+      id: row.id,
+      bookId: row.bookId,
+      book: row.book,
+      addedAt: row.addedAt,
+      lastOpenedAt: row.lastOpenedAt,
+      progress: row.progress,
+      lastPosition: row.lastPosition,
+      progressVersion: row.progressVersion,
     };
   }
   async addEBook(userId: number, body: unknown) {
@@ -602,11 +613,38 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
   }
   async openEBook(userId: number, bookId: number) {
     await this.addEBook(userId, { bookId });
-    await this.prisma.userEBook.update({
+    const row = await this.prisma.userEBook.update({
       where: { userId_bookId: { userId, bookId } },
       data: { lastOpenedAt: new Date() },
+      include: ebookInclude,
     });
-    return { success: true };
+    return { success: true, ebook: this.ebookView(row) };
+  }
+
+  async updateEBookProgress(userId: number, bookId: number, body: unknown) {
+    const input = ebookProgressInput(body);
+    const row = await this.transaction(async (tx) => {
+      await tx.$queryRaw`SELECT id FROM user_ebooks WHERE userId = ${userId} AND bookId = ${bookId} FOR UPDATE`;
+      const current = await tx.userEBook.findFirst({
+        where: { userId, bookId, book: { type: 'EBOOK' } },
+        include: ebookInclude,
+      });
+      if (!current) throw new NotFoundException('Bacaan tidak ditemukan.');
+      if (current.progressVersion !== input.expectedVersion)
+        throw new ConflictException(
+          'Posisi baca telah berubah di sesi lain. Muat ulang pembaca sebelum menyimpan kembali.',
+        );
+      return tx.userEBook.update({
+        where: { id: current.id },
+        include: ebookInclude,
+        data: {
+          progress: Math.max(current.progress, input.progress),
+          lastPosition: input.lastPosition,
+          progressVersion: { increment: 1 },
+        },
+      });
+    });
+    return { ebook: this.ebookView(row) };
   }
 
   async createReminders(now = new Date()) {
@@ -811,7 +849,9 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
           where: { userId, status: 'HILANG' },
           include: circulationInclude,
         }),
-        this.prisma.userEBook.count({ where: { userId } }),
+        this.prisma.userEBook.count({
+          where: { userId, book: { type: 'EBOOK' } },
+        }),
         this.prisma.loan.count({ where: { userId } }),
         this.prisma.notification.count({ where: { userId, readAt: null } }),
       ]);

@@ -24,7 +24,7 @@ const navigation = [
 
 export default function MemberShell({ user, children }: { user: CurrentUser; children: React.ReactNode }) {
   const pathname = usePathname();
-  const circulationPage = pathname === "/dashboard/reservasi" || pathname === "/dashboard/pinjaman";
+  const circulationPage = ["/dashboard/reservasi", "/dashboard/pinjaman", "/dashboard/e-book"].includes(pathname);
   const router = useRouter();
   const resource = useMemberResource<MemberSummary>("dashboard");
   const { reload } = resource;

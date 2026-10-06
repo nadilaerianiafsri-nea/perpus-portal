@@ -19,7 +19,11 @@ export interface Loan {
 export interface MemberNotification {
   id: number; title: string; message: string; createdAt: string; readAt: string | null; href: string;
 }
-export interface MemberEBook { id: number; book: MemberBook; addedAt: string; lastOpenedAt: string | null; }
+export interface MemberEBook {
+  id: number; bookId: number; book: MemberBook & { format: string };
+  addedAt: string; lastOpenedAt: string | null;
+  progress: number; lastPosition: number; progressVersion: number;
+}
 export interface MemberSummary {
   currentUser: MemberProfile;
   stats: { waitingPickup: number; activeLoans: number; dueTomorrow: number; ebooks: number; history: number };

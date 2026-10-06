@@ -1,0 +1,15 @@
+.toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin: 20px 0; color: #2B3056; }
+.toolbar p { margin: 0; font-size: 13px; }
+.primary,.secondary { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; gap: 8px; padding: 10px 16px; border: 1px solid #dcdde5; border-radius: 8px; font: inherit; cursor: pointer; }
+.primary { color: white; background: #2B3056; border-color: #2B3056; }
+.secondary { color: #2B3056; background: #fff; }
+.primary:disabled,.secondary:disabled { opacity: .55; cursor: wait; }
+.primary:focus-visible,.secondary:focus-visible { outline: 3px solid #b08800; outline-offset: 4px; }
+.htmlViewer { width: 100%; height: 75dvh; border: 1px solid #ddd; border-radius: 12px; background: #fff; margin-bottom: 12px; }
+.error { padding: 15px; border: 1px solid #ffb5af; border-radius: 10px; background: #ffedec; color: #a21d15; line-height: 1.6; }
+.errorActions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.pdfViewer { width: 100%; min-width: 0; padding: 16px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 12px; background: #fff; }
+.pdfViewer canvas { display: block; max-width: 100%; height: auto; margin: auto; }
+.pageControls { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+@media (max-width: 600px) { .toolbar { align-items: stretch; }.toolbar > * { width: 100%; }.pdfViewer { padding: 10px; }.pageControls { gap: 8px; font-size: 12px; }.pageControls .secondary { padding: 10px; font-size: 13px; } }

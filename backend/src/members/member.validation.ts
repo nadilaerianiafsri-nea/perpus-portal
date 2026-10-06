@@ -44,6 +44,30 @@ export function extensionInput(body: unknown): Date {
   return date;
 }
 
+export function ebookProgressInput(body: unknown) {
+  const input = objectInput(body);
+  const { progress, lastPosition, expectedVersion } = input;
+  if (
+    Object.keys(input).some(
+      (key) => !['progress', 'lastPosition', 'expectedVersion'].includes(key),
+    ) ||
+    typeof progress !== 'number' ||
+    !Number.isFinite(progress) ||
+    progress < 0 ||
+    progress > 100 ||
+    typeof lastPosition !== 'number' ||
+    !Number.isFinite(lastPosition) ||
+    lastPosition < 0 ||
+    lastPosition > 1 ||
+    typeof expectedVersion !== 'number' ||
+    !Number.isSafeInteger(expectedVersion) ||
+    expectedVersion < 0 ||
+    expectedVersion > 2147483646
+  )
+    throw new BadRequestException('Progres atau posisi baca tidak valid.');
+  return { progress, lastPosition, expectedVersion };
+}
+
 export function profileInput(body: unknown, memberType: string | null) {
   const input = objectInput(body);
   const allowed = [

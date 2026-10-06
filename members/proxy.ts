@@ -3,7 +3,7 @@ import { API_URL } from "@/catalog/serverApi";
 const allowed: Record<string, RegExp> = {
   GET: /^me\/(dashboard|profile|reservations|loans(?:\/history)?|notifications|ebooks)$/,
   POST: /^me\/(reservations|loans\/\d+\/extend|ebooks(?:\/\d+\/open)?)$/,
-  PATCH: /^me\/(profile|reservations\/\d+\/cancel|notifications\/(read-all|\d+\/read))$/,
+  PATCH: /^me\/(profile|reservations\/\d+\/cancel|notifications\/(read-all|\d+\/read)|ebooks\/\d+\/progress)$/,
 };
 export async function memberProxy(request: Request, path: string) {
   const headers = { "Cache-Control": "no-store, private", "Content-Type": "application/json" };

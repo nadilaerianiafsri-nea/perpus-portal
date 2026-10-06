@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import CatalogShell from "@/catalog/CatalogShell";
 import { getBook } from "@/catalog/serverApi";
 import styles from "@/catalog/Catalog.module.css";
 import { getCurrentUser } from "@/auth/serverAuth";
-import EBookLibraryAction from "@/catalog/EBookLibraryAction";
+import EBookReader from "@/catalog/EBookReader";
 export default async function Page({
   params,
 }: {
@@ -12,6 +12,8 @@ export default async function Page({
 }) {
   const { id } = await params;
   const [{ book, unavailable }, user] = await Promise.all([getBook(id), getCurrentUser()]);
+  if (!user || !user.emailVerified) redirect(`/login?next=${encodeURIComponent(`/e-book/${id}/baca`)}`);
+  if (user.role !== "PENGUNJUNG") redirect("/admin");
   if (!book && !unavailable) notFound();
   if (book && book.type !== "EBOOK") notFound();
   // Only embed documents served by this website; never execute external content.
@@ -32,7 +34,6 @@ export default async function Page({
           <span>Baca</span>
         </nav>
         <h1>{book?.title ?? "Baca E-Book"}</h1>
-        {book && <EBookLibraryAction key={book.id} bookId={book.id} role={user?.role ?? null} opened={!!source} />}
         {unavailable ? (
           <div className={styles.state}>
             Data koleksi belum dapat dimuat. Silakan coba lagi.
@@ -44,12 +45,7 @@ export default async function Page({
                 ? "Bacaan contoh pengembangan, bukan isi publikasi resmi."
                 : "Baca koleksi digital melalui halaman ini."}
             </p>
-            <iframe
-              className={styles.viewer}
-              src={source}
-              title={`Pembaca ${book?.title}`}
-              sandbox="allow-same-origin"
-            />
+            {book && <EBookReader key={book.id} bookId={book.id} source={source} title={book.title} />}
           </>
         ) : (
           <div className={styles.state}>

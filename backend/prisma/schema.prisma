@@ -217,6 +217,9 @@ model UserEBook {
   book         Book      @relation(fields: [bookId], references: [id], onDelete: Restrict)
   addedAt      DateTime  @default(now())
   lastOpenedAt DateTime?
+  progress        Float @default(0)
+  lastPosition    Float @default(0)
+  progressVersion Int   @default(0)
 
   @@unique([userId, bookId])
   @@index([userId, addedAt])

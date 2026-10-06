@@ -20,7 +20,8 @@ Prefix anggota: `/members/me`.
 | PATCH | `/notifications/read-all` | `{success: true}` |
 | PATCH | `/notifications/:id/read` | `{success: true}` |
 | GET / POST | `/ebooks` | GET `{ebooks}`; POST `{bookId}` → `{success: true}` |
-| POST | `/ebooks/:bookId/open` | Simpan idempotent dan perbarui lastOpenedAt |
+| POST | `/ebooks/:bookId/open` | Simpan idempotent, perbarui lastOpenedAt, respons `{success: true, ebook}` dengan posisi/progres tersimpan |
+| PATCH | `/ebooks/:bookId/progress` | `{progress, lastPosition, expectedVersion}` → `{ebook}`; konflik versi ditolak dengan 409 |
 
 Endpoint petugas hanya menerima sesi `ADMIN` terverifikasi:
 
@@ -57,6 +58,16 @@ SENDING menggunakan lease 15 menit; pekerjaan yang tertinggal setelah proses mat
 WhatsApp belum memiliki integrasi API. Reminder menyimpan `whatsappDelivery = MANUAL`, dan UI menyatakan perlu tindak lanjut manual petugas. Tidak ada klaim WhatsApp terkirim otomatis. WhatsApp wajib tersedia sebelum reservasi; edit profil memvalidasi nomor Indonesia.
 
 ## Database dan pemeriksaan
+
+### E-Book Saya
+
+Model `UserEBook` existing tetap memakai unique `(userId, bookId)`. Endpoint anggota mengambil user dari sesi, menerima hanya buku `EBOOK`, dan tidak membuat notifikasi pembacaan. GET diurutkan menurut `lastOpenedAt` terbaru, kemudian `addedAt`. Ringkasan menghitung relasi E-Book milik anggota yang sama.
+
+Migration additive `20261006000300_ebook_reading_progress` hanya menambahkan tiga field pada `user_ebooks`: `progress` (0–100, capaian tertinggi), `lastPosition` (0–1, posisi terakhir), dan `progressVersion` (versi update). Default nol menjaga record existing tetap dapat dibuka. Tidak ada tabel kedua atau reset database.
+
+Viewer existing `/e-book/[id]/baca` menggunakan scroll relatif untuk HTML, dan halaman PDF yang dirender untuk PDF. Posisi PDF dinormalisasi sebagai `(halaman - 1) / (jumlahHalaman - 1)`; progres mengikuti `halaman / jumlahHalaman * 100`. Pembukaan pertama tetap 0%; perpindahan halaman atau tindakan selesai membaca memperbarui progres. PDF satu halaman menggunakan tindakan selesai membaca. File contoh existing tetap didukung.
+
+Client menggabungkan update dengan debounce 600 ms, mempertahankan capaian tertinggi serta posisi terbaru, dan mengirim update secara berurutan. Navigasi melalui tombol kembali menunggu penyimpanan; `visibilitychange`/`pagehide` mencoba menyimpan dengan `keepalive`. Penutupan paksa browser atau perangkat offline tetap dapat menghentikan pengiriman. Backend mengunci baris milik anggota di transaksi dan membandingkan `expectedVersion` sebelum menulis; request lama ditolak agar tidak menggeser posisi baru. Konflik membutuhkan muat ulang pembaca. Posisi mundur yang disengaja diterima dengan versi terbaru tanpa menurunkan capaian tertinggi.
 
 Migration additive: `prisma/migrations/20261006000200_member_area/migration.sql`. Menambah Reservation, Loan, LoanExtension, Notification, UserEBook dan nilai HILANG pada CopyStatus. Semua relasi memakai foreign key; existing User/Book/BookCopy/MemberProfile/BookGrant tetap digunakan.
 

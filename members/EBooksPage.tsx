@@ -1,28 +1,29 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
-import { FiBookOpen } from "react-icons/fi";
-import { memberRequest, useMemberResource } from "./api";
-import { BookCover, EmptyState, ErrorState, LoadingCards, PageHeading } from "./MemberUI";
-import { memberDate } from "./format";
+import { FiMonitor } from "react-icons/fi";
+import { useMemberResource } from "./api";
+import { ErrorState, LoadingCards, PageHeading } from "./MemberUI";
 import type { MemberEBook } from "./types";
-import styles from "./Members.module.css";
+import shared from "./Members.module.css";
+import styles from "./EBooks.module.css";
 
 export default function EBooksPage() {
-  const router = useRouter();
   const resource = useMemberResource<{ ebooks: MemberEBook[] }>("ebooks");
-  const [busy, setBusy] = useState<number | null>(null);
-  const pending = useRef(false);
-  const [actionError, setActionError] = useState("");
-  async function read(bookId: number) {
-    if (pending.current) return;
-    pending.current = true; setBusy(bookId); setActionError("");
-    try { await memberRequest(`ebooks/${bookId}/open`, { method: "POST" }); router.push(`/e-book/${bookId}/baca`); }
-    catch (error) { setActionError(error instanceof Error ? error.message : "E-Book belum dapat dibuka. Silakan coba lagi."); pending.current = false; setBusy(null); }
-  }
-  return <div className={styles.pageStack}><PageHeading title="E-Book Saya" description="Koleksi bacaan digital yang Anda simpan. Buka kembali dan lanjutkan membaca kapan saja." ><Link className={styles.outlineButton} href="/e-book">Jelajahi E-Book</Link></PageHeading>{actionError && <p className={styles.error} role="alert">{actionError}</p>}
-    {resource.loading ? <LoadingCards /> : resource.error ? <ErrorState message={resource.error} retry={resource.reload} /> : !resource.data?.ebooks.length ? <EmptyState message="Belum ada E-Book di koleksi Anda." href="/e-book" label="Jelajahi E-Book" /> : resource.data.ebooks.map(ebook => <article className={`${styles.card} ${styles.bookRow}`} key={ebook.id}><BookCover book={ebook.book} /><div className={styles.bookInfo}><h2>{ebook.book.title}</h2><p className={styles.muted}>{ebook.book.author}</p><dl className={styles.details}><div><dt>Kode Buku</dt><dd>{ebook.book.code}</dd></div><div><dt>Ditambahkan</dt><dd>{memberDate(ebook.addedAt)}</dd></div>{ebook.lastOpenedAt && <div><dt>Terakhir Dibuka</dt><dd>{memberDate(ebook.lastOpenedAt, true)}</dd></div>}</dl></div><div className={styles.rowActions}><button className={styles.button} disabled={busy !== null} onClick={() => read(ebook.book.id)}><FiBookOpen />{busy === ebook.book.id ? "Membuka..." : ebook.lastOpenedAt ? "Lanjutkan Bacaan" : "Baca E-Book"}</button><Link className={styles.outlineButton} href={`/koleksi/${ebook.book.id}`}>Lihat Detail</Link></div></article>)}
+  return <div className={shared.pageStack}>
+    <PageHeading title="E-Book Saya" description="Koleksi digital yang sedang Anda baca. Lanjutkan dari terakhir dibuka." />
+    {resource.loading ? <LoadingCards /> : resource.error ? <ErrorState message="E-Book Anda belum dapat dimuat. Silakan coba lagi." retry={resource.reload} /> : !resource.data?.ebooks.length ? <div className={styles.empty}>
+      <FiMonitor size={32} aria-hidden /><h2>Belum ada E-Book yang sedang Anda baca.</h2><p>Buka katalog E-Book dan mulai membaca koleksi digital perpustakaan.</p><Link className={styles.read} href="/e-book">Jelajahi E-Book</Link>
+    </div> : <div className={styles.grid}>{resource.data.ebooks.map(ebook => {
+      const progress = Number.isFinite(ebook.progress) ? Math.round(Math.max(0, Math.min(100, ebook.progress))) : 0;
+      return <article className={styles.card} key={ebook.id} data-ebook-id={ebook.book.id}>
+        <div className={styles.header}><FiMonitor aria-hidden />E-Book</div>
+        <div className={styles.body}>
+          <Link className={styles.cover} href={`/koleksi/${ebook.book.id}`} aria-label={`Lihat detail ${ebook.book.title}`}><Image src={ebook.book.coverUrl || "/images/landing/book-placeholder-1.svg"} alt={`Sampul ${ebook.book.title}`} fill sizes="80px" unoptimized /></Link>
+          <div className={styles.information}><h2>{ebook.book.title}</h2><p>Progres membaca</p><progress className={styles.progress} value={progress} max={100} aria-label={`Progres membaca ${ebook.book.title}: ${progress}%`} /><span className={styles.percentage}>{progress}%</span><Link className={styles.read} href={`/e-book/${ebook.book.id}/baca`}>Lanjut Baca</Link></div>
+        </div>
+      </article>;
+    })}</div>}
   </div>;
 }

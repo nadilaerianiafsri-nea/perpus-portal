@@ -1,0 +1,23 @@
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.card { border: 1px solid #9dddff; border-radius: 16px; overflow: hidden; background: linear-gradient(135deg, #edf9ff, #fff); box-shadow: 0 2px 3px #00063312; }
+.header { display: flex; gap: 9px; align-items: center; padding: 12px 16px; background: #eaf7ff; color: #096ca5; border-bottom: 1px solid #a9e0ff; font-size: 12px; font-weight: 600; }
+.header svg { flex: 0 0 16px; width: 16px; height: 16px; }
+.body { display: grid; grid-template-columns: 80px minmax(0, 1fr); gap: 16px; padding: 16px; }
+.cover { width: 80px; height: 112px; position: relative; overflow: hidden; border-radius: 8px; background: #ddecf8; box-shadow: 0 1px 2px #00063315; }
+.cover img { object-fit: cover; }
+.information h2 { margin: 2px 0 4px; font-size: 16px; line-height: 1.35; overflow-wrap: anywhere; }
+.information > p { margin-bottom: 6px; font-size: 12px; color: #666; }
+.progress { display: block; width: 100%; height: 8px; border: 0; border-radius: 10px; overflow: hidden; appearance: none; background: #e4f4ff; color: #1b9de9; }
+.progress::-webkit-progress-bar { background: #e4f4ff; border-radius: 10px; }
+.progress::-webkit-progress-value { background: #1b9de9; border-radius: 10px; }
+.progress::-moz-progress-bar { background: #1b9de9; border-radius: 10px; }
+.percentage { display: block; margin: 5px 0 3px; font-size: 11px; color: #096ca5; font-weight: 600; }
+.read { display: flex; align-items: center; justify-content: center; min-height: 38px; border-radius: 8px; padding: 8px 10px; background: #2B3056; color: #fff; font-size: 13px; text-align: center; }
+.read:hover { background: #000633; }
+.empty { border: 1px solid #e7e7ed; border-radius: 16px; padding: 36px 24px; background: #fff; text-align: center; }
+.empty > svg { color: #2B3056; margin-bottom: 14px; }
+.empty h2 { margin-bottom: 8px; }
+.empty p { font-size: 14px; color: #666; margin-bottom: 20px; }
+.empty a { width: fit-content; margin: auto; min-height: 44px; padding-inline: 20px; }
+@media (max-width: 1200px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }.body { gap: 12px; } }
+@media (max-width: 600px) { .grid { grid-template-columns: minmax(0, 1fr); }.body { gap: 16px; }.read { min-height: 44px; } }
