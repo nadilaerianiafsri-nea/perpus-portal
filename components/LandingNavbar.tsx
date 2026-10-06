@@ -1,6 +1,6 @@
 import Link from "next/link";
 type NavbarProps = {
-  active?: "beranda" | "koleksi" | "ebook" | "hibah" | "tentang" | "panduan" | "faq";
+  active?: "beranda" | "koleksi" | "ebook" | "hibah" | "tentang" | "panduan" | "faq" | "kontak";
   user?: { name: string; role: "ADMIN" | "PENGUNJUNG" } | null;
 };
 export default function LandingNavbar({
@@ -15,7 +15,7 @@ export default function LandingNavbar({
     ["Tentang", "/tentang", "tentang"],
     ["Panduan", "/panduan", "panduan"],
     ["FAQ", "/faq", "faq"],
-    ["Kontak", "/#kontak", "kontak"],
+    ["Kontak", "/kontak", "kontak"],
   ];
   const actions = user ? (
     <Link

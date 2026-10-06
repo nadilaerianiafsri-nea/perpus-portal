@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { FiBookOpen, FiClock, FiMail, FiMapPin, FiPhone } from "react-icons/fi";
+import { FiBookOpen, FiMail } from "react-icons/fi";
+import ServiceDetails from "./ServiceDetails";
+import { serviceInfo } from "@/shared/serviceInfo.cjs";
 
 export default function LandingFooter({
   catalog = false,
@@ -35,23 +37,12 @@ export default function LandingFooter({
             <strong>Bantuan</strong>
             <Link href="/tentang">Tentang</Link>
             <Link href="/faq">FAQ</Link>
-            <Link href="/#kontak">Kontak</Link>
+            <Link href="/kontak">Kontak</Link>
             <Link href="/panduan">Panduan Peminjaman</Link>
           </div>
           <div className="footer-col">
             <strong>Informasi Layanan</strong>
-            <span>
-              <FiMapPin /> [Alamat Perpustakaan]
-            </span>
-            <span>
-              <FiClock /> [Jam Layanan]
-            </span>
-            <span>
-              <FiPhone /> [Kontak Telepon]
-            </span>
-            <span>
-              <FiMail /> [Email Perpustakaan]
-            </span>
+            <ServiceDetails />
           </div>
         </div>
         <div className="landing-shell footer-bottom">
@@ -72,9 +63,9 @@ export default function LandingFooter({
             Portal digital layanan informasi, koleksi, dan peminjaman
             perpustakaan Kementerian Hukum Riau.
           </p>
-          <Link href="#">
-            <FiMail /> Email Layanan
-          </Link>
+          <a href={`mailto:${serviceInfo.email}`}>
+            <FiMail /> {serviceInfo.email}
+          </a>
         </div>
 
         <div className="footer-col">
@@ -88,21 +79,13 @@ export default function LandingFooter({
         <div className="footer-col">
           <strong>Bantuan</strong>
           <Link href="/faq">FAQ</Link>
-          <Link href="#layanan">Kontak</Link>
+          <Link href="/kontak">Kontak</Link>
           <Link href="/panduan">Panduan Peminjaman</Link>
         </div>
 
         <div className="footer-col">
           <strong>Informasi Layanan</strong>
-          <span>
-            <FiClockIcon /> Jam Layanan
-          </span>
-          <span>
-            <FiMapPin /> Kemenkum Riau
-          </span>
-          <span>
-            <FiPhone /> Layanan Perpustakaan
-          </span>
+          <ServiceDetails />
         </div>
       </div>
 
@@ -112,8 +95,4 @@ export default function LandingFooter({
       </div>
     </footer>
   );
-}
-
-function FiClockIcon() {
-  return <span aria-hidden="true">◷</span>;
 }

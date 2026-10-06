@@ -14,6 +14,7 @@ import {
 } from "react-icons/fi";
 import LandingNavbar from "../components/LandingNavbar";
 import LandingFooter from "../components/LandingFooter";
+import { serviceInfo } from "@/shared/serviceInfo.cjs";
 
 const books = [
   { title: "Koleksi Buku Contoh 1", category: "Umum", image: "/images/ASSET PERPUS/asset buku terbuka.png" },
@@ -314,11 +315,11 @@ export default function Home() {
           <div className="landing-shell">
             <div className="section-head"><h2>Informasi Layanan</h2></div>
             <div className="info-grid">
-              <article><FiClock /><div><span>JAM LAYANAN</span><strong>Senin - Jumat</strong></div></article>
-              <article><FiMapPin /><div><span>ALAMAT</span><strong>Kemenkum Riau</strong></div></article>
-              <article><FiPhone /><div><span>KONTAK</span><strong>Layanan Perpustakaan</strong></div></article>
+              <article><FiClock /><div><span>JAM LAYANAN</span><strong>{serviceInfo.hours}</strong></div></article>
+              <article><FiMapPin /><div><span>ALAMAT</span><strong><a href={serviceInfo.openStreetMapUrl} target="_blank" rel="noopener noreferrer">{serviceInfo.address}</a></strong></div></article>
+              <article><FiPhone /><div><span>KONTAK</span><strong><a href={serviceInfo.phoneUrl}>{serviceInfo.phone}</a></strong><a href={`mailto:${serviceInfo.email}`}>{serviceInfo.email}</a></div></article>
             </div>
-            <div className="contact-center"><a className="outline-btn" href="#"><FiMail /> Hubungi Kami</a></div>
+            <div className="contact-center"><a className="outline-btn" href="/kontak"><FiMail /> Hubungi Kami</a></div>
           </div>
         </section>
       </main>

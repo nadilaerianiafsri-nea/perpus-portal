@@ -135,6 +135,9 @@ img { display: block; }
   box-shadow: 0 5px 14px rgba(0,6,51,.16);
 }
 .mobile-menu { display: none; }
+.footer-col > :is(a, span) { display: flex; align-items: flex-start; gap: 8px; }
+.footer-col > :is(a, span) > svg { flex-shrink: 0; margin-top: 2px; }
+.footer-col > :is(a, span) > span { display: block; min-width: 0; overflow-wrap: anywhere; }
 
 /* HERO */
 .hero {
