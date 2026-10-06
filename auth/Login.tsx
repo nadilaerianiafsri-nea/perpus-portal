@@ -7,6 +7,7 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import { SiGoogle } from "react-icons/si";
 import AuthShell from "./AuthShell";
 import styles from "./Auth.module.css";
+import { loginReturn } from "./loginReturn";
 
 type LoginResponse = {
   user?: {
@@ -70,7 +71,7 @@ export default function Login() {
       router.replace(
         data.user.role === "ADMIN"
           ? "/admin"
-          : "/pengunjung",
+          : loginReturn(new URLSearchParams(window.location.search).get("next")),
       );
 
       router.refresh();

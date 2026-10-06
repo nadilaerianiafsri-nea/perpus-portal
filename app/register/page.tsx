@@ -10,7 +10,7 @@ export default async function RegisterPage() {
     redirect(
       user.role === "ADMIN"
         ? "/admin"
-        : "/pengunjung",
+        : "/dashboard",
     );
   }
 

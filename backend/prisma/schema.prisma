@@ -29,6 +29,10 @@ model User {
   memberType    MemberType?
   emailVerified Boolean        @default(false)
   memberProfile MemberProfile?
+  reservations  Reservation[]
+  loans         Loan[]
+  notifications Notification[]
+  ebooks        UserEBook[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 
@@ -59,29 +63,33 @@ enum CopyStatus {
   TERSEDIA
   DIRESERVASI
   DIPINJAM
+  HILANG
 }
 
 model Book {
-  id          Int            @id @default(autoincrement())
-  code        String         @unique @db.VarChar(64)
-  title       String
-  author      String
-  isbnIssn    String?        @db.VarChar(64)
-  publisher   String
-  year        Int
-  edition     String?
-  language    String         @db.VarChar(64)
-  subject     String
-  type        CollectionType
-  format      String         @db.VarChar(64)
-  description String         @db.Text
-  coverUrl    String
-  shelf       String?
-  ebookUrl    String?
-  isDemo      Boolean        @default(false)
-  copies      BookCopy[]
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  id           Int            @id @default(autoincrement())
+  code         String         @unique @db.VarChar(64)
+  title        String
+  author       String
+  isbnIssn     String?        @db.VarChar(64)
+  publisher    String
+  year         Int
+  edition      String?
+  language     String         @db.VarChar(64)
+  subject      String
+  type         CollectionType
+  format       String         @db.VarChar(64)
+  description  String         @db.Text
+  coverUrl     String
+  shelf        String?
+  ebookUrl     String?
+  isDemo       Boolean        @default(false)
+  copies       BookCopy[]
+  reservations Reservation[]
+  loans        Loan[]
+  userEBooks   UserEBook[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
 
   @@index([type, year])
   @@index([language])
@@ -90,15 +98,129 @@ model Book {
 }
 
 model BookCopy {
-  id       Int        @id @default(autoincrement())
-  bookId   Int
-  book     Book       @relation(fields: [bookId], references: [id], onDelete: Restrict)
-  code     String     @unique @db.VarChar(80)
-  status   CopyStatus @default(TERSEDIA)
-  location String
+  id           Int           @id @default(autoincrement())
+  bookId       Int
+  book         Book          @relation(fields: [bookId], references: [id], onDelete: Restrict)
+  code         String        @unique @db.VarChar(80)
+  status       CopyStatus    @default(TERSEDIA)
+  location     String
+  reservations Reservation[]
+  loans        Loan[]
 
   @@index([bookId, status])
   @@map("book_copies")
+}
+
+enum ReservationStatus {
+  MENUNGGU_PENGAMBILAN
+  KEDALUWARSA
+  DIBATALKAN
+  DIAMBIL
+}
+
+enum LoanStatus {
+  AKTIF
+  DIKEMBALIKAN
+  HILANG
+}
+
+enum EmailDeliveryStatus {
+  NOT_REQUIRED
+  PENDING
+  SENDING
+  SENT
+  FAILED
+}
+
+model Reservation {
+  id          Int               @id @default(autoincrement())
+  userId      Int
+  user        User              @relation(fields: [userId], references: [id], onDelete: Restrict)
+  bookId      Int
+  book        Book              @relation(fields: [bookId], references: [id], onDelete: Restrict)
+  copyId      Int
+  copy        BookCopy          @relation(fields: [copyId], references: [id], onDelete: Restrict)
+  status      ReservationStatus @default(MENUNGGU_PENGAMBILAN)
+  createdAt   DateTime          @default(now())
+  expiresAt   DateTime
+  pickedUpAt  DateTime?
+  cancelledAt DateTime?
+  loan        Loan?
+
+  @@index([userId, status, bookId])
+  @@index([status, expiresAt])
+  @@index([copyId])
+  @@map("reservations")
+}
+
+model Loan {
+  id             Int             @id @default(autoincrement())
+  userId         Int
+  user           User            @relation(fields: [userId], references: [id], onDelete: Restrict)
+  bookId         Int
+  book           Book            @relation(fields: [bookId], references: [id], onDelete: Restrict)
+  copyId         Int
+  copy           BookCopy        @relation(fields: [copyId], references: [id], onDelete: Restrict)
+  reservationId  Int             @unique
+  reservation    Reservation     @relation(fields: [reservationId], references: [id], onDelete: Restrict)
+  status         LoanStatus      @default(AKTIF)
+  borrowedAt     DateTime
+  dueAt          DateTime
+  returnedAt     DateTime?
+  extensionCount Int             @default(0)
+  extensions     LoanExtension[]
+
+  @@index([userId, status, dueAt])
+  @@index([status, dueAt])
+  @@index([copyId])
+  @@map("loans")
+}
+
+model LoanExtension {
+  id            Int      @id @default(autoincrement())
+  loanId        Int
+  loan          Loan     @relation(fields: [loanId], references: [id], onDelete: Restrict)
+  previousDueAt DateTime
+  newDueAt      DateTime
+  createdAt     DateTime @default(now())
+
+  @@index([loanId, createdAt])
+  @@map("loan_extensions")
+}
+
+model Notification {
+  id               Int                 @id @default(autoincrement())
+  userId           Int
+  user             User                @relation(fields: [userId], references: [id], onDelete: Restrict)
+  eventKey         String              @unique @db.VarChar(191)
+  title            String
+  message          String              @db.Text
+  href             String              @db.VarChar(191)
+  createdAt        DateTime            @default(now())
+  readAt           DateTime?
+  emailDelivery    EmailDeliveryStatus @default(NOT_REQUIRED)
+  emailAttempts    Int                 @default(0)
+  emailAttemptedAt DateTime?
+  emailSentAt      DateTime?
+  whatsappDelivery String              @default("NOT_REQUIRED") @db.VarChar(32)
+
+  @@index([userId, readAt, createdAt])
+  @@index([emailDelivery, emailAttemptedAt])
+  @@map("notifications")
+}
+
+model UserEBook {
+  id           Int       @id @default(autoincrement())
+  userId       Int
+  user         User      @relation(fields: [userId], references: [id], onDelete: Restrict)
+  bookId       Int
+  book         Book      @relation(fields: [bookId], references: [id], onDelete: Restrict)
+  addedAt      DateTime  @default(now())
+  lastOpenedAt DateTime?
+
+  @@unique([userId, bookId])
+  @@index([userId, addedAt])
+  @@map("user_ebooks")
 }
 
 enum GrantStatus {

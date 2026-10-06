@@ -666,3 +666,21 @@
     animation: none;
   }
 }
+.reservationDialog {
+  max-width: 540px;
+  width: calc(100% - 32px);
+  padding: 28px;
+  border: 1px solid #e5e5e9;
+  border-radius: 20px;
+  color: #000633;
+  box-shadow: 0 20px 70px #00063340;
+}
+.reservationDialog::backdrop { background: #00063388; }
+.reservationDialog p { color: #555; line-height: 1.65; }
+.actionRow { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+.actionRow button { flex: 1; }
+.libraryAction { margin-top: 14px; }
+.reservationDialog button:focus-visible, .libraryAction button:focus-visible {
+  outline: 3px solid #ffd000;
+  outline-offset: 3px;
+}

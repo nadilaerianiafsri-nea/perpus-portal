@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { CollectionsModule } from './collections/collections.module';
 import { GrantsModule } from './grants/grants.module';
 import { ContactModule } from './contact/contact.module';
+import { MembersModule } from './members/members.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ContactModule } from './contact/contact.module';
     CollectionsModule,
     GrantsModule,
     ContactModule,
+    MembersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

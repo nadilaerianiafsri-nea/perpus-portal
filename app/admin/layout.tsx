@@ -14,7 +14,7 @@ export default async function AdminLayout({
   }
 
   if (user.role !== "ADMIN") {
-    redirect("/pengunjung");
+    redirect("/dashboard");
   }
 
   return children;

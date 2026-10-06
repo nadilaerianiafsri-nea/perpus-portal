@@ -1,7 +1,5 @@
-import Dashboard from "@/dashboard/Dashboard";
+import { redirect } from "next/navigation";
 
 export default function PengunjungPage() {
-  return (
-    <Dashboard role="pengunjung" />
-  );
+  redirect("/dashboard");
 }

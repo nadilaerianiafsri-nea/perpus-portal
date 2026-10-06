@@ -20,7 +20,7 @@ export default function LandingNavbar({
   const actions = user ? (
     <Link
       className="member-btn"
-      href={user.role === "ADMIN" ? "/admin" : "/pengunjung"}
+      href={user.role === "ADMIN" ? "/admin" : "/dashboard"}
     >
       Dashboard Saya
     </Link>

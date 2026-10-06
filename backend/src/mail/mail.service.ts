@@ -28,6 +28,18 @@ export class MailService {
   async sendPasswordResetEmail(email: string, link: string): Promise<boolean> {
     return this.send(email, link, true);
   }
+
+  async sendMemberReminder(
+    email: string,
+    title: string,
+    message: string,
+  ): Promise<boolean> {
+    return this.deliver({
+      to: email,
+      subject: `${title} — Perpustakaan Kemenkum Riau`,
+      text: `${message}\n\nBuka Dashboard Anggota untuk melihat tenggat terbaru. Tidak ada denda uang. Jika membutuhkan bantuan, hubungi petugas perpustakaan.`,
+    });
+  }
   async sendContactEmail(input: ContactInput): Promise<boolean> {
     const recipient =
       this.config.get<string>('CONTACT_RECIPIENT_EMAIL')?.trim() ||

@@ -3,13 +3,15 @@ import { notFound } from "next/navigation";
 import CatalogShell from "@/catalog/CatalogShell";
 import { getBook } from "@/catalog/serverApi";
 import styles from "@/catalog/Catalog.module.css";
+import { getCurrentUser } from "@/auth/serverAuth";
+import EBookLibraryAction from "@/catalog/EBookLibraryAction";
 export default async function Page({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const { book, unavailable } = await getBook(id);
+  const [{ book, unavailable }, user] = await Promise.all([getBook(id), getCurrentUser()]);
   if (!book && !unavailable) notFound();
   if (book && book.type !== "EBOOK") notFound();
   // Only embed documents served by this website; never execute external content.
@@ -30,6 +32,7 @@ export default async function Page({
           <span>Baca</span>
         </nav>
         <h1>{book?.title ?? "Baca E-Book"}</h1>
+        {book && <EBookLibraryAction key={book.id} bookId={book.id} role={user?.role ?? null} opened={!!source} />}
         {unavailable ? (
           <div className={styles.state}>
             Data koleksi belum dapat dimuat. Silakan coba lagi.
