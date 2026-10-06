@@ -1,10 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import type { ComponentType, FormEvent, ReactNode } from "react";
 import { useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  FiBarChart2,
   FiBell,
   FiBookOpen,
   FiChevronDown,
@@ -12,10 +12,11 @@ import {
   FiGrid,
   FiHome,
   FiLogOut,
+  FiMenu,
   FiRepeat,
   FiSearch,
-  FiSettings,
   FiUsers,
+  FiX,
 } from "react-icons/fi";
 
 import styles from "./Admin.module.css";
@@ -28,12 +29,17 @@ type AdminShellProps = {
   };
 };
 
+type SubMenuItem = {
+  label: string;
+  route: string;
+};
+
 type MenuItem = {
   id: string;
   label: string;
   icon: ComponentType<{ size?: number; className?: string }>;
-  expandable?: boolean;
   route?: string;
+  children?: SubMenuItem[];
 };
 
 const menuItems: MenuItem[] = [
@@ -47,39 +53,89 @@ const menuItems: MenuItem[] = [
     id: "koleksi",
     label: "Koleksi",
     icon: FiBookOpen,
-    expandable: true,
+    children: [
+      { label: "Data Buku", route: "/admin/koleksi/data-buku" },
+      { label: "E-Book", route: "/admin/koleksi/e-book" },
+    ],
   },
   {
     id: "keanggotaan",
     label: "Keanggotaan",
     icon: FiUsers,
-    expandable: true,
+    children: [
+      {
+        label: "Semua Anggota",
+        route: "/admin/keanggotaan/semua-anggota",
+      },
+      {
+        label: "Masyarakat Umum",
+        route: "/admin/keanggotaan/masyarakat-umum",
+      },
+      {
+        label: "Mahasiswa",
+        route: "/admin/keanggotaan/mahasiswa",
+      },
+      {
+        label: "Pegawai Internal",
+        route: "/admin/keanggotaan/pegawai-internal",
+      },
+    ],
   },
   {
     id: "transaksi",
     label: "Transaksi",
     icon: FiRepeat,
-    expandable: true,
+    children: [
+      {
+        label: "Reservasi 24 Jam",
+        route: "/admin/transaksi/reservasi-24-jam",
+      },
+      {
+        label: "Peminjaman Aktif",
+        route: "/admin/transaksi/peminjaman-aktif",
+      },
+      {
+        label: "Pengembalian",
+        route: "/admin/transaksi/pengembalian",
+      },
+      {
+        label: "Perpanjangan",
+        route: "/admin/transaksi/perpanjangan",
+      },
+      {
+        label: "Terlambat",
+        route: "/admin/transaksi/terlambat",
+      },
+      {
+        label: "Buku Hilang & Penggantian",
+        route: "/admin/transaksi/buku-hilang-penggantian",
+      },
+    ],
   },
   {
-    id: "hibah",
+    id: "hibah-buku",
     label: "Hibah Buku",
     icon: FiGift,
+    route: "/admin/hibah-buku",
   },
   {
     id: "notifikasi",
     label: "Notifikasi",
     icon: FiBell,
-  },
-  {
-    id: "laporan",
-    label: "Laporan",
-    icon: FiBarChart2,
-  },
-  {
-    id: "pengaturan",
-    label: "Pengaturan Perpustakaan",
-    icon: FiSettings,
+    children: [
+      {
+        label: "Reminder",
+        route: "/admin/notifikasi/reminder",
+      },
+      {
+        label: "Log Email",
+        route: "/admin/notifikasi/log-email",
+      },
+      {
+        label: "Log WhatsApp",
+        route: "/admin/notifikasi/log-whatsapp",
+      },
+    ],
   },
 ];
 
@@ -98,6 +154,30 @@ function initials(name: string) {
   );
 }
 
+function activeGroup(pathname: string) {
+  return (
+    menuItems.find((item) =>
+      item.children?.some((child) => pathname === child.route),
+    )?.id ?? null
+  );
+}
+
+function currentPageTitle(pathname: string) {
+  for (const item of menuItems) {
+    if (item.route === pathname) {
+      return item.label;
+    }
+
+    const child = item.children?.find((entry) => entry.route === pathname);
+
+    if (child) {
+      return child.label;
+    }
+  }
+
+  return "Dashboard";
+}
+
 export default function AdminShell({ children, user }: AdminShellProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -105,52 +185,16 @@ export default function AdminShell({ children, user }: AdminShellProps) {
   const [loggingOut, setLoggingOut] = useState(false);
   const [search, setSearch] = useState("");
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const currentTitle = useMemo(() => {
-    if (pathname === "/admin") {
-      return "Dashboard";
-    }
+  const currentTitle = useMemo(() => currentPageTitle(pathname), [pathname]);
 
-    if (pathname.startsWith("/admin/koleksi")) {
-      return "Koleksi";
-    }
-
-    if (pathname.startsWith("/admin/keanggotaan")) {
-      return "Keanggotaan";
-    }
-
-    if (pathname.startsWith("/admin/transaksi")) {
-      return "Transaksi";
-    }
-
-    if (pathname.startsWith("/admin/hibah")) {
-      return "Hibah Buku";
-    }
-
-    if (pathname.startsWith("/admin/notifikasi")) {
-      return "Notifikasi";
-    }
-
-    if (pathname.startsWith("/admin/laporan")) {
-      return "Laporan";
-    }
-
-    if (pathname.startsWith("/admin/pengaturan")) {
-      return "Pengaturan Perpustakaan";
-    }
-
-    return "Dashboard";
-  }, [pathname]);
-
-  function handleMenuClick(item: MenuItem) {
-    if (item.route) {
-      router.push(item.route);
+  function toggleMenu(item: MenuItem) {
+    if (!item.children) {
       return;
     }
 
-    if (item.expandable) {
-      setOpenMenu((current) => (current === item.id ? null : item.id));
-    }
+    setOpenMenu((current) => (current === item.id ? null : item.id));
   }
 
   async function handleLogout() {
@@ -173,64 +217,145 @@ export default function AdminShell({ children, user }: AdminShellProps) {
 
   function handleSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    const keyword = search.trim();
+
+    const target = keyword
+      ? `/admin/koleksi/data-buku?search=${encodeURIComponent(keyword)}`
+      : "/admin/koleksi/data-buku";
+
+    setOpenMenu("koleksi");
+    router.push(target);
   }
 
   return (
     <main className={styles.adminPage}>
-      <aside className={styles.sidebar}>
-        <div className={styles.brand}>
-          <span className={styles.brandMark}>P</span>
+      {mobileMenuOpen ? (
+        <button
+          type="button"
+          className={styles.sidebarOverlay}
+          aria-label="Tutup menu admin"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      ) : null}
 
-          <div className={styles.brandText}>
-            <strong>Perpustakaan</strong>
-            <small>KEMENKUM RIAU</small>
-          </div>
+      <aside
+        className={`${styles.sidebar} ${
+          mobileMenuOpen ? styles.sidebarOpen : ""
+        }`}
+      >
+        <div className={styles.brandRow}>
+          <Link
+            href="/admin"
+            className={styles.brand}
+            onClick={() => {
+              setOpenMenu(null);
+              setMobileMenuOpen(false);
+            }}
+          >
+            <span className={styles.brandMark}>P</span>
+
+            <div className={styles.brandText}>
+              <strong>Perpustakaan</strong>
+              <small>KEMENKUM RIAU</small>
+            </div>
+          </Link>
+
+          <button
+            type="button"
+            className={styles.sidebarClose}
+            aria-label="Tutup menu admin"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            <FiX size={20} />
+          </button>
         </div>
 
         <nav className={styles.menu} aria-label="Menu admin perpustakaan">
           {menuItems.map((item) => {
             const Icon = item.icon;
 
-            const selected = item.route
-              ? pathname === item.route
-              : pathname.startsWith(`/admin/${item.id}`);
+            const isRouteActive = item.route === pathname;
 
-            const expanded = openMenu === item.id;
+            const isGroupActive = item.children?.some(
+              (child) => child.route === pathname,
+            );
+
+            const expanded =
+              openMenu === item.id || (openMenu === null && isGroupActive);
+
+            if (item.route) {
+              return (
+                <Link
+                  key={item.id}
+                  href={item.route}
+                  className={isRouteActive ? styles.menuActive : undefined}
+                  aria-current={isRouteActive ? "page" : undefined}
+                  onClick={() => {
+                    setOpenMenu(null);
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <Icon size={18} />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            }
 
             return (
-              <button
-                key={item.id}
-                type="button"
-                className={selected ? styles.menuActive : undefined}
-                aria-current={selected ? "page" : undefined}
-                aria-expanded={item.expandable ? expanded : undefined}
-                onClick={() => handleMenuClick(item)}
-              >
-                <Icon size={20} />
+              <div key={item.id} className={styles.menuGroup}>
+                <button
+                  type="button"
+                  className={isGroupActive ? styles.menuGroupActive : undefined}
+                  aria-expanded={expanded}
+                  onClick={() => toggleMenu(item)}
+                >
+                  <Icon size={18} />
+                  <span>{item.label}</span>
 
-                <span>{item.label}</span>
-
-                {item.expandable ? (
                   <FiChevronDown
-                    size={17}
+                    size={16}
                     className={`${styles.chevron} ${
                       expanded ? styles.chevronOpen : ""
                     }`}
                   />
+                </button>
+
+                {expanded ? (
+                  <div className={styles.subMenu}>
+                    {item.children?.map((child) => {
+                      const active = pathname === child.route;
+
+                      return (
+                        <Link
+                          key={child.route}
+                          href={child.route}
+                          className={active ? styles.subMenuActive : undefined}
+                          aria-current={active ? "page" : undefined}
+                          onClick={() => {
+                            setOpenMenu(item.id);
+                            setMobileMenuOpen(false);
+                          }}
+                        >
+                          {child.label}
+                        </Link>
+                      );
+                    })}
+                  </div>
                 ) : null}
-              </button>
+              </div>
             );
           })}
         </nav>
 
         <div className={styles.sidebarBottom}>
-          <button type="button" onClick={() => router.push("/")}>
-            <FiHome size={19} />
+          <Link href="/" onClick={() => setMobileMenuOpen(false)}>
+            <FiHome size={18} />
             <span>Lihat Situs Publik</span>
-          </button>
+          </Link>
 
           <button type="button" onClick={handleLogout} disabled={loggingOut}>
-            <FiLogOut size={19} />
+            <FiLogOut size={18} />
 
             <span>{loggingOut ? "Keluar..." : "Keluar"}</span>
           </button>
@@ -239,23 +364,59 @@ export default function AdminShell({ children, user }: AdminShellProps) {
 
       <section className={styles.workspace}>
         <header className={styles.topbar}>
-          <div className={styles.pageTitle}>
-            <span>Admin Perpustakaan</span>
-            <h1>{currentTitle}</h1>
+          <div className={styles.topbarLeft}>
+            <button
+              type="button"
+              className={styles.mobileMenuButton}
+              aria-label="Buka menu admin"
+              aria-expanded={mobileMenuOpen}
+              onClick={() => setMobileMenuOpen(true)}
+            >
+              <FiMenu size={20} />
+            </button>
+
+            <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
+              <Link href="/">Beranda</Link>
+
+              <span>/</span>
+
+              <Link href="/admin" onClick={() => setOpenMenu(null)}>
+                Dashboard
+              </Link>
+
+              {pathname !== "/admin" ? (
+                <>
+                  <span>/</span>
+                  <strong>{currentTitle}</strong>
+                </>
+              ) : null}
+            </nav>
           </div>
 
           <div className={styles.topbarActions}>
             <form className={styles.searchBox} onSubmit={handleSearch}>
-              <FiSearch size={20} />
+              <button type="submit" aria-label="Cari koleksi">
+                <FiSearch size={17} />
+              </button>
 
               <input
-                aria-label="Cari buku cepat"
+                aria-label="Cari koleksi"
                 type="search"
-                placeholder="Cari buku cepat..."
+                name="search"
+                placeholder="Cari koleksi..."
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
               />
             </form>
+
+            <Link
+              href="/admin/notifikasi/reminder"
+              className={styles.iconButton}
+              aria-label="Notifikasi admin"
+              onClick={() => setOpenMenu("notifikasi")}
+            >
+              <FiBell size={18} />
+            </Link>
 
             <span
               className={styles.avatar}
