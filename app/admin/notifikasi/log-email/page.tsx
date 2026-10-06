@@ -1,7 +1,9 @@
-// app/admin/notifikasi/log-email/page.tsx
-
 import styles from "@/admin/Admin.module.css";
 
-export default function LogEmailPage() {
-  return <div className={styles.emptyPage} />;
+export default function DataBukuPage() {
+  return (
+    <section className={styles.emptyPage}>
+      <h1>Halaman notifikasi log email</h1>
+    </section>
+  );
 }

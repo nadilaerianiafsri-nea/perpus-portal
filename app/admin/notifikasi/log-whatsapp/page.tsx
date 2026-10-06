@@ -1,7 +1,9 @@
-// app/admin/notifikasi/log-whatsapp/page.tsx
-
 import styles from "@/admin/Admin.module.css";
 
-export default function LogWhatsAppPage() {
-  return <div className={styles.emptyPage} />;
+export default function DataBukuPage() {
+  return (
+    <section className={styles.emptyPage}>
+      <h1>Halaman notifikasi log whatsapp</h1>
+    </section>
+  );
 }

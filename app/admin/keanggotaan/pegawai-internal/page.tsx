@@ -1,7 +1,9 @@
-// app/admin/keanggotaan/pegawai-internal/page.tsx
-
 import styles from "@/admin/Admin.module.css";
 
-export default function PegawaiInternalPage() {
-  return <div className={styles.emptyPage} />;
+export default function DataBukuPage() {
+  return (
+    <section className={styles.emptyPage}>
+      <h1>Halaman keanggotaan pegawai internal  </h1>
+    </section>
+  );
 }

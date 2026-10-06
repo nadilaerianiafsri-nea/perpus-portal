@@ -1,7 +1,9 @@
-// app/admin/koleksi/e-book/page.tsx
-
 import styles from "@/admin/Admin.module.css";
 
-export default function EBookPage() {
-  return <div className={styles.emptyPage} />;
+export default function DataBukuPage() {
+  return (
+    <section className={styles.emptyPage}>
+      <h1>Halaman e-book</h1>
+    </section>
+  );
 }

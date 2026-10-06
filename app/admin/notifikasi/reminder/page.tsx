@@ -1,7 +1,9 @@
-// app/admin/notifikasi/reminder/page.tsx
-
 import styles from "@/admin/Admin.module.css";
 
-export default function ReminderPage() {
-  return <div className={styles.emptyPage} />;
+export default function DataBukuPage() {
+  return (
+    <section className={styles.emptyPage}>
+      <h1>Halaman notifikasi reminder</h1>
+    </section>
+  );
 }

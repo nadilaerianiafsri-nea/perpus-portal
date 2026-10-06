@@ -154,13 +154,6 @@ function initials(name: string) {
   );
 }
 
-function activeGroup(pathname: string) {
-  return (
-    menuItems.find((item) =>
-      item.children?.some((child) => pathname === child.route),
-    )?.id ?? null
-  );
-}
 
 function currentPageTitle(pathname: string) {
   for (const item of menuItems) {
