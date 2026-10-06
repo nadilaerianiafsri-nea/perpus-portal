@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { API_URL } from "./serverApi";
-export async function catalogProxy(request: Request, path: string) {
+export async function catalogProxy(
+  request: Request,
+  path: string,
+  errorMessage = "Data koleksi belum dapat dimuat. Silakan coba lagi.",
+) {
   try {
     const query = new URL(request.url).search;
     const response = await fetch(`${API_URL}/${path}${query}`, {
@@ -17,9 +21,6 @@ export async function catalogProxy(request: Request, path: string) {
       },
     });
   } catch {
-    return NextResponse.json(
-      { message: "Data koleksi belum dapat dimuat. Silakan coba lagi." },
-      { status: 503 },
-    );
+    return NextResponse.json({ message: errorMessage }, { status: 503 });
   }
 }

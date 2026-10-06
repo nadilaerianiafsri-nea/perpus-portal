@@ -5,14 +5,19 @@ import styles from "./Catalog.module.css";
 export default async function CatalogShell({
   children,
   ebook = false,
+  active,
 }: {
   children: React.ReactNode;
   ebook?: boolean;
+  active?: "koleksi" | "ebook" | "hibah" | "tentang";
 }) {
   const user = await getCurrentUser();
   return (
     <div className={styles.shell}>
-      <LandingNavbar active={ebook ? "ebook" : "koleksi"} user={user} />
+      <LandingNavbar
+        active={active ?? (ebook ? "ebook" : "koleksi")}
+        user={user}
+      />
       {children}
       <LandingFooter catalog />
     </div>

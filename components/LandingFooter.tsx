@@ -28,12 +28,12 @@ export default function LandingFooter({
             <strong>Jelajahi</strong>
             <Link href="/koleksi">Koleksi</Link>
             <Link href="/e-book">E-Book</Link>
-            <Link href="/#layanan">Hibah Buku</Link>
+            <Link href="/hibah-buku">Hibah Buku</Link>
             <Link href="/#panduan">Panduan</Link>
           </div>
           <div className="footer-col">
             <strong>Bantuan</strong>
-            <Link href="/#tentang">Tentang</Link>
+            <Link href="/tentang">Tentang</Link>
             <Link href="/#faq">FAQ</Link>
             <Link href="/#kontak">Kontak</Link>
             <Link href="/#panduan">Panduan Peminjaman</Link>
@@ -81,7 +81,7 @@ export default function LandingFooter({
           <strong>Jelajahi</strong>
           <Link href="/koleksi">Koleksi</Link>
           <Link href="/e-book">E-Book</Link>
-          <Link href="#layanan">Hibah Buku</Link>
+          <Link href="/hibah-buku">Hibah Buku</Link>
           <Link href="#layanan">Panduan</Link>
         </div>
 

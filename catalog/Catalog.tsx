@@ -4,6 +4,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { FiGrid, FiList, FiSearch, FiSliders, FiX } from "react-icons/fi";
 import BookCard from "./BookCard";
+import SearchInput from "@/components/SearchField";
 import Filters from "./Filters";
 import {
   type CatalogResponse,
@@ -13,44 +14,6 @@ import {
 } from "./types";
 import styles from "./Catalog.module.css";
 
-function SearchInput({
-  initialValue,
-  onSearch,
-}: {
-  initialValue: string;
-  onSearch: (value: string) => void;
-}) {
-  const [value, setValue] = useState(initialValue);
-  const [previous, setPrevious] = useState(initialValue);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  if (previous !== initialValue) {
-    setPrevious(initialValue);
-    setValue(initialValue);
-  }
-  useEffect(
-    () => () => {
-      if (timer.current) clearTimeout(timer.current);
-    },
-    [initialValue],
-  );
-  return (
-    <label className={styles.searchInput}>
-      <span className={styles.srOnly}>Cari koleksi</span>
-      <FiSearch aria-hidden="true" />
-      <input
-        value={value}
-        maxLength={191}
-        placeholder="Cari judul, penulis, subjek, ISBN, atau kode buku"
-        onChange={(e) => {
-          const next = e.target.value;
-          setValue(next);
-          if (timer.current) clearTimeout(timer.current);
-          timer.current = setTimeout(() => onSearch(next), 350);
-        }}
-      />
-    </label>
-  );
-}
 const sorts = [
   ["relevance", "Relevansi"],
   ["newest", "Terbaru"],
@@ -145,7 +108,7 @@ export default function Catalog({ ebook = false }: { ebook?: boolean }) {
     router.push(`${pathname}${next.size ? `?${next}` : ""}`, { scroll: false });
   }
   function clear() {
-    setSearchRevision(value => value + 1);
+    setSearchRevision((value) => value + 1);
     router.push(pathname, { scroll: false });
   }
   const filterProps = { query, options, ebook, update, clear };
@@ -247,9 +210,28 @@ export default function Catalog({ ebook = false }: { ebook?: boolean }) {
             </p>
             <div className={styles.sortTools}>
               <label className={styles.pageSize}>
-                <span className={styles.srOnly}>Jumlah koleksi per halaman</span>
-                <select aria-label="Jumlah koleksi per halaman" value={query.get('limit') ?? (ebook ? '8' : '20')} onChange={e => update({ limit: e.target.value })}>
-                  {[...new Set([8, 12, 20, ...(query.get('limit') ? [Number(query.get('limit'))] : [])])].map(limit => <option key={limit} value={limit}>{limit} / halaman</option>)}
+                <span className={styles.srOnly}>
+                  Jumlah koleksi per halaman
+                </span>
+                <select
+                  aria-label="Jumlah koleksi per halaman"
+                  value={query.get("limit") ?? (ebook ? "8" : "20")}
+                  onChange={(e) => update({ limit: e.target.value })}
+                >
+                  {[
+                    ...new Set([
+                      8,
+                      12,
+                      20,
+                      ...(query.get("limit")
+                        ? [Number(query.get("limit"))]
+                        : []),
+                    ]),
+                  ].map((limit) => (
+                    <option key={limit} value={limit}>
+                      {limit} / halaman
+                    </option>
+                  ))}
                 </select>
               </label>
               <label>

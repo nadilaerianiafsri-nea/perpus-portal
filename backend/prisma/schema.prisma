@@ -100,3 +100,26 @@ model BookCopy {
   @@index([bookId, status])
   @@map("book_copies")
 }
+
+enum GrantStatus {
+  MENUNGGU_VERIFIKASI
+  SEDANG_DIPROSES
+  SUDAH_DIKATALOGKAN
+}
+
+model BookGrant {
+  id         Int         @id @default(autoincrement())
+  title      String
+  quantity   Int
+  donorName  String
+  receivedAt DateTime    @db.Date
+  status     GrantStatus @default(MENUNGGU_VERIFIKASI)
+  isDemo     Boolean     @default(false)
+  seedKey    String?     @unique @db.VarChar(64)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  @@index([status, receivedAt])
+  @@index([receivedAt])
+  @@map("book_grants")
+}
