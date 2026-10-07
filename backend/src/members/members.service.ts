@@ -46,6 +46,19 @@ const notificationSelect = {
   href: true,
 } as const;
 type Tx = Prisma.TransactionClient;
+const completedLoans = (userId: number): Prisma.LoanWhereInput => ({
+  userId,
+  status: 'DIKEMBALIKAN',
+  book: { type: 'FISIK' },
+});
+const completedReservations = (
+  userId: number,
+): Prisma.ReservationWhereInput => ({
+  userId,
+  status: { in: ['KEDALUWARSA', 'DIBATALKAN'] },
+  book: { type: 'FISIK' },
+  loan: { is: null },
+});
 
 @Injectable()
 export class MembersService implements OnModuleInit, OnModuleDestroy {
@@ -445,15 +458,86 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
   }
 
   async loans(userId: number, history = false) {
+    if (history) return this.history(userId);
     const rows = await this.prisma.loan.findMany({
       where: {
         userId,
-        ...(history ? {} : { status: { in: ['AKTIF', 'HILANG'] as const } }),
+        status: { in: ['AKTIF', 'HILANG'] },
       },
       include: circulationInclude,
-      orderBy: history ? { borrowedAt: 'desc' } : { dueAt: 'asc' },
+      orderBy: { dueAt: 'asc' },
     });
     return { loans: rows.map((row) => this.loanView(row)) };
+  }
+
+  private async history(userId: number) {
+    await this.expireReservations();
+    const [loans, reservations] = await Promise.all([
+      this.prisma.loan.findMany({
+        where: completedLoans(userId),
+        select: {
+          id: true,
+          borrowedAt: true,
+          returnedAt: true,
+          book: { select: { id: true, title: true, code: true } },
+          _count: { select: { extensions: true } },
+        },
+        orderBy: [{ returnedAt: 'desc' }, { id: 'desc' }],
+      }),
+      this.prisma.reservation.findMany({
+        where: completedReservations(userId),
+        select: {
+          id: true,
+          status: true,
+          createdAt: true,
+          expiresAt: true,
+          cancelledAt: true,
+          book: { select: { id: true, title: true, code: true } },
+        },
+        orderBy: [{ expiresAt: 'desc' }, { id: 'desc' }],
+      }),
+    ]);
+    const history = [
+      ...loans.map((loan) => ({
+        id: loan.id,
+        sourceType: 'LOAN' as const,
+        bookId: loan.book.id,
+        title: loan.book.title,
+        bookCode: loan.book.code,
+        type: 'FISIK' as const,
+        borrowedAt: loan.borrowedAt,
+        reservedAt: null,
+        returnedAt: loan.returnedAt,
+        extensionCount: loan._count.extensions,
+        status: 'DIKEMBALIKAN' as const,
+        completedAt: loan.returnedAt,
+      })),
+      ...reservations.map((reservation) => ({
+        id: reservation.id,
+        sourceType: 'RESERVATION' as const,
+        bookId: reservation.book.id,
+        title: reservation.book.title,
+        bookCode: reservation.book.code,
+        type: 'FISIK' as const,
+        borrowedAt: null,
+        reservedAt: reservation.createdAt,
+        returnedAt: null,
+        extensionCount: 0,
+        status: reservation.status,
+        completedAt:
+          reservation.status === 'DIBATALKAN'
+            ? reservation.cancelledAt
+            : reservation.expiresAt,
+      })),
+    ];
+    history.sort(
+      (a, b) =>
+        (b.completedAt?.getTime() ?? -Infinity) -
+          (a.completedAt?.getTime() ?? -Infinity) ||
+        a.sourceType.localeCompare(b.sourceType) ||
+        b.id - a.id,
+    );
+    return { history };
   }
 
   async extend(userId: number, id: number, body: unknown) {
@@ -862,7 +946,14 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
         this.prisma.userEBook.count({
           where: { userId, book: { type: 'EBOOK' } },
         }),
-        this.prisma.loan.count({ where: { userId } }),
+        Promise.all([
+          this.prisma.loan.count({ where: completedLoans(userId) }),
+          this.prisma.reservation.count({
+            where: completedReservations(userId),
+          }),
+        ]).then(
+          ([loanCount, reservationCount]) => loanCount + reservationCount,
+        ),
         this.prisma.notification.count({ where: { userId, readAt: null } }),
       ]);
     const now = new Date();

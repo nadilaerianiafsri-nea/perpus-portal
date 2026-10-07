@@ -64,7 +64,28 @@ try {
   assert.equal((await prisma.bookCopy.findFirst({where: {bookId: books[0].id}})).status, 'TERSEDIA');
   const repeats = await Promise.allSettled([service.reserve(owner, {bookId: books[0].id}), service.reserve(owner, {bookId: books[0].id})]);
   assert.equal(repeats.filter(r => r.status === 'fulfilled').length, 1, 'same user/book concurrent requests deduplicate');
-  const active = repeats.find(r => r.status === 'fulfilled').value.reservation;
+  let active = repeats.find(r => r.status === 'fulfilled').value.reservation;
+  const history = (await service.loans(owner, true)).history;
+  assert.ok(Array.isArray(history), 'existing history endpoint must return normalized completed physical activity');
+  assert.equal(history.length, 2, 'only returned loan and expired reservation, not pending/picked-up reservations');
+  const returnedHistory = history.find(row => row.sourceType === 'LOAN');
+  assert.equal(returnedHistory.id, loan.id);
+  assert.equal(returnedHistory.status, 'DIKEMBALIKAN');
+  assert.equal(returnedHistory.bookCode, books[0].code, 'book code is not copy code');
+  assert.equal(returnedHistory.extensionCount, 4, 'count actual LoanExtension rows');
+  assert.ok(returnedHistory.returnedAt);
+  assert.equal(history.find(row => row.sourceType === 'RESERVATION').status, 'KEDALUWARSA');
+  assert.equal(history.find(row => row.sourceType === 'RESERVATION').borrowedAt, null, 'expired reservation never became a loan');
+  assert.equal(history.find(row => row.sourceType === 'RESERVATION').returnedAt, null);
+  assert.equal((await service.loans(other, true)).history.length, 0, 'history remains isolated by current user');
+  assert.deepEqual(history.map(row => row.completedAt.getTime()), history.map(row => row.completedAt.getTime()).sort((a,b)=>b-a));
+  await service.cancel(owner, active.id);
+  const cancelledHistory = (await service.loans(owner, true)).history.find(row => row.sourceType === 'RESERVATION' && row.id === active.id);
+  assert.equal(cancelledHistory.status, 'DIBATALKAN');
+  assert.equal(cancelledHistory.returnedAt, null);
+  assert.equal(cancelledHistory.extensionCount, 0);
+  assert.ok(cancelledHistory.completedAt);
+  active = (await service.reserve(owner, {bookId: books[0].id})).reservation;
   await prisma.reservation.update({where: {id: active.id}, data: {expiresAt: new Date(Date.now() + 3600000)}});
   await Promise.all([service.createReminders(), service.createReminders()]);
   assert.equal(await prisma.notification.count({where: {eventKey: `reservation:${active.id}:almost`}}), 1, 'almost-expiry notification deduplicates concurrently');
@@ -108,7 +129,7 @@ try {
   assert.equal(summary.currentUser.name, 'Anggota Pengujian');
   assert.equal(summary.stats.activeLoans, 1);
   assert.equal(summary.stats.ebooks, 1);
-  assert.equal(summary.stats.history, 2);
+  assert.equal(summary.stats.history, 3, 'summary counts the same completed physical activities as history');
   assert.equal(summary.alerts.overdue.length, 1);
   assert.ok(summary.unreadNotifications > 0);
   await service.readAll(owner);
@@ -147,6 +168,8 @@ try {
     assert.equal(suppressed.whatsappDelivery, 'NOT_REQUIRED', 'old milestone manual WhatsApp suppressed');
   }
   await service.finishLoan(currentLoan.id, true);
+  const afterLost = (await service.loans(owner, true)).history;
+  assert.equal(afterLost.some(row => row.sourceType === 'LOAN' && row.id === currentLoan.id), false, 'unresolved lost loan is not history');
   assert.equal((await service.loans(owner)).loans[0].status, 'HILANG', 'lost books remain visible for replacement information');
   await assert.rejects(service.extend(owner, currentLoan.id, {expectedDueAt: due.toISOString()}), /pinjaman aktif/);
   assert.equal((await service.dashboard(owner)).alerts.lost.length, 1);

@@ -14,7 +14,7 @@ Prefix anggota: `/members/me`.
 | POST | `/reservations` | `{bookId}` → `{reservation}` |
 | PATCH | `/reservations/:id/cancel` | `{reservation}` |
 | GET | `/loans` | `{loans}` aktif dan hilang; pinjaman yang dikembalikan hanya di riwayat |
-| GET | `/loans/history` | `{loans}` seluruh riwayat, termasuk aktif |
+| GET | `/loans/history` | `{history}` pinjaman fisik dikembalikan dan reservasi kedaluwarsa/dibatalkan tanpa loan; milik sesi |
 | POST | `/loans/:id/extend` | `{expectedDueAt}` ISO UTC dari respons loan yang dikonfirmasi → `{loan}` |
 | GET | `/notifications` | `{notifications}` |
 | PATCH | `/notifications/read-all` | `{success: true}` |
@@ -44,6 +44,8 @@ Perpanjangan anggota wajib mengirim `expectedDueAt` (ISO UTC dengan milidetik, m
 Halaman `/dashboard/pinjaman` menampilkan masalah paling mendesak terlebih dahulu, dengan status tanggal mengikuti `dueAt` dan kalender Asia/Jakarta: waktu melewati dueAt berarti terlambat, tanggal jatuh tempo hari ini belum terlambat sebelum tenggat, dan tanggal besok berarti H-1. Buku hilang menampilkan informasi penggantian dan kontak layanan existing; anggota tidak memiliki tindakan pengembalian atau penandaan hilang.
 
 ## Expiry dan pengingat
+
+Halaman `/dashboard/riwayat` memakai endpoint existing `/members/me/loans/history` melalui proxy `/api/members/me/loans/history`. Respons menormalkan Loan dan Reservation tanpa migration: sourceType, ID buku, judul, kode buku (bukan kode copy), tanggal pinjam/pengajuan, tanggal kembali, jumlah LoanExtension, status, dan completedAt. Riwayat diurutkan menurut returnedAt, expiresAt, atau cancelledAt terbaru; reservasi yang sudah menjadi loan tidak ditampilkan dua kali. Pinjaman aktif/terlambat, buku hilang yang belum diselesaikan, dan E-Book tidak termasuk. Statistik riwayat memakai kondisi yang sama. Pembacaan riwayat menjalankan expiry existing agar reservasi yang lewat 24 jam muncul dan stoknya dilepas. Desktop menggunakan tabel tujuh kolom; tablet/mobile menggunakan kartu dengan tanggal Asia/Jakarta. Tidak ada perubahan aturan sirkulasi atau tindakan pengembalian anggota.
 
 Interval ringan berjalan setiap 30 detik selama backend aktif, dengan `unref` dan pencegahan pekerjaan tumpang tindih dalam proses. Expiry juga dijalankan saat membaca ringkasan, reservasi/notifikasi, daftar katalog fisik/campuran dan detail buku, serta membuat reservasi. Pembacaan stok katalog langsung melepas copy kedaluwarsa tanpa menunggu interval. Setiap transisi dan notifikasi ditulis dalam transaksi. Tidak ada infrastructure scheduler tambahan.
 

@@ -9,6 +9,16 @@ export function initials(name: string) {
   return name.trim().split(/\s+/).slice(0, 2).map(part => part[0] ?? "").join("").toUpperCase();
 }
 
+export function historyDate(value: string | null, withTime = false) {
+  if (!value) return "—";
+  const parts = new Intl.DateTimeFormat("id-ID", {
+    timeZone: "Asia/Jakarta", day: "2-digit", month: "short", year: "numeric",
+    ...(withTime ? { hour: "2-digit", minute: "2-digit", hourCycle: "h23" } as const : {}),
+  }).formatToParts(new Date(value));
+  const part = (type: Intl.DateTimeFormatPartTypes) => parts.find(item => item.type === type)?.value;
+  return `${part("day")} ${part("month")} ${part("year")}${withTime ? `, ${part("hour")}:${part("minute")}` : ""}`;
+}
+
 export function loanState(loan: Loan, now = Date.now()): { label: string; tone: "green" | "orange" | "red" | "neutral"; remaining: string } {
   if (loan.status === "HILANG") return { label: "Hilang", tone: "red", remaining: "Hubungi petugas perpustakaan" };
   if (loan.status === "DIKEMBALIKAN") return { label: "Dikembalikan", tone: "green", remaining: "Peminjaman selesai" };

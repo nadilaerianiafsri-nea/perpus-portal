@@ -19,6 +19,13 @@ export interface Loan {
 export interface MemberNotification {
   id: number; title: string; message: string; createdAt: string; readAt: string | null; href: string;
 }
+export interface HistoryItem {
+  id: number; sourceType: "LOAN" | "RESERVATION";
+  bookId: number; title: string; bookCode: string; type: "FISIK";
+  borrowedAt: string | null; reservedAt: string | null; returnedAt: string | null;
+  completedAt: string | null; extensionCount: number;
+  status: "DIKEMBALIKAN" | "KEDALUWARSA" | "DIBATALKAN";
+}
 export interface MemberEBook {
   id: number; bookId: number; book: MemberBook & { format: string };
   addedAt: string; lastOpenedAt: string | null;
