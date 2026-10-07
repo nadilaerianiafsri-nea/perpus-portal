@@ -589,3 +589,93 @@
 /* Auth status and recovery pages reuse the existing split layout. */
 .statusCopy { margin: 0; line-height: 1.6; overflow-wrap: anywhere; }
 .actionLink { color: var(--navy); text-align: center; font-weight: 600; }
+
+/* Login alone uses the existing full-screen library illustration. */
+.authPage.loginPage {
+  --navyButton: #2B3056;
+  display: flex;
+  align-items: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 40px clamp(48px, 7.4vw, 120px);
+  background: linear-gradient(90deg, #00063340 0%, #00063318 38%, #00063300 64%), #000633 url("/images/ASSET%20PERPUS/login.png") right center / cover no-repeat;
+}
+.loginSurface {
+  width: min(100%, 440px);
+  min-width: 0;
+  margin-inline-start: max(0px, calc((100vw - 1560px) / 2));
+  padding: 32px 34px;
+  border: 1px solid #00063314;
+  border-radius: 24px;
+  background: #fffefcf7;
+  box-shadow: 0 20px 56px #00063324, 0 2px 8px #0006330a;
+}
+.loginContent { min-width: 0; }
+.loginBack {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 20px;
+  color: #697083;
+  font-size: 12px;
+  line-height: 1.5;
+  transition: color 160ms ease;
+}
+.loginBack svg { font-size: 16px; }
+.loginPage .brand { gap: 10px; margin-bottom: 22px; }
+.loginPage .brandMark { width: 38px; height: 38px; border-radius: 11px; background: #2B3056; font-size: 21px; }
+.loginPage .brandCopy strong { font-size: 17px; line-height: 1.2; font-weight: 600; }
+.loginPage .brandCopy small { color: #6b7080; font-size: 12px; letter-spacing: .025em; }
+.loginPage .heading { margin-bottom: 22px; }
+.loginPage .heading h1 { margin: 0; font-size: 38px; font-weight: 600; line-height: 1.12; letter-spacing: -.04em; }
+.loginPage .heading p { margin-top: 8px; color: #6b7080; font-size: 14px; line-height: 1.6; }
+.loginForm { display: grid; gap: 18px; }
+.loginForm .field { gap: 8px; }
+.loginForm .field > label { color: #31364e; font-size: 13px; font-weight: 500; }
+.loginPage .field input { height: 48px; padding-inline: 15px; border: 1px solid #dfe1e7; border-radius: 14px; background: #ffffffd9; font-size: 14px; transition: border-color 160ms ease, box-shadow 160ms ease; }
+.loginPage .field input::placeholder { color: #9599a7; }
+.loginPage .field input:focus { border-color: #697393; box-shadow: 0 0 0 3px #2b305619; }
+.loginPage .password input { padding-right: 48px; }
+.loginPage .password button { color: #7c8193; font-size: 18px; display: grid; place-items: center; }
+.loginPage .password button:hover { color: #2B3056; }
+.loginPage .metaRow { flex-direction: row; align-items: center; flex-wrap: wrap; gap: 12px; }
+.loginPage .remember { color: #626778; font-size: 13px; gap: 8px; }
+.loginPage .remember input { width: 17px; height: 17px; }
+.loginPage .linkButton { color: #454d72; font-size: 13px; font-weight: 500; }
+.loginPage .linkButton:hover { color: #000633; text-decoration: underline; }
+.loginPage .primaryButton { min-height: 48px; border-radius: 14px; font-size: 15px; font-weight: 600; box-shadow: 0 4px 10px #00063310; transition: background-color 160ms ease, box-shadow 160ms ease; }
+.loginPage .primaryButton:hover { background: #202647; box-shadow: 0 6px 14px #0006331a; }
+.loginPage .primaryButton:active { background: #000633; box-shadow: inset 0 2px 4px #00000026; }
+.loginPage .primaryButton:disabled { opacity: .55; cursor: not-allowed; }
+.loginPage .primaryButton:disabled:hover { background: var(--navyButton); box-shadow: none; }
+.loginPage .switchText { margin: 20px 0 0; color: #6b7080; font-size: 13px; line-height: 1.6; }
+.loginPage .switchText a { font-weight: 600; }
+.loginPage .switchText a:hover, .loginBack:hover { color: #000633; text-decoration: underline; }
+.loginPage :is(a, button, input):focus-visible { outline: 2px solid #6875ad; outline-offset: 3px; }
+.loginPage .field input:focus-visible { outline: 2px solid #697393; outline-offset: 2px; }
+.captchaArea { min-height: 78px; max-width: 100%; overflow-x: auto; }
+.captchaNotice { margin: 0; padding: 8px 10px; border: 1px solid #00063308; border-radius: 9px; background: #f0f1f366; color: #646a7b; font-size: 11px; line-height: 1.5; }
+.loginError { margin: 0; padding: 10px 12px; border: 1px solid #f0d3d0; border-radius: 8px; background: #fff5f4; color: #a9231b; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
+.captchaArea .loginError { margin-top: 10px; }
+
+@media (max-width: 1180px) {
+  .authPage.loginPage { padding: 32px 40px; }
+}
+@media (max-width: 820px) {
+  .authPage.loginPage { justify-content: center; padding: 28px 24px; background-position: 70% center; }
+  .loginSurface { margin-inline-start: 0; }
+}
+@media (max-width: 520px) {
+  .authPage.loginPage { padding: 24px 16px; background-image: linear-gradient(90deg, #00063355, #00063328), url("/images/ASSET%20PERPUS/login.png"); }
+  .loginSurface { padding: 28px 24px; background: #fffefc; }
+  .loginBack { margin-bottom: 20px; }
+  .loginPage .brand { margin-bottom: 22px; }
+  .loginPage .heading h1 { font-size: 32px; }
+  .loginPage .heading p { font-size: 14px; }
+  .loginForm { gap: 17px; }
+  .loginPage .remember, .loginPage .linkButton { font-size: 13px; }
+}
+@media (max-width: 360px) {
+  .authPage.loginPage { padding-inline: 12px; }
+  .loginSurface { padding-inline: 14px; }
+}

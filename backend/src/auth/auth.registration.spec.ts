@@ -7,6 +7,7 @@ import request from 'supertest';
 import bcrypt from 'bcrypt';
 import { jest } from '@jest/globals';
 import { AuthController } from './auth.controller';
+import { RecaptchaService } from './recaptcha.service';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { PrismaService } from '../prisma/prisma.service';
@@ -51,6 +52,7 @@ describe('Registration HTTP contract', () => {
       ],
       controllers: [AuthController],
       providers: [
+        RecaptchaService,
         { provide: PasswordResetService, useValue: {} },
         AuthService,
         {
@@ -61,7 +63,7 @@ describe('Registration HTTP contract', () => {
         { provide: PrismaService, useValue: prisma },
         {
           provide: ConfigService,
-          useValue: { getOrThrow: () => 'registration-test-only-secret' },
+          useValue: { get: () => undefined, getOrThrow: () => 'registration-test-only-secret' },
         },
       ],
     }).compile();

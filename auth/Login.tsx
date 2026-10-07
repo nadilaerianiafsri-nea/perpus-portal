@@ -3,11 +3,14 @@
 import { FormEvent, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FiEye, FiEyeOff } from "react-icons/fi";
-import { SiGoogle } from "react-icons/si";
+import { FiArrowLeft, FiEye, FiEyeOff } from "react-icons/fi";
 import AuthShell from "./AuthShell";
 import styles from "./Auth.module.css";
 import { loginReturn } from "./loginReturn";
+import LoginCaptcha, { type LoginCaptchaHandle } from "./LoginCaptcha";
+
+const captchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY?.trim() ?? "";
+const captchaRequired = Boolean(captchaSiteKey) || process.env.NODE_ENV === "production";
 
 type LoginResponse = {
   user?: {
@@ -29,7 +32,8 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [pendingEmail, setPendingEmail] = useState("");
-  const [info, setInfo] = useState("");
+  const [captchaToken, setCaptchaToken] = useState("");
+  const captcha = useRef<LoginCaptchaHandle>(null);
   const [loading, setLoading] = useState(false);
   const submissionLocked = useRef(false);
 
@@ -37,10 +41,13 @@ export default function Login() {
     event.preventDefault();
 
     if (submissionLocked.current) return;
+    if (captchaRequired && !captchaToken) {
+      setError("Selesaikan CAPTCHA sebelum masuk.");
+      return;
+    }
     submissionLocked.current = true;
     setPendingEmail("");
     setError("");
-    setInfo("");
     setLoading(true);
 
     try {
@@ -53,6 +60,7 @@ export default function Login() {
           email,
           password,
           remember,
+          ...(captchaToken ? { captchaToken } : {}),
         }),
         signal: AbortSignal.timeout(15000),
       });
@@ -80,30 +88,39 @@ export default function Login() {
         "Server tidak dapat dihubungi. Silakan coba lagi.",
       );
     } finally {
+      // Google tokens are single-use; unsuccessful attempts need a new challenge.
+      captcha.current?.reset();
       setLoading(false);
       submissionLocked.current = false;
     }
   }
 
   return (
-    <AuthShell>
-      <div className={styles.formWrap}>
+    <AuthShell login>
+      <div className={styles.loginContent}>
+        <Link className={styles.loginBack} href="/"><FiArrowLeft aria-hidden /> Kembali ke Beranda</Link>
+        <Link href="/" className={styles.brand} aria-label="Perpustakaan Kemenkum Riau — Beranda">
+          <span className={styles.brandMark}>P</span>
+          <span className={styles.brandCopy}><strong>Perpustakaan</strong><small>Kemenkum Riau</small></span>
+        </Link>
         <header className={styles.heading}>
-          <h2>Masuk</h2>
+          <h1 id="login-title">Masuk</h1>
           <p>Masuk ke akun anggota Anda.</p>
         </header>
 
         <form
-          className={styles.loginCard}
+          className={styles.loginForm}
           onSubmit={handleLogin}
         >
-          <label className={styles.field}>
-            <span>
+          <div className={styles.field}>
+            <label htmlFor="login-email">
               Email <b>*</b>
-            </span>
+            </label>
 
             <input
               type="email"
+              id="login-email"
+              name="email"
               placeholder="nama@email.com"
               autoComplete="email"
               value={email}
@@ -112,15 +129,17 @@ export default function Login() {
               }
               required
             />
-          </label>
+          </div>
 
-          <label className={styles.field}>
-            <span>
+          <div className={styles.field}>
+            <label htmlFor="login-password">
               Kata Sandi <b>*</b>
-            </span>
+            </label>
 
             <div className={styles.password}>
               <input
+                id="login-password"
+                name="password"
                 type={
                   showPassword
                     ? "text"
@@ -137,6 +156,8 @@ export default function Login() {
 
               <button
                 type="button"
+                aria-controls="login-password"
+                aria-pressed={showPassword}
                 aria-label={
                   showPassword
                     ? "Sembunyikan kata sandi"
@@ -149,13 +170,13 @@ export default function Login() {
                 }
               >
                 {showPassword ? (
-                  <FiEyeOff />
+                  <FiEyeOff aria-hidden />
                 ) : (
-                  <FiEye />
+                  <FiEye aria-hidden />
                 )}
               </button>
             </div>
-          </label>
+          </div>
 
           <div className={styles.metaRow}>
             <label className={styles.remember}>
@@ -174,29 +195,25 @@ export default function Login() {
             <Link className={styles.linkButton} href="/forgot-password">Lupa kata sandi?</Link>
           </div>
 
+          {captchaSiteKey ? <LoginCaptcha ref={captcha} siteKey={captchaSiteKey} onTokenChange={setCaptchaToken} /> : (
+            <p className={styles.captchaNotice} role="status">{captchaRequired
+              ? "Verifikasi keamanan belum tersedia. Silakan coba lagi nanti."
+              : "CAPTCHA belum aktif di mode pengembangan."}</p>
+          )}
+
+          {error && <p className={styles.loginError} role="alert">{error}</p>}
+          {pendingEmail && <Link className={styles.actionLink} href={`/check-email?email=${encodeURIComponent(pendingEmail)}`}>Kirim ulang email verifikasi</Link>}
+
           <button
             className={styles.primaryButton}
             type="submit"
-            disabled={loading}
+            disabled={loading || (captchaRequired && !captchaToken)}
           >
             {loading
-              ? "Masuk..."
+              ? "Memproses..."
               : "Masuk"}
           </button>
 
-          {error && (
-            <p className={styles.inlineInfo}>
-              {error}
-            </p>
-          )}
-
-          {pendingEmail && <Link className={styles.actionLink} href={`/check-email?email=${encodeURIComponent(pendingEmail)}`}>Kirim ulang email verifikasi</Link>}
-
-          {info && (
-            <p className={styles.inlineInfo}>
-              {info}
-            </p>
-          )}
         </form>
 
         <p className={styles.switchText}>
@@ -206,19 +223,6 @@ export default function Login() {
           </Link>
         </p>
 
-        <button
-          className={styles.googleButton}
-          type="button"
-          onClick={() => {
-            setError("");
-            setInfo(
-              "Login Google belum diaktifkan. OAuth Google akan dipasang pada tahap berikutnya.",
-            );
-          }}
-        >
-          <SiGoogle />
-          <span>Login With Google</span>
-        </button>
       </div>
     </AuthShell>
   );

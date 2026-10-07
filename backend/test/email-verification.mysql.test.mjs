@@ -61,6 +61,7 @@ const smtp = createServer((socket) => {
   });
 });
 const settings = {
+  NODE_ENV: 'test',
   DATABASE_URL: databaseUrl,
   JWT_SECRET: randomUUID() + randomUUID(),
   EMAIL_VERIFICATION_SECRET: secret,

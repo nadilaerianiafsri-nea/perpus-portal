@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { RecaptchaService } from './recaptcha.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { EmailVerificationService } from './email-verification.service';
 import { MailService } from '../mail/mail.service';
@@ -21,7 +22,7 @@ import { MailService } from '../mail/mail.service';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtAuthGuard, EmailVerificationService, MailService, PasswordResetService],
+  providers: [AuthService, JwtAuthGuard, EmailVerificationService, MailService, PasswordResetService, RecaptchaService],
   exports: [AuthService, JwtModule, JwtAuthGuard, MailService],
 })
 export class AuthModule {}

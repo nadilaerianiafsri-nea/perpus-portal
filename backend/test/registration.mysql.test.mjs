@@ -8,6 +8,8 @@ import request from 'supertest';
 import bcrypt from 'bcrypt';
 import mariadb from 'mariadb';
 import { AuthController } from '../dist/auth/auth.controller.js';
+import { RecaptchaService } from '../dist/auth/recaptcha.service.js';
+import { PasswordResetService } from '../dist/auth/password-reset.service.js';
 import { AuthService } from '../dist/auth/auth.service.js';
 import { JwtAuthGuard } from '../dist/auth/jwt-auth.guard.js';
 import { PrismaService } from '../dist/prisma/prisma.service.js';
@@ -44,6 +46,8 @@ before(async () => {
     imports: [JwtModule.register({ secret })],
     controllers: [AuthController],
     providers: [
+      RecaptchaService,
+      { provide: PasswordResetService, useValue: {} },
       AuthService,
       { provide: EmailVerificationService, useValue: { sendRegistrationVerification: async () => false } },
       PrismaService,
@@ -51,6 +55,7 @@ before(async () => {
       {
         provide: ConfigService,
         useValue: {
+          get: (key) => key === 'NODE_ENV' ? 'test' : undefined,
           getOrThrow: (key) => (key === 'DATABASE_URL' ? databaseUrl : secret),
         },
       },

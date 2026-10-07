@@ -4,9 +4,16 @@ import styles from "./Auth.module.css";
 type AuthShellProps = {
   children: React.ReactNode;
   registration?: boolean;
+  login?: boolean;
 };
 
-export default function AuthShell({ children, registration = false }: AuthShellProps) {
+export default function AuthShell({ children, registration = false, login = false }: AuthShellProps) {
+  if (login) return (
+    <main className={`${styles.authPage} ${styles.loginPage}`}>
+      <section className={styles.loginSurface} aria-labelledby="login-title">{children}</section>
+    </main>
+  );
+
   return (
     <main className={`${styles.authPage} ${registration ? styles.registrationPage : ""}`}>
       <aside className={styles.brandPanel}>

@@ -7,6 +7,7 @@ import { jest } from '@jest/globals';
 import request from 'supertest';
 import bcrypt from 'bcrypt';
 import { AuthController } from './auth.controller';
+import { RecaptchaService } from './recaptcha.service';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { EmailVerificationService } from './email-verification.service';
@@ -60,6 +61,7 @@ describe('Email verification HTTP flow', () => {
       imports: [JwtModule.register({ secret: 'session-test-secret' })],
       controllers: [AuthController],
       providers: [
+        RecaptchaService,
         { provide: PasswordResetService, useValue: {} },
         AuthService,
         EmailVerificationService,

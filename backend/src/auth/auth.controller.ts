@@ -16,6 +16,7 @@ import {
 import type { Response } from 'express';
 
 import { AuthService } from './auth.service';
+import { RecaptchaService } from './recaptcha.service';
 
 import { type AuthenticatedRequest, JwtAuthGuard } from './jwt-auth.guard';
 
@@ -24,6 +25,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly passwordReset: PasswordResetService,
+    private readonly recaptcha: RecaptchaService,
   ) {}
 
   private setSessionCookie(
@@ -47,6 +49,7 @@ export class AuthController {
       email?: string;
       password?: string;
       remember?: boolean;
+      captchaToken?: unknown;
     },
     @Res({
       passthrough: true,
@@ -65,6 +68,7 @@ export class AuthController {
       throw new BadRequestException('Email dan kata sandi wajib diisi.');
     }
 
+    await this.recaptcha.verify(body.captchaToken);
     const remember = body.remember === true;
     const result = await this.authService.login(
       body.email,
