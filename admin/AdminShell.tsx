@@ -154,14 +154,20 @@ function initials(name: string) {
   );
 }
 
+function routeMatches(pathname: string, route: string) {
+  if (route === "/admin") return pathname === route;
+  return pathname === route || pathname.startsWith(`${route}/`);
+}
 
 function currentPageTitle(pathname: string) {
   for (const item of menuItems) {
-    if (item.route === pathname) {
+    if (item.route && routeMatches(pathname, item.route)) {
       return item.label;
     }
 
-    const child = item.children?.find((entry) => entry.route === pathname);
+    const child = item.children?.find((entry) =>
+      routeMatches(pathname, entry.route),
+    );
 
     if (child) {
       return child.label;
@@ -267,13 +273,12 @@ export default function AdminShell({ children, user }: AdminShellProps) {
         <nav className={styles.menu} aria-label="Menu admin perpustakaan">
           {menuItems.map((item) => {
             const Icon = item.icon;
-
-            const isRouteActive = item.route === pathname;
-
-            const isGroupActive = item.children?.some(
-              (child) => child.route === pathname,
+            const isRouteActive = item.route
+              ? routeMatches(pathname, item.route)
+              : false;
+            const isGroupActive = item.children?.some((child) =>
+              routeMatches(pathname, child.route),
             );
-
             const expanded =
               openMenu === item.id || (openMenu === null && isGroupActive);
 
@@ -317,7 +322,7 @@ export default function AdminShell({ children, user }: AdminShellProps) {
                 {expanded ? (
                   <div className={styles.subMenu}>
                     {item.children?.map((child) => {
-                      const active = pathname === child.route;
+                      const active = routeMatches(pathname, child.route);
 
                       return (
                         <Link
@@ -349,7 +354,6 @@ export default function AdminShell({ children, user }: AdminShellProps) {
 
           <button type="button" onClick={handleLogout} disabled={loggingOut}>
             <FiLogOut size={18} />
-
             <span>{loggingOut ? "Keluar..." : "Keluar"}</span>
           </button>
         </div>
@@ -370,13 +374,10 @@ export default function AdminShell({ children, user }: AdminShellProps) {
 
             <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
               <Link href="/">Beranda</Link>
-
               <span>/</span>
-
               <Link href="/admin" onClick={() => setOpenMenu(null)}>
                 Dashboard
               </Link>
-
               {pathname !== "/admin" ? (
                 <>
                   <span>/</span>

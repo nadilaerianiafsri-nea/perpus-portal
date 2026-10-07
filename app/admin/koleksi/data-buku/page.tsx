@@ -1,9 +1,10 @@
-import styles from "@/admin/Admin.module.css";
+import { Suspense } from "react";
+import AdminBooksPage from "@/admin/AdminBooksPage";
 
 export default function DataBukuPage() {
   return (
-    <section className={styles.emptyPage}>
-      <h1>Data Buku</h1>
-    </section>
+    <Suspense fallback={<p role="status">Memuat Data Buku...</p>}>
+      <AdminBooksPage />
+    </Suspense>
   );
 }
