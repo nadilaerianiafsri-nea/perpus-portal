@@ -103,15 +103,34 @@ img { display: block; }
   border-radius: 999px;
   transition: background .15s ease, color .15s ease;
 }
-.main-nav a:hover {
+.main-nav a:not(.nav-active):hover,
+.mobile-menu a:not(.nav-active):not(.member-btn):not(.login-link):hover {
   background: #F6EFE0;
+  color: #000633;
   text-decoration: none;
 }
 .main-nav .nav-active {
   padding-inline: 18px;
+}
+.main-nav a.nav-active,
+.main-nav a.nav-active:hover,
+.main-nav a.nav-active:focus-visible,
+.mobile-menu a.nav-active,
+.mobile-menu a.nav-active:hover,
+.mobile-menu a.nav-active:focus-visible {
   background: #000633;
   color: #FFFFFF;
+  border-radius: 999px;
   box-shadow: 0 4px 10px rgba(0,6,51,.14);
+}
+.main-nav a:focus-visible,
+.mobile-menu a:focus-visible,
+.mobile-menu summary:focus-visible {
+  outline: 2px solid var(--navy);
+  outline-offset: 3px;
+}
+.mobile-menu a:not(.member-btn):not(.login-link) {
+  transition: background .15s ease, color .15s ease;
 }
 .nav-actions {
   display: flex;
