@@ -1,0 +1,20 @@
+.clickable {
+  position: relative;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+.clickable.clickable:hover {
+  border-color: #aac9df;
+  background: #eef7ff;
+  box-shadow: 0 3px 10px #00052f0c;
+}
+.cardLink { color: inherit; text-decoration: none; }
+/* Stretch the semantic link while keeping sibling controls independently clickable. */
+.cardLink::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+.clickable:has(.cardLink:focus-visible) { outline: 3px solid #b08800; outline-offset: 4px; }
+.clickable .cardLink:focus-visible { outline: none; }
+.actionButton { position: relative; z-index: 2; cursor: pointer; }
+.actionButton:disabled { cursor: wait; }
+.detail { display: inline-flex; align-items: center; gap: 5px; margin-left: auto; color: #086caa; white-space: nowrap; }
+.detail svg { flex-shrink: 0; }
+@media (prefers-reduced-motion: reduce) { .clickable { transition: none; } }
