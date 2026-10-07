@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import type { AuthenticatedRequest } from '../auth/jwt-auth.guard';
+import { ActiveBookGuard } from './active-book.guard';
 import { MemberRoleGuard } from './member-role.guard';
 import { MembersService } from './members.service';
 import { positiveId } from './member.validation';
@@ -37,7 +38,9 @@ export class MembersController {
   @Get('reservations') reservations(@Req() req: AuthenticatedRequest) {
     return this.members.reservations(req.user!.sub);
   }
-  @Post('reservations') reserve(
+  @Post('reservations')
+  @UseGuards(ActiveBookGuard)
+  reserve(
     @Req() req: AuthenticatedRequest,
     @Body() body: unknown,
   ) {

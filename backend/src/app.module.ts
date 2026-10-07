@@ -8,6 +8,7 @@ import { CollectionsModule } from './collections/collections.module';
 import { GrantsModule } from './grants/grants.module';
 import { ContactModule } from './contact/contact.module';
 import { MembersModule } from './members/members.module';
+import { AdminBooksModule } from './admin-books/admin-books.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { MembersModule } from './members/members.module';
     GrantsModule,
     ContactModule,
     MembersModule,
+    AdminBooksModule,
   ],
   controllers: [AppController],
   providers: [AppService],

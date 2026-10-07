@@ -70,21 +70,27 @@ function status(
 
 @Injectable()
 export class CollectionsService {
-  constructor(private readonly prisma: PrismaService, private readonly members: MembersService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly members: MembersService,
+  ) {}
 
   async filters() {
     const [subjects, languages, years] = await Promise.all([
       this.prisma.book.findMany({
+        where: { isActive: true },
         distinct: ['subject'],
         select: { subject: true },
         orderBy: { subject: 'asc' },
       }),
       this.prisma.book.findMany({
+        where: { isActive: true },
         distinct: ['language'],
         select: { language: true },
         orderBy: { language: 'asc' },
       }),
       this.prisma.book.findMany({
+        where: { isActive: true },
         distinct: ['year'],
         select: { year: true },
         orderBy: { year: 'desc' },
@@ -119,6 +125,7 @@ export class CollectionsService {
     )
       throw new BadRequestException('Jenis atau ketersediaan tidak valid.');
     const clauses: Prisma.Sql[] = [
+      Prisma.sql`b.isActive = 1`,
       Prisma.sql`b.year >= ${yearFrom} AND b.year <= ${yearTo}`,
     ];
     if (types.length)
@@ -203,8 +210,8 @@ export class CollectionsService {
     if (!/^\d+$/.test(input) || !Number.isSafeInteger(Number(input)))
       throw new NotFoundException('Koleksi tidak ditemukan.');
     await this.members.expireReservations();
-    const book = await this.prisma.book.findUnique({
-      where: { id: Number(input) },
+    const book = await this.prisma.book.findFirst({
+      where: { id: Number(input), isActive: true },
       include: { copies: { orderBy: { code: 'asc' } } },
     });
     if (!book) throw new NotFoundException('Koleksi tidak ditemukan.');

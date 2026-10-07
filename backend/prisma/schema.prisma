@@ -84,6 +84,7 @@ model Book {
   shelf        String?
   ebookUrl     String?
   isDemo       Boolean        @default(false)
+  isActive     Boolean        @default(true)
   copies       BookCopy[]
   reservations Reservation[]
   loans        Loan[]
@@ -94,6 +95,7 @@ model Book {
   @@index([type, year])
   @@index([language])
   @@index([subject])
+  @@index([type, isActive])
   @@map("books")
 }
 
@@ -210,16 +212,16 @@ model Notification {
 }
 
 model UserEBook {
-  id           Int       @id @default(autoincrement())
-  userId       Int
-  user         User      @relation(fields: [userId], references: [id], onDelete: Restrict)
-  bookId       Int
-  book         Book      @relation(fields: [bookId], references: [id], onDelete: Restrict)
-  addedAt      DateTime  @default(now())
-  lastOpenedAt DateTime?
-  progress        Float @default(0)
-  lastPosition    Float @default(0)
-  progressVersion Int   @default(0)
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  user            User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  bookId          Int
+  book            Book     @relation(fields: [bookId], references: [id], onDelete: Restrict)
+  addedAt         DateTime @default(now())
+  lastOpenedAt    DateTime?
+  progress        Float    @default(0)
+  lastPosition    Float    @default(0)
+  progressVersion Int      @default(0)
 
   @@unique([userId, bookId])
   @@index([userId, addedAt])
