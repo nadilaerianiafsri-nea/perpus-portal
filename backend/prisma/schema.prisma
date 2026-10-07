@@ -67,30 +67,33 @@ enum CopyStatus {
 }
 
 model Book {
-  id           Int            @id @default(autoincrement())
-  code         String         @unique @db.VarChar(64)
-  title        String
-  author       String
-  isbnIssn     String?        @db.VarChar(64)
-  publisher    String
-  year         Int
-  edition      String?
-  language     String         @db.VarChar(64)
-  subject      String
-  type         CollectionType
-  format       String         @db.VarChar(64)
-  description  String         @db.Text
-  coverUrl     String
-  shelf        String?
-  ebookUrl     String?
-  isDemo       Boolean        @default(false)
-  isActive     Boolean        @default(true)
-  copies       BookCopy[]
-  reservations Reservation[]
-  loans        Loan[]
-  userEBooks   UserEBook[]
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
+  id                 Int            @id @default(autoincrement())
+  code               String         @unique @db.VarChar(64)
+  title              String
+  author             String
+  isbnIssn           String?        @db.VarChar(64)
+  publisher          String
+  year               Int
+  edition            String?
+  language           String         @db.VarChar(64)
+  subject            String
+  type               CollectionType
+  format             String         @db.VarChar(64)
+  description        String         @db.Text
+  coverUrl           String
+  shelf              String?
+  ebookUrl           String?
+  accessMode         String?        @db.VarChar(64)
+  accessDurationDays Int?
+  licenseNote        String?        @db.Text
+  isDemo             Boolean        @default(false)
+  isActive           Boolean        @default(true)
+  copies             BookCopy[]
+  reservations       Reservation[]
+  loans              Loan[]
+  userEBooks          UserEBook[]
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
 
   @@index([type, year])
   @@index([language])

@@ -9,6 +9,9 @@ import { GrantsModule } from './grants/grants.module';
 import { ContactModule } from './contact/contact.module';
 import { MembersModule } from './members/members.module';
 import { AdminBooksModule } from './admin-books/admin-books.module';
+import { AdminEBooksModule } from './admin-ebooks/admin-ebooks.module';
+import { AdminUploadsModule } from './admin-uploads/admin-uploads.module';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
   imports: [
@@ -20,6 +23,9 @@ import { AdminBooksModule } from './admin-books/admin-books.module';
     ContactModule,
     MembersModule,
     AdminBooksModule,
+    AdminEBooksModule,
+    AdminUploadsModule,
+    UploadsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

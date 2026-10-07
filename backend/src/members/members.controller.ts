@@ -40,10 +40,7 @@ export class MembersController {
   }
   @Post('reservations')
   @UseGuards(ActiveBookGuard)
-  reserve(
-    @Req() req: AuthenticatedRequest,
-    @Body() body: unknown,
-  ) {
+  reserve(@Req() req: AuthenticatedRequest, @Body() body: unknown) {
     return this.members.reserve(req.user!.sub, body);
   }
   @Patch('reservations/:id/cancel') cancel(
@@ -80,16 +77,14 @@ export class MembersController {
   @Get('ebooks') ebooks(@Req() req: AuthenticatedRequest) {
     return this.members.ebooks(req.user!.sub);
   }
-  @Post('ebooks') addEBook(
-    @Req() req: AuthenticatedRequest,
-    @Body() body: unknown,
-  ) {
+  @Post('ebooks')
+  @UseGuards(ActiveBookGuard)
+  addEBook(@Req() req: AuthenticatedRequest, @Body() body: unknown) {
     return this.members.addEBook(req.user!.sub, body);
   }
-  @Post('ebooks/:bookId/open') openEBook(
-    @Req() req: AuthenticatedRequest,
-    @Param('bookId') bookId: string,
-  ) {
+  @Post('ebooks/:bookId/open')
+  @UseGuards(ActiveBookGuard)
+  openEBook(@Req() req: AuthenticatedRequest, @Param('bookId') bookId: string) {
     return this.members.openEBook(req.user!.sub, positiveId(bookId));
   }
   @Patch('ebooks/:bookId/progress') updateEBookProgress(

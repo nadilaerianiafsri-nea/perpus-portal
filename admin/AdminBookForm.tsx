@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import type { FormEvent } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { FiArrowLeft, FiCheckCircle } from "react-icons/fi";
 import {
@@ -17,6 +17,10 @@ type FormState = Omit<AdminBookPayload, "year" | "totalStock"> & {
   year: string;
   totalStock: string;
 };
+
+const MAX_COVER_BYTES = 5 * 1024 * 1024;
+const COVER_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const COVER_PLACEHOLDER = "/images/landing/book-placeholder-1.svg";
 
 const emptyForm: FormState = {
   code: "",
@@ -32,9 +36,26 @@ const emptyForm: FormState = {
   shelf: "",
   totalStock: "0",
   description: "",
-  coverUrl: "/images/landing/book-placeholder-1.svg",
+  coverUrl: "",
   isActive: true,
 };
+
+async function uploadCover(file: File): Promise<string> {
+  const body = new FormData();
+  body.append("cover", file);
+  const response = await fetch("/api/admin/uploads/cover", {
+    method: "POST",
+    body,
+  });
+  if (!response.ok) {
+    throw new Error(await apiMessage(response, "Cover gagal diunggah."));
+  }
+  const data = (await response.json()) as { coverUrl?: unknown };
+  if (typeof data.coverUrl !== "string" || !data.coverUrl) {
+    throw new Error("Respons upload cover tidak valid.");
+  }
+  return data.coverUrl;
+}
 
 export default function AdminBookForm({
   mode,
@@ -46,10 +67,18 @@ export default function AdminBookForm({
   const router = useRouter();
   const coverInput = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [coverPreview, setCoverPreview] = useState("");
   const [availableStock, setAvailableStock] = useState(0);
   const [loading, setLoading] = useState(mode === "edit");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    return () => {
+      if (coverPreview) URL.revokeObjectURL(coverPreview);
+    };
+  }, [coverPreview]);
 
   useEffect(() => {
     if (mode !== "edit" || !id) return;
@@ -61,7 +90,9 @@ export default function AdminBookForm({
     })
       .then(async (response) => {
         if (!response.ok) {
-          throw new Error(await apiMessage(response, "Data buku belum dapat dimuat."));
+          throw new Error(
+            await apiMessage(response, "Data buku belum dapat dimuat."),
+          );
         }
         return response.json() as Promise<AdminBookDetailResponse>;
       })
@@ -89,7 +120,9 @@ export default function AdminBookForm({
       .catch((reason) => {
         if (controller.signal.aborted) return;
         setError(
-          reason instanceof Error ? reason.message : "Data buku belum dapat dimuat.",
+          reason instanceof Error
+            ? reason.message
+            : "Data buku belum dapat dimuat.",
         );
         setLoading(false);
       });
@@ -99,6 +132,29 @@ export default function AdminBookForm({
 
   function update<K extends keyof FormState>(name: K, value: FormState[K]) {
     setForm((current) => ({ ...current, [name]: value }));
+  }
+
+  function chooseCover(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0] ?? null;
+    if (!file) return;
+
+    if (!COVER_TYPES.includes(file.type)) {
+      setError("Format cover harus JPG, PNG, atau WEBP.");
+      event.target.value = "";
+      return;
+    }
+    if (file.size > MAX_COVER_BYTES) {
+      setError("Ukuran cover maksimal 5 MB.");
+      event.target.value = "";
+      return;
+    }
+
+    setError("");
+    setCoverFile(file);
+    setCoverPreview((current) => {
+      if (current) URL.revokeObjectURL(current);
+      return URL.createObjectURL(file);
+    });
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -111,16 +167,22 @@ export default function AdminBookForm({
       setError("Tahun Terbit dan Jumlah Stok harus berupa angka bulat.");
       return;
     }
-
-    const payload: AdminBookPayload = {
-      ...form,
-      year,
-      totalStock,
-    };
+    if (!coverFile && !form.coverUrl) {
+      setError("Cover wajib diunggah.");
+      return;
+    }
 
     setSaving(true);
     setError("");
     try {
+      const coverUrl = coverFile ? await uploadCover(coverFile) : form.coverUrl;
+      const payload: AdminBookPayload = {
+        ...form,
+        year,
+        totalStock,
+        coverUrl,
+      };
+
       const response = await fetch(
         mode === "create" ? "/api/admin/books" : `/api/admin/books/${id}`,
         {
@@ -133,7 +195,9 @@ export default function AdminBookForm({
         throw new Error(
           await apiMessage(
             response,
-            mode === "create" ? "Buku gagal ditambahkan." : "Perubahan gagal disimpan.",
+            mode === "create"
+              ? "Buku gagal ditambahkan."
+              : "Perubahan gagal disimpan.",
           ),
         );
       }
@@ -169,7 +233,9 @@ export default function AdminBookForm({
           <div className={styles.localBreadcrumb}>
             <Link href="/admin/koleksi/data-buku">Data Buku</Link>
             <span>/</span>
-            <strong>{mode === "create" ? "Tambah Buku" : "Edit Data Buku"}</strong>
+            <strong>
+              {mode === "create" ? "Tambah Buku" : "Edit Data Buku"}
+            </strong>
           </div>
           <h1>{mode === "create" ? "Tambah Data Buku" : "Edit Data Buku"}</h1>
           <p>
@@ -184,7 +250,11 @@ export default function AdminBookForm({
         </Link>
       </div>
 
-      {error ? <div className={styles.inlineError} role="alert">{error}</div> : null}
+      {error ? (
+        <div className={styles.inlineError} role="alert">
+          {error}
+        </div>
+      ) : null}
 
       <div className={styles.formLayout}>
         <div className={styles.formMain}>
@@ -195,40 +265,94 @@ export default function AdminBookForm({
             </div>
             <div className={styles.fieldsGrid}>
               <label>
-                <span>Kode Buku <b>*</b></span>
-                <input value={form.code} onChange={(e) => update("code", e.target.value)} required maxLength={64} />
+                <span>
+                  Kode Buku <b>*</b>
+                </span>
+                <input
+                  value={form.code}
+                  onChange={(e) => update("code", e.target.value)}
+                  required
+                  maxLength={64}
+                />
               </label>
               <label>
-                <span>Judul <b>*</b></span>
-                <input value={form.title} onChange={(e) => update("title", e.target.value)} required />
+                <span>
+                  Judul <b>*</b>
+                </span>
+                <input
+                  value={form.title}
+                  onChange={(e) => update("title", e.target.value)}
+                  required
+                />
               </label>
               <label>
-                <span>Penulis / Pengarang <b>*</b></span>
-                <input value={form.author} onChange={(e) => update("author", e.target.value)} required />
+                <span>
+                  Penulis / Pengarang <b>*</b>
+                </span>
+                <input
+                  value={form.author}
+                  onChange={(e) => update("author", e.target.value)}
+                  required
+                />
               </label>
               <label>
                 <span>ISBN/ISSN</span>
-                <input value={form.isbnIssn} onChange={(e) => update("isbnIssn", e.target.value)} maxLength={64} />
+                <input
+                  value={form.isbnIssn}
+                  onChange={(e) => update("isbnIssn", e.target.value)}
+                  maxLength={64}
+                />
               </label>
               <label>
-                <span>Penerbit <b>*</b></span>
-                <input value={form.publisher} onChange={(e) => update("publisher", e.target.value)} required />
+                <span>
+                  Penerbit <b>*</b>
+                </span>
+                <input
+                  value={form.publisher}
+                  onChange={(e) => update("publisher", e.target.value)}
+                  required
+                />
               </label>
               <label>
-                <span>Tahun Terbit <b>*</b></span>
-                <input type="number" min="1000" max="9999" value={form.year} onChange={(e) => update("year", e.target.value)} required />
+                <span>
+                  Tahun Terbit <b>*</b>
+                </span>
+                <input
+                  type="number"
+                  min="1000"
+                  max="9999"
+                  value={form.year}
+                  onChange={(e) => update("year", e.target.value)}
+                  required
+                />
               </label>
               <label>
                 <span>Edisi</span>
-                <input value={form.edition} onChange={(e) => update("edition", e.target.value)} />
+                <input
+                  value={form.edition}
+                  onChange={(e) => update("edition", e.target.value)}
+                />
               </label>
               <label>
-                <span>Bahasa <b>*</b></span>
-                <input value={form.language} onChange={(e) => update("language", e.target.value)} required maxLength={64} />
+                <span>
+                  Bahasa <b>*</b>
+                </span>
+                <input
+                  value={form.language}
+                  onChange={(e) => update("language", e.target.value)}
+                  required
+                  maxLength={64}
+                />
               </label>
               <label className={styles.spanTwo}>
-                <span>Subjek / Kategori <b>*</b></span>
-                <input value={form.subject} onChange={(e) => update("subject", e.target.value)} required />
+                <span>
+                  Subjek / Kategori <b>*</b>
+                </span>
+                <input
+                  value={form.subject}
+                  onChange={(e) => update("subject", e.target.value)}
+                  required
+                />
               </label>
             </div>
           </section>
@@ -236,26 +360,60 @@ export default function AdminBookForm({
           <section className={styles.formSection}>
             <div className={styles.sectionIntro}>
               <h2>Stok & Lokasi</h2>
-              <p>Stok buku dikelola otomatis selama reservasi dan peminjaman.</p>
+              <p>
+                Stok buku dikelola otomatis selama reservasi dan peminjaman.
+              </p>
             </div>
             <div className={styles.fieldsGrid}>
               <label>
-                <span>Lokasi <b>*</b></span>
-                <input value={form.location} onChange={(e) => update("location", e.target.value)} required />
+                <span>
+                  Lokasi <b>*</b>
+                </span>
+                <input
+                  value={form.location}
+                  onChange={(e) => update("location", e.target.value)}
+                  required
+                />
               </label>
               <label>
-                <span>Rak <b>*</b></span>
-                <input value={form.shelf} onChange={(e) => update("shelf", e.target.value)} required />
+                <span>
+                  Rak <b>*</b>
+                </span>
+                <input
+                  value={form.shelf}
+                  onChange={(e) => update("shelf", e.target.value)}
+                  required
+                />
               </label>
               <label>
-                <span>Jumlah Stok <b>*</b></span>
-                <input type="number" min="0" max="9999" value={form.totalStock} onChange={(e) => update("totalStock", e.target.value)} required />
-                <small>Eksemplar aktif tidak akan dihapus ketika sedang dipinjam atau direservasi.</small>
+                <span>
+                  Jumlah Stok <b>*</b>
+                </span>
+                <input
+                  type="number"
+                  min="0"
+                  max="9999"
+                  value={form.totalStock}
+                  onChange={(e) => update("totalStock", e.target.value)}
+                  required
+                />
+                <small>
+                  Eksemplar aktif tidak akan dihapus ketika sedang dipinjam atau
+                  direservasi.
+                </small>
               </label>
               <label>
                 <span>Stok Tersedia</span>
-                <input value={mode === "create" ? "0" : String(availableStock)} readOnly disabled />
-                <small>{mode === "create" ? "Dihitung setelah buku disimpan" : `Maksimal ${form.totalStock || "0"}`}</small>
+                <input
+                  value={mode === "create" ? "0" : String(availableStock)}
+                  readOnly
+                  disabled
+                />
+                <small>
+                  {mode === "create"
+                    ? "Dihitung setelah buku disimpan"
+                    : `Maksimal ${form.totalStock || "0"}`}
+                </small>
               </label>
             </div>
           </section>
@@ -266,8 +424,15 @@ export default function AdminBookForm({
               <p>Ringkasan yang tampil di halaman detail buku.</p>
             </div>
             <label className={styles.descriptionField}>
-              <span>Deskripsi <b>*</b></span>
-              <textarea rows={6} value={form.description} onChange={(e) => update("description", e.target.value)} required />
+              <span>
+                Deskripsi <b>*</b>
+              </span>
+              <textarea
+                rows={6}
+                value={form.description}
+                onChange={(e) => update("description", e.target.value)}
+                required
+              />
             </label>
           </section>
         </div>
@@ -275,26 +440,40 @@ export default function AdminBookForm({
         <aside className={styles.formAside}>
           <section className={styles.coverCard}>
             <h2>Cover</h2>
-            <img src={form.coverUrl || "/images/landing/book-placeholder-1.svg"} alt="Preview cover buku" />
+            <img
+              src={coverPreview || form.coverUrl || COVER_PLACEHOLDER}
+              alt="Preview cover buku"
+            />
             <input
               ref={coverInput}
-              className={styles.coverUrlInput}
-              value={form.coverUrl}
-              onChange={(e) => update("coverUrl", e.target.value)}
-              placeholder="/images/... atau URL cover"
-              aria-label="URL atau path cover"
-              required
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className={styles.coverFileInput}
+              onChange={chooseCover}
             />
-            <button type="button" className={styles.coverButton} onClick={() => coverInput.current?.focus()}>
-              Ganti Cover
+            <button
+              type="button"
+              className={styles.coverButton}
+              onClick={() => coverInput.current?.click()}
+            >
+              {coverFile || form.coverUrl ? "Ganti Cover" : "Upload Cover"}
             </button>
+            <small className={styles.coverHint}>
+              JPG, PNG, atau WEBP · Maks. 5 MB
+            </small>
+            {coverFile ? (
+              <small className={styles.coverFileName}>{coverFile.name}</small>
+            ) : null}
           </section>
 
           <section className={styles.catalogCard}>
             <label className={styles.toggleRow}>
               <div>
                 <strong>Tampilkan di katalog</strong>
-                <small>Menonaktifkan buku menyembunyikannya dari katalog tanpa menghapus data.</small>
+                <small>
+                  Menonaktifkan buku menyembunyikannya dari katalog tanpa
+                  menghapus data.
+                </small>
               </div>
               <input
                 type="checkbox"
@@ -302,7 +481,9 @@ export default function AdminBookForm({
                 onChange={(e) => update("isActive", e.target.checked)}
               />
             </label>
-            <span className={`${styles.pill} ${form.isActive ? styles.active : styles.inactive}`}>
+            <span
+              className={`${styles.pill} ${form.isActive ? styles.active : styles.inactive}`}
+            >
               {form.isActive ? "Aktif" : "Nonaktif"}
             </span>
           </section>
@@ -310,7 +491,9 @@ export default function AdminBookForm({
       </div>
 
       <footer className={styles.formFooter}>
-        <Link href={backHref} className={styles.cancelButton}>Batal</Link>
+        <Link href={backHref} className={styles.cancelButton}>
+          Batal
+        </Link>
         <button type="submit" className={styles.saveButton} disabled={saving}>
           <FiCheckCircle aria-hidden />
           {saving
