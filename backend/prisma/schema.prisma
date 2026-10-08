@@ -93,8 +93,8 @@ model Book {
   reservations       Reservation[]
   loans              Loan[]
   userEBooks          UserEBook[]
-  createdAt          DateTime       @default(now())
-  updatedAt          DateTime       @updatedAt
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
 
   @@index([type, year])
   @@index([language])
@@ -233,24 +233,37 @@ model UserEBook {
 }
 
 enum GrantStatus {
-  MENUNGGU_VERIFIKASI
-  SEDANG_DIPROSES
+  BELUM_DIKATALOGKAN
   SUDAH_DIKATALOGKAN
 }
 
 model BookGrant {
-  id         Int         @id @default(autoincrement())
-  title      String
-  quantity   Int
+  id         Int             @id @default(autoincrement())
   donorName  String
-  receivedAt DateTime    @db.Date
-  status     GrantStatus @default(MENUNGGU_VERIFIKASI)
-  isDemo     Boolean     @default(false)
-  seedKey    String?     @unique @db.VarChar(64)
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  receivedAt DateTime        @db.Date
+  status     GrantStatus     @default(BELUM_DIKATALOGKAN)
+  note       String?         @db.Text
+  isDemo     Boolean         @default(false)
+  seedKey    String?         @unique @db.VarChar(64)
+  items      BookGrantItem[]
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
 
   @@index([status, receivedAt])
   @@index([receivedAt])
   @@map("book_grants")
+}
+
+model BookGrantItem {
+  id        Int       @id @default(autoincrement())
+  grantId   Int
+  grant     BookGrant @relation(fields: [grantId], references: [id], onDelete: Cascade)
+  title     String
+  quantity  Int
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([grantId])
+  @@index([title])
+  @@map("book_grant_items")
 }

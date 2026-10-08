@@ -1,5 +1,5 @@
-export type GrantStatus =
-  "MENUNGGU_VERIFIKASI" | "SEDANG_DIPROSES" | "SUDAH_DIKATALOGKAN";
+export type GrantStatus = "BELUM_DIKATALOGKAN" | "SUDAH_DIKATALOGKAN";
+
 export type BookGrant = {
   id: number;
   title: string;
@@ -9,9 +9,15 @@ export type BookGrant = {
   status: GrantStatus;
   isDemo: boolean;
 };
+
 export type GrantsResponse = {
   data: BookGrant[];
-  meta: { page: number; limit: number; total: number; totalPages: number };
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
   summary: {
     totalTitles: number;
     totalBooks: number;
@@ -20,8 +26,8 @@ export type GrantsResponse = {
   };
   years: number[];
 };
+
 export const grantStatusLabels: Record<GrantStatus, string> = {
-  MENUNGGU_VERIFIKASI: "Menunggu Verifikasi",
-  SEDANG_DIPROSES: "Sedang Diproses",
+  BELUM_DIKATALOGKAN: "Belum Dikatalogkan",
   SUDAH_DIKATALOGKAN: "Sudah Dikatalogkan",
 };

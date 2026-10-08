@@ -37,7 +37,10 @@ type SubMenuItem = {
 type MenuItem = {
   id: string;
   label: string;
-  icon: ComponentType<{ size?: number; className?: string }>;
+  icon: ComponentType<{
+    size?: number;
+    className?: string;
+  }>;
   route?: string;
   children?: SubMenuItem[];
 };
@@ -166,8 +169,11 @@ export default function AdminShell({ children, user }: AdminShellProps) {
   const pathname = usePathname();
 
   const [loggingOut, setLoggingOut] = useState(false);
+
   const [search, setSearch] = useState("");
+
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const currentTitle = useMemo(() => currentPageTitle(pathname), [pathname]);
@@ -348,7 +354,15 @@ export default function AdminShell({ children, user }: AdminShellProps) {
       </aside>
 
       <section className={styles.workspace}>
-        <header className={styles.topbar}>
+        <header
+          className={styles.topbar}
+          style={{
+            position: "sticky",
+            top: "clamp(12px, 2vw, 26px)",
+            zIndex: 35,
+            background: "var(--surface)",
+          }}
+        >
           <div className={styles.topbarLeft}>
             <button
               type="button"

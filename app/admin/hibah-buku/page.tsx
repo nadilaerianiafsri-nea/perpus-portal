@@ -1,9 +1,5 @@
-import styles from "@/admin/Admin.module.css";
+import AdminGrantsPage from "@/admin/AdminGrantsPage";
 
-export default function DataBukuPage() {
-  return (
-    <section className={styles.emptyPage}>
-      <h1>Halaman Hibah Buku</h1>
-    </section>
-  );
+export default function HibahBukuPage() {
+  return <AdminGrantsPage />;
 }
