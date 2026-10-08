@@ -3,8 +3,10 @@ import { NextResponse } from "next/server";
 import { API_URL } from "@/catalog/serverApi";
 
 const allowed: Record<string, RegExp> = {
-  GET: /^(?:me\/(dashboard|profile|reservations|loans(?:\/history)?|notifications|ebooks)|admin\/members(?:\/\d+)?)$/,
-  POST: /^me\/(reservations|loans\/\d+\/extend|ebooks(?:\/\d+\/open)?)$/,
+  GET: /^(?:me\/(dashboard|profile|reservations|loans(?:\/history)?|notifications|ebooks)|admin\/members(?:\/\d+)?|admin\/transactions\/(reservations|loans|returns|lost-books))$/,
+
+  POST: /^(?:me\/(reservations|loans\/\d+\/extend|ebooks(?:\/\d+\/open)?)|admin\/(?:reservations\/\d+\/pickup|loans\/\d+\/(?:return|lost)))$/,
+
   PATCH:
     /^(?:me\/(profile|reservations\/\d+\/cancel|notifications\/(read-all|\d+\/read)|ebooks\/\d+\/progress)|admin\/members\/\d+(?:\/status)?)$/,
 };
@@ -17,8 +19,13 @@ export async function memberProxy(request: Request, path: string) {
 
   if (!allowed[request.method]?.test(path)) {
     return NextResponse.json(
-      { message: "Endpoint tidak tersedia." },
-      { status: 404, headers },
+      {
+        message: "Endpoint tidak tersedia.",
+      },
+      {
+        status: 404,
+        headers,
+      },
     );
   }
 
@@ -27,8 +34,13 @@ export async function memberProxy(request: Request, path: string) {
 
     if (origin && origin !== new URL(request.url).origin) {
       return NextResponse.json(
-        { message: "Permintaan tidak diizinkan." },
-        { status: 403, headers },
+        {
+          message: "Permintaan tidak diizinkan.",
+        },
+        {
+          status: 403,
+          headers,
+        },
       );
     }
   }
@@ -38,8 +50,13 @@ export async function memberProxy(request: Request, path: string) {
 
     if (body && body.length > 16384) {
       return NextResponse.json(
-        { message: "Data permintaan terlalu panjang." },
-        { status: 400, headers },
+        {
+          message: "Data permintaan terlalu panjang.",
+        },
+        {
+          status: 400,
+          headers,
+        },
       );
     }
 
@@ -51,6 +68,7 @@ export async function memberProxy(request: Request, path: string) {
         ?.trim() ?? "";
 
     const incomingUrl = new URL(request.url);
+
     const targetUrl = new URL(`${API_URL}/members/${path}`);
 
     incomingUrl.searchParams.forEach((value, key) => {
@@ -81,7 +99,10 @@ export async function memberProxy(request: Request, path: string) {
       {
         message: "Layanan anggota belum dapat dihubungi. Silakan coba lagi.",
       },
-      { status: 503, headers },
+      {
+        status: 503,
+        headers,
+      },
     );
   }
 }

@@ -1,9 +1,5 @@
-import styles from "@/admin/Admin.module.css";
+import AdminLostBooksPage from "@/admin/AdminLostBooksPage";
 
-export default function DataBukuPage() {
-  return (
-    <section className={styles.emptyPage}>
-      <h1>Halaman transaksi buku hilang penggantian</h1>
-    </section>
-  );
+export default function BukuHilangPenggantianPage() {
+  return <AdminLostBooksPage />;
 }

@@ -54,8 +54,14 @@ const menuItems: MenuItem[] = [
     label: "Koleksi",
     icon: FiBookOpen,
     children: [
-      { label: "Data Buku", route: "/admin/koleksi/data-buku" },
-      { label: "E-Book", route: "/admin/koleksi/e-book" },
+      {
+        label: "Data Buku",
+        route: "/admin/koleksi/data-buku",
+      },
+      {
+        label: "E-Book",
+        route: "/admin/koleksi/e-book",
+      },
     ],
   },
   {
@@ -70,24 +76,16 @@ const menuItems: MenuItem[] = [
     icon: FiRepeat,
     children: [
       {
-        label: "Reservasi 24 Jam",
-        route: "/admin/transaksi/reservasi-24-jam",
+        label: "Reservasi",
+        route: "/admin/transaksi/reservasi",
       },
       {
-        label: "Peminjaman Aktif",
-        route: "/admin/transaksi/peminjaman-aktif",
+        label: "Peminjaman",
+        route: "/admin/transaksi/peminjaman",
       },
       {
         label: "Pengembalian",
         route: "/admin/transaksi/pengembalian",
-      },
-      {
-        label: "Perpanjangan",
-        route: "/admin/transaksi/perpanjangan",
-      },
-      {
-        label: "Terlambat",
-        route: "/admin/transaksi/terlambat",
       },
       {
         label: "Buku Hilang & Penggantian",
@@ -138,7 +136,10 @@ function initials(name: string) {
 }
 
 function routeMatches(pathname: string, route: string) {
-  if (route === "/admin") return pathname === route;
+  if (route === "/admin") {
+    return pathname === route;
+  }
+
   return pathname === route || pathname.startsWith(`${route}/`);
 }
 
@@ -256,12 +257,16 @@ export default function AdminShell({ children, user }: AdminShellProps) {
         <nav className={styles.menu} aria-label="Menu admin perpustakaan">
           {menuItems.map((item) => {
             const Icon = item.icon;
+
             const isRouteActive = item.route
               ? routeMatches(pathname, item.route)
               : false;
-            const isGroupActive = item.children?.some((child) =>
-              routeMatches(pathname, child.route),
-            );
+
+            const isGroupActive =
+              item.children?.some((child) =>
+                routeMatches(pathname, child.route),
+              ) ?? false;
+
             const expanded =
               openMenu === item.id || (openMenu === null && isGroupActive);
 
@@ -358,6 +363,7 @@ export default function AdminShell({ children, user }: AdminShellProps) {
             <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
               <Link href="/">Beranda</Link>
               <span>/</span>
+
               <Link href="/admin" onClick={() => setOpenMenu(null)}>
                 Dashboard
               </Link>

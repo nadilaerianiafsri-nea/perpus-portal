@@ -1,9 +1,5 @@
-import styles from "@/admin/Admin.module.css";
+import AdminReturnsPage from "@/admin/AdminReturnsPage";
 
-export default function DataBukuPage() {
-  return (
-    <section className={styles.emptyPage}>
-      <h1>Halaman transaksi pengembalian</h1>
-    </section>
-  );
+export default function PengembalianPage() {
+  return <AdminReturnsPage />;
 }
