@@ -28,6 +28,7 @@ model User {
   role          Role           @default(PENGUNJUNG)
   memberType    MemberType?
   emailVerified Boolean        @default(false)
+  isActive      Boolean        @default(true)
   memberProfile MemberProfile?
   reservations  Reservation[]
   loans         Loan[]

@@ -62,24 +62,7 @@ const menuItems: MenuItem[] = [
     id: "keanggotaan",
     label: "Keanggotaan",
     icon: FiUsers,
-    children: [
-      {
-        label: "Semua Anggota",
-        route: "/admin/keanggotaan/semua-anggota",
-      },
-      {
-        label: "Masyarakat Umum",
-        route: "/admin/keanggotaan/masyarakat-umum",
-      },
-      {
-        label: "Mahasiswa",
-        route: "/admin/keanggotaan/mahasiswa",
-      },
-      {
-        label: "Pegawai Internal",
-        route: "/admin/keanggotaan/pegawai-internal",
-      },
-    ],
+    route: "/admin/keanggotaan",
   },
   {
     id: "transaksi",
@@ -378,6 +361,7 @@ export default function AdminShell({ children, user }: AdminShellProps) {
               <Link href="/admin" onClick={() => setOpenMenu(null)}>
                 Dashboard
               </Link>
+
               {pathname !== "/admin" ? (
                 <>
                   <span>/</span>

@@ -11,7 +11,6 @@ import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcrypt';
 
 import { MemberType, Prisma, Role } from '../generated/prisma/client';
-
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { EmailVerificationService } from './email-verification.service';
@@ -78,7 +77,9 @@ export class AuthService {
     const email = emailInput.trim().toLowerCase();
 
     const user = await this.prisma.user.findUnique({
-      where: { email },
+      where: {
+        email,
+      },
     });
 
     if (!user) {
@@ -89,6 +90,14 @@ export class AuthService {
 
     if (!validPassword) {
       throw new UnauthorizedException('Email atau kata sandi salah.');
+    }
+
+    if (user.role === Role.PENGUNJUNG && !user.isActive) {
+      throw new ForbiddenException({
+        message:
+          'Akun anggota sedang dinonaktifkan. Hubungi petugas perpustakaan.',
+        code: 'ACCOUNT_INACTIVE',
+      });
     }
 
     if (!user.emailVerified) {
@@ -103,13 +112,22 @@ export class AuthService {
 
   async register(body: unknown) {
     const input = RegisterDto.from(body);
+
     const existingUser = await this.prisma.user.findUnique({
-      where: { email: input.email },
-      select: { id: true },
+      where: {
+        email: input.email,
+      },
+      select: {
+        id: true,
+      },
     });
-    if (existingUser) throw new ConflictException('Email sudah terdaftar.');
+
+    if (existingUser) {
+      throw new ConflictException('Email sudah terdaftar.');
+    }
 
     const passwordHash = await bcrypt.hash(input.password, 12);
+
     try {
       const user = await this.prisma.$transaction(async (tx) => {
         const created = await tx.user.create({
@@ -120,6 +138,7 @@ export class AuthService {
             memberType: input.memberType,
             role: Role.PENGUNJUNG,
             emailVerified: false,
+            isActive: true,
           },
           select: {
             id: true,
@@ -128,6 +147,7 @@ export class AuthService {
             emailVerified: true,
           },
         });
+
         await tx.memberProfile.create({
           data: {
             userId: created.id,
@@ -142,10 +162,13 @@ export class AuthService {
               input.memberType === MemberType.PEGAWAI ? input.division : null,
           },
         });
+
         return created;
       });
+
       const verificationEmailSent =
         await this.verification.sendRegistrationVerification(user);
+
       return {
         message: verificationEmailSent
           ? 'Pendaftaran berhasil. Email verifikasi telah dikirim; akun menunggu verifikasi email.'
@@ -165,6 +188,7 @@ export class AuthService {
       ) {
         throw new ConflictException('Email sudah terdaftar.');
       }
+
       throw error;
     }
   }
@@ -179,7 +203,9 @@ export class AuthService {
 
   async getUserById(id: number) {
     const user = await this.prisma.user.findUnique({
-      where: { id },
+      where: {
+        id,
+      },
       select: {
         id: true,
         name: true,
@@ -187,6 +213,7 @@ export class AuthService {
         role: true,
         memberType: true,
         emailVerified: true,
+        isActive: true,
       },
     });
 
@@ -194,8 +221,16 @@ export class AuthService {
       throw new UnauthorizedException('Sesi tidak valid.');
     }
 
-    if (!user.emailVerified)
+    if (user.role === Role.PENGUNJUNG && !user.isActive) {
+      throw new ForbiddenException(
+        'Akun anggota sedang dinonaktifkan. Hubungi petugas perpustakaan.',
+      );
+    }
+
+    if (!user.emailVerified) {
       throw new ForbiddenException('Akun menunggu verifikasi email.');
+    }
+
     return {
       id: user.id,
       name: user.name,
@@ -203,6 +238,7 @@ export class AuthService {
       role: user.role,
       memberType: user.memberType,
       emailVerified: user.emailVerified,
+      isActive: user.isActive,
     };
   }
 }
