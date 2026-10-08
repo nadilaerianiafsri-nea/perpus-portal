@@ -794,14 +794,20 @@
 
 .formAside {
   display: grid;
+  align-content: start;
   gap: 14px;
 }
 
 .formSection {
   display: grid;
-  grid-template-columns: 180px minmax(0, 1fr);
-  gap: 22px;
+  grid-template-columns: 1fr;
+  gap: 16px;
   padding: 20px;
+}
+
+.sectionIntro {
+  padding-bottom: 14px;
+  border-bottom: 1px solid #ececef;
 }
 
 .sectionIntro h2 {
@@ -821,6 +827,7 @@
 }
 
 .sectionIntro p {
+  max-width: 720px;
   margin: 0;
   color: #777;
   font-size: 10px;
@@ -894,7 +901,7 @@
 }
 
 .descriptionField {
-  grid-column: 2;
+  grid-column: auto;
 }
 
 .descriptionField textarea {
@@ -1003,6 +1010,10 @@
   transform: translateX(18px);
 }
 
+.catalogCard {
+  align-self: start;
+}
+
 .catalogCard .pill {
   margin-top: 12px;
 }
@@ -1024,12 +1035,46 @@
   }
 
   .formAside {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    order: -1;
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .coverCard {
+    display: grid;
+    grid-template-columns: minmax(160px, 220px) minmax(0, 1fr);
+    column-gap: 18px;
+    row-gap: 8px;
+    align-items: start;
+  }
+
+  .coverCard h2 {
+    grid-column: 1 / -1;
+    margin-bottom: 4px;
   }
 
   .coverCard img {
-    max-height: 300px;
+    grid-column: 1;
+    grid-row: 2 / span 4;
+    max-height: 280px;
+    margin-bottom: 0;
     object-fit: contain;
+  }
+
+  .coverButton {
+    grid-column: 2;
+    align-self: start;
+  }
+
+  .coverHint,
+  .coverFileName {
+    grid-column: 2;
+    margin-top: 0;
+    text-align: left;
+  }
+
+  .catalogCard {
+    align-self: start;
   }
 }
 
@@ -1158,6 +1203,27 @@
 
   .formAside {
     grid-template-columns: 1fr;
+  }
+
+  .coverCard {
+    display: block;
+  }
+
+  .coverCard h2 {
+    margin-bottom: 17px;
+  }
+
+  .coverCard img {
+    width: min(100%, 280px);
+    max-height: none;
+    margin: 0 auto 10px;
+    object-fit: cover;
+  }
+
+  .coverHint,
+  .coverFileName {
+    margin-top: 8px;
+    text-align: center;
   }
 
   .formFooter {
