@@ -3,13 +3,18 @@
 import { useState } from "react";
 import Accordion from "@/components/Accordion";
 import SearchField from "@/components/SearchField";
-import { faqItems } from "./serviceContent";
 import styles from "./Information.module.css";
 
-export default function FAQ() {
+type FAQItem = {
+  id: string;
+  question: string;
+  answer: string;
+};
+
+export default function FAQ({ items }: { items: FAQItem[] }) {
   const [search, setSearch] = useState("");
   const query = search.trim().toLocaleLowerCase("id-ID");
-  const filtered = faqItems.filter(({ question, answer }) =>
+  const filtered = items.filter(({ question, answer }) =>
     `${question} ${answer}`.toLocaleLowerCase("id-ID").includes(query),
   );
 
@@ -25,7 +30,7 @@ export default function FAQ() {
       <div className={styles.faqResults}>
         {filtered.length ? (
           <Accordion
-            defaultOpenId={faqItems[0].id}
+            defaultOpenId={items[0]?.id}
             items={filtered.map(({ id, question, answer }) => ({
               id,
               title: question,

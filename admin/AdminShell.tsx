@@ -5,6 +5,7 @@ import type { ComponentType, FormEvent, ReactNode } from "react";
 import { useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
+  FiBarChart2,
   FiBell,
   FiBookOpen,
   FiChevronDown,
@@ -15,6 +16,7 @@ import {
   FiMenu,
   FiRepeat,
   FiSearch,
+  FiSettings,
   FiUsers,
   FiX,
 } from "react-icons/fi";
@@ -106,20 +108,19 @@ const menuItems: MenuItem[] = [
     id: "notifikasi",
     label: "Notifikasi",
     icon: FiBell,
-    children: [
-      {
-        label: "Reminder",
-        route: "/admin/notifikasi/reminder",
-      },
-      {
-        label: "Log Email",
-        route: "/admin/notifikasi/log-email",
-      },
-      {
-        label: "Log WhatsApp",
-        route: "/admin/notifikasi/log-whatsapp",
-      },
-    ],
+    route: "/admin/notifikasi",
+  },
+  {
+    id: "laporan",
+    label: "Laporan",
+    icon: FiBarChart2,
+    route: "/admin/laporan",
+  },
+  {
+    id: "pengaturan",
+    label: "Pengaturan Perpustakaan",
+    icon: FiSettings,
+    route: "/admin/pengaturan",
   },
 ];
 
@@ -169,11 +170,8 @@ export default function AdminShell({ children, user }: AdminShellProps) {
   const pathname = usePathname();
 
   const [loggingOut, setLoggingOut] = useState(false);
-
   const [search, setSearch] = useState("");
-
   const [openMenu, setOpenMenu] = useState<string | null>(null);
-
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const currentTitle = useMemo(() => currentPageTitle(pathname), [pathname]);
@@ -408,10 +406,10 @@ export default function AdminShell({ children, user }: AdminShellProps) {
             </form>
 
             <Link
-              href="/admin/notifikasi/reminder"
+              href="/admin/notifikasi"
               className={styles.iconButton}
               aria-label="Notifikasi admin"
-              onClick={() => setOpenMenu("notifikasi")}
+              onClick={() => setOpenMenu(null)}
             >
               <FiBell size={18} />
             </Link>

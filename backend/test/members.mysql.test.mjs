@@ -10,12 +10,13 @@ const { CollectionsService } = await import('../dist/collections/collections.ser
 const { PrismaService } = await import('../dist/prisma/prisma.service.js');
 const { jakartaDay, reminderMilestone } = await import('../dist/members/member.validation.js');
 assert.equal(jakartaDay(new Date('2026-10-06T17:00:00Z')) - jakartaDay(new Date('2026-10-06T16:59:59Z')), 1, 'Jakarta midnight determines calendar reminders');
-for (const [days, expected] of [[-2, null], [-1, -1], [0, 0], [1, 1], [2, null], [3, 3], [4, null], [5, 5]]) {
+for (const [days, expected] of [[-2, null], [-1, -1], [0, 0], [1, null], [2, 2], [3, 3], [4, 4], [5, 5]]) {
   assert.equal(reminderMilestone(new Date('2026-10-07T05:00:00Z'), new Date(Date.parse('2026-10-07T05:00:00Z') + days * 86400000)), expected);
 }
 const key = `member-test-${randomUUID().slice(0, 8)}`;
 const prisma = new PrismaService({ getOrThrow: () => process.env.DATABASE_URL });
-const service = new MembersService(prisma, { isConfigured: () => false, sendMemberReminder: async () => { throw new Error('Tests must never send email'); } });
+const mail = { isConfigured: () => false, sendMemberReminder: async () => { throw new Error('Tests must never send email'); } };
+const service = new MembersService(prisma, mail);
 const collections = new CollectionsService(prisma, service);
 const users = [], books = [];
 const day = 86400000;
@@ -32,6 +33,31 @@ try {
   assert.equal(reservation.pickupLocation, 'Meja Layanan Sirkulasi', 'pickup desk comes from shared service configuration');
   assert.equal(reservation.copy.status, 'DIRESERVASI', 'response includes the actual allocated copy status');
   assert.equal(await prisma.loan.count({where: {userId: owner}}), 0, 'reservation is not a loan');
+
+  const settingsUser = await prisma.user.create({data: {name: `${key} settings`, email: `${key}-settings@example.test`, passwordHash: 'test-only-no-login', role: 'PENGUNJUNG', memberType: 'UMUM', emailVerified: true, memberProfile: {create: {whatsapp: '081234567891', address: 'Alamat pengujian settings', identityNumber: `${key}-settings`}}}});
+  users.push(settingsUser);
+  const settingsBook = await prisma.book.create({data: {code: `${key}-SETTINGS`, title: `Buku Settings ${key}`, author: 'Pengujian', publisher: 'Pengujian', year: 2026, language: 'Indonesia', subject: 'Pengujian', type: 'FISIK', format: 'Cetak', description: 'Fixture aturan dinamis', coverUrl: '/placeholder-book.svg', copies: {create: [{code: `${key}-settings-copy`, location: 'Pengujian'}]}}});
+  books.push(settingsBook);
+  const policy = {reservationDurationHours: 12, loanDurationDays: 10, extensionDurationDays: 3, maxExtensions: null};
+  const configuredService = new MembersService(prisma, mail, undefined, {getSettings: async () => policy});
+  const configuredReservation = (await configuredService.reserve(settingsUser.id, {bookId: settingsBook.id})).reservation;
+  assert.equal(new Date(configuredReservation.expiresAt) - new Date(configuredReservation.createdAt), 12 * 3600000, 'new reservation uses configured duration');
+  const storedExpiry = new Date(configuredReservation.expiresAt).getTime();
+  policy.reservationDurationHours = 1;
+  assert.equal((await prisma.reservation.findUnique({where: {id: configuredReservation.id}})).expiresAt.getTime(), storedExpiry, 'settings change does not rewrite existing reservation expiry');
+  const configuredLoan = (await configuredService.pickup(configuredReservation.id)).loan;
+  assert.equal(new Date(configuredLoan.dueAt) - new Date(configuredLoan.borrowedAt), 10 * day, 'new pickup uses configured loan duration');
+  const storedDueAt = new Date(configuredLoan.dueAt).getTime();
+  policy.loanDurationDays = 30;
+  assert.equal((await prisma.loan.findUnique({where: {id: configuredLoan.id}})).dueAt.getTime(), storedDueAt, 'settings change does not rewrite existing loan due date');
+  policy.maxExtensions = 0;
+  await assert.rejects(configuredService.extend(settingsUser.id, configuredLoan.id, {expectedDueAt: new Date(configuredLoan.dueAt).toISOString()}), /dinonaktifkan/);
+  policy.maxExtensions = 1;
+  const configuredExtended = (await configuredService.extend(settingsUser.id, configuredLoan.id, {expectedDueAt: new Date(configuredLoan.dueAt).toISOString()})).loan;
+  assert.equal(new Date(configuredExtended.dueAt).getTime() - storedDueAt, 3 * day, 'extension uses configured extension duration');
+  await assert.rejects(configuredService.extend(settingsUser.id, configuredLoan.id, {expectedDueAt: new Date(configuredExtended.dueAt).toISOString()}), /Batas maksimal/);
+  await configuredService.finishLoan(configuredLoan.id, false);
+
   await assert.rejects(service.reserve(owner, {bookId: books[0].id}), /reservasi aktif/);
   await assert.rejects(service.cancel(other, reservation.id), /tidak ditemukan/);
   const {loan} = await service.pickup(reservation.id);
@@ -48,7 +74,7 @@ try {
     const current = await prisma.loan.findUnique({where: {id: loan.id}});
     await service.extend(owner, loan.id, {expectedDueAt: current.dueAt.toISOString()});
   }
-  assert.equal((await prisma.loan.findUnique({where: {id: loan.id}})).extensionCount, 4, 'there is no artificial extension limit');
+  assert.equal((await prisma.loan.findUnique({where: {id: loan.id}})).extensionCount, 4, 'there is no artificial extension limit when maxExtensions is null');
   await assert.rejects(service.extend(other, loan.id, extensionRequest), /tidak ditemukan/);
   await assert.rejects(service.extend(owner, loan.id, {expectedDueAt: 'invalid'}), /jatuh tempo/);
   await service.finishLoan(loan.id, false);
@@ -90,7 +116,7 @@ try {
   await Promise.all([service.createReminders(), service.createReminders()]);
   assert.equal(await prisma.notification.count({where: {eventKey: `reservation:${active.id}:almost`}}), 1, 'almost-expiry notification deduplicates concurrently');
   const currentLoan = (await service.pickup(active.id)).loan;
-  const due = new Date(Date.now() - day);
+  const due = new Date(Date.now() - 2 * day);
   await prisma.loan.update({where: {id: currentLoan.id}, data: {dueAt: due}});
   await service.createReminders();
   await service.createReminders();
@@ -174,7 +200,7 @@ try {
   await assert.rejects(service.extend(owner, currentLoan.id, {expectedDueAt: due.toISOString()}), /pinjaman aktif/);
   assert.equal((await service.dashboard(owner)).alerts.lost.length, 1);
   assert.equal((await prisma.bookCopy.findFirst({where: {bookId: books[0].id}})).status, 'HILANG');
-  console.log('PASS members: locking, duplicate, ownership, 24h expiry, pickup, concurrent extensions, returns/lost, reminders, ebooks, profile, real summary');
+  console.log('PASS members: locking, duplicate, ownership, configurable expiry/loan/extension policy, returns/lost, H-1/H/H+2 reminders, ebooks, profile, real summary');
 } finally {
   const userIds = users.map(u => u.id), bookIds = books.map(b => b.id);
   await prisma.notification.deleteMany({where: {userId: {in: userIds}}});

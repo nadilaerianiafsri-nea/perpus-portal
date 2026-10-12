@@ -14,6 +14,10 @@ import {
 } from "react-icons/fi";
 import LandingNavbar from "../components/LandingNavbar";
 import LandingFooter from "../components/LandingFooter";
+import {
+  formatPublicPhone,
+  getLibrarySettings,
+} from "@/information/librarySettings";
 import { serviceInfo } from "@/shared/serviceInfo.cjs";
 
 const books = [
@@ -36,17 +40,24 @@ const subjects = [
   "Karya Ilmiah",
 ];
 
-const steps = [
-  ["01", "Cari Buku", "Telusuri koleksi yang tersedia."],
-  ["02", "Ajukan Peminjaman", "Pilih buku dan ajukan pinjam."],
-  ["03", "Reservasi Buku", "Reservasi jika buku sedang dipinjam."],
-  ["04", "Ambil di Perpustakaan", "Datang sesuai jadwal pengambilan."],
-  ["05", "Baca & Kembalikan", "Nikmati buku selama masa pinjam."],
-  ["06", "Perpanjang 7 Hari", "Perpanjang bila masih dibutuhkan."],
-  ["07", "Kembalikan", "Kembalikan sebelum jatuh tempo."],
-];
+export default async function Home() {
+  const settings = await getLibrarySettings();
+  const steps = [
+    ["01", "Cari Buku", "Telusuri koleksi yang tersedia."],
+    ["02", "Ajukan Peminjaman", "Pilih buku dan ajukan pinjam."],
+    ["03", "Reservasi Buku", `Reservasi berlaku ${settings.reservationDurationHours} jam.`],
+    ["04", "Ambil di Perpustakaan", "Datang sesuai jadwal pengambilan."],
+    ["05", "Baca & Kembalikan", `Nikmati buku selama masa pinjam ${settings.loanDurationDays} hari.`],
+    [
+      "06",
+      `Perpanjang ${settings.extensionDurationDays} Hari`,
+      settings.maxExtensions === 0
+        ? "Perpanjangan sedang dinonaktifkan."
+        : "Perpanjang bila masih dibutuhkan.",
+    ],
+    ["07", "Kembalikan", "Kembalikan sebelum jatuh tempo."],
+  ];
 
-export default function Home() {
   return (
     <>
       <LandingNavbar />
@@ -55,7 +66,7 @@ export default function Home() {
         <section className="hero" id="beranda">
           <div className="landing-shell hero-grid">
             <div className="hero-copy">
-              <span className="micro-badge">PORTAL RESMI PERPUSTAKAAN KEMENKUM RIAU</span>
+              <span className="micro-badge">PORTAL RESMI {settings.libraryName.toUpperCase()}</span>
               <h1>Temukan<br />Pengetahuan,<br />dalam Satu Akses</h1>
               <p>
                 Jelajahi ribuan koleksi fisik dan e-book, reservasi buku,
@@ -76,7 +87,7 @@ export default function Home() {
             <div className="hero-art">
               <Image
                 src="/images/ASSET PERPUS/BG LANDING PAGE.png"
-                alt="Ilustrasi perpustakaan Kemenkum Riau"
+                alt={`Ilustrasi ${settings.libraryName}`}
                 fill
                 priority
                 sizes="(max-width: 900px) 100vw, 50vw"
@@ -123,7 +134,7 @@ export default function Home() {
                   <div className="book-body">
                     <small>{book.category}</small>
                     <h3>{book.title}</h3>
-                    <p>Perpustakaan Digital Kemenkum Riau</p>
+                    <p>{settings.libraryName}</p>
                     <div className="availability"><FiCheckCircle /> Tersedia</div>
                     <a href="#">Lihat Detail</a>
                   </div>
@@ -172,7 +183,7 @@ export default function Home() {
                 </p>
                 <div className="pill-row">
                   <span><FiSearch /> Katalog lengkap</span>
-                  <span><FiClock /> Reservasi 24 jam</span>
+                  <span><FiClock /> Reservasi {settings.reservationDurationHours} jam</span>
                   <span><FiMapPin /> Cek rak buku</span>
                 </div>
               </div>
@@ -189,11 +200,12 @@ export default function Home() {
                 <span className="mini-tag">Layanan 02</span>
                 <h3>Perpanjang Pinjaman & Reminder Otomatis</h3>
                 <p>
-                  Perpanjang pinjaman hingga 7 hari tanpa datang ke perpustakaan dan
-                  dapatkan pengingat sebelum jatuh tempo.
+                  {settings.maxExtensions === 0
+                    ? "Perpanjangan pinjaman sedang dinonaktifkan. Pengingat jatuh tempo tetap tersedia."
+                    : `Perpanjang pinjaman +${settings.extensionDurationDays} hari tanpa datang ke perpustakaan dan dapatkan pengingat sebelum jatuh tempo.`}
                 </p>
                 <div className="pill-row">
-                  <span><FiCalendar /> Perpanjang 7 hari</span>
+                  <span><FiCalendar /> Perpanjang {settings.extensionDurationDays} hari</span>
                   <span><FiBell /> Reminder otomatis</span>
                   <span><FiMail /> Info via email</span>
                 </div>
@@ -256,11 +268,11 @@ export default function Home() {
             <div className="reminder-grid">
               <article>
                 <div className="reminder-icon"><FiCalendar /></div>
-                <div><span>Perpanjangan</span><h3>Perpanjang Pinjaman +7 Hari</h3><p>Ajukan perpanjangan langsung dari akun tanpa harus datang.</p><a href="#">Kelola Pinjaman <FiArrowRight /></a></div>
+                <div><span>Perpanjangan</span><h3>Perpanjang Pinjaman +{settings.extensionDurationDays} Hari</h3><p>Ajukan perpanjangan langsung dari akun tanpa harus datang.</p><a href="#">Kelola Pinjaman <FiArrowRight /></a></div>
               </article>
               <article>
                 <div className="reminder-icon"><FiBell /></div>
-                <div><span>Reminder Otomatis</span><h3>Reminder via Email</h3><p>Notifikasi sebelum masa pinjaman Anda berakhir.</p><a href="#">Lihat Panduan <FiArrowRight /></a></div>
+                <div><span>Reminder Otomatis</span><h3>Reminder via Email</h3><p>Notifikasi sebelum dan setelah masa pinjaman Anda berakhir.</p><a href="#">Lihat Panduan <FiArrowRight /></a></div>
               </article>
             </div>
           </div>
@@ -315,9 +327,9 @@ export default function Home() {
           <div className="landing-shell">
             <div className="section-head"><h2>Informasi Layanan</h2></div>
             <div className="info-grid">
-              <article><FiClock /><div><span>JAM LAYANAN</span><strong>{serviceInfo.hours}</strong></div></article>
-              <article><FiMapPin /><div><span>ALAMAT</span><strong><a href={serviceInfo.openStreetMapUrl} target="_blank" rel="noopener noreferrer">{serviceInfo.address}</a></strong></div></article>
-              <article><FiPhone /><div><span>KONTAK</span><strong><a href={serviceInfo.phoneUrl}>{serviceInfo.phone}</a></strong><a href={`mailto:${serviceInfo.email}`}>{serviceInfo.email}</a></div></article>
+              <article><FiClock /><div><span>JAM LAYANAN</span><strong>{settings.serviceHours}</strong></div></article>
+              <article><FiMapPin /><div><span>ALAMAT</span><strong><a href={serviceInfo.openStreetMapUrl} target="_blank" rel="noopener noreferrer">{settings.address}</a></strong></div></article>
+              <article><FiPhone /><div><span>KONTAK</span><strong><a href={`tel:${settings.phoneE164}`}>{formatPublicPhone(settings.phoneE164)}</a></strong><a href={`mailto:${serviceInfo.email}`}>{serviceInfo.email}</a></div></article>
             </div>
             <div className="contact-center"><a className="outline-btn" href="/kontak"><FiMail /> Hubungi Kami</a></div>
           </div>

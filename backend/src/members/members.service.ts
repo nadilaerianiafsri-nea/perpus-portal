@@ -13,6 +13,7 @@ import { serviceInfo } from '../../../shared/serviceInfo.cjs';
 import { PrismaService } from '../prisma/prisma.service';
 import { MailService } from '../mail/mail.service';
 import { Prisma } from '../generated/prisma/client';
+import { AdminOperationsService } from './admin-operations.service';
 import {
   bookInput,
   extensionInput,
@@ -69,7 +70,18 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
     private readonly prisma: PrismaService,
     private readonly mail: MailService,
     @Optional() private readonly config?: ConfigService,
+    @Optional() private readonly operations?: AdminOperationsService,
   ) {}
+
+  private async circulationSettings() {
+    if (this.operations) return this.operations.getSettings();
+    return {
+      reservationDurationHours: 24,
+      loanDurationDays: 7,
+      extensionDurationDays: 7,
+      maxExtensions: null as number | null,
+    };
+  }
 
   onModuleInit() {
     this.timer = setInterval(() => void this.background(), 30000);
@@ -104,7 +116,6 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
           timeout: 15000,
         });
       } catch (error) {
-        // InnoDB deadlocks can surface through either Prisma's transaction or raw-query code.
         const e = error as {
           code?: string;
           meta?: {
@@ -272,8 +283,8 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
   async reserve(userId: number, body: unknown) {
     const bookId = bookInput(body);
     await this.expireReservations();
+    const settings = await this.circulationSettings();
     const row = await this.transaction(async (tx) => {
-      // User lock serializes duplicate requests even when a book has multiple copies.
       await tx.$queryRaw`SELECT id FROM users WHERE id = ${userId} FOR UPDATE`;
       const member = await tx.memberProfile.findUnique({
         where: { userId },
@@ -314,7 +325,9 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
           bookId,
           copyId: available[0].id,
           createdAt: now,
-          expiresAt: new Date(now.getTime() + DAY),
+          expiresAt: new Date(
+            now.getTime() + settings.reservationDurationHours * 60 * 60 * 1000,
+          ),
         },
         include: circulationInclude,
       });
@@ -323,7 +336,7 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
         userId,
         `reservation:${reservation.id}:created`,
         'Reservasi berhasil dibuat',
-        `${book.title} telah direservasi. Ambil buku dalam 24 jam sebelum batas pengambilan.`,
+        `${book.title} telah direservasi. Ambil buku dalam ${settings.reservationDurationHours} jam sebelum batas pengambilan.`,
         '/dashboard/reservasi',
       );
       return reservation;
@@ -370,7 +383,6 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
 
   async cancel(userId: number, id: number) {
     const row = await this.transaction(async (tx) => {
-      // Scope the lock as well as the read to avoid touching another member's rows.
       await tx.$queryRaw`SELECT id FROM reservations WHERE id = ${id} AND userId = ${userId} FOR UPDATE`;
       const row = await tx.reservation.findFirst({
         where: { id, userId },
@@ -407,6 +419,7 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
   }
 
   async pickup(id: number) {
+    const settings = await this.circulationSettings();
     const loan = await this.transaction(async (tx) => {
       await tx.$queryRaw`SELECT id FROM reservations WHERE id = ${id} FOR UPDATE`;
       const reservation = await tx.reservation.findUnique({
@@ -439,7 +452,7 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
           copyId: reservation.copyId,
           reservationId: id,
           borrowedAt: now,
-          dueAt: new Date(now.getTime() + 7 * DAY),
+          dueAt: new Date(now.getTime() + settings.loanDurationDays * DAY),
         },
         include: circulationInclude,
       });
@@ -448,7 +461,7 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
         reservation.userId,
         `loan:${loan.id}:pickup`,
         'Buku sudah diambil',
-        `${reservation.book.title} telah dikonfirmasi diambil petugas. Masa pinjaman dimulai sekarang selama 7 hari.`,
+        `${reservation.book.title} telah dikonfirmasi diambil petugas. Masa pinjaman dimulai sekarang selama ${settings.loanDurationDays} hari.`,
         '/dashboard/pinjaman',
       );
       return loan;
@@ -542,6 +555,7 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
 
   async extend(userId: number, id: number, body: unknown) {
     const expectedDueAt = extensionInput(body);
+    const settings = await this.circulationSettings();
     const row = await this.transaction(async (tx) => {
       await tx.$queryRaw`SELECT id FROM loans WHERE id = ${id} AND userId = ${userId} FOR UPDATE`;
       const loan = await tx.loan.findFirst({
@@ -554,8 +568,6 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
           'Hanya pinjaman aktif yang dapat diperpanjang.',
         );
       if (loan.dueAt.getTime() !== expectedDueAt.getTime()) {
-        // A retry confirms the same previous deadline, including after a lost
-        // response. The loan row lock serializes check, update and event creation.
         const applied = await tx.loanExtension.findFirst({
           where: { loanId: id, previousDueAt: expectedDueAt },
         });
@@ -564,7 +576,19 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
           'Jatuh tempo telah berubah. Muat ulang data pinjaman lalu konfirmasi kembali.',
         );
       }
-      const dueAt = new Date(loan.dueAt.getTime() + 7 * DAY);
+      if (
+        settings.maxExtensions !== null &&
+        loan.extensionCount >= settings.maxExtensions
+      ) {
+        throw new ConflictException(
+          settings.maxExtensions === 0
+            ? 'Perpanjangan pinjaman sedang dinonaktifkan oleh perpustakaan.'
+            : `Batas maksimal perpanjangan adalah ${settings.maxExtensions} kali.`,
+        );
+      }
+      const dueAt = new Date(
+        loan.dueAt.getTime() + settings.extensionDurationDays * DAY,
+      );
       const extended = await tx.loan.update({
         where: { id },
         data: { dueAt, extensionCount: { increment: 1 } },
@@ -578,10 +602,9 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
         userId,
         `extension:${extension.id}`,
         'Masa pinjam diperpanjang',
-        `Masa pinjam "${loan.book.title}" berhasil diperpanjang sampai ${new Intl.DateTimeFormat('id-ID', { timeZone: 'Asia/Jakarta', day: 'numeric', month: 'short', year: 'numeric' }).format(dueAt)}.`,
+        `Masa pinjam "${loan.book.title}" berhasil diperpanjang ${settings.extensionDurationDays} hari sampai ${new Intl.DateTimeFormat('id-ID', { timeZone: 'Asia/Jakarta', day: 'numeric', month: 'short', year: 'numeric' }).format(dueAt)}.`,
         '/dashboard/pinjaman',
       );
-      // Queued reminders for the old deadline no longer apply after extension.
       await this.invalidateReminders(tx, userId, id);
       return extended;
     });
@@ -688,7 +711,6 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
       select: { id: true },
     });
     if (!book) throw new NotFoundException('E-Book tidak ditemukan.');
-    // Native unique key plus upsert makes repeated saves idempotent.
     await this.prisma.userEBook.createMany({
       data: [{ userId, bookId }],
       skipDuplicates: true,
@@ -767,7 +789,6 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
     for (const loan of loans) {
       const milestone = reminderMilestone(loan.dueAt, now);
       if (milestone === null) continue;
-      // Lock and re-read so an extension/return cannot create a stale reminder.
       await this.transaction(async (tx) => {
         await tx.$queryRaw`SELECT id FROM loans WHERE id = ${loan.id} FOR UPDATE`;
         const current = await tx.loan.findUnique({ where: { id: loan.id } });
@@ -831,8 +852,6 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
       if (!event) continue;
       const loanId = Number(event[1]);
       const deadline = Number(event[2]);
-      // Claim under the same loan lock used by extensions and returns. The attempt
-      // timestamp is the lease; stale SENDING claims recover after 15 minutes.
       const claimed = await this.transaction(async (tx) => {
         await tx.$queryRaw`SELECT id FROM loans WHERE id = ${loanId} FOR UPDATE`;
         const loan = await tx.loan.findUnique({
@@ -979,7 +998,7 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
       unreadNotifications: unread,
       reminders: {
         email: this.mail.isConfigured()
-          ? 'Email pengingat otomatis aktif: H-1, hari jatuh tempo, H+1, lalu setiap 2 hari.'
+          ? 'Email pengingat otomatis aktif: H-1, hari jatuh tempo, lalu H+2 dan seterusnya selama masih terlambat.'
           : 'Email pengingat menunggu konfigurasi SMTP; jadwal tetap tercatat.',
         whatsapp:
           'WhatsApp belum terintegrasi otomatis. Pengingat tercatat untuk tindak lanjut manual petugas; nomor WhatsApp wajib.',

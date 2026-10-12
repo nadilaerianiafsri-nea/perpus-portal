@@ -1,13 +1,16 @@
 import Link from "next/link";
 import { FiBookOpen, FiMail } from "react-icons/fi";
 import ServiceDetails from "./ServiceDetails";
+import { getLibrarySettings } from "@/information/librarySettings";
 import { serviceInfo } from "@/shared/serviceInfo.cjs";
 
-export default function LandingFooter({
+export default async function LandingFooter({
   catalog = false,
 }: {
   catalog?: boolean;
 }) {
+  const settings = await getLibrarySettings();
+
   if (catalog)
     return (
       <footer className="landing-footer">
@@ -16,8 +19,8 @@ export default function LandingFooter({
             <div className="footer-logo">
               <span className="wordmark-box">P</span>
               <div>
-                <strong>Perpustakaan</strong>
-                <small>[LOGO KEMENKUM RIAU]</small>
+                <strong>{settings.libraryName}</strong>
+                <small>KEMENKUM RIAU</small>
               </div>
             </div>
             <p>
@@ -42,11 +45,11 @@ export default function LandingFooter({
           </div>
           <div className="footer-col">
             <strong>Informasi Layanan</strong>
-            <ServiceDetails />
+            <ServiceDetails settings={settings} />
           </div>
         </div>
         <div className="landing-shell footer-bottom">
-          <span>© 2026 Perpustakaan Kemenkum Riau — Data Contoh.</span>
+          <span>© 2026 {settings.libraryName} — Data Contoh.</span>
           <span>Kebijakan Privasi · Syarat Layanan</span>
         </div>
       </footer>
@@ -57,11 +60,10 @@ export default function LandingFooter({
         <div className="footer-about">
           <div className="footer-logo">
             <FiBookOpen />
-            <strong>PerpusRiau</strong>
+            <strong>{settings.libraryName}</strong>
           </div>
           <p>
-            Portal digital layanan informasi, koleksi, dan peminjaman
-            perpustakaan Kementerian Hukum Riau.
+            Portal digital layanan informasi, koleksi, dan peminjaman untuk {settings.libraryName}.
           </p>
           <a href={`mailto:${serviceInfo.email}`}>
             <FiMail /> {serviceInfo.email}
@@ -85,12 +87,12 @@ export default function LandingFooter({
 
         <div className="footer-col">
           <strong>Informasi Layanan</strong>
-          <ServiceDetails />
+          <ServiceDetails settings={settings} />
         </div>
       </div>
 
       <div className="landing-shell footer-bottom">
-        <span>© 2026 Perpustakaan Digital Kemenkum Riau</span>
+        <span>© 2026 {settings.libraryName}</span>
         <span>Portal Layanan Perpustakaan</span>
       </div>
     </footer>

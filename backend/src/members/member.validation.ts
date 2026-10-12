@@ -118,9 +118,7 @@ export function jakartaDay(value: Date): number {
 
 export function reminderMilestone(dueAt: Date, now: Date): number | null {
   const difference = jakartaDay(now) - jakartaDay(dueAt);
-  return difference === -1 ||
-    difference === 0 ||
-    (difference > 0 && difference % 2 === 1)
+  return difference === -1 || difference === 0 || difference >= 2
     ? difference
     : null;
 }
