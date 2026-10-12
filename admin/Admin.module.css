@@ -148,6 +148,15 @@
   color: var(--yellow);
 }
 
+.menu > .menuActive:hover {
+  background: var(--navy);
+  color: var(--white);
+}
+
+.menu > .menuActive:hover svg {
+  color: var(--yellow);
+}
+
 .menuGroup > .menuGroupActive {
   color: var(--navy);
   font-weight: 600;

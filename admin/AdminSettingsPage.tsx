@@ -177,7 +177,6 @@ export default function AdminSettingsPage() {
           <section className={styles.card}>
             <div className={styles.cardHeading}>
               <h2>Informasi Perpustakaan</h2>
-              <p>Informasi ini juga digunakan pada tampilan website publik.</p>
             </div>
             <div className={styles.formGrid}>
               <label className={styles.fullField}>
