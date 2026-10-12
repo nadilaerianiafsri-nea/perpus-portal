@@ -1,3 +1,4 @@
+import { textInputError } from '../../../shared/inputValidation.cjs';
 import {
   BadRequestException,
   Injectable,
@@ -29,7 +30,7 @@ export class AdminGrantsService {
 
     const id = Number(value);
 
-    if (!Number.isSafeInteger(id) || id < 1) {
+    if (!Number.isSafeInteger(id) || id < 1 || id > 2147483647) {
       throw new BadRequestException('ID hibah tidak valid.');
     }
 
@@ -45,6 +46,8 @@ export class AdminGrantsService {
       throw new BadRequestException(`${label} tidak valid.`);
     }
 
+    const error = textInputError(value, { max: 191, required: false });
+    if (error) throw new BadRequestException(error);
     return value.trim();
   }
 
@@ -168,6 +171,14 @@ export class AdminGrantsService {
       );
     }
 
+    for (const [field, max] of [['donorName', 191], ['note', 3000]] as const) {
+      const raw = value[field];
+      if (raw !== undefined && raw !== null) {
+        const error = textInputError(raw, { max, required: field !== 'note', multiline: field === 'note' });
+        if (error) throw new BadRequestException(error);
+      }
+    }
+
     const donorName =
       typeof value.donorName === 'string' ? value.donorName.trim() : '';
 
@@ -229,6 +240,12 @@ export class AdminGrantsService {
     const items = value.items.map((raw, index) => {
       const item = this.record(raw);
 
+      if (Object.keys(item).some((key) => !['title', 'quantity'].includes(key))) {
+        throw new BadRequestException('Field item hibah tidak diizinkan.');
+      }
+      const error = textInputError(item.title, { max: 191, required: true });
+      if (error) throw new BadRequestException(error);
+
       const title = typeof item.title === 'string' ? item.title.trim() : '';
 
       if (title.length < 2 || title.length > 191) {
@@ -240,7 +257,7 @@ export class AdminGrantsService {
       const quantity =
         typeof item.quantity === 'number'
           ? item.quantity
-          : Number(item.quantity);
+          : Number.NaN;
 
       if (
         !Number.isSafeInteger(quantity) ||
@@ -268,6 +285,9 @@ export class AdminGrantsService {
   }
 
   async list(query: Record<string, unknown>) {
+    if (Object.keys(query).some((key) => !['search', 'status', 'year', 'page', 'limit'].includes(key))) {
+      throw new BadRequestException('Parameter hibah tidak diizinkan.');
+    }
     const where = this.buildWhere(query);
 
     const page = this.queryInteger(query.page, 1, 1_000_000, 'Halaman');
@@ -427,7 +447,7 @@ export class AdminGrantsService {
         note: input.note,
         isDemo: false,
         items: {
-          create: input.items,
+          create: input.items.map((item) => ({ title: item.title, quantity: item.quantity })),
         },
       },
       select: {

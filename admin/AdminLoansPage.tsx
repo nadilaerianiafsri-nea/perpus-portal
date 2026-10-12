@@ -1,6 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import { safeCoverUrl } from "../shared/displayUrls.cjs";
+import { plainTextMessage } from "../members/inputSecurity";
+
 import { useCallback, useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 
@@ -40,6 +43,7 @@ const emptyResult: LoansResponse = {
 
 export default function AdminLoansPage() {
   const [searchInput, setSearchInput] = useState("");
+  const searchError = plainTextMessage(searchInput, 100);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<StatusFilter>("ALL");
   const [memberType, setMemberType] = useState<MemberFilter>("ALL");
@@ -53,12 +57,13 @@ export default function AdminLoansPage() {
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
+      if (searchError) return;
       setSearch(searchInput.trim());
       setPage(1);
     }, 350);
 
     return () => window.clearTimeout(timeout);
-  }, [searchInput]);
+  }, [searchInput, searchError]);
 
   const load = useCallback(async () => {
     void revision;
@@ -115,6 +120,7 @@ export default function AdminLoansPage() {
   }, [due, memberType, page, revision, search, status]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Existing fetch lifecycle starts the loading state before requesting data.
     void load();
   }, [load]);
 
@@ -164,11 +170,15 @@ export default function AdminLoansPage() {
             <FiSearch aria-hidden />
             <input
               type="search"
+              maxLength={100}
+              aria-invalid={Boolean(searchError)}
+              aria-describedby={searchError ? "search-input-error" : undefined}
               value={searchInput}
               onChange={(event) => setSearchInput(event.target.value)}
               placeholder="Cari anggota, judul, kode buku, atau nomor transaksi..."
               aria-label="Cari peminjaman"
             />
+          {searchError && <small id="search-input-error" role="alert">{searchError}</small>}
           </label>
 
           <label className={styles.selectField}>
@@ -286,8 +296,7 @@ export default function AdminLoansPage() {
                         <div className={styles.bookCell}>
                           <img
                             src={
-                              loan.book.coverUrl ||
-                              "/images/landing/book-placeholder-1.svg"
+                              safeCoverUrl(loan.book.coverUrl)
                             }
                             alt=""
                           />

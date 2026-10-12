@@ -12,7 +12,7 @@ import {
   Role,
 } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { objectInput } from './member.validation';
+import { objectInput, memberText, memberQuery } from './member.validation';
 
 type ListInput = {
   search?: string;
@@ -144,6 +144,7 @@ export class AdminMembersService {
   }
 
   async list(input: ListInput) {
+    input = memberQuery(input, ['search', 'memberType', 'verified', 'page', 'limit']);
     const requestedPage = this.parsePage(input.page);
     const limit = this.parseLimit(input.limit);
     const where = this.buildWhere(input);
@@ -375,6 +376,13 @@ export class AdminMembersService {
       throw new BadRequestException(
         'Terdapat field anggota yang tidak boleh diubah.',
       );
+    }
+
+    for (const key of ['name', 'whatsapp', 'address', 'identityNumber']) {
+      memberText(input[key], key === 'address' ? 2000 : key === 'whatsapp' ? 32 : 191, true, key === 'address');
+    }
+    for (const key of ['universityName', 'workUnit']) {
+      if (input[key] !== undefined && input[key] !== null) memberText(input[key], 191);
     }
 
     const name = typeof input.name === 'string' ? input.name.trim() : '';

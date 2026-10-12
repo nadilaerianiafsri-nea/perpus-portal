@@ -15,7 +15,7 @@ import type { AuthenticatedRequest } from '../auth/jwt-auth.guard';
 import { ActiveBookGuard } from './active-book.guard';
 import { MemberRoleGuard } from './member-role.guard';
 import { MembersService } from './members.service';
-import { positiveId } from './member.validation';
+import { positiveId, emptyInput } from './member.validation';
 import { MemberCacheInterceptor } from './members-cache.interceptor';
 
 @Controller('members/me')
@@ -46,7 +46,9 @@ export class MembersController {
   @Patch('reservations/:id/cancel') cancel(
     @Req() req: AuthenticatedRequest,
     @Param('id') id: string,
+    @Body() body: unknown,
   ) {
+    emptyInput(body);
     return this.members.cancel(req.user!.sub, positiveId(id));
   }
   @Get('loans') loans(@Req() req: AuthenticatedRequest) {
@@ -65,13 +67,16 @@ export class MembersController {
   @Get('notifications') notifications(@Req() req: AuthenticatedRequest) {
     return this.members.notifications(req.user!.sub);
   }
-  @Patch('notifications/read-all') readAll(@Req() req: AuthenticatedRequest) {
+  @Patch('notifications/read-all') readAll(@Req() req: AuthenticatedRequest, @Body() body: unknown) {
+    emptyInput(body);
     return this.members.readAll(req.user!.sub);
   }
   @Patch('notifications/:id/read') read(
     @Req() req: AuthenticatedRequest,
     @Param('id') id: string,
+    @Body() body: unknown,
   ) {
+    emptyInput(body);
     return this.members.read(req.user!.sub, positiveId(id));
   }
   @Get('ebooks') ebooks(@Req() req: AuthenticatedRequest) {
@@ -84,7 +89,8 @@ export class MembersController {
   }
   @Post('ebooks/:bookId/open')
   @UseGuards(ActiveBookGuard)
-  openEBook(@Req() req: AuthenticatedRequest, @Param('bookId') bookId: string) {
+  openEBook(@Req() req: AuthenticatedRequest, @Param('bookId') bookId: string, @Body() body: unknown) {
+    emptyInput(body);
     return this.members.openEBook(req.user!.sub, positiveId(bookId));
   }
   @Patch('ebooks/:bookId/progress') updateEBookProgress(
@@ -106,13 +112,16 @@ export class MembersController {
 @SetMetadata('memberRole', 'ADMIN')
 export class MemberCirculationController {
   constructor(private readonly members: MembersService) {}
-  @Post('reservations/:id/pickup') pickup(@Param('id') id: string) {
+  @Post('reservations/:id/pickup') pickup(@Param('id') id: string, @Body() body: unknown) {
+    emptyInput(body);
     return this.members.pickup(positiveId(id));
   }
-  @Post('loans/:id/return') returnLoan(@Param('id') id: string) {
+  @Post('loans/:id/return') returnLoan(@Param('id') id: string, @Body() body: unknown) {
+    emptyInput(body);
     return this.members.finishLoan(positiveId(id), false);
   }
-  @Post('loans/:id/lost') lost(@Param('id') id: string) {
+  @Post('loans/:id/lost') lost(@Param('id') id: string, @Body() body: unknown) {
+    emptyInput(body);
     return this.members.finishLoan(positiveId(id), true);
   }
 }

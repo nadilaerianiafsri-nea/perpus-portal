@@ -1,3 +1,5 @@
+import { containsHtml, isSafeUrl, textInputError } from '../shared/inputValidation.cjs';
+
 export type EBookAccessMode =
   | 'BACA_DI_WEBSITE'
   | 'PENYEDIA_EKSTERNAL'
@@ -78,4 +80,19 @@ export function accessModeLabel(mode: EBookAccessMode) {
   if (mode === 'BACA_DI_WEBSITE') return 'Baca di Website';
   if (mode === 'PENYEDIA_EKSTERNAL') return 'Penyedia Eksternal';
   return 'Tidak Tersedia';
+}
+
+export function adminEBookTextError(fields: Record<string, unknown>): string | null {
+  for (const [key, value] of Object.entries(fields)) {
+    if (typeof value !== 'string') continue;
+    if (containsHtml(value)) return 'HTML tidak diperbolehkan pada kolom ini.';
+    const max = ['description', 'licenseNote'].includes(key) ? 10000 : key === 'note' ? 3000 : ['code', 'isbnIssn', 'language'].includes(key) ? 64 : 191;
+    const error = textInputError(value, { max, required: false, multiline: ['description', 'licenseNote', 'note'].includes(key) });
+    if (error) return error;
+  }
+  return null;
+}
+
+export function adminEBookSourceUrl(value: string | null | undefined): string | null {
+  return typeof value === 'string' && (isSafeUrl(value) || /^\/ebooks\/[A-Za-z0-9_-]+\.(?:html|pdf)$/.test(value)) ? value : null;
 }

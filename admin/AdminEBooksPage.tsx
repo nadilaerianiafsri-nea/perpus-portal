@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import { adminCoverUrl, adminBookTextError } from "./adminBooks";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import type { FormEvent } from "react";
@@ -36,6 +37,8 @@ export default function AdminEBooksPage() {
 
   const load = useCallback(async () => {
     void revision;
+    const textError = adminBookTextError({ search });
+    if (textError) { setError(textError); setLoading(false); return; }
     setLoading(true);
     setError("");
 
@@ -71,11 +74,13 @@ export default function AdminEBooksPage() {
   }, [page, search, status, revision]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Existing fetch lifecycle starts the loading state before requesting data.
     void load();
   }, [load]);
 
   useEffect(() => {
     const next = params.get("search")?.trim() ?? "";
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Keep the existing search control synchronized with navigation query changes.
     setSearchInput(next);
     setSearch(next);
     setPage(1);
@@ -83,6 +88,8 @@ export default function AdminEBooksPage() {
 
   function submitSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const textError = adminBookTextError({ search: searchInput });
+    if (textError) { setError(textError); return; }
     setSearch(searchInput.trim());
     setPage(1);
   }
@@ -205,7 +212,7 @@ export default function AdminEBooksPage() {
                   <tr key={book.id}>
                     <td>
                       <div className={styles.bookCell}>
-                        <img src={book.coverUrl || "/images/landing/book-placeholder-1.svg"} alt={`Sampul ${book.title}`} />
+                        <img src={adminCoverUrl(book.coverUrl)} alt={`Sampul ${book.title}`} />
                         <div>
                           <strong>{book.title}</strong>
                           <small>{book.author}</small>

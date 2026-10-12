@@ -10,6 +10,7 @@ import {
   type AdminMemberType,
 } from "./adminMembers";
 import styles from "./AdminMembers.module.css";
+import { plainTextMessage } from "../members/inputSecurity";
 
 type Props = {
   id: string;
@@ -43,6 +44,7 @@ export default function AdminMemberForm({ id }: Props) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     let active = true;
@@ -107,6 +109,7 @@ export default function AdminMemberForm({ id }: Props) {
   }, [id]);
 
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
+    if (key !== "memberType") setFieldErrors(current => ({ ...current, [key]: plainTextMessage(value, key === "address" ? 2000 : key === "whatsapp" ? 32 : 191, key === "address") }));
     setForm((current) => ({
       ...current,
       [key]: value,
@@ -119,6 +122,11 @@ export default function AdminMemberForm({ id }: Props) {
     if (saving) {
       return;
     }
+
+    const fields = ["name", "whatsapp", "address", "identityNumber", ...(form.memberType === "MAHASISWA" ? ["universityName"] : []), ...(form.memberType === "PEGAWAI" ? ["workUnit"] : [])] as (keyof FormState)[];
+    const errors = Object.fromEntries(fields.map(key => [key, plainTextMessage(form[key], key === "address" ? 2000 : key === "whatsapp" ? 32 : 191, key === "address")]));
+    setFieldErrors(errors);
+    if (Object.values(errors).some(Boolean)) return;
 
     setSaving(true);
     setError("");
@@ -200,10 +208,14 @@ export default function AdminMemberForm({ id }: Props) {
               <input
                 type="text"
                 value={form.name}
+                aria-invalid={Boolean(fieldErrors.name)}
+                aria-describedby={fieldErrors.name ? "admin-member-name-error" : undefined}
+                minLength={3}
                 maxLength={191}
                 required
                 onChange={(event) => update("name", event.target.value)}
               />
+            {fieldErrors.name && <small id="admin-member-name-error" role="alert">{fieldErrors.name}</small>}
             </label>
 
             <label>
@@ -233,11 +245,14 @@ export default function AdminMemberForm({ id }: Props) {
               <input
                 type="text"
                 value={form.whatsapp}
+                aria-invalid={Boolean(fieldErrors.whatsapp)}
+                aria-describedby={fieldErrors.whatsapp ? "admin-member-whatsapp-error" : undefined}
                 maxLength={32}
                 required
                 placeholder="081234567890"
                 onChange={(event) => update("whatsapp", event.target.value)}
               />
+            {fieldErrors.whatsapp && <small id="admin-member-whatsapp-error" role="alert">{fieldErrors.whatsapp}</small>}
             </label>
 
             <label>
@@ -245,12 +260,15 @@ export default function AdminMemberForm({ id }: Props) {
               <input
                 type="text"
                 value={form.identityNumber}
+                aria-invalid={Boolean(fieldErrors.identityNumber)}
+                aria-describedby={fieldErrors.identityNumber ? "admin-member-identityNumber-error" : undefined}
                 maxLength={191}
                 required
                 onChange={(event) =>
                   update("identityNumber", event.target.value)
                 }
               />
+            {fieldErrors.identityNumber && <small id="admin-member-identityNumber-error" role="alert">{fieldErrors.identityNumber}</small>}
             </label>
 
             {form.memberType === "MAHASISWA" ? (
@@ -259,13 +277,16 @@ export default function AdminMemberForm({ id }: Props) {
                 <input
                   type="text"
                   value={form.universityName}
+                aria-invalid={Boolean(fieldErrors.universityName)}
+                aria-describedby={fieldErrors.universityName ? "admin-member-universityName-error" : undefined}
                   maxLength={191}
                   required
                   onChange={(event) =>
                     update("universityName", event.target.value)
                   }
                 />
-              </label>
+              {fieldErrors.universityName && <small id="admin-member-universityName-error" role="alert">{fieldErrors.universityName}</small>}
+            </label>
             ) : null}
 
             {form.memberType === "PEGAWAI" ? (
@@ -274,21 +295,27 @@ export default function AdminMemberForm({ id }: Props) {
                 <input
                   type="text"
                   value={form.workUnit}
+                aria-invalid={Boolean(fieldErrors.workUnit)}
+                aria-describedby={fieldErrors.workUnit ? "admin-member-workUnit-error" : undefined}
                   maxLength={191}
                   required
                   onChange={(event) => update("workUnit", event.target.value)}
                 />
-              </label>
+              {fieldErrors.workUnit && <small id="admin-member-workUnit-error" role="alert">{fieldErrors.workUnit}</small>}
+            </label>
             ) : null}
 
             <label className={styles.fullField}>
               <span>Alamat *</span>
               <textarea
                 value={form.address}
+                aria-invalid={Boolean(fieldErrors.address)}
+                aria-describedby={fieldErrors.address ? "admin-member-address-error" : undefined}
                 maxLength={2000}
                 required
                 onChange={(event) => update("address", event.target.value)}
               />
+            {fieldErrors.address && <small id="admin-member-address-error" role="alert">{fieldErrors.address}</small>}
             </label>
           </div>
         </section>

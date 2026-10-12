@@ -1,6 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import { safeCoverUrl } from "../shared/displayUrls.cjs";
+import { plainTextMessage } from "../members/inputSecurity";
+
 import { useCallback, useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 
@@ -55,6 +58,7 @@ function statusLabel(status: StatusFilter) {
 
 export default function AdminReservationsPage() {
   const [searchInput, setSearchInput] = useState("");
+  const searchError = plainTextMessage(searchInput, 100);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<StatusFilter>("ALL");
   const [memberType, setMemberType] = useState<MemberFilter>("ALL");
@@ -68,12 +72,13 @@ export default function AdminReservationsPage() {
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
+      if (searchError) return;
       setSearch(searchInput.trim());
       setPage(1);
     }, 350);
 
     return () => window.clearTimeout(timeout);
-  }, [searchInput]);
+  }, [searchInput, searchError]);
 
   const load = useCallback(async () => {
     void revision;
@@ -129,6 +134,7 @@ export default function AdminReservationsPage() {
   }, [memberType, page, revision, search, status]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Existing fetch lifecycle starts the loading state before requesting data.
     void load();
   }, [load]);
 
@@ -221,11 +227,15 @@ export default function AdminReservationsPage() {
             <FiSearch aria-hidden />
             <input
               type="search"
+              maxLength={100}
+              aria-invalid={Boolean(searchError)}
+              aria-describedby={searchError ? "search-input-error" : undefined}
               value={searchInput}
               onChange={(event) => setSearchInput(event.target.value)}
               placeholder="Cari anggota, buku, kode buku, atau WhatsApp..."
               aria-label="Cari reservasi"
             />
+          {searchError && <small id="search-input-error" role="alert">{searchError}</small>}
           </label>
 
           <label className={styles.selectField}>
@@ -315,8 +325,7 @@ export default function AdminReservationsPage() {
                       <div className={styles.bookCell}>
                         <img
                           src={
-                            reservation.book.coverUrl ||
-                            "/images/landing/book-placeholder-1.svg"
+                            safeCoverUrl(reservation.book.coverUrl)
                           }
                           alt=""
                         />

@@ -1,6 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import { safeCoverUrl } from "../shared/displayUrls.cjs";
+import { plainTextMessage } from "../members/inputSecurity";
+
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
@@ -35,6 +38,7 @@ const emptyResult: LostBooksResponse = {
 
 export default function AdminLostBooksPage() {
   const [searchInput, setSearchInput] = useState("");
+  const searchError = plainTextMessage(searchInput, 100);
   const [search, setSearch] = useState("");
   const [memberType, setMemberType] = useState<MemberFilter>("ALL");
   const [extension, setExtension] = useState<ExtensionFilter>("ALL");
@@ -47,12 +51,13 @@ export default function AdminLostBooksPage() {
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
+      if (searchError) return;
       setSearch(searchInput.trim());
       setPage(1);
     }, 350);
 
     return () => window.clearTimeout(timeout);
-  }, [searchInput]);
+  }, [searchInput, searchError]);
 
   const load = useCallback(async () => {
     void revision;
@@ -108,6 +113,7 @@ export default function AdminLostBooksPage() {
   }, [extension, memberType, page, revision, search]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Existing fetch lifecycle starts the loading state before requesting data.
     void load();
   }, [load]);
 
@@ -155,11 +161,15 @@ export default function AdminLostBooksPage() {
             <FiSearch aria-hidden />
             <input
               type="search"
+              maxLength={100}
+              aria-invalid={Boolean(searchError)}
+              aria-describedby={searchError ? "search-input-error" : undefined}
               value={searchInput}
               onChange={(event) => setSearchInput(event.target.value)}
               placeholder="Cari anggota, buku, kode buku, atau transaksi..."
               aria-label="Cari buku hilang"
             />
+          {searchError && <small id="search-input-error" role="alert">{searchError}</small>}
           </label>
 
           <label className={styles.selectField}>
@@ -246,8 +256,7 @@ export default function AdminLostBooksPage() {
                       <div className={styles.bookCell}>
                         <img
                           src={
-                            loan.book.coverUrl ||
-                            "/images/landing/book-placeholder-1.svg"
+                            safeCoverUrl(loan.book.coverUrl)
                           }
                           alt=""
                         />

@@ -1,3 +1,4 @@
+import { assertSameOrigin, readLimitedBytes, requestErrorResponse } from '@/shared/requestSecurity.cjs';
 import 'server-only';
 import { NextResponse } from 'next/server';
 import { API_URL } from '@/catalog/serverApi';
@@ -42,7 +43,8 @@ export async function adminCoverUploadProxy(request: Request) {
   }
 
   try {
-    const body = await request.arrayBuffer();
+    assertSameOrigin(request);
+    const body = await readLimitedBytes(request, maxProxyBytes);
     if (body.byteLength > maxProxyBytes) {
       return NextResponse.json(
         { message: 'Ukuran cover maksimal 5 MB.' },
@@ -74,7 +76,9 @@ export async function adminCoverUploadProxy(request: Request) {
       status: response.status,
       headers: responseHeaders,
     });
-  } catch {
+  } catch (error) {
+    const rejected = requestErrorResponse(error);
+    if (rejected) return rejected;
     return NextResponse.json(
       { message: 'Layanan upload cover belum dapat dihubungi. Silakan coba lagi.' },
       { status: 503, headers: responseHeaders },

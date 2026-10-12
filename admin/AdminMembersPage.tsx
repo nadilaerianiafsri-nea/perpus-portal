@@ -1,5 +1,7 @@
 "use client";
 
+import { plainTextMessage } from "../members/inputSecurity";
+
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
@@ -33,6 +35,7 @@ const emptyResult: AdminMembersResponse = {
 
 export default function AdminMembersPage() {
   const [searchInput, setSearchInput] = useState("");
+  const searchError = plainTextMessage(searchInput, 100);
   const [search, setSearch] = useState("");
   const [memberType, setMemberType] = useState<MemberTypeFilter>("ALL");
   const [verification, setVerification] = useState<VerificationFilter>("ALL");
@@ -46,12 +49,13 @@ export default function AdminMembersPage() {
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
+      if (searchError) return;
       setSearch(searchInput.trim());
       setPage(1);
     }, 350);
 
     return () => window.clearTimeout(timeout);
-  }, [searchInput]);
+  }, [searchInput, searchError]);
 
   const load = useCallback(async () => {
     void revision;
@@ -104,6 +108,7 @@ export default function AdminMembersPage() {
   }, [memberType, page, revision, search, verification]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Existing fetch lifecycle starts the loading state before requesting data.
     void load();
   }, [load]);
 
@@ -195,12 +200,16 @@ export default function AdminMembersPage() {
           <FiSearch aria-hidden />
           <input
             type="search"
+              maxLength={100}
+              aria-invalid={Boolean(searchError)}
+              aria-describedby={searchError ? "search-input-error" : undefined}
             value={searchInput}
             onChange={(event) => setSearchInput(event.target.value)}
             placeholder="Cari nama, email, atau WhatsApp..."
             aria-label="Cari anggota"
           />
-        </label>
+          {searchError && <small id="search-input-error" role="alert">{searchError}</small>}
+          </label>
 
         <label className={styles.selectField}>
           <span>Jenis Anggota</span>

@@ -1,12 +1,14 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import { adminCoverUrl } from "./adminBooks";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { FiArrowLeft, FiCheckCircle } from "react-icons/fi";
 import {
+  adminBookTextError,
   apiMessage,
   type AdminBookDetailResponse,
   type AdminBookPayload,
@@ -20,7 +22,6 @@ type FormState = Omit<AdminBookPayload, "year" | "totalStock"> & {
 
 const MAX_COVER_BYTES = 5 * 1024 * 1024;
 const COVER_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const COVER_PLACEHOLDER = "/images/landing/book-placeholder-1.svg";
 
 const emptyForm: FormState = {
   code: "",
@@ -138,7 +139,7 @@ export default function AdminBookForm({
     const file = event.target.files?.[0] ?? null;
     if (!file) return;
 
-    if (!COVER_TYPES.includes(file.type)) {
+    if (!COVER_TYPES.includes(file.type) || !/\.(?:jpe?g|png|webp)$/i.test(file.name)) {
       setError("Format cover harus JPG, PNG, atau WEBP.");
       event.target.value = "";
       return;
@@ -160,6 +161,9 @@ export default function AdminBookForm({
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (saving) return;
+
+    const textError = adminBookTextError(form);
+    if (textError) { setError(textError); return; }
 
     const year = Number(form.year);
     const totalStock = Number(form.totalStock);
@@ -441,7 +445,7 @@ export default function AdminBookForm({
           <section className={styles.coverCard}>
             <h2>Cover</h2>
             <img
-              src={coverPreview || form.coverUrl || COVER_PLACEHOLDER}
+              src={coverPreview || adminCoverUrl(form.coverUrl)}
               alt="Preview cover buku"
             />
             <input

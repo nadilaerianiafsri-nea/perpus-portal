@@ -19,6 +19,7 @@ type UploadedCover = {
   buffer: Buffer;
   mimetype: string;
   size: number;
+  originalname: string;
 };
 
 @Controller('admin/uploads')
@@ -27,7 +28,7 @@ export class AdminUploadsController {
   @Post('cover')
   @UseInterceptors(
     FileInterceptor('cover', {
-      limits: { fileSize: 6 * 1024 * 1024, files: 1 },
+      limits: { fileSize: MAX_COVER_BYTES, files: 1, fields: 0, parts: 1 },
     }),
   )
   async cover(@UploadedFile() file?: UploadedCover) {
@@ -37,7 +38,7 @@ export class AdminUploadsController {
 
     let extension: 'jpg' | 'png' | 'webp';
     try {
-      extension = validateCoverFile(file.buffer, file.mimetype);
+      extension = validateCoverFile(file.buffer, file.mimetype, file.originalname);
     } catch (error) {
       throw new BadRequestException(
         error instanceof Error ? error.message : 'File cover tidak valid.',

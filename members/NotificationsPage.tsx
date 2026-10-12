@@ -11,6 +11,7 @@ import { memberDate } from "./format";
 import type { MemberNotification } from "./types";
 import styles from "./Members.module.css";
 import interaction from "./Notifications.module.css";
+import { notificationDestination } from "./inputSecurity";
 
 export default function NotificationsPage() {
   const router = useRouter();
@@ -30,24 +31,27 @@ export default function NotificationsPage() {
   }
   async function openNotification(item: MemberNotification, newTab = false) {
     if (pending.current) return;
+    const destination = notificationDestination(item.href);
+    if (!destination) return;
     // Reserve the tab during the user gesture; load its destination only after PATCH succeeds.
     const tab = newTab ? window.open("about:blank", "_blank") : null;
     if (tab) tab.opener = null;
     if (await markRead(item.id)) {
-      if (tab) tab.location.replace(item.href);
-      else router.push(item.href);
+      if (tab) tab.location.replace(destination);
+      else router.push(destination);
     } else tab?.close();
   }
   const hasUnread = resource.data?.notifications.some(item => !item.readAt);
   return <div className={styles.pageStack}><PageHeading title="Notifikasi" description="Informasi reservasi, peminjaman, dan pengingat perpustakaan Anda."><button className={styles.outlineButton} disabled={!hasUnread || busy !== null} onClick={() => markRead()}><FiCheck />{busy === "all" ? "Memperbarui..." : "Tandai Semua Dibaca"}</button></PageHeading><div className={styles.filters}>{["Semua", "Belum Dibaca"].map(label => <button key={label} className={filter === label ? styles.selectedFilter : ""} aria-pressed={filter === label} onClick={() => setFilter(label)}>{label}</button>)}</div>{actionError && <p className={styles.error} role="alert">{actionError}</p>}
     {resource.loading ? <LoadingCards /> : resource.error ? <ErrorState message={resource.error} retry={resource.reload} /> : !notifications.length ? <EmptyState message={filter === "Semua" ? "Belum ada notifikasi." : "Semua notifikasi sudah dibaca."} /> : notifications.map(item => {
-      const linked = item.href.startsWith("/dashboard");
+      const destination = notificationDestination(item.href);
+      const linked = destination !== null;
       return <article key={item.id} className={`${styles.card} ${styles.notification} ${!item.readAt ? styles.unread : ""} ${linked ? interaction.clickable : ""}`}>
         <span className={styles.notificationIcon}><FiBell aria-hidden /></span>
         <div className={styles.bookInfo}>
           <h2>{linked ? <Link
             className={interaction.cardLink}
-            href={item.href}
+            href={destination!}
             aria-label={`Lihat detail: ${item.title}`}
             aria-busy={busy === String(item.id)}
             aria-disabled={!item.readAt && busy !== null}

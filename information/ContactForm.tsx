@@ -2,6 +2,7 @@
 import { useRef, useState, type FormEvent } from "react";
 import { validateContact, type ContactInput, type ContactErrors } from "@/shared/contactValidation.cjs";
 import styles from "./Contact.module.css";
+import { plaintextError } from '@/catalog/plaintextInput.cjs';
 
 const empty: ContactInput = { name: "", email: "", message: "" };
 export default function ContactForm() {
@@ -16,6 +17,10 @@ export default function ContactForm() {
     if (pending.current) return;
     const form = event.currentTarget;
     const { value, errors: nextErrors } = validateContact(values);
+    for (const key of ['name', 'email', 'message'] as const) {
+      const error = plaintextError(values[key], { required: true, max: key === 'name' ? 100 : key === 'email' ? 254 : 3000, multiline: key === 'message' });
+      if (error) nextErrors[key] = error;
+    }
     setErrors(nextErrors);
     setFeedback(null);
     if (Object.keys(nextErrors).length) {
@@ -39,7 +44,7 @@ export default function ContactForm() {
         if (response.status === 400 && data.errors && typeof data.errors === "object") {
           const fieldErrors: ContactErrors = {};
           for (const key of ["name", "email", "message"] as const)
-            if (typeof data.errors[key] === "string") fieldErrors[key] = data.errors[key];
+            if (typeof data.errors[key] === "string") fieldErrors[key] = data.errors[key] === 'Input tidak boleh mengandung HTML.' ? 'HTML tidak diperbolehkan pada kolom ini.' : data.errors[key];
           setErrors(fieldErrors);
         }
         setFeedback({ success: false, text: data.code === "CONTACT_UNAVAILABLE"

@@ -1,5 +1,6 @@
 "use client";
 
+import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import Image from "next/image";
 import Link from "next/link";
 import { FiMonitor } from "react-icons/fi";
@@ -20,7 +21,7 @@ export default function EBooksPage() {
       return <article className={styles.card} key={ebook.id} data-ebook-id={ebook.book.id}>
         <div className={styles.header}><FiMonitor aria-hidden />E-Book</div>
         <div className={styles.body}>
-          <Link className={styles.cover} href={`/koleksi/${ebook.book.id}`} aria-label={`Lihat detail ${ebook.book.title}`}><Image src={ebook.book.coverUrl || "/images/landing/book-placeholder-1.svg"} alt={`Sampul ${ebook.book.title}`} fill sizes="80px" unoptimized /></Link>
+          <Link className={styles.cover} href={`/koleksi/${ebook.book.id}`} aria-label={`Lihat detail ${ebook.book.title}`}><Image src={safeCoverUrl(ebook.book.coverUrl)} alt={`Sampul ${ebook.book.title}`} fill sizes="80px" unoptimized /></Link>
           <div className={styles.information}><h2>{ebook.book.title}</h2><p>Progres membaca</p><progress className={styles.progress} value={progress} max={100} aria-label={`Progres membaca ${ebook.book.title}: ${progress}%`} /><span className={styles.percentage}>{progress}%</span><Link className={styles.read} href={`/e-book/${ebook.book.id}/baca`}>Lanjut Baca</Link></div>
         </div>
       </article>;

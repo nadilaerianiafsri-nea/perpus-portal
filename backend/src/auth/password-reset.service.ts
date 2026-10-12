@@ -10,6 +10,7 @@ import { createHmac, randomUUID } from 'node:crypto';
 import bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { MailService } from '../mail/mail.service';
+import { authEmail, authObject, authToken } from './input-validation';
 
 type ResetPayload = {
   sub: number;
@@ -47,10 +48,8 @@ export class PasswordResetService {
     return createHmac('sha256', secret).update(hash).digest('hex');
   }
   async forgot(body: unknown) {
-    const input =
-      body && typeof body === 'object' ? (body as Record<string, unknown>) : {};
-    const email =
-      typeof input.email === 'string' ? input.email.trim().toLowerCase() : '';
+    const input = authObject(body, ['email']);
+    const email = authEmail(input.email);
     if (email.length > 191 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
       throw new BadRequestException('Email tidak valid.');
     const secret = this.secret();
@@ -115,8 +114,7 @@ export class PasswordResetService {
     return { message };
   }
   async reset(body: unknown) {
-    const input =
-      body && typeof body === 'object' ? (body as Record<string, unknown>) : {};
+    const input = authObject(body, ['token', 'password']);
     if (
       typeof input.password !== 'string' ||
       input.password.length < 8 ||
@@ -126,9 +124,7 @@ export class PasswordResetService {
         'Kata sandi minimal 8 karakter dan maksimal 72 byte.',
       );
     if (
-      typeof input.token !== 'string' ||
-      !input.token ||
-      input.token.length > 4096
+      !authToken(input.token)
     )
       throw new BadRequestException(
         'Token reset tidak valid atau sudah kedaluwarsa.',
@@ -146,8 +142,11 @@ export class PasswordResetService {
         payload.purpose !== 'password-reset' ||
         !Number.isSafeInteger(payload.sub) ||
         payload.sub < 1 ||
-        typeof payload.exp !== 'number' ||
-        typeof payload.fingerprint !== 'string'
+        !Number.isSafeInteger(payload.exp) ||
+        typeof payload.email !== 'string' ||
+        authEmail(payload.email) !== payload.email ||
+        typeof payload.fingerprint !== 'string' ||
+        !/^[a-f0-9]{64}$/.test(payload.fingerprint)
       )
         throw new Error();
     } catch {

@@ -1,5 +1,6 @@
 "use client";
 
+import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import Image from "next/image";
 import Link from "next/link";
 import { FiAlertTriangle, FiCheck, FiRefreshCw, FiXCircle } from "react-icons/fi";
@@ -20,7 +21,7 @@ export default function LoanCard({ loan, now, busy, extending, onExtend, onRepla
     {warning && <div className={styles.warning}><FiAlertTriangle aria-hidden /><span>{warning}</span></div>}
     <div className={styles.body}>
       <Link className={styles.cover} href={`/koleksi/${loan.book.id}`} aria-label={`Lihat detail ${loan.book.title}`}>
-        <Image src={loan.book.coverUrl || "/images/landing/book-placeholder-1.svg"} alt={`Sampul ${loan.book.title}`} fill sizes="96px" unoptimized />
+        <Image src={safeCoverUrl(loan.book.coverUrl)} alt={`Sampul ${loan.book.title}`} fill sizes="96px" unoptimized />
       </Link>
       <div className={styles.information}>
         <span className={styles.badge}><Icon aria-hidden />{label}</span>

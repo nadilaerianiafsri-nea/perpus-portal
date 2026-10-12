@@ -4,6 +4,7 @@ import Link from 'next/link';
 import AuthShell from './AuthShell';
 import { authRequest } from './authApi';
 import styles from './Auth.module.css';
+import { plaintextError } from '@/catalog/plaintextInput.cjs';
 
 export default function PasswordRecovery({ token, reset = false }: { token?: string; reset?: boolean }) {
   const [email, setEmail] = useState('');
@@ -16,7 +17,9 @@ export default function PasswordRecovery({ token, reset = false }: { token?: str
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (locked.current) return;
+    if (!reset) { const error = plaintextError(email, { required: true }); if (error) { setMessage(error); return; } }
     if (reset && (password.length < 8 || password !== confirmation)) { setMessage('Kata sandi minimal 8 karakter dan konfirmasi harus sama.'); return; }
+    if (reset && new TextEncoder().encode(password).length > 72) { setMessage('Kata sandi maksimal 72 byte.'); return; }
     locked.current = true; setLoading(true); setMessage('');
     const result = await authRequest(reset ? 'reset-password' : 'forgot-password', reset ? { token, password } : { email });
     setMessage(result.ok && reset ? 'Password berhasil diperbarui.' : result.message); setDone(result.ok && reset); setLoading(false); locked.current = false;

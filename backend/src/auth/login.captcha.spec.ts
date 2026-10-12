@@ -40,6 +40,11 @@ describe('Login CAPTCHA HTTP contract', () => {
   afterAll(async () => { google.mockRestore(); await app.close(); });
   const credentials = { email: 'member@example.com', password: 'existing-password', remember: true };
 
+  it.each([{ email: '<b>x</b>@example.com' }, { extra: 'x' }, { remember: 'true' }, { email: 'member@example.com\r\nBcc: x@y.com' }])('rejects invalid login plaintext before CAPTCHA and credentials', async (extra) => {
+    await request(app.getHttpServer()).post('/auth/login').send({ ...credentials, captchaToken: 'valid-token', ...extra }).expect(400);
+    expect(google).not.toHaveBeenCalled(); expect(authenticate).not.toHaveBeenCalled();
+  });
+
   it('rejects direct login without a token before checking credentials or setting cookies', async () => {
     const response = await request(app.getHttpServer()).post('/auth/login').send(credentials).expect(400);
     expect(response.body.code).toBe('CAPTCHA_REQUIRED');

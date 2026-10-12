@@ -9,7 +9,7 @@ import {
 import type { Response } from 'express';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { isSafeCoverFilename } from '../admin-uploads/cover-file';
+import { isSafeCoverFilename, validateCoverFile } from '../admin-uploads/cover-file';
 
 const coverMime: Record<string, string> = {
   jpg: 'image/jpeg',
@@ -38,6 +38,13 @@ export class UploadsController {
     }
 
     const extension = filename.slice(filename.lastIndexOf('.') + 1);
+    try {
+      validateCoverFile(buffer, coverMime[extension]);
+    } catch {
+      throw new NotFoundException('Cover tidak ditemukan.');
+    }
+    response.setHeader('X-Content-Type-Options', 'nosniff');
+    response.setHeader('Content-Security-Policy', "default-src 'none'; sandbox");
     response.setHeader('Content-Type', coverMime[extension]);
     response.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
     return new StreamableFile(buffer);

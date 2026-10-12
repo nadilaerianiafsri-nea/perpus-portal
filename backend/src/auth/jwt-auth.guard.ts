@@ -28,7 +28,7 @@ export class JwtAuthGuard implements CanActivate {
 
     const token = request.cookies?.perpus_session as string | undefined;
 
-    if (!token) {
+    if (typeof token !== 'string' || !token || token.length > 8192) {
       throw new UnauthorizedException('Silakan login terlebih dahulu.');
     }
 
@@ -37,7 +37,7 @@ export class JwtAuthGuard implements CanActivate {
         secret: this.configService.getOrThrow<string>('JWT_SECRET'),
       });
 
-      if (!Number.isSafeInteger(payload.sub) || payload.sub < 1)
+      if (!Number.isSafeInteger(payload.sub) || payload.sub < 1 || payload.sub > 2147483647)
         throw new Error('Invalid subject');
       const user = await this.prisma.user.findUnique({
         where: { id: payload.sub },

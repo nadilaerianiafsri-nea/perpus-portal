@@ -1,3 +1,4 @@
+import { textInputError } from '../../../shared/inputValidation.cjs';
 import {
   BadRequestException,
   ConflictException,
@@ -20,6 +21,8 @@ type AdminBooksQuery = Record<string, unknown>;
 function queryText(value: unknown, label: string, max = 191): string {
   if (value === undefined || value === null || value === '') return '';
   if (typeof value !== 'string') throw new BadRequestException(`${label} tidak valid.`);
+  const error = textInputError(value, { max });
+  if (error) throw new BadRequestException(error);
   const result = value.trim();
   if (result.length > max) throw new BadRequestException(`${label} terlalu panjang.`);
   return result;
@@ -77,6 +80,9 @@ export class AdminBooksService {
   constructor(private readonly prisma: PrismaService) {}
 
   async list(query: AdminBooksQuery) {
+    if (Object.keys(query).some((key) => !['search', 'status', 'page', 'limit'].includes(key))) {
+      throw new BadRequestException('Parameter tidak diizinkan.');
+    }
     const search = queryText(query.search, 'Pencarian');
     const status = queryText(query.status, 'Status', 16).toUpperCase() || 'ALL';
     const page = queryInteger(query.page, 1, 1, 100000);
@@ -394,6 +400,9 @@ export class AdminBooksService {
       throw new BadRequestException('Status buku tidak valid.');
     }
 
+    if (Object.keys(body).some((key) => key !== 'isActive')) {
+      throw new BadRequestException('Field status tidak diizinkan.');
+    }
     const isActive = (body as Record<string, unknown>).isActive;
     if (typeof isActive !== 'boolean') {
       throw new BadRequestException('Status buku tidak valid.');

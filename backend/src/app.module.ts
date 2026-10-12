@@ -12,6 +12,8 @@ import { AdminBooksModule } from './admin-books/admin-books.module';
 import { AdminEBooksModule } from './admin-ebooks/admin-ebooks.module';
 import { AdminUploadsModule } from './admin-uploads/admin-uploads.module';
 import { UploadsModule } from './uploads/uploads.module';
+import { APP_GUARD } from '@nestjs/core';
+import { PublicRateGuard } from './security/public-rate.guard';
 
 @Module({
   imports: [
@@ -28,6 +30,6 @@ import { UploadsModule } from './uploads/uploads.module';
     UploadsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, { provide: APP_GUARD, useClass: PublicRateGuard }],
 })
 export class AppModule {}

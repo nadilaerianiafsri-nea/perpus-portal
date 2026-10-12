@@ -6,6 +6,7 @@ import { FiSearch } from "react-icons/fi";
 
 import {
   adminGrantApiMessage,
+  adminGrantTextError,
   adminGrantStatusLabels,
   formatAdminGrantDate,
   grantCode,
@@ -52,6 +53,8 @@ export default function AdminGrantsPage() {
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
+      const textError = adminGrantTextError({ search: searchInput });
+      if (textError) { setError(textError); return; }
       setSearch(searchInput.trim());
 
       setPage(1);
@@ -117,6 +120,7 @@ export default function AdminGrantsPage() {
   }, [page, revision, search, status, year]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Existing fetch lifecycle starts the loading state before requesting data.
     void load();
   }, [load]);
 

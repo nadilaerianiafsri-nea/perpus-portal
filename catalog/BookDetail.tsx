@@ -1,3 +1,4 @@
+import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -61,7 +62,7 @@ export default async function BookDetail({ id }: { id: string }) {
         <article className={styles.detail}>
           <div className={styles.detailCover}>
             <Image
-              src={book.coverUrl}
+              src={safeCoverUrl(book.coverUrl)}
               alt={`Sampul ${book.title}`}
               fill
               priority

@@ -17,6 +17,7 @@ import type { Response } from 'express';
 
 import { AuthService } from './auth.service';
 import { RecaptchaService } from './recaptcha.service';
+import { authEmail, authObject } from './input-validation';
 
 import { type AuthenticatedRequest, JwtAuthGuard } from './jwt-auth.guard';
 
@@ -56,6 +57,7 @@ export class AuthController {
     })
     response: Response,
   ) {
+    authObject(body, ['email', 'password', 'remember', 'captchaToken']);
     if (
       !body ||
       typeof body.email !== 'string' ||
@@ -67,6 +69,10 @@ export class AuthController {
     ) {
       throw new BadRequestException('Email dan kata sandi wajib diisi.');
     }
+
+    authEmail(body.email);
+    if (body.remember !== undefined && typeof body.remember !== 'boolean')
+      throw new BadRequestException('Pilihan ingat saya tidak valid.');
 
     await this.recaptcha.verify(body.captchaToken);
     const remember = body.remember === true;
@@ -95,8 +101,9 @@ export class AuthController {
   @Get('verify-email')
   @Header('Cache-Control', 'no-store')
   @Header('Referrer-Policy', 'no-referrer')
-  async verifyEmail(@Query('token') token: unknown) {
-    return this.authService.verifyEmail(token);
+  async verifyEmail(@Query() query: unknown) {
+    const input = authObject(query, ['token']);
+    return this.authService.verifyEmail(input.token);
   }
 
   @Post('resend-verification')
@@ -132,11 +139,13 @@ export class AuthController {
 
   @Post('logout')
   logout(
+    @Body() body: unknown,
     @Res({
       passthrough: true,
     })
     response: Response,
   ) {
+    if (body !== undefined) authObject(body, []);
     response.clearCookie('perpus_session', {
       httpOnly: true,
       sameSite: 'lax',

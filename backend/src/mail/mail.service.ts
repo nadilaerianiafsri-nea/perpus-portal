@@ -52,6 +52,8 @@ export class MailService {
     });
   }
   async sendContactEmail(input: ContactInput): Promise<boolean> {
+    // Defense in depth for any internal caller bypassing the contact DTO.
+    if (/[\r\n]/.test(input.name) || !/^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]+$/.test(input.email)) return false;
     const recipient =
       this.config.get<string>('CONTACT_RECIPIENT_EMAIL')?.trim() ||
       serviceInfo.email;

@@ -11,6 +11,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { AdminTransactionsService } from './admin-transactions.service';
 import { MemberCacheInterceptor } from './members-cache.interceptor';
 import { MemberRoleGuard } from './member-role.guard';
+import { memberQuery } from './member.validation';
 
 @Controller('members/admin/transactions')
 @UseGuards(JwtAuthGuard, MemberRoleGuard)
@@ -20,72 +21,22 @@ export class AdminTransactionsController {
   constructor(private readonly transactions: AdminTransactionsService) {}
 
   @Get('reservations')
-  reservations(
-    @Query('search') search?: string,
-    @Query('status') status?: string,
-    @Query('memberType') memberType?: string,
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-  ) {
-    return this.transactions.reservations({
-      search,
-      status,
-      memberType,
-      page,
-      limit,
-    });
+  reservations(@Query() query: unknown) {
+    return this.transactions.reservations(memberQuery(query, ['search', 'status', 'memberType', 'page', 'limit']));
   }
 
   @Get('loans')
-  loans(
-    @Query('search') search?: string,
-    @Query('status') status?: string,
-    @Query('memberType') memberType?: string,
-    @Query('due') due?: string,
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-  ) {
-    return this.transactions.loans({
-      search,
-      status,
-      memberType,
-      due,
-      page,
-      limit,
-    });
+  loans(@Query() query: unknown) {
+    return this.transactions.loans(memberQuery(query, ['search', 'status', 'memberType', 'due', 'page', 'limit']));
   }
 
   @Get('returns')
-  returns(
-    @Query('search') search?: string,
-    @Query('status') status?: string,
-    @Query('memberType') memberType?: string,
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-  ) {
-    return this.transactions.returns({
-      search,
-      status,
-      memberType,
-      page,
-      limit,
-    });
+  returns(@Query() query: unknown) {
+    return this.transactions.returns(memberQuery(query, ['search', 'status', 'memberType', 'page', 'limit']));
   }
 
   @Get('lost-books')
-  lostBooks(
-    @Query('search') search?: string,
-    @Query('memberType') memberType?: string,
-    @Query('extension') extension?: string,
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-  ) {
-    return this.transactions.lostBooks({
-      search,
-      memberType,
-      extension,
-      page,
-      limit,
-    });
+  lostBooks(@Query() query: unknown) {
+    return this.transactions.lostBooks(memberQuery(query, ['search', 'memberType', 'extension', 'page', 'limit']));
   }
 }

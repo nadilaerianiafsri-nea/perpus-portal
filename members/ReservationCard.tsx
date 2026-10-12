@@ -1,5 +1,6 @@
 "use client";
 
+import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import Image from "next/image";
 import Link from "next/link";
 import { FiCalendar, FiClock, FiMapPin } from "react-icons/fi";
@@ -32,7 +33,7 @@ export default function ReservationCard({ reservation, onExpire, onCancel, busy 
   return <article className={`${styles.card} ${!active ? styles.finished : ""}`} data-reservation-id={reservation.id}>
     <header className={styles.header}><FiCalendar aria-hidden /><strong>{active ? "Reservasi Aktif" : "Reservasi Selesai"}</strong><span><FiClock aria-hidden />{labels[reservation.status]}</span></header>
     <div className={styles.body}>
-      <Link href={`/koleksi/${reservation.book.id}`} className={styles.cover}><Image src={reservation.book.coverUrl || "/images/landing/book-placeholder-1.svg"} alt={`Sampul ${reservation.book.title}`} fill sizes="96px" unoptimized /></Link>
+      <Link href={`/koleksi/${reservation.book.id}`} className={styles.cover}><Image src={safeCoverUrl(reservation.book.coverUrl)} alt={`Sampul ${reservation.book.title}`} fill sizes="96px" unoptimized /></Link>
       <div className={styles.info}>
         <Link href={`/koleksi/${reservation.book.id}`}><h2>{reservation.book.title}</h2></Link>
         <p className={styles.author}>{reservation.book.author}</p>

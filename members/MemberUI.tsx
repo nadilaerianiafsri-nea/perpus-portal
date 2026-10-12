@@ -1,5 +1,6 @@
 "use client";
 
+import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import Image from "next/image";
 import Link from "next/link";
 import { useCountdown } from "./useCountdown";
@@ -20,7 +21,7 @@ export function PageHeading({ title, description, children }: { title: string; d
   return <div className={styles.pageHeading}><div><h1>{title}</h1><p>{description}</p></div>{children}</div>;
 }
 export function BookCover({ book, small = false }: { book: MemberBook; small?: boolean }) {
-  return <div className={`${styles.cover} ${small ? styles.coverSmall : ""}`}><Image src={book.coverUrl || "/images/landing/book-placeholder-1.svg"} alt={`Sampul ${book.title}`} fill sizes={small ? "40px" : "72px"} unoptimized /></div>;
+  return <div className={`${styles.cover} ${small ? styles.coverSmall : ""}`}><Image src={safeCoverUrl(book.coverUrl)} alt={`Sampul ${book.title}`} fill sizes={small ? "40px" : "72px"} unoptimized /></div>;
 }
 export function Badge({ children, tone = "neutral" }: { children: React.ReactNode; tone?: string }) {
   return <span className={`${styles.badge} ${styles[tone] ?? ""}`}>{children}</span>;

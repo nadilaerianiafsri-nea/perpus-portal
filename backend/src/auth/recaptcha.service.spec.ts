@@ -45,12 +45,12 @@ describe('Login reCAPTCHA verification', () => {
     expect(google).not.toHaveBeenCalled();
   });
 
-  it('allows a localhost-only frontend without a key even if NODE_ENV is inherited as production', async () => {
+  it('fails closed in production even with a localhost frontend and missing key', async () => {
     settings.NODE_ENV = 'production';
     settings.FRONTEND_URL = 'http://localhost:3000';
     delete settings.RECAPTCHA_SECRET_KEY;
 
-    await expect(service.verify(undefined)).resolves.toBeUndefined();
+    await expect(service.verify(undefined)).rejects.toBeInstanceOf(ServiceUnavailableException);
     expect(google).not.toHaveBeenCalled();
   });
 

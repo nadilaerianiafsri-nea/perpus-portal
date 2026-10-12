@@ -1,10 +1,11 @@
+import { assertSameOrigin, readLimitedText, requestErrorResponse } from '@/shared/requestSecurity.cjs';
 import { NextResponse } from "next/server";
 import { API_URL } from "@/catalog/serverApi";
 
 export async function POST(request: Request) {
   let body: unknown;
-  try { body = await request.json(); }
-  catch { return NextResponse.json({ message: "Data pesan tidak valid." }, { status: 400 }); }
+  try { assertSameOrigin(request); body = JSON.parse(await readLimitedText(request)); }
+  catch (error) { const rejected = requestErrorResponse(error); if (rejected) return rejected; return NextResponse.json({ message: "Data pesan tidak valid." }, { status: 400 }); }
   try {
     const response = await fetch(`${API_URL}/contact`, {
       method: "POST",

@@ -1,3 +1,4 @@
+import { assertSameOrigin, readLimitedText, requestErrorResponse } from '@/shared/requestSecurity.cjs';
 import 'server-only';
 import { NextResponse } from 'next/server';
 import { API_URL } from '@/catalog/serverApi';
@@ -32,7 +33,8 @@ export async function adminBooksProxy(request: Request, path = '') {
   }
 
   try {
-    const body = request.method === 'GET' ? undefined : await request.text();
+    assertSameOrigin(request);
+    const body = request.method === 'GET' ? undefined : await readLimitedText(request, 65536);
     if (body && body.length > 32768) {
       return NextResponse.json(
         { message: 'Data permintaan terlalu panjang.' },
@@ -68,7 +70,9 @@ export async function adminBooksProxy(request: Request, path = '') {
       status: response.status,
       headers,
     });
-  } catch {
+  } catch (error) {
+    const rejected = requestErrorResponse(error);
+    if (rejected) return rejected;
     return NextResponse.json(
       { message: 'Layanan Data Buku belum dapat dihubungi. Silakan coba lagi.' },
       { status: 503, headers },

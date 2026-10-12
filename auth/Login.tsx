@@ -8,6 +8,7 @@ import AuthShell from "./AuthShell";
 import styles from "./Auth.module.css";
 import { loginReturn } from "./loginReturn";
 import LoginCaptcha, { type LoginCaptchaHandle } from "./LoginCaptcha";
+import { plaintextError } from '@/catalog/plaintextInput.cjs';
 
 const captchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY?.trim() ?? "";
 const captchaRequired = Boolean(captchaSiteKey) || process.env.NODE_ENV === "production";
@@ -41,6 +42,8 @@ export default function Login() {
     event.preventDefault();
 
     if (submissionLocked.current) return;
+    const emailError = plaintextError(email, { required: true });
+    if (emailError) { setError(emailError); return; }
     if (captchaRequired && !captchaToken) {
       setError("Selesaikan CAPTCHA sebelum masuk.");
       return;
@@ -123,6 +126,7 @@ export default function Login() {
               name="email"
               placeholder="nama@email.com"
               autoComplete="email"
+              maxLength={191}
               value={email}
               onChange={(event) =>
                 setEmail(event.target.value)

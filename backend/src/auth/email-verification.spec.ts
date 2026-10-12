@@ -25,6 +25,7 @@ describe('Email verification HTTP flow', () => {
     passwordHash: string;
     role: string;
     emailVerified: boolean;
+    isActive: boolean;
   };
   const mail = {
     isConfigured: () => true,
@@ -91,6 +92,7 @@ describe('Email verification HTTP flow', () => {
       passwordHash: await bcrypt.hash('passwordaman', 4),
       role: 'PENGUNJUNG',
       emailVerified: false,
+      isActive: true,
     };
   });
   afterAll(async () => {

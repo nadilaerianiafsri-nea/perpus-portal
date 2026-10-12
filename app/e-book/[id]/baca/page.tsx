@@ -1,3 +1,4 @@
+import { localReaderSource } from "@/shared/displayUrls.cjs";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import CatalogShell from "@/catalog/CatalogShell";
@@ -17,12 +18,7 @@ export default async function Page({
   if (!book && !unavailable) notFound();
   if (book && book.type !== "EBOOK") notFound();
   // Only embed documents served by this website; never execute external content.
-  let source: string | null = null;
-  if (book?.ebookUrl?.startsWith("/") && !book.ebookUrl.startsWith("//")) {
-    const url = new URL(book.ebookUrl, "https://perpus.local");
-    if (/^\/(ebooks|files)\/.+\.(pdf|html)$/i.test(url.pathname))
-      source = url.pathname;
-  }
+  const source = localReaderSource(book?.ebookUrl);
   return (
     <CatalogShell ebook>
       <main className={styles.main}>

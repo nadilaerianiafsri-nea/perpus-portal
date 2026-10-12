@@ -1,3 +1,5 @@
+import { containsHtml, isSafeUrl, textInputError } from '../shared/inputValidation.cjs';
+
 export type AdminBookListItem = {
   id: number;
   code: string;
@@ -90,4 +92,22 @@ export function adminDate(value: string) {
     month: 'short',
     year: 'numeric',
   }).format(new Date(value));
+}
+
+export function adminBookTextError(fields: Record<string, unknown>): string | null {
+  for (const [key, value] of Object.entries(fields)) {
+    if (typeof value !== 'string') continue;
+    if (containsHtml(value)) return 'HTML tidak diperbolehkan pada kolom ini.';
+    const max = ['description', 'licenseNote'].includes(key) ? 10000 : key === 'note' ? 3000 : ['code', 'isbnIssn', 'language'].includes(key) ? 64 : 191;
+    const error = textInputError(value, { max, required: false, multiline: ['description', 'licenseNote', 'note'].includes(key) });
+    if (error) return error;
+  }
+  return null;
+}
+
+export function adminCoverUrl(value: string | null | undefined): string {
+  const safe = typeof value === 'string' && (isSafeUrl(value)
+    || /^\/images\/(?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9_-]+\.(?:svg|jpg|jpeg|png|webp)$/.test(value)
+    || /^\/uploads\/covers\/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.(?:jpg|png|webp)$/.test(value));
+  return safe ? value! : '/images/landing/book-placeholder-1.svg';
 }

@@ -1,4 +1,5 @@
 import { serviceInfo } from '../../../shared/serviceInfo.cjs';
+import { escapeHtml as encodeHtml } from '../../../shared/inputValidation.cjs';
 
 type Tone = 'info' | 'warning' | 'warningStrong' | 'danger';
 type EmailContent = {
@@ -21,12 +22,7 @@ const palette = {
 };
 
 export function escapeHtml(value: string): string {
-  return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
+  return encodeHtml(value);
 }
 
 const multiline = (value: string) =>

@@ -2,12 +2,15 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { GrantStatus, Prisma } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { textInputError } from '../../../shared/inputValidation.cjs';
 
 @Injectable()
 export class GrantsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async list(query: Record<string, unknown>) {
+    if (!query || typeof query !== 'object' || Array.isArray(query) || Object.keys(query).some((key) => !['search', 'status', 'year', 'page', 'limit'].includes(key)))
+      throw new BadRequestException('Parameter tidak dikenal.');
     const text = (key: string) => {
       const value = query[key];
 
@@ -18,6 +21,9 @@ export class GrantsService {
       if (typeof value !== 'string') {
         throw new BadRequestException(`${key} tidak valid.`);
       }
+
+      const error = textInputError(value, { max: 191, required: false });
+      if (error) throw new BadRequestException(error);
 
       return value.trim();
     };

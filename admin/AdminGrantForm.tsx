@@ -5,6 +5,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import {
+  adminGrantTextError,
   adminGrantApiMessage,
   type AdminGrantDetailResponse,
   type AdminGrantStatus,
@@ -176,6 +177,10 @@ export default function AdminGrantForm({ mode, id }: Props) {
     if (saving) {
       return;
     }
+
+    const textError = adminGrantTextError({ donorName: form.donorName, note: form.note })
+      || form.items.map((item) => adminGrantTextError({ title: item.title })).find(Boolean);
+    if (textError) { setError(textError); return; }
 
     const items = form.items.map((item) => ({
       title: item.title.trim(),

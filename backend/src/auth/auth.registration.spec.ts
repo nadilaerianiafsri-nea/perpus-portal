@@ -156,6 +156,7 @@ describe('Registration HTTP contract', () => {
       passwordHash,
       role: 'PENGUNJUNG',
       emailVerified: false,
+      isActive: true,
     });
     await request(app.getHttpServer())
       .post('/auth/login')

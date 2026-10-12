@@ -31,6 +31,7 @@ const result = spawnSync(
     '--runInBand',
     '--config',
     JSON.stringify(config),
+    ...process.argv.slice(2),
   ],
   { cwd: rootDir, stdio: 'inherit' },
 );

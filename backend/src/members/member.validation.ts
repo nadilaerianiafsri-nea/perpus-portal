@@ -1,9 +1,39 @@
 import { BadRequestException } from '@nestjs/common';
+import { textInputError } from '../../../shared/inputValidation.cjs';
 
 export function objectInput(body: unknown): Record<string, unknown> {
   if (!body || typeof body !== 'object' || Array.isArray(body))
     throw new BadRequestException('Data tidak valid.');
   return body as Record<string, unknown>;
+}
+
+export function emptyInput(body: unknown): void {
+  if (body === undefined) return;
+  if (Object.keys(objectInput(body)).length)
+    throw new BadRequestException('Endpoint ini tidak menerima field tambahan.');
+}
+
+export function memberText(value: unknown, max: number, required = false, multiline = false): string {
+  const error = textInputError(value, { max, required, multiline });
+  if (error) throw new BadRequestException(error);
+  return (value as string).trim();
+}
+
+// Express can supply repeated query parameters as arrays. Validate before any
+// parsing or Prisma work, and preserve search punctuation as ordinary data.
+export function memberQuery(body: unknown, allowed: readonly string[]): Record<string, string> {
+  const input = objectInput(body);
+  const result: Record<string, string> = {};
+  for (const [key, value] of Object.entries(input)) {
+    if (!allowed.includes(key)) throw new BadRequestException('Parameter tidak dikenal.');
+    if (value === undefined) continue;
+    result[key] = memberText(value, key === 'search' ? 100 : 32);
+    if (key === 'page' || key === 'limit') {
+      const number = positiveId(result[key]);
+      if (key === 'limit' && number > 100) throw new BadRequestException('Batas data tidak valid.');
+    }
+  }
+  return result;
 }
 
 export function positiveId(value: unknown): number {
@@ -88,6 +118,7 @@ export function profileInput(body: unknown, memberType: string | null) {
   for (const key of Object.keys(input)) {
     const value = input[key];
     const max = key === 'address' ? 2000 : key === 'whatsapp' ? 32 : 191;
+    memberText(value, max, true, key === 'address');
     if (
       typeof value !== 'string' ||
       !value.trim() ||

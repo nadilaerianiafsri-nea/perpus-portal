@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { FiArrowLeft, FiCheckCircle, FiEdit2, FiPower } from "react-icons/fi";
@@ -40,6 +41,7 @@ export default function AdminBookDetailPage({ id }: { id: string }) {
   }, [id]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Existing fetch lifecycle starts the loading state before requesting data.
     void load();
   }, [load]);
 
@@ -116,7 +118,7 @@ export default function AdminBookDetailPage({ id }: { id: string }) {
       <section className={styles.detailHero}>
         <img
           className={styles.detailCover}
-          src={book.coverUrl || "/images/landing/book-placeholder-1.svg"}
+          src={safeCoverUrl(book.coverUrl)}
           alt={`Sampul ${book.title}`}
         />
         <div className={styles.heroInfo}>

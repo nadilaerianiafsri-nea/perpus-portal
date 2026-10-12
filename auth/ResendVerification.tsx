@@ -2,6 +2,7 @@
 import { useRef, useState } from 'react';
 import { authRequest } from './authApi';
 import styles from './Auth.module.css';
+import { plaintextError } from '@/catalog/plaintextInput.cjs';
 
 export default function ResendVerification({ email }: { email: string }) {
   const [loading, setLoading] = useState(false);
@@ -9,6 +10,7 @@ export default function ResendVerification({ email }: { email: string }) {
   const locked = useRef(false);
   async function resend() {
     if (locked.current) return;
+    const error = plaintextError(email, { required: true }); if (error) { setMessage(error); return; }
     locked.current = true; setLoading(true); setMessage('');
     const result = await authRequest('resend-verification', { email });
     setMessage(result.message); setLoading(false); locked.current = false;

@@ -17,5 +17,12 @@ export function validateRegistration(values: RegistrationValues, memberType: Mem
   if (!values.confirmPassword) errors.confirmPassword = "Konfirmasi kata sandi wajib diisi.";
   else if (values.confirmPassword !== values.password) errors.confirmPassword = "Konfirmasi kata sandi tidak sama.";
   if (!values.consent) errors.consent = "Setujui Syarat Layanan dan Kebijakan Privasi untuk melanjutkan.";
+  for (const field of ['name', 'email', 'whatsapp', 'address', 'identity', 'university', 'division'] as const) {
+    const required = ['name', 'email', 'whatsapp', 'address', 'identity'].includes(field) || (field === 'university' && memberType === 'mahasiswa') || (field === 'division' && memberType === 'pegawai');
+    const error = plaintextError(values[field], { required, max: field === 'address' ? 2000 : field === 'whatsapp' ? 32 : 191, multiline: field === 'address' });
+    if (error) errors[field] = error;
+  }
+  if (new TextEncoder().encode(values.password).length > 72) errors.password = 'Kata sandi maksimal 72 byte.';
   return errors;
 }
+import { plaintextError } from '../catalog/plaintextInput.cjs';

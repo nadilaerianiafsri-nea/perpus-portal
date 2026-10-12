@@ -1,13 +1,16 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import { adminCoverUrl } from "./adminBooks";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { FiArrowLeft, FiCheckCircle } from "react-icons/fi";
 import {
+  adminEBookTextError,
   accessModeLabel,
+  adminEBookSourceUrl,
   ebookApiMessage,
   type AdminEBookDetailResponse,
   type AdminEBookPayload,
@@ -22,7 +25,6 @@ type FormState = Omit<AdminEBookPayload, "year" | "accessDurationDays"> & {
 
 const MAX_COVER_BYTES = 5 * 1024 * 1024;
 const COVER_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const COVER_PLACEHOLDER = "/images/landing/book-placeholder-1.svg";
 
 const emptyForm: FormState = {
   code: "",
@@ -121,7 +123,7 @@ export default function AdminEBookForm({ mode, id }: { mode: "create" | "edit"; 
   function chooseCover(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0] ?? null;
     if (!file) return;
-    if (!COVER_TYPES.includes(file.type)) {
+    if (!COVER_TYPES.includes(file.type) || !/\.(?:jpe?g|png|webp)$/i.test(file.name)) {
       setError("Format cover harus JPG, PNG, atau WEBP.");
       event.target.value = "";
       return;
@@ -143,6 +145,9 @@ export default function AdminEBookForm({ mode, id }: { mode: "create" | "edit"; 
     event.preventDefault();
     if (saving) return;
 
+    const textError = adminEBookTextError(form);
+    if (textError) { setError(textError); return; }
+
     const year = Number(form.year);
     const accessDurationDays = form.accessDurationDays.trim() ? Number(form.accessDurationDays) : null;
     if (!Number.isInteger(year)) {
@@ -156,6 +161,9 @@ export default function AdminEBookForm({ mode, id }: { mode: "create" | "edit"; 
     if (form.accessMode !== "TIDAK_TERSEDIA" && !form.ebookUrl.trim()) {
       setError("URL / Sumber E-Book wajib diisi untuk mode akses ini.");
       return;
+    }
+    if (form.ebookUrl && !adminEBookSourceUrl(form.ebookUrl.trim())) {
+      setError('URL / Sumber E-Book tidak valid.'); return;
     }
     if (!coverFile && !form.coverUrl) {
       setError("Cover wajib diunggah.");
@@ -265,7 +273,7 @@ export default function AdminEBookForm({ mode, id }: { mode: "create" | "edit"; 
         <aside className={styles.formAside}>
           <section className={styles.coverCard}>
             <h2>Cover</h2>
-            <img src={coverPreview || form.coverUrl || COVER_PLACEHOLDER} alt="Preview cover E-Book" />
+            <img src={coverPreview || adminCoverUrl(form.coverUrl)} alt="Preview cover E-Book" />
             <input ref={coverInput} type="file" accept="image/jpeg,image/png,image/webp" className={styles.coverFileInput} onChange={chooseCover} />
             <button type="button" className={styles.coverButton} onClick={() => coverInput.current?.click()}>{coverFile || form.coverUrl ? "Ganti Cover" : "Upload Cover"}</button>
             <small className={styles.coverHint}>JPG, PNG, atau WEBP · Maks. 5 MB</small>

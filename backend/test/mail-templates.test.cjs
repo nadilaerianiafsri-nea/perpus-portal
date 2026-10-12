@@ -25,7 +25,7 @@ function complete(message) {
   assert.doesNotMatch(message.html, /<script|<link|display:\s*(?:flex|grid)/i);
 }
 
-test('contact preserves configured recipient and Reply-To while escaping user content', async () => {
+void test('contact preserves configured recipient and Reply-To while escaping user content', async () => {
   const input = { name: '<script>alert(1)</script> & "Najwa"', email: 'najwa@example.test', message: 'Baris pertama\n<img src=x onerror=alert(1)> & pesan kedua' };
   assert.equal(await mail.sendContactEmail(input), true);
   const message = sent.at(-1);
@@ -40,7 +40,16 @@ test('contact preserves configured recipient and Reply-To while escaping user co
   assert.doesNotMatch(message.text, /jangan membalas/i);
 });
 
-test('verification and reset preserve action URLs and their existing expiry', async () => {
+void test('contact refuses header injection even for an internal caller', async () => {
+  const before = sent.length;
+  for (const input of [
+    { name: 'Nama\r\nBcc: attacker@example.test', email: 'member@example.test', message: 'Normal' },
+    { name: 'Nama', email: 'member@example.test\r\nBcc: attacker@example.test', message: 'Normal' },
+  ]) assert.equal(await mail.sendContactEmail(input), false);
+  assert.equal(sent.length, before);
+});
+
+void test('verification and reset preserve action URLs and their existing expiry', async () => {
   const verification = 'https://library.example.test/verify-email?token=test-token&lang=id';
   await mail.sendVerificationEmail('member@example.test', verification);
   let message = sent.at(-1);
@@ -57,7 +66,7 @@ test('verification and reset preserve action URLs and their existing expiry', as
   assert.ok(message.text.includes('1 jam'));
 });
 
-test('reminder variants render actual book/deadline and configured frontend CTA with Jakarta time', async () => {
+void test('reminder variants render actual book/deadline and configured frontend CTA with Jakarta time', async () => {
   for (const [milestone, heading] of [[-1, 'Buku Anda Jatuh Tempo Besok'], [0, 'Buku Anda Jatuh Tempo Hari Ini'], [1, 'Pinjaman Anda Telah Melewati Jatuh Tempo'], [3, 'Pinjaman Anda Telah Melewati Jatuh Tempo']]) {
     await mail.sendMemberReminder('member@example.test', 'Pengingat', 'Pesan jadwal existing', { bookTitle: 'Buku <A> & B', bookCode: 'BK-123', dueAt: new Date('2026-10-07T02:32:00Z'), milestone });
     const message = sent.at(-1);

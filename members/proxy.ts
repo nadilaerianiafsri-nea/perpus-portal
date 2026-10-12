@@ -1,3 +1,4 @@
+import { assertSameOrigin, readLimitedText, requestErrorResponse } from '@/shared/requestSecurity.cjs';
 import { NextResponse } from "next/server";
 
 import { API_URL } from "@/catalog/serverApi";
@@ -46,7 +47,8 @@ export async function memberProxy(request: Request, path: string) {
   }
 
   try {
-    const body = request.method !== "GET" ? await request.text() : undefined;
+    assertSameOrigin(request);
+    const body = request.method !== "GET" ? await readLimitedText(request, 16384) : undefined;
 
     if (body && body.length > 16384) {
       return NextResponse.json(
@@ -94,7 +96,9 @@ export async function memberProxy(request: Request, path: string) {
       status: response.status,
       headers,
     });
-  } catch {
+  } catch (error) {
+    const rejected = requestErrorResponse(error);
+    if (rejected) return rejected;
     return NextResponse.json(
       {
         message: "Layanan anggota belum dapat dihubungi. Silakan coba lagi.",

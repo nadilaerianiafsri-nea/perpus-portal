@@ -1,3 +1,4 @@
+import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import Image from "next/image";
 import Link from "next/link";
 import { FiBookOpen, FiCheckCircle, FiClock, FiMonitor } from "react-icons/fi";
@@ -33,7 +34,7 @@ export default function BookCard({ book }: { book: Book }) {
         aria-label={`Lihat detail ${book.title}`}
       >
         <Image
-          src={book.coverUrl || "/images/landing/book-placeholder-1.svg"}
+          src={safeCoverUrl(book.coverUrl)}
           alt={`Sampul ${book.title}`}
           fill
           sizes="(max-width: 600px) 50vw, (max-width: 1000px) 33vw, 25vw"

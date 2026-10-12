@@ -6,6 +6,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, CollectionType, CopyStatus } from '../generated/prisma/client';
 import { MembersService } from '../members/members.service';
+import { textInputError } from '../../../shared/inputValidation.cjs';
 
 type CatalogRow = {
   id: number;
@@ -28,8 +29,13 @@ const reserved = Prisma.sql`EXISTS (SELECT 1 FROM book_copies c WHERE c.bookId =
 function values(value: unknown): string[] {
   if (value === undefined || value === '') return [];
   const list = Array.isArray(value) ? value : [value];
+  if (list.length > 20) throw new BadRequestException('Parameter filter terlalu panjang.');
   if (list.some((v) => typeof v !== 'string'))
     throw new BadRequestException('Parameter filter tidak valid.');
+  for (const item of list) {
+    const error = textInputError(item, { max: 4000 });
+    if (error) throw new BadRequestException(error);
+  }
   const result = list
     .flatMap((v) => (v as string).split(','))
     .map((v) => v.trim())
@@ -104,6 +110,9 @@ export class CollectionsService {
   }
 
   async list(query: Record<string, unknown>, ebooksOnly = false) {
+    const allowed = ['page', 'limit', 'yearFrom', 'yearTo', 'search', 'type', 'availability', 'subject', 'language', 'sort'];
+    if (!query || typeof query !== 'object' || Array.isArray(query) || Object.keys(query).some((key) => !allowed.includes(key)))
+      throw new BadRequestException('Parameter tidak dikenal.');
     const page = integer(query.page, 1, 1, 100000);
     const limit = integer(query.limit, ebooksOnly ? 8 : 20, 1, 40);
     const yearFrom = integer(query.yearFrom, 0, 0, 9999);
@@ -113,9 +122,12 @@ export class CollectionsService {
     if (query.search !== undefined && typeof query.search !== 'string')
       throw new BadRequestException('Pencarian tidak valid.');
     const search = (query.search as string | undefined)?.trim() ?? '';
+    const searchError = textInputError(search, { max: 191, required: false });
+    if (searchError) throw new BadRequestException(searchError);
     if (search.length > 191)
       throw new BadRequestException('Pencarian terlalu panjang.');
     const types = ebooksOnly ? ['EBOOK'] : values(query.type);
+    if (ebooksOnly) values(query.type);
     const availabilities = values(query.availability);
     if (
       types.some((v) => !['FISIK', 'EBOOK'].includes(v)) ||
@@ -207,7 +219,7 @@ export class CollectionsService {
   }
 
   async detail(input: string) {
-    if (!/^\d+$/.test(input) || !Number.isSafeInteger(Number(input)))
+    if (typeof input !== 'string' || input.length > 10 || !/^\d+$/.test(input) || !Number.isSafeInteger(Number(input)) || Number(input) < 1 || Number(input) > 2_147_483_647)
       throw new NotFoundException('Koleksi tidak ditemukan.');
     await this.members.expireReservations();
     const book = await this.prisma.book.findFirst({

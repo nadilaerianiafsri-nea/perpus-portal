@@ -54,10 +54,9 @@ export class RecaptchaService {
       const developmentMode =
         environment === 'development' || environment === 'test';
 
-      // Local development may run without Google reCAPTCHA credentials.
-      // FRONTEND_URL is also checked so an inherited/global NODE_ENV value
-      // cannot accidentally block a localhost-only development setup.
-      if (developmentMode || this.hasLocalFrontend()) {
+      // Production must fail closed, including reverse-proxy deployments whose
+      // frontend URL still points to loopback. Local development remains usable.
+      if (environment !== 'production' && (developmentMode || this.hasLocalFrontend())) {
         return;
       }
 

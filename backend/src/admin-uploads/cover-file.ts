@@ -44,6 +44,7 @@ function isWebp(buffer: Buffer): boolean {
 export function validateCoverFile(
   buffer: Buffer,
   mimetype: string,
+  originalname?: string,
 ): CoverExtension {
   if (buffer.length > MAX_COVER_BYTES) {
     throw new Error('Ukuran cover maksimal 5 MB.');
@@ -52,6 +53,15 @@ export function validateCoverFile(
   const extension = coverExtension(mimetype);
   if (!extension) {
     throw new Error('Format cover harus JPG, PNG, atau WEBP.');
+  }
+
+  if (originalname !== undefined) {
+    const suffix = originalname.split('.').pop()?.toLowerCase();
+    const matchesName = extension === 'jpg' ? suffix === 'jpg' || suffix === 'jpeg' : suffix === extension;
+    // eslint-disable-next-line no-control-regex -- Reject control bytes in upload filenames.
+    if (originalname.length > 191 || /[\\/\u0000-\u001f\u007f]/.test(originalname) || !matchesName) {
+      throw new Error('Nama dan ekstensi file cover tidak valid.');
+    }
   }
 
   const matches =

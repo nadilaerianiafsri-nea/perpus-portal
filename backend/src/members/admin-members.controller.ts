@@ -14,7 +14,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { AdminMembersService } from './admin-members.service';
 import { MemberRoleGuard } from './member-role.guard';
 import { MemberCacheInterceptor } from './members-cache.interceptor';
-import { positiveId } from './member.validation';
+import { positiveId, memberQuery } from './member.validation';
 
 @Controller('members/admin/members')
 @UseGuards(JwtAuthGuard, MemberRoleGuard)
@@ -24,20 +24,8 @@ export class AdminMembersController {
   constructor(private readonly adminMembers: AdminMembersService) {}
 
   @Get()
-  list(
-    @Query('search') search?: string,
-    @Query('memberType') memberType?: string,
-    @Query('verified') verified?: string,
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-  ) {
-    return this.adminMembers.list({
-      search,
-      memberType,
-      verified,
-      page,
-      limit,
-    });
+  list(@Query() query: unknown) {
+    return this.adminMembers.list(memberQuery(query, ['search', 'memberType', 'verified', 'page', 'limit']));
   }
 
   @Get(':id')

@@ -1,12 +1,19 @@
 const emailPattern = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?)+$/;
+const { textInputError } = require('./inputValidation.cjs');
 exports.validateContact = function validateContact(body) {
   const input = body && typeof body === 'object' && !Array.isArray(body) ? body : {};
   const errors = {};
+  if (!body || typeof body !== 'object' || Array.isArray(body) || Object.keys(input).some(key => !['name', 'email', 'message'].includes(key))) {
+    errors.message = 'Data pesan memiliki field yang tidak valid.';
+  }
   const text = (key, label, max) => {
     const value = typeof input[key] === 'string' ? input[key].trim() : '';
     if (!value) errors[key] = `${label} wajib diisi.`;
     else if (value.length > max) errors[key] = `${label} maksimal ${max} karakter.`;
-    else if (/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/.test(value)) errors[key] = `${label} mengandung karakter tidak valid.`;
+    else {
+      const error = textInputError(input[key], { max, multiline: key === 'message' });
+      if (error) errors[key] = error;
+    }
     return value;
   };
   const value = {name: text('name', 'Nama', 100), email: text('email', 'Email', 254).toLowerCase(), message: text('message', 'Pesan', 3000)};

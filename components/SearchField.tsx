@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import { plaintextError } from '@/catalog/plaintextInput.cjs';
 import { FiSearch } from "react-icons/fi";
 import styles from "@/catalog/Catalog.module.css";
 export default function SearchField({
@@ -18,6 +19,8 @@ export default function SearchField({
   const [value, setValue] = useState(initialValue);
   const [previous, setPrevious] = useState(initialValue);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const errorId = useId();
+  const error = plaintextError(value);
   if (previous !== initialValue) {
     setPrevious(initialValue);
     setValue(initialValue);
@@ -35,15 +38,19 @@ export default function SearchField({
       <input
         value={value}
         maxLength={191}
+        aria-invalid={!!error}
+        aria-describedby={error ? errorId : undefined}
         placeholder={placeholder}
         onChange={(e) => {
           const next = e.target.value;
           setValue(next);
           if (timer.current) clearTimeout(timer.current);
+          if (plaintextError(next)) return;
           if (delayMs === 0) onSearch(next);
           else timer.current = setTimeout(() => onSearch(next), delayMs);
         }}
       />
+      {error && <span id={errorId} role="alert" className={styles.inlineError}>{error}</span>}
     </label>
   );
 }

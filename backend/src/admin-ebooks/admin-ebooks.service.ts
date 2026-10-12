@@ -1,3 +1,4 @@
+import { textInputError } from '../../../shared/inputValidation.cjs';
 import {
   BadRequestException,
   ConflictException,
@@ -19,6 +20,8 @@ function queryText(value: unknown, label: string, max = 191): string {
   if (typeof value !== 'string') {
     throw new BadRequestException(`${label} tidak valid.`);
   }
+  const error = textInputError(value, { max });
+  if (error) throw new BadRequestException(error);
   const result = value.trim();
   if (result.length > max) {
     throw new BadRequestException(`${label} terlalu panjang.`);
@@ -68,6 +71,9 @@ export class AdminEBooksService {
   constructor(private readonly prisma: PrismaService) {}
 
   async list(query: AdminEBooksQuery) {
+    if (Object.keys(query).some((key) => !['search', 'status', 'page', 'limit'].includes(key))) {
+      throw new BadRequestException('Parameter tidak diizinkan.');
+    }
     const search = queryText(query.search, 'Pencarian');
     const status = queryText(query.status, 'Status', 16).toUpperCase() || 'ALL';
     const page = queryInteger(query.page, 1, 1, 100000);
@@ -274,6 +280,9 @@ export class AdminEBooksService {
       throw new BadRequestException('Status E-Book tidak valid.');
     }
 
+    if (Object.keys(body).some((key) => key !== 'isActive')) {
+      throw new BadRequestException('Field status tidak diizinkan.');
+    }
     const isActive = (body as Record<string, unknown>).isActive;
     if (typeof isActive !== 'boolean') {
       throw new BadRequestException('Status E-Book tidak valid.');

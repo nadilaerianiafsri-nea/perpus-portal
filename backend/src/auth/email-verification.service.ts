@@ -9,6 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { randomUUID } from 'node:crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { MailService } from '../mail/mail.service';
+import { authEmail, authObject, authToken } from './input-validation';
 
 type VerificationPayload = {
   sub: number;
@@ -98,7 +99,7 @@ export class EmailVerificationService {
   }
 
   async verifyEmail(token: unknown) {
-    if (typeof token !== 'string' || !token.trim() || token.length > 4096)
+    if (!authToken(token))
       throw new BadRequestException(
         'Token verifikasi tidak valid atau sudah kedaluwarsa.',
       );
@@ -116,7 +117,8 @@ export class EmailVerificationService {
         !Number.isSafeInteger(payload.sub) ||
         payload.sub < 1 ||
         typeof payload.email !== 'string' ||
-        typeof payload.exp !== 'number'
+        authEmail(payload.email) !== payload.email ||
+        !Number.isSafeInteger(payload.exp)
       )
         throw new Error('Invalid verification claims');
     } catch (error) {
@@ -170,12 +172,8 @@ export class EmailVerificationService {
   }
 
   async resendVerification(body: unknown) {
-    const input =
-      body && typeof body === 'object' && !Array.isArray(body)
-        ? (body as Record<string, unknown>)
-        : {};
-    const email =
-      typeof input.email === 'string' ? input.email.trim().toLowerCase() : '';
+    const input = authObject(body, ['email']);
+    const email = authEmail(input.email);
     if (email.length > 191 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
       throw new BadRequestException('Email tidak valid.');
     const user = await this.prisma.user.findUnique({

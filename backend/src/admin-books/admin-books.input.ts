@@ -1,3 +1,6 @@
+import { textInputError, isSafeUrl } from '../../../shared/inputValidation.cjs';
+import { isSafeCoverFilename } from '../admin-uploads/cover-file';
+
 export type AdminBookInput = {
   code: string;
   title: string;
@@ -31,6 +34,8 @@ function requiredText(
   if (typeof value !== 'string' || !value.trim()) {
     throw new Error(`${label} wajib diisi.`);
   }
+  const error = textInputError(value, { max, multiline: max > 191 });
+  if (error) throw new Error(error);
   const result = value.trim();
   if (result.length > max) throw new Error(`${label} terlalu panjang.`);
   return result;
@@ -43,6 +48,8 @@ function optionalText(
 ): string | null {
   if (value === undefined || value === null || value === '') return null;
   if (typeof value !== 'string') throw new Error(`${label} tidak valid.`);
+  const error = textInputError(value, { max, required: false, multiline: max > 191 });
+  if (error) throw new Error(error);
   const result = value.trim();
   if (!result) return null;
   if (result.length > max) throw new Error(`${label} terlalu panjang.`);
@@ -55,12 +62,7 @@ function integer(
   min: number,
   max: number,
 ): number {
-  const result =
-    typeof value === 'number'
-      ? value
-      : typeof value === 'string' && /^-?\d+$/.test(value.trim())
-        ? Number(value)
-        : Number.NaN;
+  const result = typeof value === 'number' ? value : Number.NaN;
   if (!Number.isSafeInteger(result) || result < min || result > max) {
     throw new Error(`${label} tidak valid.`);
   }
@@ -70,7 +72,7 @@ function integer(
 export function positiveBookId(value: string): number {
   if (!/^\d+$/.test(value)) throw new Error('ID buku tidak valid.');
   const id = Number(value);
-  if (!Number.isSafeInteger(id) || id < 1) {
+  if (!Number.isSafeInteger(id) || id < 1 || id > 2147483647) {
     throw new Error('ID buku tidak valid.');
   }
   return id;
@@ -80,8 +82,20 @@ export function copyCode(bookCode: string, index: number): string {
   return `${bookCode}-E${index}`;
 }
 
+function coverUrlInput(value: unknown): string {
+  const url = requiredText(value, 'Cover', 191);
+  const local = /^\/images\/(?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9_-]+\.(?:svg|jpg|jpeg|png|webp)$/.test(url)
+    || (url.startsWith('/uploads/covers/') && isSafeCoverFilename(url.slice('/uploads/covers/'.length)));
+  if (!isSafeUrl(url) && !local) throw new Error('URL cover tidak valid.');
+  return url;
+}
+
 export function parseAdminBookInput(body: unknown): AdminBookInput {
   const input = record(body);
+  const allowed = new Set(["code", "title", "author", "isbnIssn", "publisher", "year", "edition", "language", "subject", "description", "coverUrl", "isActive", "location", "shelf", "totalStock"]);
+  if (Object.keys(input).some((key) => !allowed.has(key))) {
+    throw new Error('Terdapat field yang tidak diizinkan.');
+  }
   const code = requiredText(input.code, 'Kode Buku', 64);
   const title = requiredText(input.title, 'Judul');
   const author = requiredText(input.author, 'Penulis / Pengarang');
@@ -93,7 +107,7 @@ export function parseAdminBookInput(body: unknown): AdminBookInput {
   const shelf = requiredText(input.shelf, 'Rak');
   const totalStock = integer(input.totalStock, 'Jumlah Stok', 0, 9999);
   const description = requiredText(input.description, 'Deskripsi', 10000);
-  const coverUrl = requiredText(input.coverUrl, 'Cover', 191);
+  const coverUrl = coverUrlInput(input.coverUrl);
   const isActive = input.isActive;
   if (typeof isActive !== 'boolean') {
     throw new Error('Status katalog tidak valid.');

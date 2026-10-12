@@ -3,6 +3,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { MemberType, Prisma, Role } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { MembersService } from './members.service';
+import { memberQuery } from './member.validation';
 
 const DAY = 86_400_000;
 const JAKARTA_OFFSET = 7 * 60 * 60 * 1000;
@@ -320,6 +321,7 @@ export class AdminTransactionsService {
   }
 
   async reservations(input: ReservationInput) {
+    input = memberQuery(input, ['search', 'status', 'memberType', 'page', 'limit']);
     await this.members.expireReservations();
 
     const search = this.searchValue(input.search);
@@ -566,6 +568,7 @@ export class AdminTransactionsService {
   }
 
   async loans(input: LoanInput) {
+    input = memberQuery(input, ['search', 'status', 'memberType', 'due', 'page', 'limit']);
     const search = this.searchValue(input.search);
     const memberType = this.memberType(input.memberType);
 
@@ -810,6 +813,7 @@ export class AdminTransactionsService {
   }
 
   async returns(input: ReturnInput) {
+    input = memberQuery(input, ['search', 'status', 'memberType', 'page', 'limit']);
     const search = this.searchValue(input.search);
     const memberType = this.memberType(input.memberType);
 
@@ -987,6 +991,7 @@ export class AdminTransactionsService {
   }
 
   async lostBooks(input: LostInput) {
+    input = memberQuery(input, ['search', 'memberType', 'extension', 'page', 'limit']);
     const search = this.searchValue(input.search);
     const memberType = this.memberType(input.memberType);
 

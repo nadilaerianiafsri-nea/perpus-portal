@@ -1,6 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import { safeEBookUrl } from "../shared/displayUrls.cjs";
+import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { FiArrowLeft, FiEdit2, FiPower } from "react-icons/fi";
@@ -38,6 +40,7 @@ export default function AdminEBookDetailPage({ id }: { id: string }) {
   }, [id]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Existing fetch lifecycle starts the loading state before requesting data.
     void load();
   }, [load]);
 
@@ -102,7 +105,7 @@ export default function AdminEBookDetailPage({ id }: { id: string }) {
       {error ? <div className={styles.inlineError} role="alert">{error}</div> : null}
 
       <section className={styles.detailHero}>
-        <img className={styles.detailCover} src={book.coverUrl || "/images/landing/book-placeholder-1.svg"} alt={`Sampul ${book.title}`} />
+        <img className={styles.detailCover} src={safeCoverUrl(book.coverUrl)} alt={`Sampul ${book.title}`} />
         <div className={styles.heroInfo}>
           <div className={styles.heroBadges}>
             <span>E-Book</span>
@@ -146,8 +149,8 @@ export default function AdminEBookDetailPage({ id }: { id: string }) {
             <div>
               <dt>SUMBER / TAUTAN</dt>
               <dd>
-                {book.ebookUrl ? (
-                  <a className={styles.digitalLink} href={book.ebookUrl} target="_blank" rel="noreferrer">Buka sumber E-Book</a>
+                {safeEBookUrl(book.ebookUrl) ? (
+                  <a className={styles.digitalLink} href={safeEBookUrl(book.ebookUrl)!} target="_blank" rel="noreferrer">Buka sumber E-Book</a>
                 ) : "Tidak tersedia"}
               </dd>
             </div>

@@ -1,5 +1,7 @@
 import { BadRequestException } from '@nestjs/common';
 import { MemberType } from '../../generated/prisma/client';
+import { textInputError } from '../../../../shared/inputValidation.cjs';
+import { authEmail, authObject } from '../input-validation';
 
 // Uses the existing explicit NestJS validation mechanism; no second validation library.
 export class RegisterDto {
@@ -14,13 +16,12 @@ export class RegisterDto {
   division?: string;
 
   static from(body: unknown): RegisterDto {
-    if (!body || typeof body !== 'object' || Array.isArray(body)) {
-      throw new BadRequestException('Data registrasi harus berupa object.');
-    }
-    const input = body as Record<string, unknown>;
+    const input = authObject(body, ['name', 'email', 'whatsapp', 'address', 'identity', 'password', 'memberType', 'university', 'division', 'confirmPassword', 'consent']);
     const errors: Record<string, string> = {};
     const text = (key: string, max = 191): string => {
       const value = input[key];
+      const error = textInputError(value, { required: true, max, multiline: key === 'address' });
+      if (error) { errors[key] = error; return ''; }
       if (typeof value !== 'string' || !value.trim()) {
         errors[key] = 'Field ini wajib diisi sebagai teks.';
         return '';
@@ -34,8 +35,7 @@ export class RegisterDto {
     if (dto.name && dto.name.length < 3)
       errors.name = 'Nama lengkap minimal 3 karakter.';
     dto.email = text('email').toLowerCase();
-    if (dto.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(dto.email))
-      errors.email = 'Email tidak valid.';
+    if (dto.email) { try { dto.email = authEmail(dto.email); } catch { errors.email = 'Email tidak valid.'; } }
     dto.whatsapp = text('whatsapp', 32);
     dto.address = text('address', 2000);
     dto.identity = text('identity');
@@ -50,6 +50,12 @@ export class RegisterDto {
     if (dto.memberType === MemberType.MAHASISWA)
       dto.university = text('university');
     if (dto.memberType === MemberType.PEGAWAI) dto.division = text('division');
+    for (const key of ['university', 'division']) {
+      if (input[key] !== undefined) {
+        const error = textInputError(input[key], { max: 191 });
+        if (error) errors[key] = error;
+      }
+    }
     dto.password = typeof input.password === 'string' ? input.password : '';
     if (dto.password.length < 8)
       errors.password = 'Kata sandi minimal 8 karakter.';
