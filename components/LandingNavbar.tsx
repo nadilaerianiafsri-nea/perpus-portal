@@ -1,12 +1,27 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useRef } from "react";
+
 type NavbarProps = {
-  active?: "beranda" | "koleksi" | "ebook" | "hibah" | "tentang" | "panduan" | "faq" | "kontak";
+  active?:
+    | "beranda"
+    | "koleksi"
+    | "ebook"
+    | "hibah"
+    | "tentang"
+    | "panduan"
+    | "faq"
+    | "kontak";
   user?: { name: string; role: "ADMIN" | "PENGUNJUNG" } | null;
 };
+
 export default function LandingNavbar({
   active = "beranda",
   user,
 }: NavbarProps) {
+  const mobileMenuRef = useRef<HTMLDetailsElement>(null);
+
   const links = [
     ["Beranda", "/", "beranda"],
     ["Koleksi", "/koleksi", "koleksi"],
@@ -17,6 +32,27 @@ export default function LandingNavbar({
     ["FAQ", "/faq", "faq"],
     ["Kontak", "/kontak", "kontak"],
   ];
+
+  useEffect(() => {
+    const handlePointerDown = (event: PointerEvent) => {
+      const mobileMenu = mobileMenuRef.current;
+
+      if (!mobileMenu?.open) {
+        return;
+      }
+
+      if (event.target instanceof Node && !mobileMenu.contains(event.target)) {
+        mobileMenu.open = false;
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+    };
+  }, []);
+
   const actions = user ? (
     <Link
       className="member-btn"
@@ -34,12 +70,14 @@ export default function LandingNavbar({
       </Link>
     </>
   );
+
   return (
     <header className="site-header">
       <div className="landing-shell top-nav">
         <Link className="wordmark" href="/" aria-label="Beranda Perpustakaan">
           <span className="wordmark-box">P</span>
         </Link>
+
         <nav className="main-nav" aria-label="Navigasi utama">
           {links.map(([label, href, key]) => (
             <Link
@@ -52,13 +90,16 @@ export default function LandingNavbar({
             </Link>
           ))}
         </nav>
+
         <div className="nav-actions">{actions}</div>
-        <details className="mobile-menu">
+
+        <details className="mobile-menu" ref={mobileMenuRef}>
           <summary aria-label="Buka menu">
             <span />
             <span />
             <span />
           </summary>
+
           <div>
             {links.map(([label, href, key]) => (
               <Link
