@@ -25,6 +25,22 @@ type FormState = Omit<AdminEBookPayload, "year" | "accessDurationDays"> & {
 
 const MAX_COVER_BYTES = 5 * 1024 * 1024;
 const COVER_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const SUBJECT_CATEGORIES = [
+  "Hukum",
+  "Novel",
+  "Pendidikan",
+  "Sejarah",
+  "Agama",
+  "Teknologi",
+  "Sosial",
+  "Ekonomi",
+  "Politik",
+  "Biografi",
+  "Sastra",
+  "Referensi",
+  "Anak",
+  "Umum",
+] as const;
 
 const emptyForm: FormState = {
   code: "",
@@ -202,6 +218,10 @@ export default function AdminEBookForm({ mode, id }: { mode: "create" | "edit"; 
   }
 
   const backHref = mode === "edit" && id ? `/admin/koleksi/e-book/${id}` : "/admin/koleksi/e-book";
+  const subjectCategories =
+    form.subject && !SUBJECT_CATEGORIES.includes(form.subject as (typeof SUBJECT_CATEGORIES)[number])
+      ? [form.subject, ...SUBJECT_CATEGORIES]
+      : SUBJECT_CATEGORIES;
   if (loading) return <div className={styles.statePanel}>Memuat data E-Book...</div>;
 
   return (
@@ -234,7 +254,13 @@ export default function AdminEBookForm({ mode, id }: { mode: "create" | "edit"; 
               <label><span>Tahun Terbit <b>*</b></span><input type="number" min="1000" max="9999" value={form.year} onChange={(e) => update("year", e.target.value)} required /></label>
               <label><span>Edisi</span><input value={form.edition} onChange={(e) => update("edition", e.target.value)} /></label>
               <label><span>Bahasa <b>*</b></span><input value={form.language} onChange={(e) => update("language", e.target.value)} required maxLength={64} /></label>
-              <label className={styles.spanTwo}><span>Subjek / Kategori <b>*</b></span><input value={form.subject} onChange={(e) => update("subject", e.target.value)} required /></label>
+              <label className={styles.spanTwo}>
+                <span>Subjek / Kategori <b>*</b></span>
+                <select value={form.subject} onChange={(e) => update("subject", e.target.value)} required>
+                  <option value="" disabled>Pilih Subjek / Kategori</option>
+                  {subjectCategories.map((subject) => <option key={subject} value={subject}>{subject}</option>)}
+                </select>
+              </label>
             </div>
           </section>
 

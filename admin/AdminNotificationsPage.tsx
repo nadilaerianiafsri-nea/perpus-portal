@@ -5,6 +5,7 @@ import { FiSearch } from "react-icons/fi";
 import {
   adminOperationsApiMessage,
   formatAdminOperationDate,
+  type AdminNotificationRow,
   type AdminNotificationsResponse,
   type NotificationChannel,
 } from "./adminOperations";
@@ -16,8 +17,15 @@ const emptyResult: AdminNotificationsResponse = {
   meta: { page: 1, limit: 10, total: 0, totalPages: 1 },
 };
 
-function statusLabel(status: string) {
-  switch (status) {
+function channelLabel(channel: AdminNotificationRow["channel"]) {
+  if (channel === "SYSTEM") return "Sistem";
+  return channel === "EMAIL" ? "Email" : "WhatsApp";
+}
+
+function statusLabel(row: AdminNotificationRow) {
+  if (row.channel === "SYSTEM") return "Menunggu Pengambilan";
+
+  switch (row.status) {
     case "TERKIRIM":
       return "Terkirim";
     case "GAGAL":
@@ -29,6 +37,12 @@ function statusLabel(status: string) {
     default:
       return "Menunggu";
   }
+}
+
+function contactLabel(row: AdminNotificationRow) {
+  if (row.channel === "SYSTEM") return "Notifikasi Sistem";
+  if (row.channel === "EMAIL") return row.memberEmail;
+  return row.memberWhatsapp || "Nomor belum tersedia";
 }
 
 export default function AdminNotificationsPage() {
@@ -109,14 +123,14 @@ export default function AdminNotificationsPage() {
       <header className={styles.pageHeading}>
         <div>
           <h1>Notifikasi</h1>
-          <p>Monitor pengingat Email dan tindak lanjut WhatsApp anggota.</p>
+          <p>Monitor reservasi baru, pengingat Email, dan tindak lanjut WhatsApp anggota.</p>
         </div>
       </header>
 
       <div className={styles.infoBox} role="note">
-        Email otomatis dikirim pada H-1, hari jatuh tempo (H), lalu H+2 dan
-        seterusnya selama masih terlambat. WhatsApp dikirim manual oleh petugas
-        dari menu Transaksi.
+        Reservasi baru tampil sebagai notifikasi Sistem. Email otomatis dikirim
+        pada H-1, hari jatuh tempo (H), lalu H+2 dan seterusnya selama masih
+        terlambat. WhatsApp dikirim manual oleh petugas dari menu Transaksi.
       </div>
 
       <section className={styles.filterCard} aria-label="Filter notifikasi">
@@ -126,7 +140,7 @@ export default function AdminNotificationsPage() {
             type="search"
             value={searchInput}
             onChange={(event) => setSearchInput(event.target.value)}
-            placeholder="Cari jenis pengingat atau nomor transaksi..."
+            placeholder="Cari anggota, buku, pengingat, atau nomor transaksi..."
             aria-label="Cari notifikasi"
           />
         </label>
@@ -185,18 +199,19 @@ export default function AdminNotificationsPage() {
                     <td>
                       <div className={styles.memberCell}>
                         <strong>{row.memberName}</strong>
-                        <small>
-                          {row.channel === "EMAIL"
-                            ? row.memberEmail
-                            : row.memberWhatsapp || "Nomor belum tersedia"}
-                        </small>
+                        <small>{contactLabel(row)}</small>
                       </div>
                     </td>
                     <td>{row.transactionCode}</td>
-                    <td>{row.reminderType}</td>
+                    <td>
+                      <div className={styles.memberCell}>
+                        <strong>{row.reminderType}</strong>
+                        {row.bookTitle ? <small>{row.bookTitle}</small> : null}
+                      </div>
+                    </td>
                     <td>
                       <span className={styles.channelPill}>
-                        {row.channel === "EMAIL" ? "Email" : "WhatsApp"}
+                        {channelLabel(row.channel)}
                       </span>
                     </td>
                     <td>{formatAdminOperationDate(row.time)}</td>
@@ -204,7 +219,7 @@ export default function AdminNotificationsPage() {
                       <span
                         className={`${styles.statusPill} ${styles[`status${row.status}`]}`}
                       >
-                        {statusLabel(row.status)}
+                        {statusLabel(row)}
                       </span>
                     </td>
                   </tr>
@@ -234,16 +249,17 @@ export default function AdminNotificationsPage() {
                   <span
                     className={`${styles.statusPill} ${styles[`status${row.status}`]}`}
                   >
-                    {statusLabel(row.status)}
+                    {statusLabel(row)}
                   </span>
                 </div>
                 <dl>
                   <div><dt>Jenis Pengingat</dt><dd>{row.reminderType}</dd></div>
-                  <div><dt>Kanal</dt><dd>{row.channel === "EMAIL" ? "Email" : "WhatsApp"}</dd></div>
+                  {row.bookTitle ? <div><dt>Buku</dt><dd>{row.bookTitle}</dd></div> : null}
+                  <div><dt>Kanal</dt><dd>{channelLabel(row.channel)}</dd></div>
                   <div><dt>Waktu</dt><dd>{formatAdminOperationDate(row.time)}</dd></div>
                   <div>
                     <dt>Kontak</dt>
-                    <dd>{row.channel === "EMAIL" ? row.memberEmail : row.memberWhatsapp || "-"}</dd>
+                    <dd>{contactLabel(row)}</dd>
                   </div>
                 </dl>
               </article>

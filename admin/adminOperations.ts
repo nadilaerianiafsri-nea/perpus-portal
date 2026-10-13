@@ -25,7 +25,8 @@ export type AdminNotificationRow = {
   memberWhatsapp: string;
   transactionCode: string;
   reminderType: string;
-  channel: "EMAIL" | "WHATSAPP";
+  bookTitle: string | null;
+  channel: "SYSTEM" | "EMAIL" | "WHATSAPP";
   time: string;
   status: NotificationStatus;
 };

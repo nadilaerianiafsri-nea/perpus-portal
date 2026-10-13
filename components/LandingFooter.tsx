@@ -24,10 +24,8 @@ export default async function LandingFooter({
               </div>
             </div>
             <p>
-              Portal digital library institusi. Data berlabel contoh digunakan
-              untuk keperluan pengembangan.
+              Portal digital layanan informasi, koleksi, dan peminjaman untuk {settings.libraryName}.
             </p>
-            <span className="catalog-demo">Data Contoh</span>
           </div>
           <div className="footer-col">
             <strong>Jelajahi</strong>
@@ -49,7 +47,7 @@ export default async function LandingFooter({
           </div>
         </div>
         <div className="landing-shell footer-bottom">
-          <span>© 2026 {settings.libraryName} — Data Contoh.</span>
+          <span>© 2026 {settings.libraryName}</span>
           <span>Kebijakan Privasi · Syarat Layanan</span>
         </div>
       </footer>

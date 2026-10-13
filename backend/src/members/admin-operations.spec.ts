@@ -150,6 +150,46 @@ describe('AdminOperationsService', () => {
     expect(result.data[0].reminderType).toBe('H-1 Jatuh Tempo');
   });
 
+  it('projects a new reservation as a System notification with its book title', async () => {
+    const createdAt = new Date('2026-10-13T01:00:00.000Z');
+    const { service, prisma } = serviceWith();
+    prisma.notification.findMany.mockResolvedValueOnce([
+      {
+        id: 8,
+        eventKey: 'reservation:23:created',
+        title: 'Reservasi berhasil dibuat',
+        message: 'Laskar Pelangi telah direservasi.',
+        createdAt,
+        emailDelivery: 'NOT_REQUIRED',
+        emailAttemptedAt: null,
+        emailSentAt: null,
+        whatsappDelivery: 'NOT_REQUIRED',
+        user: {
+          name: 'Anggota Uji',
+          email: 'anggota@example.com',
+          memberProfile: { whatsapp: '081234567890' },
+        },
+      },
+    ]);
+    prisma.reservation.findMany.mockResolvedValueOnce([
+      {
+        id: 23,
+        book: { title: 'Laskar Pelangi' },
+      },
+    ]);
+
+    const result = await service.notifications({ channel: 'ALL', page: '1', limit: '10' });
+
+    expect(result.counts).toEqual({ all: 1, email: 0, whatsapp: 0, failed: 0 });
+    expect(result.data[0]).toMatchObject({
+      channel: 'SYSTEM',
+      transactionCode: 'RSV-00023',
+      reminderType: 'Reservasi Baru',
+      bookTitle: 'Laskar Pelangi',
+      status: 'MENUNGGU',
+    });
+  });
+
   it('builds realtime dashboard totals and filtered month trend from database activity', async () => {
     const { service, prisma } = serviceWith();
 

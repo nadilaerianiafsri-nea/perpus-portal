@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { API_URL } from "@/catalog/serverApi";
 
 const allowed: Record<string, RegExp> = {
-  GET: /^(?:me\/(dashboard|profile|reservations|loans(?:\/history)?|notifications|ebooks)|admin\/members(?:\/\d+)?|admin\/transactions\/(reservations|loans|returns|lost-books)|admin\/operations\/(notifications|reports|settings))$/,
+  GET: /^(?:me\/(dashboard|profile|reservations|loans(?:\/history)?|notifications|ebooks|books\/\d+\/borrowing-status)|admin\/members(?:\/\d+)?|admin\/transactions\/(reservations|loans|returns|lost-books)|admin\/operations\/(dashboard|notifications|reports|settings))$/,
 
   POST: /^(?:me\/(reservations|loans\/\d+\/extend|ebooks(?:\/\d+\/open)?)|admin\/(?:reservations\/\d+\/pickup|loans\/\d+\/(?:return|lost)))$/,
 

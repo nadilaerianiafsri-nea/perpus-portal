@@ -25,6 +25,12 @@ type StatusFilter =
 
 type MemberFilter = "ALL" | "UMUM" | "MAHASISWA" | "PEGAWAI";
 
+type PickupTarget = {
+  id: number;
+  memberName: string;
+  bookTitle: string;
+};
+
 const emptyResult: ReservationsResponse = {
   stats: {
     waiting: 0,
@@ -68,6 +74,7 @@ export default function AdminReservationsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [processingId, setProcessingId] = useState<number | null>(null);
+  const [pickupTarget, setPickupTarget] = useState<PickupTarget | null>(null);
   const [revision, setRevision] = useState(0);
 
   useEffect(() => {
@@ -138,25 +145,28 @@ export default function AdminReservationsPage() {
     void load();
   }, [load]);
 
-  async function confirmPickup(
-    id: number,
-    memberName: string,
-    bookTitle: string,
-  ) {
-    const approved = window.confirm(
-      `Konfirmasi ${memberName} telah mengambil buku “${bookTitle}”? Masa pinjam 7 hari akan dimulai saat dikonfirmasi.`,
-    );
+  useEffect(() => {
+    if (!pickupTarget) return;
 
-    if (!approved) {
-      return;
-    }
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && processingId === null) {
+        setPickupTarget(null);
+      }
+    };
 
-    setProcessingId(id);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [pickupTarget, processingId]);
+
+  async function confirmPickup() {
+    if (!pickupTarget || processingId !== null) return;
+
+    setProcessingId(pickupTarget.id);
     setError("");
 
     try {
       const response = await fetch(
-        `/api/members/admin/reservations/${id}/pickup`,
+        `/api/members/admin/reservations/${pickupTarget.id}/pickup`,
         {
           method: "POST",
         },
@@ -171,6 +181,7 @@ export default function AdminReservationsPage() {
         );
       }
 
+      setPickupTarget(null);
       setRevision((value) => value + 1);
     } catch (reason) {
       setError(
@@ -178,6 +189,7 @@ export default function AdminReservationsPage() {
           ? reason.message
           : "Pengambilan buku gagal dikonfirmasi.",
       );
+      setPickupTarget(null);
     } finally {
       setProcessingId(null);
     }
@@ -363,11 +375,11 @@ export default function AdminReservationsPage() {
                           className={styles.primaryAction}
                           disabled={processingId === reservation.id}
                           onClick={() =>
-                            void confirmPickup(
-                              reservation.id,
-                              reservation.member.name,
-                              reservation.book.title,
-                            )
+                            setPickupTarget({
+                              id: reservation.id,
+                              memberName: reservation.member.name,
+                              bookTitle: reservation.book.title,
+                            })
                           }
                         >
                           {processingId === reservation.id
@@ -418,6 +430,65 @@ export default function AdminReservationsPage() {
           </nav>
         ) : null}
       </section>
+
+      {pickupTarget ? (
+        <div
+          className={styles.modalBackdrop}
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && processingId === null) {
+              setPickupTarget(null);
+            }
+          }}
+        >
+          <section
+            className={styles.confirmModal}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="pickup-confirmation-title"
+            aria-describedby="pickup-confirmation-description"
+          >
+            <div className={styles.confirmModalHeader}>
+              <h2 id="pickup-confirmation-title">Konfirmasi Pengambilan</h2>
+            </div>
+            <div className={styles.confirmModalBody}>
+              <p id="pickup-confirmation-description">
+                Pastikan buku sudah diserahkan kepada anggota sebelum melanjutkan.
+              </p>
+              <dl className={styles.confirmDetails}>
+                <div>
+                  <dt>Anggota</dt>
+                  <dd>{pickupTarget.memberName}</dd>
+                </div>
+                <div>
+                  <dt>Buku</dt>
+                  <dd>{pickupTarget.bookTitle}</dd>
+                </div>
+              </dl>
+              <p className={styles.confirmNote}>
+                Setelah dikonfirmasi, reservasi berubah menjadi pinjaman aktif dan masa pinjam 7 hari dimulai.
+              </p>
+            </div>
+            <div className={styles.confirmModalActions}>
+              <button
+                type="button"
+                className={styles.secondaryAction}
+                disabled={processingId !== null}
+                onClick={() => setPickupTarget(null)}
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                className={styles.primaryAction}
+                disabled={processingId !== null}
+                onClick={() => void confirmPickup()}
+              >
+                {processingId !== null ? "Memproses..." : "Konfirmasi Pengambilan"}
+              </button>
+            </div>
+          </section>
+        </div>
+      ) : null}
     </div>
   );
 }

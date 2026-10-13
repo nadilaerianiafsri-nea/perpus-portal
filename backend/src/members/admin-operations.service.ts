@@ -41,7 +41,8 @@ type AdminNotificationRow = {
   memberWhatsapp: string;
   transactionCode: string;
   reminderType: string;
-  channel: 'EMAIL' | 'WHATSAPP';
+  bookTitle: string | null;
+  channel: 'SYSTEM' | 'EMAIL' | 'WHATSAPP';
   time: Date;
   status: 'TERKIRIM' | 'GAGAL' | 'MENUNGGU' | 'MENGIRIM' | 'MANUAL';
 };
@@ -49,6 +50,15 @@ type AdminNotificationRow = {
 function transactionCode(eventKey: string) {
   const match = /^(?:loan|reservation):(\d+):/.exec(eventKey);
   return match ? `TRX-${String(Number(match[1])).padStart(5, '0')}` : '-';
+}
+
+function reservationTransactionCode(id: number) {
+  return `RSV-${String(id).padStart(5, '0')}`;
+}
+
+function reservationCreatedId(eventKey: string) {
+  const match = /^reservation:(\d+):created$/.exec(eventKey);
+  return match ? Number(match[1]) : null;
 }
 
 function reminderType(eventKey: string, title: string) {
@@ -413,6 +423,7 @@ export class AdminOperationsService {
         OR: [
           { emailDelivery: { not: 'NOT_REQUIRED' } },
           { whatsappDelivery: { not: 'NOT_REQUIRED' } },
+          { eventKey: { startsWith: 'reservation:', endsWith: ':created' } },
         ],
       },
       select: {
@@ -436,8 +447,29 @@ export class AdminOperationsService {
       orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
     });
 
+    const reservationIds = [
+      ...new Set(
+        notices
+          .map((notice) => reservationCreatedId(notice.eventKey))
+          .filter((id): id is number => id !== null),
+      ),
+    ];
+    const reservations = reservationIds.length
+      ? await this.prisma.reservation.findMany({
+          where: { id: { in: reservationIds } },
+          select: {
+            id: true,
+            book: { select: { title: true } },
+          },
+        })
+      : [];
+    const reservationTitles = new Map(
+      reservations.map((reservation) => [reservation.id, reservation.book.title]),
+    );
+
     const projected: AdminNotificationRow[] = [];
     for (const notice of notices) {
+      const createdReservationId = reservationCreatedId(notice.eventKey);
       const base = {
         sourceNotificationId: notice.id,
         memberName: notice.user.name,
@@ -445,7 +477,22 @@ export class AdminOperationsService {
         memberWhatsapp: notice.user.memberProfile?.whatsapp ?? '',
         transactionCode: transactionCode(notice.eventKey),
         reminderType: reminderType(notice.eventKey, notice.title),
+        bookTitle: null as string | null,
       };
+
+      if (createdReservationId !== null) {
+        projected.push({
+          ...base,
+          id: `${notice.id}:SYSTEM`,
+          transactionCode: reservationTransactionCode(createdReservationId),
+          reminderType: 'Reservasi Baru',
+          bookTitle: reservationTitles.get(createdReservationId) ?? null,
+          channel: 'SYSTEM',
+          time: notice.createdAt,
+          status: 'MENUNGGU',
+        });
+      }
+
       if (notice.emailDelivery !== 'NOT_REQUIRED') {
         projected.push({
           ...base,
@@ -466,6 +513,12 @@ export class AdminOperationsService {
       }
     }
 
+    projected.sort(
+      (left, right) =>
+        right.time.getTime() - left.time.getTime() ||
+        right.sourceNotificationId - left.sourceNotificationId,
+    );
+
     const needle = filter.search.toLocaleLowerCase('id-ID');
     const searched = needle
       ? projected.filter((row) =>
@@ -475,6 +528,7 @@ export class AdminOperationsService {
             row.memberWhatsapp,
             row.transactionCode,
             row.reminderType,
+            row.bookTitle ?? '',
           ]
             .join(' ')
             .toLocaleLowerCase('id-ID')

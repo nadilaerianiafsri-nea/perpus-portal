@@ -85,7 +85,7 @@
 
 .statYellow {
   background: var(--yellow);
-  color: var(--navy);
+  color: var(--white);
 }
 
 .statOrange {
@@ -483,6 +483,98 @@
   font-weight: 600;
 }
 
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: #00063325;
+}
+
+.confirmModal {
+  width: min(100%, 480px);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--white);
+  box-shadow: 0 18px 48px #00063325;
+}
+
+.confirmModalHeader {
+  padding: 18px 20px;
+  border-bottom: 1px solid #ececef;
+}
+
+.confirmModalHeader h2 {
+  margin: 0;
+  color: var(--navy);
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.confirmModalBody {
+  padding: 18px 20px;
+}
+
+.confirmModalBody > p {
+  margin: 0;
+  color: #777;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.confirmDetails {
+  margin: 16px 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.confirmDetails > div {
+  padding: 11px 12px;
+  border: 1px solid #ececef;
+  border-radius: 9px;
+  background: var(--white);
+}
+
+.confirmDetails dt {
+  margin-bottom: 4px;
+  color: #777;
+  font-size: 8px;
+}
+
+.confirmDetails dd {
+  margin: 0;
+  color: var(--navy);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.confirmModalBody .confirmNote {
+  padding: 11px 12px;
+  border-radius: 9px;
+  background: #f4f4f7;
+  color: var(--navy);
+}
+
+.confirmModalActions {
+  padding: 14px 20px 18px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  border-top: 1px solid #ececef;
+}
+
+.confirmModalActions .primaryAction,
+.confirmModalActions .secondaryAction {
+  min-height: 38px;
+  padding: 9px 14px;
+  font-size: 10px;
+}
+
 @media (max-width: 1180px) {
   .statsFour {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -545,5 +637,25 @@
   .errorBox {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .modalBackdrop {
+    padding: 14px;
+  }
+
+  .confirmModalHeader,
+  .confirmModalBody {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .confirmModalActions {
+    padding: 12px 16px 16px;
+    flex-direction: column-reverse;
+  }
+
+  .confirmModalActions .primaryAction,
+  .confirmModalActions .secondaryAction {
+    width: 100%;
   }
 }

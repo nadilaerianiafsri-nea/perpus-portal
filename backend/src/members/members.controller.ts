@@ -35,6 +35,12 @@ export class MembersController {
   ) {
     return this.members.updateProfile(req.user!.sub, body);
   }
+  @Get('books/:bookId/borrowing-status')
+  @UseGuards(ActiveBookGuard)
+  borrowingStatus(@Param('bookId') bookId: string) {
+    positiveId(bookId);
+    return { available: true };
+  }
   @Get('reservations') reservations(@Req() req: AuthenticatedRequest) {
     return this.members.reservations(req.user!.sub);
   }

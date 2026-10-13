@@ -74,7 +74,10 @@ export function useReadingProgress(bookId: number) {
       revision.current = ebook.progressVersion; ready.current = true;
       highest.current = ebook.progress;
       setReading(ebook); setProgress(ebook.progress);
-    }).catch(() => { if (active) setError("Riwayat bacaan belum dapat dimuat. Silakan coba lagi."); });
+    }).catch((failure) => {
+      if (!active) return;
+      setError(failure instanceof Error ? failure.message : "Riwayat bacaan belum dapat dimuat. Silakan coba lagi.");
+    });
     const hide = () => { leaving.current = true; if (timer.current) clearTimeout(timer.current); void flush(); };
     const visibility = () => { if (document.visibilityState === "hidden") hide(); else leaving.current = false; };
     window.addEventListener("pagehide", hide);

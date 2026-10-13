@@ -22,6 +22,22 @@ type FormState = Omit<AdminBookPayload, "year" | "totalStock"> & {
 
 const MAX_COVER_BYTES = 5 * 1024 * 1024;
 const COVER_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const SUBJECT_CATEGORIES = [
+  "Hukum",
+  "Novel",
+  "Pendidikan",
+  "Sejarah",
+  "Agama",
+  "Teknologi",
+  "Sosial",
+  "Ekonomi",
+  "Politik",
+  "Biografi",
+  "Sastra",
+  "Referensi",
+  "Anak",
+  "Umum",
+] as const;
 
 const emptyForm: FormState = {
   code: "",
@@ -225,6 +241,10 @@ export default function AdminBookForm({
     mode === "edit" && id
       ? `/admin/koleksi/data-buku/${id}`
       : "/admin/koleksi/data-buku";
+  const subjectCategories =
+    form.subject && !SUBJECT_CATEGORIES.includes(form.subject as (typeof SUBJECT_CATEGORIES)[number])
+      ? [form.subject, ...SUBJECT_CATEGORIES]
+      : SUBJECT_CATEGORIES;
 
   if (loading) {
     return <div className={styles.statePanel}>Memuat data buku...</div>;
@@ -352,11 +372,20 @@ export default function AdminBookForm({
                 <span>
                   Subjek / Kategori <b>*</b>
                 </span>
-                <input
+                <select
                   value={form.subject}
                   onChange={(e) => update("subject", e.target.value)}
                   required
-                />
+                >
+                  <option value="" disabled>
+                    Pilih Subjek / Kategori
+                  </option>
+                  {subjectCategories.map((subject) => (
+                    <option key={subject} value={subject}>
+                      {subject}
+                    </option>
+                  ))}
+                </select>
               </label>
             </div>
           </section>
