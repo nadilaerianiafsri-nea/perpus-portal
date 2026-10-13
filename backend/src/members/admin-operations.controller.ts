@@ -17,6 +17,11 @@ import { MemberRoleGuard } from './member-role.guard';
 export class AdminOperationsController {
   constructor(private readonly operations: AdminOperationsService) {}
 
+  @Get('dashboard')
+  dashboard(@Query('from') from?: string, @Query('to') to?: string) {
+    return this.operations.dashboard({ from, to });
+  }
+
   @Get('notifications')
   notifications(
     @Query('search') search?: string,

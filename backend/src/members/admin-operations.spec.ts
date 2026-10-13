@@ -71,13 +71,19 @@ describe('AdminOperationsService', () => {
       $queryRaw: jest.fn(async () => []),
       $executeRaw: jest.fn(async () => 1),
       notification: { findMany: jest.fn(async () => []) },
-      loan: { findMany: jest.fn(async () => []) },
+      loan: {
+        findMany: jest.fn(async () => []),
+        count: jest.fn(async () => 0),
+      },
       reservation: {
         findMany: jest.fn(async () => []),
         count: jest.fn(async () => 0),
       },
       userEBook: { findMany: jest.fn(async () => []) },
       bookGrant: { findMany: jest.fn(async () => []) },
+      book: { count: jest.fn(async () => 0) },
+      bookCopy: { count: jest.fn(async () => 0) },
+      user: { count: jest.fn(async () => 0) },
       ...overrides,
     };
     return {
@@ -142,6 +148,76 @@ describe('AdminOperationsService', () => {
     expect(result.data.map((row) => row.channel)).toEqual(['EMAIL', 'WHATSAPP']);
     expect(result.data[0].transactionCode).toBe('TRX-00015');
     expect(result.data[0].reminderType).toBe('H-1 Jatuh Tempo');
+  });
+
+  it('builds realtime dashboard totals and filtered month trend from database activity', async () => {
+    const { service, prisma } = serviceWith();
+
+    prisma.book.count
+      .mockResolvedValueOnce(12)
+      .mockResolvedValueOnce(8);
+    prisma.bookCopy.count
+      .mockResolvedValueOnce(30)
+      .mockResolvedValueOnce(21);
+    prisma.reservation.count.mockResolvedValueOnce(3);
+    prisma.loan.count
+      .mockResolvedValueOnce(5)
+      .mockResolvedValueOnce(2)
+      .mockResolvedValueOnce(1)
+      .mockResolvedValueOnce(1);
+    prisma.user.count
+      .mockResolvedValueOnce(10)
+      .mockResolvedValueOnce(6)
+      .mockResolvedValueOnce(3)
+      .mockResolvedValueOnce(1);
+    prisma.loan.findMany
+      .mockResolvedValueOnce([
+        {
+          borrowedAt: new Date('2026-04-10T01:00:00.000Z'),
+        },
+        {
+          borrowedAt: new Date('2026-06-10T01:00:00.000Z'),
+        },
+      ])
+      .mockResolvedValueOnce([
+        {
+          returnedAt: new Date('2026-05-01T01:00:00.000Z'),
+        },
+      ]);
+
+    const dashboard = await service.dashboard({
+      from: '2026-04-01',
+      to: '2026-06-30',
+    });
+
+    expect(dashboard.stats).toEqual({
+      totalCollections: 12,
+      totalStock: 30,
+      availableStock: 21,
+      waitingPickup: 3,
+      activeLoans: 5,
+      dueToday: 2,
+      overdue: 1,
+      lostInProcess: 1,
+      totalMembers: 10,
+      ebooks: 8,
+    });
+    expect(dashboard.memberCategories).toEqual({
+      umum: 6,
+      mahasiswa: 3,
+      pegawai: 1,
+    });
+    expect(dashboard.trend.map((row) => row.key)).toEqual([
+      '2026-04',
+      '2026-05',
+      '2026-06',
+    ]);
+    expect(dashboard.trend.map((row) => [row.borrowings, row.returns])).toEqual([
+      [1, 0],
+      [0, 1],
+      [1, 0],
+    ]);
+    expect(dashboard.generatedAt).toEqual(expect.any(String));
   });
 
   it('builds report totals and continuous month buckets from real activity', async () => {

@@ -19,6 +19,9 @@ const DEFAULT_SETTINGS: LibrarySettings = Object.freeze({
   maxExtensions: null,
 });
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+const JAKARTA_OFFSET_MS = 7 * 60 * 60 * 1000;
+
 type SettingsRow = {
   libraryName: string;
   address: string;
@@ -85,7 +88,7 @@ function whatsappStatus(value: string): AdminNotificationRow['status'] {
 }
 
 function monthKeyFromDate(value: Date) {
-  const shifted = new Date(value.getTime() + 7 * 60 * 60 * 1000);
+  const shifted = new Date(value.getTime() + JAKARTA_OFFSET_MS);
   return `${shifted.getUTCFullYear()}-${String(shifted.getUTCMonth() + 1).padStart(2, '0')}`;
 }
 
@@ -113,6 +116,21 @@ function monthLabel(key: string) {
     year: 'numeric',
     timeZone: 'UTC',
   }).format(new Date(Date.UTC(year, month - 1, 1)));
+}
+
+function jakartaDayRange(now: Date) {
+  const local = new Date(now.getTime() + JAKARTA_OFFSET_MS);
+  const startMs =
+    Date.UTC(
+      local.getUTCFullYear(),
+      local.getUTCMonth(),
+      local.getUTCDate(),
+    ) - JAKARTA_OFFSET_MS;
+
+  return {
+    start: new Date(startMs),
+    endExclusive: new Date(startMs + DAY_MS),
+  };
 }
 
 @Injectable()
@@ -199,6 +217,188 @@ export class AdminOperationsService {
         'Pengaturan belum dapat disimpan. Pastikan tabel pengaturan perpustakaan sudah tersedia.',
       );
     }
+  }
+
+  async dashboard(query: { from?: unknown; to?: unknown }) {
+    const range = parseReportRange(query.from, query.to);
+    const during = { gte: range.start, lt: range.endExclusive };
+    const now = new Date();
+    const today = jakartaDayRange(now);
+
+    const [
+      totalCollections,
+      totalStock,
+      availableStock,
+      waitingPickup,
+      activeLoans,
+      dueToday,
+      overdue,
+      lostInProcess,
+      totalMembers,
+      ebooks,
+      umum,
+      mahasiswa,
+      pegawai,
+      borrowed,
+      returned,
+    ] = await Promise.all([
+      this.prisma.book.count({
+        where: {
+          type: 'FISIK',
+          isActive: true,
+        },
+      }),
+      this.prisma.bookCopy.count({
+        where: {
+          book: {
+            is: {
+              type: 'FISIK',
+              isActive: true,
+            },
+          },
+        },
+      }),
+      this.prisma.bookCopy.count({
+        where: {
+          status: 'TERSEDIA',
+          book: {
+            is: {
+              type: 'FISIK',
+              isActive: true,
+            },
+          },
+        },
+      }),
+      this.prisma.reservation.count({
+        where: {
+          status: 'MENUNGGU_PENGAMBILAN',
+          expiresAt: {
+            gt: now,
+          },
+        },
+      }),
+      this.prisma.loan.count({
+        where: {
+          status: 'AKTIF',
+        },
+      }),
+      this.prisma.loan.count({
+        where: {
+          status: 'AKTIF',
+          dueAt: {
+            gte: today.start,
+            lt: today.endExclusive,
+          },
+        },
+      }),
+      this.prisma.loan.count({
+        where: {
+          status: 'AKTIF',
+          dueAt: {
+            lt: now,
+          },
+        },
+      }),
+      this.prisma.loan.count({
+        where: {
+          status: 'HILANG',
+        },
+      }),
+      this.prisma.user.count({
+        where: {
+          role: 'PENGUNJUNG',
+        },
+      }),
+      this.prisma.book.count({
+        where: {
+          type: 'EBOOK',
+          isActive: true,
+        },
+      }),
+      this.prisma.user.count({
+        where: {
+          role: 'PENGUNJUNG',
+          memberType: 'UMUM',
+        },
+      }),
+      this.prisma.user.count({
+        where: {
+          role: 'PENGUNJUNG',
+          memberType: 'MAHASISWA',
+        },
+      }),
+      this.prisma.user.count({
+        where: {
+          role: 'PENGUNJUNG',
+          memberType: 'PEGAWAI',
+        },
+      }),
+      this.prisma.loan.findMany({
+        where: {
+          borrowedAt: during,
+        },
+        select: {
+          borrowedAt: true,
+        },
+      }),
+      this.prisma.loan.findMany({
+        where: {
+          returnedAt: during,
+        },
+        select: {
+          returnedAt: true,
+        },
+      }),
+    ]);
+
+    const buckets = new Map(
+      monthKeys(range.from, range.to).map((key) => [
+        key,
+        {
+          key,
+          label: monthLabel(key),
+          borrowings: 0,
+          returns: 0,
+        },
+      ]),
+    );
+
+    borrowed.forEach((loan) => {
+      const bucket = buckets.get(monthKeyFromDate(loan.borrowedAt));
+      if (bucket) bucket.borrowings += 1;
+    });
+
+    returned.forEach((loan) => {
+      if (!loan.returnedAt) return;
+      const bucket = buckets.get(monthKeyFromDate(loan.returnedAt));
+      if (bucket) bucket.returns += 1;
+    });
+
+    return {
+      generatedAt: now.toISOString(),
+      range: {
+        from: range.from,
+        to: range.to,
+      },
+      stats: {
+        totalCollections,
+        totalStock,
+        availableStock,
+        waitingPickup,
+        activeLoans,
+        dueToday,
+        overdue,
+        lostInProcess,
+        totalMembers,
+        ebooks,
+      },
+      memberCategories: {
+        umum,
+        mahasiswa,
+        pegawai,
+      },
+      trend: [...buckets.values()],
+    };
   }
 
   async notifications(query: {
