@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import type { ComponentType } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -22,6 +23,7 @@ import {
 } from "./adminOperations";
 import styles from "./Admin.module.css";
 import controls from "./AdminReports.module.css";
+import enhancements from "./AdminEnhancements.module.css";
 
 type DashboardTrendRow = {
   key: string;
@@ -61,6 +63,7 @@ type StatCard = {
   value: string;
   icon: ComponentType<{ size?: number }>;
   tone: string;
+  href: string;
 };
 
 function validateDates(from: string, to: string) {
@@ -104,6 +107,26 @@ function chartPoints(
     .join(" ");
 }
 
+function chartCoordinate(
+  rows: DashboardTrendRow[],
+  index: number,
+  value: number,
+  maximum: number,
+) {
+  const startX = 48;
+  const endX = 835;
+  const topY = 32;
+  const bottomY = 280;
+  const width = endX - startX;
+  const height = bottomY - topY;
+  const x =
+    rows.length <= 1
+      ? startX + width / 2
+      : startX + (index / (rows.length - 1)) * width;
+  const y = bottomY - (value / maximum) * height;
+  return { x, y };
+}
+
 function formatUpdatedAt(value: string) {
   const date = new Date(value);
 
@@ -136,6 +159,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [revision, setRevision] = useState(0);
+  const [activeTrend, setActiveTrend] = useState<number | null>(null);
   const requestId = useRef(0);
 
   const load = useCallback(async () => {
@@ -226,60 +250,70 @@ export default function AdminDashboard() {
           value: dashboard.stats.totalCollections.toLocaleString("id-ID"),
           icon: FiBookOpen,
           tone: styles.statNavy,
+          href: "/admin/koleksi/data-buku",
         },
         {
           label: "TOTAL STOK BUKU",
           value: dashboard.stats.totalStock.toLocaleString("id-ID"),
           icon: FiLayers,
           tone: styles.statSlate,
+          href: "/admin/koleksi/data-buku",
         },
         {
           label: "STOK TERSEDIA",
           value: dashboard.stats.availableStock.toLocaleString("id-ID"),
           icon: FiCheckCircle,
           tone: styles.statGreen,
+          href: "/admin/koleksi/data-buku",
         },
         {
           label: "MENUNGGU PENGAMBILAN",
           value: dashboard.stats.waitingPickup.toLocaleString("id-ID"),
           icon: FiClock,
           tone: styles.statBlue,
+          href: "/admin/transaksi/reservasi",
         },
         {
           label: "PEMINJAMAN AKTIF",
           value: dashboard.stats.activeLoans.toLocaleString("id-ID"),
           icon: FiPackage,
           tone: styles.statTeal,
+          href: "/admin/transaksi/peminjaman",
         },
         {
           label: "JATUH TEMPO HARI INI",
           value: dashboard.stats.dueToday.toLocaleString("id-ID"),
           icon: FiAlertTriangle,
           tone: styles.statOrange,
+          href: "/admin/transaksi/peminjaman",
         },
         {
           label: "TERLAMBAT",
           value: dashboard.stats.overdue.toLocaleString("id-ID"),
           icon: FiAlertTriangle,
           tone: styles.statRed,
+          href: "/admin/transaksi/peminjaman",
         },
         {
           label: "BUKU HILANG (PROSES)",
           value: dashboard.stats.lostInProcess.toLocaleString("id-ID"),
           icon: FiBox,
           tone: styles.statCoral,
+          href: "/admin/transaksi/buku-hilang-penggantian",
         },
         {
           label: "TOTAL ANGGOTA",
           value: dashboard.stats.totalMembers.toLocaleString("id-ID"),
           icon: FiUsers,
           tone: styles.statMember,
+          href: "/admin/keanggotaan",
         },
         {
           label: "E-BOOK",
           value: dashboard.stats.ebooks.toLocaleString("id-ID"),
           icon: FiMonitor,
           tone: styles.statYellow,
+          href: "/admin/koleksi/e-book",
         },
       ]
     : [];
@@ -395,9 +429,11 @@ export default function AdminDashboard() {
               const Icon = card.icon;
 
               return (
-                <article
+                <Link
                   key={card.label}
-                  className={`${styles.statCard} ${card.tone}`}
+                  href={card.href}
+                  className={`${styles.statCard} ${card.tone} ${enhancements.clickableStatCard} ${enhancements.forceWhiteStatCard}`}
+                  aria-label={`${card.label}: ${card.value}. Buka halaman terkait.`}
                 >
                   <span className={styles.statIcon}>
                     <Icon size={24} />
@@ -407,7 +443,7 @@ export default function AdminDashboard() {
                     <span className={styles.statLabel}>{card.label}</span>
                     <strong>{card.value}</strong>
                   </div>
-                </article>
+                </Link>
               );
             })}
           </section>
@@ -440,9 +476,11 @@ export default function AdminDashboard() {
               <div
                 className={styles.lineChartWrap}
                 aria-label="Grafik transaksi peminjaman"
+                onMouseLeave={() => setActiveTrend(null)}
                 style={{ overflowX: "auto" }}
               >
                 <div
+                  className={enhancements.chartFrame}
                   style={{
                     minWidth: Math.max(620, dashboard.trend.length * 92),
                   }}
@@ -492,7 +530,73 @@ export default function AdminDashboard() {
                         points={returnPoints}
                       />
                     ) : null}
+
+                    {dashboard.trend.map((row, index) => {
+                      const borrowing = chartCoordinate(
+                        dashboard.trend,
+                        index,
+                        row.borrowings,
+                        maxTrend,
+                      );
+                      const returned = chartCoordinate(
+                        dashboard.trend,
+                        index,
+                        row.returns,
+                        maxTrend,
+                      );
+
+                      return (
+                        <g key={`points-${row.key}`}>
+                          <circle
+                            className={`${enhancements.chartPoint} ${enhancements.chartPointDark}`}
+                            cx={borrowing.x}
+                            cy={borrowing.y}
+                            r="6"
+                            tabIndex={0}
+                            aria-label={`${row.label}: ${row.borrowings} peminjaman, ${row.returns} pengembalian`}
+                            onMouseEnter={() => setActiveTrend(index)}
+                            onFocus={() => setActiveTrend(index)}
+                            onClick={() => setActiveTrend(index)}
+                          />
+                          <circle
+                            className={`${enhancements.chartPoint} ${enhancements.chartPointBlue}`}
+                            cx={returned.x}
+                            cy={returned.y}
+                            r="6"
+                            tabIndex={0}
+                            aria-label={`${row.label}: ${row.borrowings} peminjaman, ${row.returns} pengembalian`}
+                            onMouseEnter={() => setActiveTrend(index)}
+                            onFocus={() => setActiveTrend(index)}
+                            onClick={() => setActiveTrend(index)}
+                          />
+                        </g>
+                      );
+                    })}
                   </svg>
+
+                  {activeTrend !== null && dashboard.trend[activeTrend] ? (() => {
+                    const row = dashboard.trend[activeTrend];
+                    const point = chartCoordinate(
+                      dashboard.trend,
+                      activeTrend,
+                      Math.max(row.borrowings, row.returns),
+                      maxTrend,
+                    );
+                    return (
+                      <div
+                        className={enhancements.chartTooltip}
+                        role="status"
+                        style={{
+                          left: `${(point.x / 860) * 100}%`,
+                          top: `${(point.y / 300) * 100}%`,
+                        }}
+                      >
+                        <strong>{row.label}</strong>
+                        <span>Peminjaman: {row.borrowings}</span>
+                        <span>Pengembalian: {row.returns}</span>
+                      </div>
+                    );
+                  })() : null}
 
                   <div
                     className={styles.monthLabels}

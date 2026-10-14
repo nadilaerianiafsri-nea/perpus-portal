@@ -50,7 +50,7 @@ export default function LoansPage() {
     <PageHeading title="Pinjaman Saya" description="Kelola buku yang sedang Anda pinjam dan ajukan perpanjangan 7 hari." />
     {notice && <p className={shared.success} role="status">{notice}</p>}
     {resource.loading || now === null ? <LoadingCards /> : resource.error ? <ErrorState message="Data pinjaman belum dapat dimuat. Silakan coba lagi." retry={resource.reload} /> : !loans.length ? <div className={styles.empty}>
-      <FiBookOpen size={32} aria-hidden /><h2>Belum ada buku yang sedang dipinjam.</h2><p>Buku yang sudah Anda ambil dari perpustakaan akan muncul di sini.</p><Link href="/koleksi" className={styles.extendButton}>Cari Koleksi</Link>
+      <FiBookOpen size={32} aria-hidden /><h2>Belum ada buku yang sedang dipinjam.</h2><p>Buku yang sudah Anda ambil dari perpustakaan akan muncul di sini.</p><Link href="/dashboard/koleksi" className={styles.extendButton}>Cari Koleksi</Link>
     </div> : <div className={styles.list}>{loans.map(loan => <LoanCard key={loan.id} loan={loan} now={now} busy={busy !== null} extending={busy === loan.id} onExtend={() => open("extend", loan)} onReplacement={() => open("replacement", loan)} />)}</div>}
     <LoanDialog selection={selection} pending={busy !== null} error={actionError} onDismiss={() => { if (!pending.current) setSelection(null); }} onConfirm={extend} />
   </div>;

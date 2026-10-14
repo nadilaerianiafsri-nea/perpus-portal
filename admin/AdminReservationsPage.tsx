@@ -452,21 +452,14 @@ export default function AdminReservationsPage() {
             </div>
             <div className={styles.confirmModalBody}>
               <p id="pickup-confirmation-description">
-                Pastikan buku sudah diserahkan kepada anggota sebelum melanjutkan.
+                Periksa kembali sebelum mengonfirmasi pengambilan.
               </p>
-              <dl className={styles.confirmDetails}>
-                <div>
-                  <dt>Anggota</dt>
-                  <dd>{pickupTarget.memberName}</dd>
-                </div>
-                <div>
-                  <dt>Buku</dt>
-                  <dd>{pickupTarget.bookTitle}</dd>
-                </div>
-              </dl>
-              <p className={styles.confirmNote}>
-                Setelah dikonfirmasi, reservasi berubah menjadi pinjaman aktif dan masa pinjam 7 hari dimulai.
-              </p>
+              <ul className={styles.confirmPoints}>
+                <li><strong>Anggota:</strong> {pickupTarget.memberName}</li>
+                <li><strong>Buku:</strong> {pickupTarget.bookTitle}</li>
+                <li>Pastikan buku sudah diserahkan kepada anggota.</li>
+                <li>Reservasi akan berubah menjadi pinjaman aktif.</li>
+              </ul>
             </div>
             <div className={styles.confirmModalActions}>
               <button

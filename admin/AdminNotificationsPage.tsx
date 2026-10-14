@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { FiSearch } from "react-icons/fi";
 import {
   adminOperationsApiMessage,
@@ -10,9 +11,10 @@ import {
   type NotificationChannel,
 } from "./adminOperations";
 import styles from "./AdminNotifications.module.css";
+import enhancements from "./AdminEnhancements.module.css";
 
 const emptyResult: AdminNotificationsResponse = {
-  counts: { all: 0, email: 0, whatsapp: 0, failed: 0 },
+  counts: { all: 0, email: 0, whatsapp: 0, failed: 0, unread: 0 },
   data: [],
   meta: { page: 1, limit: 10, total: 0, totalPages: 1 },
 };
@@ -46,6 +48,7 @@ function contactLabel(row: AdminNotificationRow) {
 }
 
 export default function AdminNotificationsPage() {
+  const router = useRouter();
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
   const [channel, setChannel] = useState<NotificationChannel>("ALL");
@@ -114,6 +117,52 @@ export default function AdminNotificationsPage() {
     ["EMAIL", "Email", result.counts.email],
     ["WHATSAPP", "WhatsApp", result.counts.whatsapp],
   ];
+
+  async function openNotification(row: AdminNotificationRow) {
+    if (row.channel !== "SYSTEM" || !row.href) return;
+
+    setError("");
+    try {
+      if (!row.readAt) {
+        const response = await fetch(
+          `/api/members/admin/operations/notifications/${row.sourceNotificationId}/read`,
+          {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: "{}",
+          },
+        );
+
+        if (!response.ok) {
+          setError(
+            await adminOperationsApiMessage(
+              response,
+              "Notifikasi belum dapat ditandai sebagai dibaca.",
+            ),
+          );
+          return;
+        }
+
+        setResult((current) => ({
+          ...current,
+          counts: {
+            ...current.counts,
+            unread: Math.max(0, current.counts.unread - 1),
+          },
+          data: current.data.map((item) =>
+            item.sourceNotificationId === row.sourceNotificationId &&
+            item.channel === "SYSTEM"
+              ? { ...item, readAt: new Date().toISOString() }
+              : item,
+          ),
+        }));
+      }
+
+      router.push(row.href);
+    } catch {
+      setError("Notifikasi belum dapat dibuka. Silakan coba lagi.");
+    }
+  }
 
   const first = result.meta.total ? (result.meta.page - 1) * result.meta.limit + 1 : 0;
   const last = Math.min(result.meta.page * result.meta.limit, result.meta.total);
@@ -202,10 +251,32 @@ export default function AdminNotificationsPage() {
                         <small>{contactLabel(row)}</small>
                       </div>
                     </td>
-                    <td>{row.transactionCode}</td>
+                    <td>
+                      {row.channel === "SYSTEM" && row.href ? (
+                        <button
+                          type="button"
+                          className={enhancements.notificationLink}
+                          onClick={() => void openNotification(row)}
+                        >
+                          {row.transactionCode}
+                        </button>
+                      ) : (
+                        row.transactionCode
+                      )}
+                    </td>
                     <td>
                       <div className={styles.memberCell}>
-                        <strong>{row.reminderType}</strong>
+                        {row.channel === "SYSTEM" && row.href ? (
+                          <button
+                            type="button"
+                            className={enhancements.notificationLink}
+                            onClick={() => void openNotification(row)}
+                          >
+                            {row.reminderType}
+                          </button>
+                        ) : (
+                          <strong>{row.reminderType}</strong>
+                        )}
                         {row.bookTitle ? <small>{row.bookTitle}</small> : null}
                       </div>
                     </td>
@@ -244,7 +315,17 @@ export default function AdminNotificationsPage() {
                 <div className={styles.mobileHeading}>
                   <div>
                     <strong>{row.memberName}</strong>
-                    <small>{row.transactionCode}</small>
+                    {row.channel === "SYSTEM" && row.href ? (
+                      <button
+                        type="button"
+                        className={enhancements.notificationLink}
+                        onClick={() => void openNotification(row)}
+                      >
+                        {row.transactionCode}
+                      </button>
+                    ) : (
+                      <small>{row.transactionCode}</small>
+                    )}
                   </div>
                   <span
                     className={`${styles.statusPill} ${styles[`status${row.status}`]}`}
@@ -253,7 +334,9 @@ export default function AdminNotificationsPage() {
                   </span>
                 </div>
                 <dl>
-                  <div><dt>Jenis Pengingat</dt><dd>{row.reminderType}</dd></div>
+                  <div><dt>Jenis Pengingat</dt><dd>{row.channel === "SYSTEM" && row.href ? (
+                    <button type="button" className={enhancements.notificationLink} onClick={() => void openNotification(row)}>{row.reminderType}</button>
+                  ) : row.reminderType}</dd></div>
                   {row.bookTitle ? <div><dt>Buku</dt><dd>{row.bookTitle}</dd></div> : null}
                   <div><dt>Kanal</dt><dd>{channelLabel(row.channel)}</dd></div>
                   <div><dt>Waktu</dt><dd>{formatAdminOperationDate(row.time)}</dd></div>

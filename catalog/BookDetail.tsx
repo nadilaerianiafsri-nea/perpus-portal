@@ -11,23 +11,40 @@ import { getBook } from "./serverApi";
 import { typeLabels } from "./types";
 import styles from "./Catalog.module.css";
 
-export default async function BookDetail({ id }: { id: string }) {
-  const [{ book, unavailable }, user] = await Promise.all([getBook(id), getCurrentUser()]);
-  if (unavailable)
+export default async function BookDetail({
+  id,
+  member = false,
+}: {
+  id: string;
+  member?: boolean;
+}) {
+  const [{ book, unavailable }, user] = await Promise.all([
+    getBook(id, member),
+    getCurrentUser(),
+  ]);
+  const basePath = member ? "/dashboard/koleksi" : "/koleksi";
+
+  if (unavailable) {
+    const state = (
+      <div className={styles.state}>
+        <h1>Data koleksi belum dapat dimuat. Silakan coba lagi.</h1>
+        <Link className={styles.detailLink} href={`${basePath}/${id}`}>
+          Coba Lagi
+        </Link>
+        <Link href={basePath}>Kembali ke Katalog</Link>
+      </div>
+    );
+
+    if (member) return <div className={styles.main}>{state}</div>;
     return (
       <CatalogShell>
-        <main className={styles.main}>
-          <div className={styles.state}>
-            <h1>Data koleksi belum dapat dimuat. Silakan coba lagi.</h1>
-            <Link className={styles.detailLink} href={`/koleksi/${id}`}>
-              Coba Lagi
-            </Link>
-            <Link href="/koleksi">Kembali ke Katalog</Link>
-          </div>
-        </main>
+        <main className={styles.main}>{state}</main>
       </CatalogShell>
     );
+  }
+
   if (!book) notFound();
+
   const ebook = book.type === "EBOOK";
   const metadata = [
     ["Kode Buku", book.code],
@@ -47,9 +64,10 @@ export default async function BookDetail({ id }: { id: string }) {
         ]
       : []),
   ];
-  return (
-    <CatalogShell ebook={ebook}>
-      <main className={styles.main}>
+
+  const content = (
+    <>
+      {!member ? (
         <nav className={styles.breadcrumb} aria-label="Breadcrumb">
           <Link href="/">Beranda</Link>
           <span>/</span>
@@ -59,76 +77,94 @@ export default async function BookDetail({ id }: { id: string }) {
           <span>/</span>
           <span>Detail Buku</span>
         </nav>
-        <article className={styles.detail}>
-          <div className={styles.detailCover}>
-            <Image
-              src={safeCoverUrl(book.coverUrl)}
-              alt={`Sampul ${book.title}`}
-              fill
-              priority
-              sizes="(max-width: 600px) 280px, 340px"
-            />
-          </div>
-          <div>
-            <h1>{book.title}</h1>
-            <p>{book.author}</p>
-            <BookStatus book={book} />
-            {book.isDemo && <p>Data contoh pengembangan.</p>}
-            <dl className={styles.metadata}>
-              {metadata.map(([label, value]) => (
-                <div key={label}>
-                  <dt>{label}</dt>
-                  <dd>{value}</dd>
-                </div>
-              ))}
-            </dl>
-            <h2>Deskripsi</h2>
-            <p>{book.description}</p>
-            {ebook ? (
-              <>
-              <Link
-                className={styles.primaryButton}
-                href={`/e-book/${book.id}/baca`}
-              >
+      ) : null}
+
+      <article className={styles.detail}>
+        <div className={styles.detailCover}>
+          <Image
+            src={safeCoverUrl(book.coverUrl)}
+            alt={`Sampul ${book.title}`}
+            fill
+            priority
+            sizes="(max-width: 600px) 280px, 340px"
+          />
+        </div>
+
+        <div>
+          <h1>{book.title}</h1>
+          <p>{book.author}</p>
+          <BookStatus book={book} />
+          {book.isDemo ? <p>Data contoh pengembangan.</p> : null}
+
+          <dl className={styles.metadata}>
+            {metadata.map(([label, value]) => (
+              <div key={label}>
+                <dt>{label}</dt>
+                <dd>{value}</dd>
+              </div>
+            ))}
+          </dl>
+
+          <h2>Deskripsi</h2>
+          <p>{book.description}</p>
+
+          {ebook ? (
+            <>
+              <Link className={styles.primaryButton} href={`/e-book/${book.id}/baca`}>
                 Baca E-Book
               </Link>
               <EBookLibraryAction key={book.id} bookId={book.id} role={user?.role ?? null} />
-              </>
-            ) : (
-              <BorrowAction key={book.id} available={book.availableCopies > 0} bookId={book.id} role={user?.role ?? null} />
-            )}
-          </div>
-        </article>
-        {!ebook && (
-          <section className={styles.tableWrap}>
-            <h2>Eksemplar Buku</h2>
-            <table className={styles.copyTable}>
-              <thead>
-                <tr>
-                  <th>Kode Eksemplar</th>
-                  <th>Status</th>
-                  <th>Lokasi</th>
+            </>
+          ) : (
+            <BorrowAction
+              key={book.id}
+              available={book.availableCopies > 0}
+              bookId={book.id}
+              role={user?.role ?? null}
+            />
+          )}
+        </div>
+      </article>
+
+      {!ebook ? (
+        <section className={styles.tableWrap}>
+          <h2>Eksemplar Buku</h2>
+          <table className={styles.copyTable}>
+            <thead>
+              <tr>
+                <th>Kode Eksemplar</th>
+                <th>Status</th>
+                <th>Lokasi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {book.copies.map((copy) => (
+                <tr key={copy.id}>
+                  <td>{copy.code}</td>
+                  <td>
+                    {copy.status === "TERSEDIA"
+                      ? "Tersedia"
+                      : copy.status === "DIRESERVASI"
+                        ? "Direservasi"
+                        : copy.status === "HILANG"
+                          ? "Hilang"
+                          : "Dipinjam"}
+                  </td>
+                  <td>{copy.location}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {book.copies.map((copy) => (
-                  <tr key={copy.id}>
-                    <td>{copy.code}</td>
-                    <td>
-                      {copy.status === "TERSEDIA"
-                        ? "Tersedia"
-                        : copy.status === "DIRESERVASI"
-                          ? "Direservasi"
-                          : copy.status === "HILANG" ? "Hilang" : "Dipinjam"}
-                    </td>
-                    <td>{copy.location}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </section>
-        )}
-      </main>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      ) : null}
+    </>
+  );
+
+  if (member) return <div className={styles.main}>{content}</div>;
+
+  return (
+    <CatalogShell ebook={ebook}>
+      <main className={styles.main}>{content}</main>
     </CatalogShell>
   );
 }

@@ -36,6 +36,6 @@ import { MembersService } from './members.service';
     MemberRoleGuard,
     ActiveBookGuard,
   ],
-  exports: [MembersService, AdminOperationsService],
+  exports: [MembersService, AdminOperationsService, MemberRoleGuard],
 })
 export class MembersModule {}

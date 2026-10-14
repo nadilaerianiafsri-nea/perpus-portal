@@ -180,6 +180,10 @@ export default function AdminBookForm({
 
     const textError = adminBookTextError(form);
     if (textError) { setError(textError); return; }
+    if (!SUBJECT_CATEGORIES.includes(form.subject.trim() as (typeof SUBJECT_CATEGORIES)[number])) {
+      setError("Pilih Subjek / Kategori dari daftar yang tersedia.");
+      return;
+    }
 
     const year = Number(form.year);
     const totalStock = Number(form.totalStock);
@@ -372,20 +376,20 @@ export default function AdminBookForm({
                 <span>
                   Subjek / Kategori <b>*</b>
                 </span>
-                <select
+                <input
+                  list="book-subject-categories"
                   value={form.subject}
                   onChange={(e) => update("subject", e.target.value)}
+                  placeholder="Cari atau pilih Subjek / Kategori"
+                  autoComplete="off"
                   required
-                >
-                  <option value="" disabled>
-                    Pilih Subjek / Kategori
-                  </option>
+                  maxLength={191}
+                />
+                <datalist id="book-subject-categories">
                   {subjectCategories.map((subject) => (
-                    <option key={subject} value={subject}>
-                      {subject}
-                    </option>
+                    <option key={subject} value={subject} />
                   ))}
-                </select>
+                </datalist>
               </label>
             </div>
           </section>

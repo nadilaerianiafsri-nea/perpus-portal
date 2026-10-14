@@ -1,4 +1,4 @@
-import { BadRequestException, ServiceUnavailableException } from '@nestjs/common';
+import { BadRequestException, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import { jest } from '@jest/globals';
 import { AdminOperationsService } from './admin-operations.service';
 import {
@@ -70,7 +70,15 @@ describe('AdminOperationsService', () => {
     const prisma = {
       $queryRaw: jest.fn(async () => []),
       $executeRaw: jest.fn(async () => 1),
-      notification: { findMany: jest.fn(async () => []) },
+      notification: {
+        findMany: jest.fn(async () => []),
+        findFirst: jest.fn(async () => null),
+        count: jest.fn(async () => 0),
+      },
+      adminNotificationRead: {
+        findMany: jest.fn(async () => []),
+        upsert: jest.fn(async () => ({ readAt: new Date('2026-10-14T01:00:00.000Z') })),
+      },
       loan: {
         findMany: jest.fn(async () => []),
         count: jest.fn(async () => 0),
@@ -143,8 +151,8 @@ describe('AdminOperationsService', () => {
       },
     ]);
 
-    const result = await service.notifications({ channel: 'ALL', page: '1', limit: '10' });
-    expect(result.counts).toEqual({ all: 2, email: 1, whatsapp: 1, failed: 0 });
+    const result = await service.notifications(99, { channel: 'ALL', page: '1', limit: '10' });
+    expect(result.counts).toEqual({ all: 2, email: 1, whatsapp: 1, failed: 0, unread: 0 });
     expect(result.data.map((row) => row.channel)).toEqual(['EMAIL', 'WHATSAPP']);
     expect(result.data[0].transactionCode).toBe('TRX-00015');
     expect(result.data[0].reminderType).toBe('H-1 Jatuh Tempo');
@@ -178,16 +186,96 @@ describe('AdminOperationsService', () => {
       },
     ]);
 
-    const result = await service.notifications({ channel: 'ALL', page: '1', limit: '10' });
+    const result = await service.notifications(99, { channel: 'ALL', page: '1', limit: '10' });
 
-    expect(result.counts).toEqual({ all: 1, email: 0, whatsapp: 0, failed: 0 });
+    expect(result.counts).toEqual({ all: 1, email: 0, whatsapp: 0, failed: 0, unread: 1 });
     expect(result.data[0]).toMatchObject({
       channel: 'SYSTEM',
       transactionCode: 'RSV-00023',
       reminderType: 'Reservasi Baru',
       bookTitle: 'Laskar Pelangi',
       status: 'MENUNGGU',
+      readAt: null,
+      href: '/admin/transaksi/reservasi',
     });
+  });
+
+  it('keeps System notification read state separate for each admin account', async () => {
+    const createdAt = new Date('2026-10-13T01:00:00.000Z');
+    const readAt = new Date('2026-10-14T01:00:00.000Z');
+    const { service, prisma } = serviceWith();
+    prisma.notification.findMany.mockResolvedValueOnce([
+      {
+        id: 8,
+        eventKey: 'reservation:23:created',
+        title: 'Reservasi berhasil dibuat',
+        message: 'Laskar Pelangi telah direservasi.',
+        createdAt,
+        emailDelivery: 'NOT_REQUIRED',
+        emailAttemptedAt: null,
+        emailSentAt: null,
+        whatsappDelivery: 'NOT_REQUIRED',
+        user: {
+          name: 'Anggota Uji',
+          email: 'anggota@example.com',
+          memberProfile: { whatsapp: '081234567890' },
+        },
+      },
+    ]);
+    prisma.reservation.findMany.mockResolvedValueOnce([
+      { id: 23, book: { title: 'Laskar Pelangi' } },
+    ]);
+    prisma.adminNotificationRead.findMany.mockResolvedValueOnce([
+      { notificationId: 8, readAt },
+    ]);
+
+    const result = await service.notifications(99, {
+      channel: 'ALL',
+      page: '1',
+      limit: '10',
+    });
+
+    expect(prisma.adminNotificationRead.findMany).toHaveBeenCalledWith({
+      where: { adminId: 99, notificationId: { in: [8] } },
+      select: { notificationId: true, readAt: true },
+    });
+    expect(result.counts.unread).toBe(0);
+    expect(result.data[0].readAt).toEqual(readAt);
+  });
+
+  it('returns the unread System notification count for one admin', async () => {
+    const { service, prisma } = serviceWith();
+    prisma.notification.count.mockResolvedValueOnce(4);
+
+    await expect(service.unreadNotificationCount(77)).resolves.toEqual({ unread: 4 });
+    expect(prisma.notification.count).toHaveBeenCalledWith({
+      where: {
+        eventKey: { startsWith: 'reservation:', endsWith: ':created' },
+        adminReads: { none: { adminId: 77 } },
+      },
+    });
+  });
+
+  it('marks an actionable System notification read for the current admin only', async () => {
+    const readAt = new Date('2026-10-14T01:00:00.000Z');
+    const { service, prisma } = serviceWith();
+    prisma.notification.findFirst.mockResolvedValueOnce({ id: 8 });
+    prisma.adminNotificationRead.upsert.mockResolvedValueOnce({ readAt });
+
+    await expect(service.markNotificationRead(77, 8)).resolves.toEqual({ readAt });
+    expect(prisma.adminNotificationRead.upsert).toHaveBeenCalledWith({
+      where: { adminId_notificationId: { adminId: 77, notificationId: 8 } },
+      update: {},
+      create: { adminId: 77, notificationId: 8 },
+      select: { readAt: true },
+    });
+  });
+
+  it('rejects marking a non-System notification as read', async () => {
+    const { service } = serviceWith();
+    await expect(service.markNotificationRead(77, 999)).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
   });
 
   it('builds realtime dashboard totals and filtered month trend from database activity', async () => {

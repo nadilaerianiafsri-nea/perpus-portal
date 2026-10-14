@@ -29,6 +29,8 @@ export type AdminNotificationRow = {
   channel: "SYSTEM" | "EMAIL" | "WHATSAPP";
   time: string;
   status: NotificationStatus;
+  readAt: string | null;
+  href: string | null;
 };
 
 export type PageMeta = {
@@ -44,6 +46,7 @@ export type AdminNotificationsResponse = {
     email: number;
     whatsapp: number;
     failed: number;
+    unread: number;
   };
   data: AdminNotificationRow[];
   meta: PageMeta;

@@ -163,6 +163,10 @@ export default function AdminEBookForm({ mode, id }: { mode: "create" | "edit"; 
 
     const textError = adminEBookTextError(form);
     if (textError) { setError(textError); return; }
+    if (!SUBJECT_CATEGORIES.includes(form.subject.trim() as (typeof SUBJECT_CATEGORIES)[number])) {
+      setError("Pilih Subjek / Kategori dari daftar yang tersedia.");
+      return;
+    }
 
     const year = Number(form.year);
     const accessDurationDays = form.accessDurationDays.trim() ? Number(form.accessDurationDays) : null;
@@ -256,10 +260,18 @@ export default function AdminEBookForm({ mode, id }: { mode: "create" | "edit"; 
               <label><span>Bahasa <b>*</b></span><input value={form.language} onChange={(e) => update("language", e.target.value)} required maxLength={64} /></label>
               <label className={styles.spanTwo}>
                 <span>Subjek / Kategori <b>*</b></span>
-                <select value={form.subject} onChange={(e) => update("subject", e.target.value)} required>
-                  <option value="" disabled>Pilih Subjek / Kategori</option>
-                  {subjectCategories.map((subject) => <option key={subject} value={subject}>{subject}</option>)}
-                </select>
+                <input
+                  list="ebook-subject-categories"
+                  value={form.subject}
+                  onChange={(e) => update("subject", e.target.value)}
+                  placeholder="Cari atau pilih Subjek / Kategori"
+                  autoComplete="off"
+                  required
+                  maxLength={191}
+                />
+                <datalist id="ebook-subject-categories">
+                  {subjectCategories.map((subject) => <option key={subject} value={subject} />)}
+                </datalist>
               </label>
             </div>
           </section>

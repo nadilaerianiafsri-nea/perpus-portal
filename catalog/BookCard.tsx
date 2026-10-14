@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FiBookOpen, FiCheckCircle, FiClock, FiMonitor } from "react-icons/fi";
 import { type Book, availabilityLabels, typeLabels } from "./types";
 import styles from "./Catalog.module.css";
+
 export function BookStatus({ book }: { book: Book }) {
   const status = book.availability;
   return (
@@ -25,11 +26,20 @@ export function BookStatus({ book }: { book: Book }) {
     </span>
   );
 }
-export default function BookCard({ book }: { book: Book }) {
+
+export default function BookCard({
+  book,
+  basePath = "/koleksi",
+}: {
+  book: Book;
+  basePath?: string;
+}) {
+  const detailHref = `${basePath}/${book.id}`;
+
   return (
     <article className={styles.card}>
       <Link
-        href={`/koleksi/${book.id}`}
+        href={detailHref}
         className={styles.cover}
         aria-label={`Lihat detail ${book.title}`}
       >
@@ -46,14 +56,14 @@ export default function BookCard({ book }: { book: Book }) {
       </Link>
       <div className={styles.cardBody}>
         <h2>
-          <Link href={`/koleksi/${book.id}`}>{book.title}</Link>
+          <Link href={detailHref}>{book.title}</Link>
         </h2>
         <p>{book.author}</p>
         <small>
           {book.code} · {book.year}
         </small>
         <BookStatus book={book} />
-        <Link className={styles.detailLink} href={`/koleksi/${book.id}`}>
+        <Link className={styles.detailLink} href={detailHref}>
           Lihat Detail
         </Link>
       </div>

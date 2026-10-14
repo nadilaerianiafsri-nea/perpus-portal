@@ -395,6 +395,21 @@
   color: #bc241c;
 }
 
+.primaryAction,
+.secondaryAction {
+  transition: transform 0.16s ease, background 0.16s ease, color 0.16s ease;
+}
+
+.primaryAction:hover:not(:disabled) {
+  background: var(--navy-soft);
+  transform: scale(1.03);
+}
+
+.secondaryAction:hover:not(:disabled) {
+  background: var(--surface);
+  transform: scale(1.03);
+}
+
 .primaryAction:disabled,
 .secondaryAction:disabled,
 .dangerAction:disabled {
@@ -525,39 +540,33 @@
   line-height: 1.6;
 }
 
-.confirmDetails {
-  margin: 16px 0;
+.confirmPoints {
+  margin: 16px 0 0;
   padding: 0;
   display: grid;
-  gap: 10px;
+  gap: 9px;
+  list-style: none;
 }
 
-.confirmDetails > div {
-  padding: 11px 12px;
-  border: 1px solid #ececef;
-  border-radius: 9px;
-  background: var(--white);
-}
-
-.confirmDetails dt {
-  margin-bottom: 4px;
-  color: #777;
-  font-size: 8px;
-}
-
-.confirmDetails dd {
-  margin: 0;
-  color: var(--navy);
+.confirmPoints li {
+  position: relative;
+  padding-left: 17px;
+  color: #565656;
   font-size: 11px;
-  font-weight: 600;
-  line-height: 1.4;
+  line-height: 1.55;
 }
 
-.confirmModalBody .confirmNote {
-  padding: 11px 12px;
-  border-radius: 9px;
-  background: #f4f4f7;
+.confirmPoints li::before {
+  content: "•";
+  position: absolute;
+  left: 2px;
+  color: var(--yellow);
+  font-weight: 800;
+}
+
+.confirmPoints strong {
   color: var(--navy);
+  font-weight: 700;
 }
 
 .confirmModalActions {

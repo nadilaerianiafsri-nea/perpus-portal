@@ -21,21 +21,22 @@ enum MemberType {
 }
 
 model User {
-  id            Int            @id @default(autoincrement())
-  name          String
-  email         String         @unique
-  passwordHash  String
-  role          Role           @default(PENGUNJUNG)
-  memberType    MemberType?
-  emailVerified Boolean        @default(false)
-  isActive      Boolean        @default(true)
-  memberProfile MemberProfile?
-  reservations  Reservation[]
-  loans         Loan[]
-  notifications Notification[]
-  ebooks        UserEBook[]
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  id                     Int                     @id @default(autoincrement())
+  name                   String
+  email                  String                  @unique
+  passwordHash           String
+  role                   Role                    @default(PENGUNJUNG)
+  memberType             MemberType?
+  emailVerified          Boolean                 @default(false)
+  isActive               Boolean                 @default(true)
+  memberProfile          MemberProfile?
+  reservations           Reservation[]
+  loans                  Loan[]
+  notifications          Notification[]
+  ebooks                 UserEBook[]
+  adminNotificationReads AdminNotificationRead[] @relation("AdminNotificationReadAdmin")
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
 
   @@map("users")
 }
@@ -195,24 +196,39 @@ model LoanExtension {
 }
 
 model Notification {
-  id               Int                 @id @default(autoincrement())
+  id               Int                     @id @default(autoincrement())
   userId           Int
-  user             User                @relation(fields: [userId], references: [id], onDelete: Restrict)
-  eventKey         String              @unique @db.VarChar(191)
+  user             User                    @relation(fields: [userId], references: [id], onDelete: Restrict)
+  eventKey         String                  @unique @db.VarChar(191)
   title            String
-  message          String              @db.Text
-  href             String              @db.VarChar(191)
-  createdAt        DateTime            @default(now())
+  message          String                  @db.Text
+  href             String                  @db.VarChar(191)
+  createdAt        DateTime                @default(now())
   readAt           DateTime?
-  emailDelivery    EmailDeliveryStatus @default(NOT_REQUIRED)
-  emailAttempts    Int                 @default(0)
+  emailDelivery    EmailDeliveryStatus     @default(NOT_REQUIRED)
+  emailAttempts    Int                     @default(0)
   emailAttemptedAt DateTime?
   emailSentAt      DateTime?
-  whatsappDelivery String              @default("NOT_REQUIRED") @db.VarChar(32)
+  whatsappDelivery String                  @default("NOT_REQUIRED") @db.VarChar(32)
+  adminReads       AdminNotificationRead[] @relation("AdminNotificationReadNotification")
 
   @@index([userId, readAt, createdAt])
   @@index([emailDelivery, emailAttemptedAt])
   @@map("notifications")
+}
+
+model AdminNotificationRead {
+  id             Int          @id @default(autoincrement())
+  adminId        Int
+  admin          User         @relation("AdminNotificationReadAdmin", fields: [adminId], references: [id], onDelete: Restrict)
+  notificationId Int
+  notification   Notification @relation("AdminNotificationReadNotification", fields: [notificationId], references: [id], onDelete: Restrict)
+  readAt         DateTime     @default(now())
+
+  @@unique([adminId, notificationId])
+  @@index([adminId, readAt])
+  @@index([notificationId])
+  @@map("admin_notification_reads")
 }
 
 model UserEBook {

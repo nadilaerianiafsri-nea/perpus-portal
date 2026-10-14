@@ -1,4 +1,4 @@
-import { Injectable, ServiceUnavailableException } from '@nestjs/common';
+import { Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import { serviceInfo } from '../../../shared/serviceInfo.cjs';
 import { PrismaService } from '../prisma/prisma.service';
 import {
@@ -45,6 +45,8 @@ type AdminNotificationRow = {
   channel: 'SYSTEM' | 'EMAIL' | 'WHATSAPP';
   time: Date;
   status: 'TERKIRIM' | 'GAGAL' | 'MENUNGGU' | 'MENGIRIM' | 'MANUAL';
+  readAt: Date | null;
+  href: string | null;
 };
 
 function transactionCode(eventKey: string) {
@@ -411,12 +413,15 @@ export class AdminOperationsService {
     };
   }
 
-  async notifications(query: {
-    search?: unknown;
-    channel?: unknown;
-    page?: unknown;
-    limit?: unknown;
-  }) {
+  async notifications(
+    adminId: number,
+    query: {
+      search?: unknown;
+      channel?: unknown;
+      page?: unknown;
+      limit?: unknown;
+    },
+  ) {
     const filter = parseNotificationQuery(query);
     const notices = await this.prisma.notification.findMany({
       where: {
@@ -467,6 +472,19 @@ export class AdminOperationsService {
       reservations.map((reservation) => [reservation.id, reservation.book.title]),
     );
 
+    const readRows = notices.length
+      ? await this.prisma.adminNotificationRead.findMany({
+          where: {
+            adminId,
+            notificationId: { in: notices.map((notice) => notice.id) },
+          },
+          select: { notificationId: true, readAt: true },
+        })
+      : [];
+    const readByNotification = new Map(
+      readRows.map((row) => [row.notificationId, row.readAt]),
+    );
+
     const projected: AdminNotificationRow[] = [];
     for (const notice of notices) {
       const createdReservationId = reservationCreatedId(notice.eventKey);
@@ -490,6 +508,8 @@ export class AdminOperationsService {
           channel: 'SYSTEM',
           time: notice.createdAt,
           status: 'MENUNGGU',
+          readAt: readByNotification.get(notice.id) ?? null,
+          href: '/admin/transaksi/reservasi',
         });
       }
 
@@ -500,6 +520,8 @@ export class AdminOperationsService {
           channel: 'EMAIL',
           time: notice.emailSentAt ?? notice.emailAttemptedAt ?? notice.createdAt,
           status: emailStatus(notice.emailDelivery),
+          readAt: null,
+          href: null,
         });
       }
       if (notice.whatsappDelivery !== 'NOT_REQUIRED') {
@@ -509,6 +531,8 @@ export class AdminOperationsService {
           channel: 'WHATSAPP',
           time: notice.createdAt,
           status: whatsappStatus(notice.whatsappDelivery),
+          readAt: null,
+          href: null,
         });
       }
     }
@@ -541,6 +565,9 @@ export class AdminOperationsService {
       email: searched.filter((row) => row.channel === 'EMAIL').length,
       whatsapp: searched.filter((row) => row.channel === 'WHATSAPP').length,
       failed: searched.filter((row) => row.status === 'GAGAL').length,
+      unread: searched.filter(
+        (row) => row.channel === 'SYSTEM' && row.readAt === null,
+      ).length,
     };
     const channelRows =
       filter.channel === 'ALL'
@@ -560,6 +587,41 @@ export class AdminOperationsService {
         totalPages,
       },
     };
+  }
+
+  async unreadNotificationCount(adminId: number) {
+    const unread = await this.prisma.notification.count({
+      where: {
+        eventKey: { startsWith: 'reservation:', endsWith: ':created' },
+        adminReads: { none: { adminId } },
+      },
+    });
+    return { unread };
+  }
+
+  async markNotificationRead(adminId: number, notificationId: number) {
+    const notification = await this.prisma.notification.findFirst({
+      where: {
+        id: notificationId,
+        eventKey: { startsWith: 'reservation:', endsWith: ':created' },
+      },
+      select: { id: true },
+    });
+
+    if (!notification) {
+      throw new NotFoundException('Notifikasi sistem tidak ditemukan atau tidak dapat ditandai.');
+    }
+
+    const read = await this.prisma.adminNotificationRead.upsert({
+      where: {
+        adminId_notificationId: { adminId, notificationId },
+      },
+      update: {},
+      create: { adminId, notificationId },
+      select: { readAt: true },
+    });
+
+    return { readAt: read.readAt };
   }
 
   async reports(query: { from?: unknown; to?: unknown }) {

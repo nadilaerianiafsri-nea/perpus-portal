@@ -20,12 +20,12 @@ export default function LoanCard({ loan, now, busy, extending, onExtend, onRepla
   return <article className={`${styles.card} ${styles[state.tone]}`} data-loan-id={loan.id}>
     {warning && <div className={styles.warning}><FiAlertTriangle aria-hidden /><span>{warning}</span></div>}
     <div className={styles.body}>
-      <Link className={styles.cover} href={`/koleksi/${loan.book.id}`} aria-label={`Lihat detail ${loan.book.title}`}>
+      <Link className={styles.cover} href={`/dashboard/koleksi/${loan.book.id}`} aria-label={`Lihat detail ${loan.book.title}`}>
         <Image src={safeCoverUrl(loan.book.coverUrl)} alt={`Sampul ${loan.book.title}`} fill sizes="96px" unoptimized />
       </Link>
       <div className={styles.information}>
         <span className={styles.badge}><Icon aria-hidden />{label}</span>
-        <h2><Link href={`/koleksi/${loan.book.id}`}>{loan.book.title}</Link></h2>
+        <h2><Link href={`/dashboard/koleksi/${loan.book.id}`}>{loan.book.title}</Link></h2>
         <p className={styles.author}>{loan.book.author}</p>
         <dl className={styles.metadata}>
           <div><dt>Kode Buku</dt><dd className={styles.strong}>{loan.book.code}</dd></div>
@@ -36,7 +36,7 @@ export default function LoanCard({ loan, now, busy, extending, onExtend, onRepla
       </div>
       <div className={styles.actions}>
         {lost ? <button className={styles.replacementButton} disabled={busy} onClick={onReplacement}>Info Penggantian</button> : loan.status === "AKTIF" && <button className={styles.extendButton} disabled={busy} onClick={onExtend}><FiRefreshCw aria-hidden />{extending ? "Memperpanjang..." : "Perpanjang 7 Hari"}</button>}
-        <Link className={styles.detailLink} href={`/koleksi/${loan.book.id}`}>Lihat Detail</Link>
+        <Link className={styles.detailLink} href={`/dashboard/koleksi/${loan.book.id}`}>Lihat Detail</Link>
       </div>
     </div>
   </article>;

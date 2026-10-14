@@ -4,12 +4,12 @@ import { NextResponse } from "next/server";
 import { API_URL } from "@/catalog/serverApi";
 
 const allowed: Record<string, RegExp> = {
-  GET: /^(?:me\/(dashboard|profile|reservations|loans(?:\/history)?|notifications|ebooks|books\/\d+\/borrowing-status)|admin\/members(?:\/\d+)?|admin\/transactions\/(reservations|loans|returns|lost-books)|admin\/operations\/(dashboard|notifications|reports|settings))$/,
+  GET: /^(?:me\/(dashboard|profile|reservations|loans(?:\/history)?|notifications|ebooks|books\/\d+\/borrowing-status|catalog(?:\/filters|\/\d+)?)|admin\/members(?:\/\d+)?|admin\/transactions\/(reservations|loans|returns|lost-books)|admin\/operations\/(dashboard|notifications(?:\/unread-count)?|reports|settings))$/,
 
   POST: /^(?:me\/(reservations|loans\/\d+\/extend|ebooks(?:\/\d+\/open)?)|admin\/(?:reservations\/\d+\/pickup|loans\/\d+\/(?:return|lost)))$/,
 
   PATCH:
-    /^(?:me\/(profile|reservations\/\d+\/cancel|notifications\/(read-all|\d+\/read)|ebooks\/\d+\/progress)|admin\/members\/\d+(?:\/status)?|admin\/operations\/settings)$/,
+    /^(?:me\/(profile|reservations\/\d+\/cancel|notifications\/(read-all|\d+\/read)|ebooks\/\d+\/progress)|admin\/members\/\d+(?:\/status)?|admin\/operations\/(settings|notifications\/\d+\/read))$/,
 };
 
 export async function memberProxy(request: Request, path: string) {
