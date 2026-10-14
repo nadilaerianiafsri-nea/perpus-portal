@@ -5,6 +5,7 @@ import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import { plainTextMessage } from "../members/inputSecurity";
 
 import { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { FiSearch } from "react-icons/fi";
 
 import {
@@ -30,6 +31,15 @@ type PickupTarget = {
   memberName: string;
   bookTitle: string;
 };
+
+function readStatus(value: string | null): StatusFilter {
+  return value === "MENUNGGU_PENGAMBILAN" ||
+    value === "KEDALUWARSA" ||
+    value === "DIBATALKAN" ||
+    value === "DIAMBIL"
+    ? value
+    : "ALL";
+}
 
 const emptyResult: ReservationsResponse = {
   stats: {
@@ -63,10 +73,11 @@ function statusLabel(status: StatusFilter) {
 }
 
 export default function AdminReservationsPage() {
+  const params = useSearchParams();
   const [searchInput, setSearchInput] = useState("");
   const searchError = plainTextMessage(searchInput, 100);
   const [search, setSearch] = useState("");
-  const [status, setStatus] = useState<StatusFilter>("ALL");
+  const [status, setStatus] = useState<StatusFilter>(readStatus(params.get("status")));
   const [memberType, setMemberType] = useState<MemberFilter>("ALL");
   const [page, setPage] = useState(1);
 
@@ -86,6 +97,12 @@ export default function AdminReservationsPage() {
 
     return () => window.clearTimeout(timeout);
   }, [searchInput, searchError]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Synchronize dashboard deep-link filter with existing controls.
+    setStatus(readStatus(params.get("status")));
+    setPage(1);
+  }, [params]);
 
   const load = useCallback(async () => {
     void revision;
@@ -336,9 +353,7 @@ export default function AdminReservationsPage() {
                     <td>
                       <div className={styles.bookCell}>
                         <img
-                          src={
-                            safeCoverUrl(reservation.book.coverUrl)
-                          }
+                          src={safeCoverUrl(reservation.book.coverUrl)}
                           alt=""
                         />
                         <div>

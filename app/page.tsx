@@ -236,7 +236,7 @@ export default async function Home() {
         <section className="ebook-section section-pad" id="ebook">
           <div className="landing-shell ebook-grid">
             <div className="ebook-art">
-              <Image src="/images/ASSET PERPUS/Asset banyak burung ikon.jpg" alt="Karakter perpustakaan" fill sizes="480px" />
+              <Image src="/images/ASSET PERPUS/Hero pegang buku.png" alt="Baca E-Book Perpustakaan" fill sizes="480px" />
             </div>
             <div className="ebook-copy">
               <span className="section-kicker">KOLEKSI DIGITAL</span>

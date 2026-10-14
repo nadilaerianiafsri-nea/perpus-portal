@@ -5,6 +5,7 @@ import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import { plainTextMessage } from "../members/inputSecurity";
 
 import { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { FiSearch } from "react-icons/fi";
 
 import {
@@ -19,10 +20,23 @@ import {
 import styles from "./AdminTransactions.module.css";
 
 type StatusFilter = "ALL" | "ACTIVE" | "DUE_SOON" | "OVERDUE";
-
 type MemberFilter = "ALL" | "UMUM" | "MAHASISWA" | "PEGAWAI";
-
 type DueFilter = "ALL" | "TODAY" | "7_DAYS" | "30_DAYS" | "THIS_MONTH";
+
+function readStatus(value: string | null): StatusFilter {
+  return value === "ACTIVE" || value === "DUE_SOON" || value === "OVERDUE"
+    ? value
+    : "ALL";
+}
+
+function readDue(value: string | null): DueFilter {
+  return value === "TODAY" ||
+    value === "7_DAYS" ||
+    value === "30_DAYS" ||
+    value === "THIS_MONTH"
+    ? value
+    : "ALL";
+}
 
 const emptyResult: LoansResponse = {
   stats: {
@@ -42,12 +56,13 @@ const emptyResult: LoansResponse = {
 };
 
 export default function AdminLoansPage() {
+  const params = useSearchParams();
   const [searchInput, setSearchInput] = useState("");
   const searchError = plainTextMessage(searchInput, 100);
   const [search, setSearch] = useState("");
-  const [status, setStatus] = useState<StatusFilter>("ALL");
+  const [status, setStatus] = useState<StatusFilter>(readStatus(params.get("status")));
   const [memberType, setMemberType] = useState<MemberFilter>("ALL");
-  const [due, setDue] = useState<DueFilter>("ALL");
+  const [due, setDue] = useState<DueFilter>(readDue(params.get("due")));
   const [page, setPage] = useState(1);
 
   const [result, setResult] = useState<LoansResponse>(emptyResult);
@@ -64,6 +79,13 @@ export default function AdminLoansPage() {
 
     return () => window.clearTimeout(timeout);
   }, [searchInput, searchError]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Synchronize dashboard deep-link filters with existing controls.
+    setStatus(readStatus(params.get("status")));
+    setDue(readDue(params.get("due")));
+    setPage(1);
+  }, [params]);
 
   const load = useCallback(async () => {
     void revision;
@@ -295,9 +317,7 @@ export default function AdminLoansPage() {
                       <td>
                         <div className={styles.bookCell}>
                           <img
-                            src={
-                              safeCoverUrl(loan.book.coverUrl)
-                            }
+                            src={safeCoverUrl(loan.book.coverUrl)}
                             alt=""
                           />
                           <div>

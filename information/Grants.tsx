@@ -87,7 +87,6 @@ export default function Grants() {
         <span>
           Pengajuan hibah <strong>tidak dilakukan melalui website.</strong> Data
           di bawah hanya menampilkan hibah yang sudah diterima.
-          {summary && summary.demoRecords > 0 ? " (Data Contoh)" : ""}
         </span>
       </div>
       <section className={styles.stats} aria-label="Ringkasan seluruh hibah">
@@ -110,9 +109,6 @@ export default function Grants() {
                 )}
               </strong>
               <p>{label}</p>
-              {label === "Total Buku" && !!summary?.demoRecords && (
-                <small>Data Contoh</small>
-              )}
             </div>
           </article>
         ))}

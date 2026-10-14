@@ -10,6 +10,7 @@ import { BookStatus } from "./BookCard";
 import { getBook } from "./serverApi";
 import { typeLabels } from "./types";
 import styles from "./Catalog.module.css";
+import memberStyles from "./MemberCatalogEnhancements.module.css";
 
 export default async function BookDetail({
   id,
@@ -77,7 +78,11 @@ export default async function BookDetail({
           <span>/</span>
           <span>Detail Buku</span>
         </nav>
-      ) : null}
+      ) : (
+        <Link className={memberStyles.memberBackButton} href={basePath}>
+          Kembali
+        </Link>
+      )}
 
       <article className={styles.detail}>
         <div className={styles.detailCover}>
@@ -126,7 +131,7 @@ export default async function BookDetail({
         </div>
       </article>
 
-      {!ebook ? (
+      {!ebook && !member ? (
         <section className={styles.tableWrap}>
           <h2>Eksemplar Buku</h2>
           <table className={styles.copyTable}>

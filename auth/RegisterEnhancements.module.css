@@ -1,0 +1,83 @@
+.memberCardFocusFix:focus-within {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(43, 48, 86, 0.14) !important;
+}
+
+.backToMembership {
+  transition:
+    color 150ms ease,
+    text-decoration-color 150ms ease;
+}
+
+.backToMembership:hover {
+  color: #2b3056;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.prefixedInput {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid #e1e1e1;
+  border-radius: 8px;
+  background: #ffffff;
+  font-family: var(--font-outfit), "Outfit", sans-serif;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.prefixedInput:focus-within {
+  border-color: #2b3056;
+  box-shadow: 0 0 0 3px rgba(43, 48, 86, 0.08);
+}
+
+.prefixedInput[data-invalid="true"] {
+  border-color: #ff3b2f;
+}
+
+.prefix {
+  height: 42px;
+  padding: 0 0 0 14px;
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  color: #333333;
+  font-size: 14px;
+  font-weight: 500;
+  user-select: none;
+}
+
+.prefixedInput input {
+  height: 42px !important;
+  min-width: 0;
+  padding-left: 8px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.prefixedInput input:focus {
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 520px) {
+  .prefix {
+    padding-left: 12px;
+    font-size: 13px;
+  }
+
+  .prefixedInput input {
+    padding-left: 7px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backToMembership,
+  .prefixedInput {
+    transition: none;
+  }
+}

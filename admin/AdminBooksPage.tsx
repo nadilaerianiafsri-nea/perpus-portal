@@ -9,8 +9,22 @@ import { useSearchParams } from "next/navigation";
 import { FiEdit2, FiEye, FiPlus, FiPower, FiSearch } from "react-icons/fi";
 import { apiMessage, type AdminBooksResponse } from "./adminBooks";
 import styles from "./AdminBooks.module.css";
+import enhancements from "./AdminBooksEnhancements.module.css";
 
 type StatusFilter = "ALL" | "ACTIVE" | "INACTIVE";
+type AvailabilityFilter = "ALL" | "TERSEDIA" | "STOK_HABIS";
+
+function readStatus(value: string | null): StatusFilter {
+  return value === "ACTIVE" || value === "INACTIVE" ? value : "ALL";
+}
+
+function readAvailability(value: string | null): AvailabilityFilter {
+  return value === "TERSEDIA" || value === "STOK_HABIS" ? value : "ALL";
+}
+
+function readStock(value: string | null) {
+  return value && /^\d+$/.test(value) ? value : "";
+}
 
 const emptyData: AdminBooksResponse = {
   stats: { total: 0, active: 0, inactive: 0 },
@@ -21,9 +35,21 @@ const emptyData: AdminBooksResponse = {
 export default function AdminBooksPage() {
   const params = useSearchParams();
   const initialSearch = params.get("search")?.trim() ?? "";
+  const initialAvailability = readAvailability(params.get("availability"));
+  const initialStockMin = readStock(params.get("stockMin"));
+  const initialStockMax = readStock(params.get("stockMax"));
+
   const [searchInput, setSearchInput] = useState(initialSearch);
   const [search, setSearch] = useState(initialSearch);
-  const [status, setStatus] = useState<StatusFilter>("ALL");
+  const [status, setStatus] = useState<StatusFilter>(readStatus(params.get("status")));
+  const [availabilityInput, setAvailabilityInput] =
+    useState<AvailabilityFilter>(initialAvailability);
+  const [availability, setAvailability] =
+    useState<AvailabilityFilter>(initialAvailability);
+  const [stockMinInput, setStockMinInput] = useState(initialStockMin);
+  const [stockMaxInput, setStockMaxInput] = useState(initialStockMax);
+  const [stockMin, setStockMin] = useState(initialStockMin);
+  const [stockMax, setStockMax] = useState(initialStockMax);
   const [page, setPage] = useState(1);
   const [result, setResult] = useState<AdminBooksResponse>(emptyData);
   const [loading, setLoading] = useState(true);
@@ -34,16 +60,23 @@ export default function AdminBooksPage() {
   const load = useCallback(async () => {
     void revision;
     const textError = adminBookTextError({ search });
-    if (textError) { setError(textError); setLoading(false); return; }
+    if (textError) {
+      setError(textError);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError("");
 
     const query = new URLSearchParams({
       status,
+      availability,
       page: String(page),
       limit: "20",
     });
     if (search) query.set("search", search);
+    if (stockMin) query.set("stockMin", stockMin);
+    if (stockMax) query.set("stockMax", stockMax);
 
     try {
       const response = await fetch(`/api/admin/books?${query}`, {
@@ -67,7 +100,7 @@ export default function AdminBooksPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, status, revision]);
+  }, [availability, page, search, status, stockMax, stockMin, revision]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- Existing fetch lifecycle starts the loading state before requesting data.
@@ -75,18 +108,60 @@ export default function AdminBooksPage() {
   }, [load]);
 
   useEffect(() => {
-    const next = params.get("search")?.trim() ?? "";
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- Keep the existing search control synchronized with navigation query changes.
-    setSearchInput(next);
-    setSearch(next);
+    const nextSearch = params.get("search")?.trim() ?? "";
+    const nextStatus = readStatus(params.get("status"));
+    const nextAvailability = readAvailability(params.get("availability"));
+    const nextStockMin = readStock(params.get("stockMin"));
+    const nextStockMax = readStock(params.get("stockMax"));
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Synchronize controls with dashboard deep-link filters.
+    setSearchInput(nextSearch);
+    setSearch(nextSearch);
+    setStatus(nextStatus);
+    setAvailabilityInput(nextAvailability);
+    setAvailability(nextAvailability);
+    setStockMinInput(nextStockMin);
+    setStockMaxInput(nextStockMax);
+    setStockMin(nextStockMin);
+    setStockMax(nextStockMax);
     setPage(1);
   }, [params]);
 
   function submitSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const textError = adminBookTextError({ search: searchInput });
-    if (textError) { setError(textError); return; }
+    if (textError) {
+      setError(textError);
+      return;
+    }
     setSearch(searchInput.trim());
+    setPage(1);
+  }
+
+  function applyBookFilters(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (
+      (stockMinInput && !/^\d+$/.test(stockMinInput)) ||
+      (stockMaxInput && !/^\d+$/.test(stockMaxInput))
+    ) {
+      setError("Rentang stok harus berupa angka 0 atau lebih.");
+      return;
+    }
+
+    if (
+      stockMinInput &&
+      stockMaxInput &&
+      Number(stockMinInput) > Number(stockMaxInput)
+    ) {
+      setError("Stok minimum tidak boleh lebih besar dari stok maksimum.");
+      return;
+    }
+
+    setError("");
+    setAvailability(availabilityInput);
+    setStockMin(stockMinInput);
+    setStockMax(stockMaxInput);
     setPage(1);
   }
 
@@ -176,6 +251,53 @@ export default function AdminBooksPage() {
         ))}
       </div>
 
+      <form className={enhancements.filterPanel} onSubmit={applyBookFilters}>
+        <label className={enhancements.filterField}>
+          <span>Ketersediaan</span>
+          <select
+            value={availabilityInput}
+            onChange={(event) =>
+              setAvailabilityInput(event.target.value as AvailabilityFilter)
+            }
+          >
+            <option value="ALL">Semua Ketersediaan</option>
+            <option value="TERSEDIA">Tersedia</option>
+            <option value="STOK_HABIS">Stok Habis</option>
+          </select>
+        </label>
+
+        <div className={enhancements.stockGroup}>
+          <span>Rentang Stok Tersedia</span>
+          <div className={enhancements.stockRange}>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              inputMode="numeric"
+              value={stockMinInput}
+              onChange={(event) => setStockMinInput(event.target.value)}
+              placeholder="Minimum"
+              aria-label="Stok minimum"
+            />
+            <span className={enhancements.rangeSeparator}>–</span>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              inputMode="numeric"
+              value={stockMaxInput}
+              onChange={(event) => setStockMaxInput(event.target.value)}
+              placeholder="Maksimum"
+              aria-label="Stok maksimum"
+            />
+          </div>
+        </div>
+
+        <button type="submit" className={enhancements.applyButton}>
+          Terapkan Filter
+        </button>
+      </form>
+
       {error ? (
         <div className={styles.errorBox} role="alert">
           <p>{error}</p>
@@ -193,7 +315,7 @@ export default function AdminBooksPage() {
                 <th>BUKU</th>
                 <th>KODE</th>
                 <th>TAHUN</th>
-                <th>STOK</th>
+                <th>STOK TERSEDIA</th>
                 <th>KETERSEDIAAN</th>
                 <th>STATUS</th>
                 <th>AKSI</th>

@@ -45,6 +45,18 @@ function queryInteger(
   return result;
 }
 
+function optionalStockInteger(value: unknown, label: string): number | null {
+  if (value === undefined || value === null || value === '') return null;
+  if (typeof value !== 'string' || !/^\d+$/.test(value)) {
+    throw new BadRequestException(`${label} tidak valid.`);
+  }
+  const result = Number(value);
+  if (!Number.isSafeInteger(result) || result < 0 || result > 1_000_000) {
+    throw new BadRequestException(`${label} tidak valid.`);
+  }
+  return result;
+}
+
 function parseInput(body: unknown): AdminBookInput {
   try {
     return parseAdminBookInput(body);
@@ -80,16 +92,42 @@ export class AdminBooksService {
   constructor(private readonly prisma: PrismaService) {}
 
   async list(query: AdminBooksQuery) {
-    if (Object.keys(query).some((key) => !['search', 'status', 'page', 'limit'].includes(key))) {
+    if (
+      Object.keys(query).some(
+        (key) =>
+          ![
+            'search',
+            'status',
+            'availability',
+            'stockMin',
+            'stockMax',
+            'page',
+            'limit',
+          ].includes(key),
+      )
+    ) {
       throw new BadRequestException('Parameter tidak diizinkan.');
     }
+
     const search = queryText(query.search, 'Pencarian');
     const status = queryText(query.status, 'Status', 16).toUpperCase() || 'ALL';
+    const availability =
+      queryText(query.availability, 'Ketersediaan', 20).toUpperCase() || 'ALL';
+    const stockMin = optionalStockInteger(query.stockMin, 'Stok minimum');
+    const stockMax = optionalStockInteger(query.stockMax, 'Stok maksimum');
     const page = queryInteger(query.page, 1, 1, 100000);
     const limit = queryInteger(query.limit, 20, 1, 100);
 
     if (!['ALL', 'ACTIVE', 'INACTIVE'].includes(status)) {
       throw new BadRequestException('Status tidak valid.');
+    }
+    if (!['ALL', 'TERSEDIA', 'STOK_HABIS'].includes(availability)) {
+      throw new BadRequestException('Ketersediaan tidak valid.');
+    }
+    if (stockMin !== null && stockMax !== null && stockMin > stockMax) {
+      throw new BadRequestException(
+        'Stok minimum tidak boleh lebih besar dari stok maksimum.',
+      );
     }
 
     const where: Prisma.BookWhereInput = {
@@ -112,30 +150,22 @@ export class AdminBooksService {
     };
 
     const baseWhere: Prisma.BookWhereInput = { type: 'FISIK' };
-    const [totalBooks, activeBooks, inactiveBooks, total, books] =
+    const [totalBooks, activeBooks, inactiveBooks, books] =
       await this.prisma.$transaction([
         this.prisma.book.count({ where: baseWhere }),
         this.prisma.book.count({ where: { ...baseWhere, isActive: true } }),
         this.prisma.book.count({ where: { ...baseWhere, isActive: false } }),
-        this.prisma.book.count({ where }),
         this.prisma.book.findMany({
           where,
           include: {
             copies: { select: { status: true } },
           },
           orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
-          skip: (page - 1) * limit,
-          take: limit,
         }),
       ]);
 
-    return {
-      stats: {
-        total: totalBooks,
-        active: activeBooks,
-        inactive: inactiveBooks,
-      },
-      data: books.map((book) => {
+    const filteredBooks = books
+      .map((book) => {
         const totalCopies = book.copies.length;
         const availableCopies = book.copies.filter(
           (copy) => copy.status === 'TERSEDIA',
@@ -153,12 +183,35 @@ export class AdminBooksService {
           availableCopies,
           availability: availableCopies > 0 ? 'TERSEDIA' : 'STOK_HABIS',
         };
-      }),
+      })
+      .filter((book) => {
+        if (availability === 'TERSEDIA' && book.availableCopies <= 0) return false;
+        if (availability === 'STOK_HABIS' && book.availableCopies !== 0) return false;
+        if (stockMin !== null && book.availableCopies < stockMin) return false;
+        if (stockMax !== null && book.availableCopies > stockMax) return false;
+        return true;
+      });
+
+    const total = filteredBooks.length;
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+    const resolvedPage = Math.min(page, totalPages);
+    const data = filteredBooks.slice(
+      (resolvedPage - 1) * limit,
+      resolvedPage * limit,
+    );
+
+    return {
+      stats: {
+        total: totalBooks,
+        active: activeBooks,
+        inactive: inactiveBooks,
+      },
+      data,
       meta: {
-        page,
+        page: resolvedPage,
         limit,
         total,
-        totalPages: Math.max(1, Math.ceil(total / limit)),
+        totalPages,
       },
     };
   }

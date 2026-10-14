@@ -1,0 +1,132 @@
+.memberCatalogLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  align-items: start;
+}
+
+.memberSearchRow {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+.memberFilterButton {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid #dfdfdf;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #2b3056;
+  cursor: pointer;
+  font-family: var(--font-outfit), "Outfit", sans-serif;
+  font-size: 18px;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.memberFilterButton:hover {
+  border-color: #2b3056;
+  background: #e6e6eb;
+  color: #000633;
+  transform: scale(1.05);
+}
+
+.memberFilterButton:focus-visible {
+  outline: none;
+  border-color: #2b3056;
+  box-shadow: 0 0 0 3px rgba(43, 48, 86, 0.16);
+}
+
+.memberFilterDialog {
+  font-family: var(--font-outfit), "Outfit", sans-serif;
+}
+
+.memberFilterDialog[open] {
+  animation: memberFilterCardIn 180ms ease both;
+}
+
+@keyframes memberFilterCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.memberBackButton {
+  width: fit-content;
+  min-height: 42px;
+  margin: 0 0 18px;
+  padding: 9px 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dfdfdf;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #2b3056;
+  cursor: pointer;
+  font-family: var(--font-outfit), "Outfit", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.memberBackButton:hover {
+  border-color: #000633;
+  background: #000633;
+  color: #ffffff;
+  transform: scale(1.03);
+  box-shadow: 0 7px 14px rgba(0, 6, 51, 0.14);
+}
+
+.memberBackButton:focus-visible {
+  outline: none;
+  border-color: #2b3056;
+  box-shadow: 0 0 0 3px rgba(43, 48, 86, 0.16);
+}
+
+@media (max-width: 600px) {
+  .memberFilterButton {
+    width: 40px;
+    height: 40px;
+    flex-basis: 40px;
+    border-radius: 9px;
+  }
+
+  .memberBackButton {
+    width: 100%;
+    margin-bottom: 14px;
+  }
+
+  .memberFilterDialog {
+    width: min(420px, calc(100vw - 20px));
+    padding: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .memberFilterButton,
+  .memberBackButton,
+  .memberFilterDialog[open] {
+    animation: none;
+    transition: none;
+  }
+}

@@ -14,6 +14,7 @@ import {
   validateRegistration,
 } from "./registrationValidation";
 import styles from "./Auth.module.css";
+import enhancements from "./RegisterEnhancements.module.css";
 
 const memberOptions = [
   {
@@ -53,6 +54,14 @@ type FieldProps = {
 };
 
 const digitsOnly = (value: string) => value.replace(/\D/g, "");
+
+function normalizeWhatsappInput(value: string) {
+  const digits = digitsOnly(value);
+  if (!digits) return "62";
+  if (digits.startsWith("62")) return digits.slice(0, 14);
+  if (digits.startsWith("0")) return `62${digits.slice(1)}`.slice(0, 14);
+  return `62${digits}`.slice(0, 14);
+}
 
 function FormField({
   name,
@@ -137,7 +146,7 @@ export default function Register() {
   const [values, setValues] = useState<RegistrationValues>({
     name: "",
     email: "",
-    whatsapp: "",
+    whatsapp: "62",
     address: "",
     identity: "",
     university: "",
@@ -275,7 +284,7 @@ export default function Register() {
                 return (
                   <label
                     key={option.value}
-                    className={`${styles.memberCard} ${active ? styles.memberCardActive : ""}`}
+                    className={`${styles.memberCard} ${enhancements.memberCardFocusFix} ${active ? styles.memberCardActive : ""}`}
                   >
                     <span className={styles.memberIcon}>
                       <Icon aria-hidden="true" />
@@ -315,7 +324,7 @@ export default function Register() {
         ) : (
           <>
             <button
-              className={styles.backToMembership}
+              className={`${styles.backToMembership} ${enhancements.backToMembership}`}
               type="button"
               disabled={loading || succeeded}
               onClick={() => changeStep(1)}
@@ -346,15 +355,42 @@ export default function Register() {
                 "email",
                 "email",
               )}
-              {field(
-                "whatsapp",
-                "Nomor WhatsApp",
-                "081234567890",
-                "Wajib. Ketik angka saja dengan awalan 08 atau 628. Digunakan untuk pengingat layanan dan tidak dapat dinonaktifkan.",
-                "tel",
-                "tel",
-                { inputMode: "numeric", maxLength: 14, sanitize: digitsOnly },
-              )}
+
+              <div className={styles.field}>
+                <label htmlFor="whatsapp">
+                  Nomor WhatsApp <b>*</b>
+                </label>
+                <div
+                  className={enhancements.prefixedInput}
+                  data-invalid={Boolean(errors.whatsapp)}
+                >
+                  <span className={enhancements.prefix} aria-hidden="true">+62</span>
+                  <input
+                    id="whatsapp"
+                    name="whatsapp"
+                    type="tel"
+                    inputMode="numeric"
+                    autoComplete="tel"
+                    maxLength={12}
+                    value={values.whatsapp.startsWith("62") ? values.whatsapp.slice(2) : values.whatsapp}
+                    onChange={(event) => update("whatsapp", normalizeWhatsappInput(event.target.value))}
+                    placeholder="81234567890"
+                    required
+                    aria-invalid={!!errors.whatsapp}
+                    aria-describedby={`whatsapp-helper${errors.whatsapp ? " whatsapp-error" : ""}`}
+                    disabled={loading || succeeded}
+                  />
+                </div>
+                <small id="whatsapp-helper" className={styles.fieldHelper}>
+                  Awalan +62 sudah disediakan. Ketik nomor setelah +62, misalnya 81234567890.
+                </small>
+                {errors.whatsapp ? (
+                  <small id="whatsapp-error" className={styles.fieldError}>
+                    {errors.whatsapp}
+                  </small>
+                ) : null}
+              </div>
+
               {field(
                 "address",
                 "Alamat",

@@ -6,6 +6,7 @@ import { plainTextMessage } from "../members/inputSecurity";
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { FiSearch } from "react-icons/fi";
 
 import {
@@ -16,10 +17,15 @@ import {
   type LostBooksResponse,
 } from "./adminTransactions";
 import styles from "./AdminTransactions.module.css";
+import enhancements from "./AdminTransactionEnhancements.module.css";
 
 type MemberFilter = "ALL" | "UMUM" | "MAHASISWA" | "PEGAWAI";
-
 type ExtensionFilter = "ALL" | "EXTENDED" | "NOT_EXTENDED";
+type StatusFilter = "ALL" | "PROCESS";
+
+function readStatus(value: string | null): StatusFilter {
+  return value === "PROCESS" ? "PROCESS" : "ALL";
+}
 
 const emptyResult: LostBooksResponse = {
   stats: {
@@ -37,9 +43,11 @@ const emptyResult: LostBooksResponse = {
 };
 
 export default function AdminLostBooksPage() {
+  const params = useSearchParams();
   const [searchInput, setSearchInput] = useState("");
   const searchError = plainTextMessage(searchInput, 100);
   const [search, setSearch] = useState("");
+  const [status, setStatus] = useState<StatusFilter>(readStatus(params.get("status")));
   const [memberType, setMemberType] = useState<MemberFilter>("ALL");
   const [extension, setExtension] = useState<ExtensionFilter>("ALL");
   const [page, setPage] = useState(1);
@@ -58,6 +66,12 @@ export default function AdminLostBooksPage() {
 
     return () => window.clearTimeout(timeout);
   }, [searchInput, searchError]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Synchronize dashboard deep-link filter with existing controls.
+    setStatus(readStatus(params.get("status")));
+    setPage(1);
+  }, [params]);
 
   const load = useCallback(async () => {
     void revision;
@@ -156,7 +170,7 @@ export default function AdminLostBooksPage() {
           </p>
         </header>
 
-        <div className={`${styles.filterBar} ${styles.filterBarThree}`}>
+        <div className={styles.filterBar}>
           <label className={styles.searchBox}>
             <FiSearch aria-hidden />
             <input
@@ -170,6 +184,20 @@ export default function AdminLostBooksPage() {
               aria-label="Cari buku hilang"
             />
           {searchError && <small id="search-input-error" role="alert">{searchError}</small>}
+          </label>
+
+          <label className={`${styles.selectField} ${enhancements.interactiveFilter}`}>
+            <span>Status</span>
+            <select
+              value={status}
+              onChange={(event) => {
+                setStatus(event.target.value as StatusFilter);
+                setPage(1);
+              }}
+            >
+              <option value="ALL">Semua Status</option>
+              <option value="PROCESS">Proses</option>
+            </select>
           </label>
 
           <label className={styles.selectField}>
@@ -255,9 +283,7 @@ export default function AdminLostBooksPage() {
                     <td>
                       <div className={styles.bookCell}>
                         <img
-                          src={
-                            safeCoverUrl(loan.book.coverUrl)
-                          }
+                          src={safeCoverUrl(loan.book.coverUrl)}
                           alt=""
                         />
                         <div>

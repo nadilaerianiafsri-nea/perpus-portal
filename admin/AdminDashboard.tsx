@@ -66,6 +66,8 @@ type StatCard = {
   href: string;
 };
 
+type MemberCategoryKey = "umum" | "mahasiswa" | "pegawai";
+
 function validateDates(from: string, to: string) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(from) || !/^\d{4}-\d{2}-\d{2}$/.test(to)) {
     return "Dari Tanggal dan Sampai Tanggal wajib diisi.";
@@ -127,6 +129,38 @@ function chartCoordinate(
   return { x, y };
 }
 
+function inputDate(value: string) {
+  const date = new Date(`${value}T00:00:00Z`);
+  return Number.isFinite(date.getTime()) ? date : null;
+}
+
+function formatRangeLabel(from: string, to: string) {
+  const fromDate = inputDate(from);
+  const toDate = inputDate(to);
+
+  if (!fromDate || !toDate) return `${from}–${to}`;
+
+  const startYear = fromDate.getUTCFullYear();
+  const endYear = toDate.getUTCFullYear();
+  const dayMonth = new Intl.DateTimeFormat("id-ID", {
+    day: "numeric",
+    month: "short",
+    timeZone: "UTC",
+  });
+  const dayMonthYear = new Intl.DateTimeFormat("id-ID", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+
+  if (startYear === endYear) {
+    return `${dayMonth.format(fromDate)}–${dayMonthYear.format(toDate)}`;
+  }
+
+  return `${dayMonthYear.format(fromDate)}–${dayMonthYear.format(toDate)}`;
+}
+
 function formatUpdatedAt(value: string) {
   const date = new Date(value);
 
@@ -135,12 +169,9 @@ function formatUpdatedAt(value: string) {
   }
 
   return new Intl.DateTimeFormat("id-ID", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-    second: "2-digit",
+    hour12: false,
     timeZone: "Asia/Jakarta",
   }).format(date);
 }
@@ -160,6 +191,8 @@ export default function AdminDashboard() {
   const [error, setError] = useState("");
   const [revision, setRevision] = useState(0);
   const [activeTrend, setActiveTrend] = useState<number | null>(null);
+  const [activeMemberCategory, setActiveMemberCategory] =
+    useState<MemberCategoryKey | null>(null);
   const requestId = useRef(0);
 
   const load = useCallback(async () => {
@@ -264,42 +297,42 @@ export default function AdminDashboard() {
           value: dashboard.stats.availableStock.toLocaleString("id-ID"),
           icon: FiCheckCircle,
           tone: styles.statGreen,
-          href: "/admin/koleksi/data-buku",
+          href: "/admin/koleksi/data-buku?availability=TERSEDIA",
         },
         {
           label: "MENUNGGU PENGAMBILAN",
           value: dashboard.stats.waitingPickup.toLocaleString("id-ID"),
           icon: FiClock,
           tone: styles.statBlue,
-          href: "/admin/transaksi/reservasi",
+          href: "/admin/transaksi/reservasi?status=MENUNGGU_PENGAMBILAN",
         },
         {
           label: "PEMINJAMAN AKTIF",
           value: dashboard.stats.activeLoans.toLocaleString("id-ID"),
           icon: FiPackage,
           tone: styles.statTeal,
-          href: "/admin/transaksi/peminjaman",
+          href: "/admin/transaksi/peminjaman?status=ACTIVE",
         },
         {
           label: "JATUH TEMPO HARI INI",
           value: dashboard.stats.dueToday.toLocaleString("id-ID"),
           icon: FiAlertTriangle,
           tone: styles.statOrange,
-          href: "/admin/transaksi/peminjaman",
+          href: "/admin/transaksi/peminjaman?due=TODAY",
         },
         {
           label: "TERLAMBAT",
           value: dashboard.stats.overdue.toLocaleString("id-ID"),
           icon: FiAlertTriangle,
           tone: styles.statRed,
-          href: "/admin/transaksi/peminjaman",
+          href: "/admin/transaksi/peminjaman?status=OVERDUE",
         },
         {
           label: "BUKU HILANG (PROSES)",
           value: dashboard.stats.lostInProcess.toLocaleString("id-ID"),
           icon: FiBox,
           tone: styles.statCoral,
-          href: "/admin/transaksi/buku-hilang-penggantian",
+          href: "/admin/transaksi/buku-hilang-penggantian?status=PROCESS",
         },
         {
           label: "TOTAL ANGGOTA",
@@ -344,22 +377,38 @@ export default function AdminDashboard() {
       dashboard.memberCategories.pegawai
     : 0;
 
-  const umumEnd =
-    memberTotal > 0
-      ? (dashboard!.memberCategories.umum / memberTotal) * 100
-      : 0;
-  const mahasiswaEnd =
-    memberTotal > 0
-      ? ((dashboard!.memberCategories.umum +
-          dashboard!.memberCategories.mahasiswa) /
-          memberTotal) *
-        100
-      : 0;
+  let memberOffset = 0;
+  const memberSegments = dashboard
+    ? ([
+        {
+          key: "umum" as const,
+          label: "Masyarakat Umum",
+          value: dashboard.memberCategories.umum,
+          tone: enhancements.memberSegmentNavy,
+        },
+        {
+          key: "mahasiswa" as const,
+          label: "Mahasiswa",
+          value: dashboard.memberCategories.mahasiswa,
+          tone: enhancements.memberSegmentBlue,
+        },
+        {
+          key: "pegawai" as const,
+          label: "Pegawai Internal",
+          value: dashboard.memberCategories.pegawai,
+          tone: enhancements.memberSegmentYellow,
+        },
+      ]).map((category) => {
+        const percentage = memberTotal > 0 ? (category.value / memberTotal) * 100 : 0;
+        const start = memberOffset;
+        memberOffset += percentage;
+        return { ...category, percentage, start };
+      })
+    : [];
 
-  const donutBackground =
-    memberTotal > 0
-      ? `conic-gradient(#2d345f 0 ${umumEnd}%, #2aaef3 ${umumEnd}% ${mahasiswaEnd}%, #ffd000 ${mahasiswaEnd}% 100%)`
-      : "#dedfe5";
+  const activeMember = memberSegments.find(
+    (segment) => segment.key === activeMemberCategory,
+  );
 
   return (
     <div className={styles.content}>
@@ -453,7 +502,7 @@ export default function AdminDashboard() {
               <header>
                 <h2>Transaksi Peminjaman</h2>
                 <p>
-                  {dashboard.range.from} sampai {dashboard.range.to} · diperbarui{" "}
+                  {formatRangeLabel(dashboard.range.from, dashboard.range.to)} · Diperbarui{" "}
                   {formatUpdatedAt(dashboard.generatedAt)}
                 </p>
 
@@ -584,7 +633,9 @@ export default function AdminDashboard() {
                     );
                     return (
                       <div
-                        className={enhancements.chartTooltip}
+                        className={`${enhancements.chartTooltip} ${
+                          point.y < 82 ? enhancements.chartTooltipBelow : ""
+                        }`}
                         role="status"
                         style={{
                           left: `${(point.x / 860) * 100}%`,
@@ -624,10 +675,48 @@ export default function AdminDashboard() {
 
               <div className={styles.donutArea}>
                 <div
-                  className={styles.donut}
-                  aria-label="Diagram kategori anggota"
-                  style={{ background: donutBackground }}
-                />
+                  className={enhancements.memberDonutWrap}
+                  onMouseLeave={() => setActiveMemberCategory(null)}
+                >
+                  <svg
+                    className={enhancements.memberDonut}
+                    viewBox="0 0 120 120"
+                    role="img"
+                    aria-label="Diagram kategori anggota. Arahkan kursor ke segmen untuk melihat jumlah dan persentase."
+                  >
+                    <circle
+                      className={enhancements.memberDonutTrack}
+                      cx="60"
+                      cy="60"
+                      r="44"
+                    />
+                    {memberSegments.map((segment) => (
+                      <circle
+                        key={segment.key}
+                        className={`${enhancements.memberDonutSegment} ${segment.tone}`}
+                        cx="60"
+                        cy="60"
+                        r="44"
+                        pathLength="100"
+                        strokeDasharray={`${segment.percentage} ${100 - segment.percentage}`}
+                        strokeDashoffset={-segment.start}
+                        tabIndex={0}
+                        aria-label={`${segment.label}: ${segment.value.toLocaleString("id-ID")} anggota, ${segment.percentage.toFixed(1)} persen`}
+                        onMouseEnter={() => setActiveMemberCategory(segment.key)}
+                        onFocus={() => setActiveMemberCategory(segment.key)}
+                        onClick={() => setActiveMemberCategory(segment.key)}
+                      />
+                    ))}
+                  </svg>
+
+                  {activeMember ? (
+                    <div className={enhancements.memberChartTooltip} role="status">
+                      <strong>{activeMember.label}</strong>
+                      <span>{activeMember.value.toLocaleString("id-ID")} anggota</span>
+                      <span>{activeMember.percentage.toFixed(1)}%</span>
+                    </div>
+                  ) : null}
+                </div>
 
                 <div className={styles.legend}>
                   <div>

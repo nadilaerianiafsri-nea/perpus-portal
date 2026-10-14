@@ -1,0 +1,31 @@
+.interactiveFilter {
+  font-family: var(--font-outfit), "Outfit", sans-serif;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease,
+    transform 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.interactiveFilter:hover {
+  border-color: var(--navy-soft);
+  background: #f4f4f7;
+  transform: scale(1.01);
+}
+
+.interactiveFilter:focus-within {
+  border-color: var(--navy-soft);
+  box-shadow: 0 0 0 3px #00063312;
+}
+
+@media (max-width: 600px) {
+  .interactiveFilter:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .interactiveFilter {
+    transition: none;
+  }
+}

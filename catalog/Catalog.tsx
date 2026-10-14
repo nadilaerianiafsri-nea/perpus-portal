@@ -14,6 +14,7 @@ import {
   typeLabels,
 } from "./types";
 import styles from "./Catalog.module.css";
+import memberStyles from "./MemberCatalogEnhancements.module.css";
 
 const sorts = [
   ["relevance", "Relevansi"],
@@ -182,44 +183,60 @@ export default function Catalog({
 
       <h1>{ebook ? "Katalog E-Book" : "Katalog Koleksi"}</h1>
 
-      <div className={styles.searchRow}>
+      <div className={`${styles.searchRow} ${member ? memberStyles.memberSearchRow : ""}`}>
         <SearchInput
           key={searchRevision}
           initialValue={query.get("search") ?? ""}
           onSearch={(value) => update({ search: value.trim() || null })}
         />
-        <label>
-          <span className={styles.srOnly}>Kategori pencarian</span>
-          <select
-            aria-label="Kategori pencarian"
-            value={
-              (query.get("subject") ?? "").includes(",")
-                ? ""
-                : (query.get("subject") ?? "")
-            }
-            onChange={(event) => update({ subject: event.target.value || null })}
-          >
-            <option value="">Semua</option>
-            {options.subjects.map((subject) => (
-              <option key={subject}>{subject}</option>
-            ))}
-          </select>
-        </label>
+        {!member ? (
+          <label>
+            <span className={styles.srOnly}>Kategori pencarian</span>
+            <select
+              aria-label="Kategori pencarian"
+              value={
+                (query.get("subject") ?? "").includes(",")
+                  ? ""
+                  : (query.get("subject") ?? "")
+              }
+              onChange={(event) => update({ subject: event.target.value || null })}
+            >
+              <option value="">Semua</option>
+              {options.subjects.map((subject) => (
+                <option key={subject}>{subject}</option>
+              ))}
+            </select>
+          </label>
+        ) : null}
       </div>
 
-      <div className={styles.catalogLayout}>
-        <aside className={styles.sidebar}>
-          <Filters {...filterProps} />
-          {filtersError ? (
-            <p className={styles.inlineError}>Filter belum dapat dimuat.</p>
-          ) : null}
-        </aside>
+      <div className={member ? memberStyles.memberCatalogLayout : styles.catalogLayout}>
+        {!member ? (
+          <aside className={styles.sidebar}>
+            <Filters {...filterProps} />
+            {filtersError ? (
+              <p className={styles.inlineError}>Filter belum dapat dimuat.</p>
+            ) : null}
+          </aside>
+        ) : null}
 
         <section className={styles.results} aria-label="Hasil pencarian" aria-busy={loading}>
           <div className={styles.toolbar}>
-            <button className={styles.mobileFilter} onClick={() => dialog.current?.showModal()}>
-              <FiSliders /> Filter
-            </button>
+            {member ? (
+              <button
+                type="button"
+                className={memberStyles.memberFilterButton}
+                aria-label="Buka filter koleksi"
+                title="Filter koleksi"
+                onClick={() => dialog.current?.showModal()}
+              >
+                <FiSliders aria-hidden="true" />
+              </button>
+            ) : (
+              <button className={styles.mobileFilter} onClick={() => dialog.current?.showModal()}>
+                <FiSliders /> Filter
+              </button>
+            )}
             <p aria-live="polite">
               {loading ? (
                 "Memuat koleksi..."
@@ -366,7 +383,11 @@ export default function Catalog({
         </section>
       </div>
 
-      <dialog ref={dialog} className={styles.filterDialog} aria-label="Filter koleksi">
+      <dialog
+        ref={dialog}
+        className={`${styles.filterDialog} ${member ? memberStyles.memberFilterDialog : ""}`}
+        aria-label="Filter koleksi"
+      >
         <button className={styles.closeDialog} aria-label="Tutup filter" onClick={() => dialog.current?.close()}>
           <FiX />
         </button>
