@@ -23,11 +23,13 @@ const sorts = [
   ["yearAsc", "Tahun Terlama"],
 ];
 const emptyOptions: FilterOptions = { subjects: [], languages: [], years: [] };
+
 export default function Catalog({ ebook = false }: { ebook?: boolean }) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
   const query = new URLSearchParams(params.toString());
+
   const [options, setOptions] = useState<FilterOptions>(emptyOptions);
   const [filtersError, setFiltersError] = useState(false);
   const [retry, setRetry] = useState(0);
@@ -37,21 +39,27 @@ export default function Catalog({ ebook = false }: { ebook?: boolean }) {
     data?: CatalogResponse;
     error?: string;
   } | null>(null);
+
   const dialog = useRef<HTMLDialogElement>(null);
   const apiQuery = new URLSearchParams(query);
+
   apiQuery.delete("view");
+
   if (ebook) {
     apiQuery.delete("type");
     apiQuery.delete("availability");
   }
+
   const queryString = apiQuery.toString();
   const key = `${ebook}:${queryString}:${retry}`;
   const loading = result?.key !== key;
   const response = !loading ? result?.data : undefined;
   const error = !loading ? result?.error : undefined;
   const view = query.get("view") === "list" ? "list" : "grid";
+
   useEffect(() => {
     const controller = new AbortController();
+
     fetch("/api/collections/filters", { signal: controller.signal })
       .then(async (r) => {
         if (!r.ok) throw new Error();
@@ -64,10 +72,13 @@ export default function Catalog({ ebook = false }: { ebook?: boolean }) {
       .catch(() => {
         if (!controller.signal.aborted) setFiltersError(true);
       });
+
     return () => controller.abort();
   }, [retry]);
+
   useEffect(() => {
     const controller = new AbortController();
+
     fetch(`/api/${ebook ? "ebooks" : "collections"}?${queryString}`, {
       signal: AbortSignal.any([controller.signal, AbortSignal.timeout(12000)]),
       cache: "no-store",
@@ -75,19 +86,21 @@ export default function Catalog({ ebook = false }: { ebook?: boolean }) {
       .then(async (r) => {
         if (!r.ok) {
           const body = await r.json();
+
           throw new Error(
             r.status === 400 && typeof body.message === "string"
               ? body.message
               : "Data koleksi belum dapat dimuat. Silakan coba lagi.",
           );
         }
+
         return r.json();
       })
       .then((data) => {
         if (!controller.signal.aborted) setResult({ key, data });
       })
       .catch((reason) => {
-        if (!controller.signal.aborted)
+        if (!controller.signal.aborted) {
           setResult({
             key,
             error:
@@ -95,23 +108,42 @@ export default function Catalog({ ebook = false }: { ebook?: boolean }) {
                 ? reason.message
                 : "Data koleksi belum dapat dimuat. Silakan coba lagi.",
           });
+        }
       });
+
     return () => controller.abort();
   }, [ebook, queryString, key]);
+
   function update(updates: Record<string, string | null>) {
     const next = new URLSearchParams(window.location.search);
+
     for (const [name, value] of Object.entries(updates)) {
       if (value) next.set(name, value);
       else next.delete(name);
     }
-    if (!("page" in updates) && !("view" in updates)) next.delete("page");
-    router.push(`${pathname}${next.size ? `?${next}` : ""}`, { scroll: false });
+
+    if (!("page" in updates) && !("view" in updates)) {
+      next.delete("page");
+    }
+
+    router.push(`${pathname}${next.size ? `?${next}` : ""}`, {
+      scroll: false,
+    });
   }
+
   function clear() {
     setSearchRevision((value) => value + 1);
     router.push(pathname, { scroll: false });
   }
-  const filterProps = { query, options, ebook, update, clear };
+
+  const filterProps = {
+    query,
+    options,
+    ebook,
+    update,
+    clear,
+  };
+
   const chips = (
     ebook
       ? ["subject", "language"]
@@ -132,59 +164,97 @@ export default function Catalog({ ebook = false }: { ebook?: boolean }) {
               : value,
       })),
   );
-  for (const name of ["yearFrom", "yearTo"])
-    if (query.get(name))
+
+  for (const name of ["yearFrom", "yearTo"]) {
+    if (query.get(name)) {
       chips.push({
         name,
         value: query.get(name)!,
         label: `${name === "yearFrom" ? "Dari" : "Sampai"} ${query.get(name)}`,
       });
+    }
+  }
+
   const currentPage = response?.meta.page ?? Number(query.get("page") || 1);
+
   const totalPages = response?.meta.totalPages ?? 0;
+
   const pageStart = Math.max(1, Math.min(currentPage - 2, totalPages - 4));
+
   const pages = Array.from(
     { length: Math.min(5, totalPages) },
     (_, i) => pageStart + i,
   );
+
   return (
-    <main className={styles.main}>
+    <main className={`${styles.main} ${styles.catalogPage}`}>
       <nav className={styles.breadcrumb} aria-label="Breadcrumb">
         <Link href="/">Beranda</Link>
         <span>/</span>
         <span>{ebook ? "E-Book" : "Koleksi"}</span>
       </nav>
-      <h1>{ebook ? "Katalog E-Book" : "Katalog Koleksi"}</h1>
-      <div className={styles.searchRow}>
-        <SearchInput
-          key={searchRevision}
-          initialValue={query.get("search") ?? ""}
-          onSearch={(value) => update({ search: value.trim() || null })}
-        />
-        <label>
-          <span className={styles.srOnly}>Kategori pencarian</span>
-          <select
-            aria-label="Kategori pencarian"
-            value={
-              (query.get("subject") ?? "").includes(",")
-                ? ""
-                : (query.get("subject") ?? "")
+
+      <header className={styles.catalogHero}>
+        <span className={styles.catalogEyebrow}>
+          {ebook ? "Perpustakaan Digital" : "Koleksi Perpustakaan"}
+        </span>
+
+        <h1>{ebook ? "Katalog E-Book" : "Katalog Koleksi"}</h1>
+
+        <p>
+          {ebook
+            ? "Temukan bacaan digital dan akses E-Book yang tersedia langsung melalui web perpustakaan."
+            : "Jelajahi koleksi perpustakaan, temukan buku yang dibutuhkan, dan periksa ketersediaannya sebelum berkunjung."}
+        </p>
+      </header>
+
+      <section className={styles.searchPanel} aria-label="Pencarian katalog">
+        <div className={styles.searchRow}>
+          <SearchInput
+            key={searchRevision}
+            initialValue={query.get("search") ?? ""}
+            onSearch={(value) =>
+              update({
+                search: value.trim() || null,
+              })
             }
-            onChange={(e) => update({ subject: e.target.value || null })}
-          >
-            <option value="">Semua</option>
-            {options.subjects.map((subject) => (
-              <option key={subject}>{subject}</option>
-            ))}
-          </select>
-        </label>
-      </div>
+          />
+
+          <label>
+            <span className={styles.srOnly}>Kategori pencarian</span>
+
+            <select
+              aria-label="Kategori pencarian"
+              value={
+                (query.get("subject") ?? "").includes(",")
+                  ? ""
+                  : (query.get("subject") ?? "")
+              }
+              onChange={(e) =>
+                update({
+                  subject: e.target.value || null,
+                })
+              }
+            >
+              <option value="">Semua</option>
+
+              {options.subjects.map((subject) => (
+                <option key={subject}>{subject}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+      </section>
+
       <div className={styles.catalogLayout}>
         <aside className={styles.sidebar}>
           <Filters {...filterProps} />
+
           {filtersError && (
             <p className={styles.inlineError}>Filter belum dapat dimuat.</p>
           )}
         </aside>
+
         <section
           className={styles.results}
           aria-label="Hasil pencarian"
@@ -195,8 +265,10 @@ export default function Catalog({ ebook = false }: { ebook?: boolean }) {
               className={styles.mobileFilter}
               onClick={() => dialog.current?.showModal()}
             >
-              <FiSliders /> Filter
+              <FiSliders />
+              Filter
             </button>
+
             <p aria-live="polite">
               {loading ? (
                 "Memuat koleksi..."
@@ -208,15 +280,21 @@ export default function Catalog({ ebook = false }: { ebook?: boolean }) {
                 "Hasil pencarian"
               )}
             </p>
+
             <div className={styles.sortTools}>
               <label className={styles.pageSize}>
                 <span className={styles.srOnly}>
                   Jumlah koleksi per halaman
                 </span>
+
                 <select
                   aria-label="Jumlah koleksi per halaman"
                   value={query.get("limit") ?? (ebook ? "8" : "20")}
-                  onChange={(e) => update({ limit: e.target.value })}
+                  onChange={(e) =>
+                    update({
+                      limit: e.target.value,
+                    })
+                  }
                 >
                   {[
                     ...new Set([
@@ -234,11 +312,17 @@ export default function Catalog({ ebook = false }: { ebook?: boolean }) {
                   ))}
                 </select>
               </label>
+
               <label>
                 <span className={styles.srOnly}>Urutkan koleksi</span>
+
                 <select
                   value={query.get("sort") ?? "relevance"}
-                  onChange={(e) => update({ sort: e.target.value })}
+                  onChange={(e) =>
+                    update({
+                      sort: e.target.value,
+                    })
+                  }
                 >
                   {sorts.map(([value, label]) => (
                     <option key={value} value={value}>
@@ -247,24 +331,35 @@ export default function Catalog({ ebook = false }: { ebook?: boolean }) {
                   ))}
                 </select>
               </label>
+
               <div className={styles.viewToggle}>
                 <button
                   aria-label="Tampilan grid"
                   aria-pressed={view === "grid"}
-                  onClick={() => update({ view: null })}
+                  onClick={() =>
+                    update({
+                      view: null,
+                    })
+                  }
                 >
                   <FiGrid />
                 </button>
+
                 <button
                   aria-label="Tampilan list"
                   aria-pressed={view === "list"}
-                  onClick={() => update({ view: "list" })}
+                  onClick={() =>
+                    update({
+                      view: "list",
+                    })
+                  }
                 >
                   <FiList />
                 </button>
               </div>
             </div>
           </div>
+
           {(ebook || chips.length > 0) && (
             <div className={styles.chips}>
               {ebook && (
@@ -272,9 +367,11 @@ export default function Catalog({ ebook = false }: { ebook?: boolean }) {
                   href="/koleksi"
                   aria-label="Hapus pembatas E-Book, buka semua koleksi"
                 >
-                  E-Book <FiX />
+                  E-Book
+                  <FiX />
                 </Link>
               )}
+
               {chips.map((chip) => (
                 <button
                   key={`${chip.name}:${chip.value}`}
@@ -293,26 +390,37 @@ export default function Catalog({ ebook = false }: { ebook?: boolean }) {
                   <FiX />
                 </button>
               ))}
+
               <button className={styles.clearChips} onClick={clear}>
-                <FiX /> Hapus semua
+                <FiX />
+                Hapus semua
               </button>
             </div>
           )}
+
           {loading ? (
             <div className={styles.grid} aria-label="Memuat koleksi">
-              {Array.from({ length: ebook ? 8 : 12 }, (_, i) => (
-                <div className={styles.skeleton} key={i}>
-                  <div />
-                  <span />
-                  <span />
-                </div>
-              ))}
+              {Array.from(
+                {
+                  length: ebook ? 8 : 12,
+                },
+                (_, i) => (
+                  <div className={styles.skeleton} key={i}>
+                    <div />
+                    <span />
+                    <span />
+                  </div>
+                ),
+              )}
             </div>
           ) : error ? (
             <div className={styles.state} role="alert">
               <h2>Data koleksi belum dapat dimuat. Silakan coba lagi.</h2>
+
               {error === "Rentang tahun tidak valid." && <p>{error}</p>}
+
               <button onClick={() => setRetry((v) => v + 1)}>Coba Lagi</button>
+
               <button onClick={clear}>Bersihkan Filter</button>
             </div>
           ) : response?.data.length ? (
@@ -322,25 +430,40 @@ export default function Catalog({ ebook = false }: { ebook?: boolean }) {
                   <BookCard key={book.id} book={book} />
                 ))}
               </div>
+
               <nav className={styles.pagination} aria-label="Halaman katalog">
                 <button
                   disabled={currentPage <= 1}
-                  onClick={() => update({ page: String(currentPage - 1) })}
+                  onClick={() =>
+                    update({
+                      page: String(currentPage - 1),
+                    })
+                  }
                 >
                   Sebelumnya
                 </button>
+
                 {pages.map((page) => (
                   <button
                     key={page}
                     aria-current={page === currentPage ? "page" : undefined}
-                    onClick={() => update({ page: String(page) })}
+                    onClick={() =>
+                      update({
+                        page: String(page),
+                      })
+                    }
                   >
                     {page}
                   </button>
                 ))}
+
                 <button
                   disabled={currentPage >= totalPages}
-                  onClick={() => update({ page: String(currentPage + 1) })}
+                  onClick={() =>
+                    update({
+                      page: String(currentPage + 1),
+                    })
+                  }
                 >
                   Berikutnya
                 </button>
@@ -349,11 +472,21 @@ export default function Catalog({ ebook = false }: { ebook?: boolean }) {
           ) : (
             <div className={styles.state}>
               <FiSearch />
+
               <h2>Tidak ada koleksi yang sesuai.</h2>
+
               <p>Coba kata kunci lain atau hapus filter yang dipilih.</p>
+
               <button onClick={clear}>Bersihkan Filter</button>
+
               {totalPages > 0 && (
-                <button onClick={() => update({ page: "1" })}>
+                <button
+                  onClick={() =>
+                    update({
+                      page: "1",
+                    })
+                  }
+                >
                   Kembali ke Halaman Pertama
                 </button>
               )}
@@ -361,6 +494,7 @@ export default function Catalog({ ebook = false }: { ebook?: boolean }) {
           )}
         </section>
       </div>
+
       <dialog
         ref={dialog}
         className={styles.filterDialog}
@@ -373,8 +507,11 @@ export default function Catalog({ ebook = false }: { ebook?: boolean }) {
         >
           <FiX />
         </button>
+
         <Filters {...filterProps} />
+
         {filtersError && <p>Filter belum dapat dimuat.</p>}
+
         <button
           className={styles.primaryButton}
           onClick={() => dialog.current?.close()}
