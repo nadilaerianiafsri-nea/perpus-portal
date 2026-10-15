@@ -31,10 +31,12 @@ export default function BookCard({
   book,
   basePath = "/koleksi",
   member = false,
+  compact = false,
 }: {
   book: Book;
   basePath?: string;
   member?: boolean;
+  compact?: boolean;
 }) {
   const detailHref = `${basePath}/${book.id}`;
   const details = (
@@ -70,7 +72,9 @@ export default function BookCard({
   );
 
   return (
-    <article className={styles.card}>
+    <article
+      className={`${styles.card}${compact ? ` ${styles.relatedCard}` : ""}`}
+    >
       <Link
         href={detailHref}
         className={styles.cover}
@@ -81,9 +85,11 @@ export default function BookCard({
           alt={`Sampul ${book.title}`}
           fill
           sizes={
-            member
-              ? "(max-width: 600px) 90vw, (max-width: 900px) 45vw, (max-width: 1200px) 30vw, 20vw"
-              : "(max-width: 600px) 50vw, (max-width: 1000px) 33vw, 25vw"
+            compact
+              ? "(max-width: 600px) 45vw, (max-width: 1100px) 30vw, 16vw"
+              : member
+                ? "(max-width: 600px) 90vw, (max-width: 900px) 45vw, (max-width: 1200px) 30vw, 20vw"
+                : "(max-width: 600px) 50vw, (max-width: 1000px) 33vw, 25vw"
           }
         />
         <span className={styles.typeBadge}>

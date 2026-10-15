@@ -18,9 +18,11 @@ function formatRemaining(deadline: string | null | undefined, now: number) {
 export default function EBookLibraryAction({
   bookId,
   role,
+  readAfterBorrow = false,
 }: {
   bookId: number;
   role: "ADMIN" | "PENGUNJUNG" | null;
+  readAfterBorrow?: boolean;
 }) {
   const router = useRouter();
   const locked = useRef(false);
@@ -28,7 +30,7 @@ export default function EBookLibraryAction({
   const [loading, setLoading] = useState(role === "PENGUNJUNG");
   const [pending, setPending] = useState(false);
   const [notice, setNotice] = useState("");
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState(() => Date.now());
 
   const load = useCallback(async () => {
     if (role !== "PENGUNJUNG") return;
@@ -41,7 +43,9 @@ export default function EBookLibraryAction({
       });
       const data = await response.json().catch(() => null);
       if (response.status === 401) {
-        router.replace(`/login?next=${encodeURIComponent(`/koleksi/${bookId}`)}`);
+        router.replace(
+          `/login?next=${encodeURIComponent(`/koleksi/${bookId}`)}`,
+        );
         return;
       }
       if (!response.ok) {
@@ -65,6 +69,8 @@ export default function EBookLibraryAction({
   }, [bookId, role, router]);
 
   useEffect(() => {
+    // Synchronize the existing circulation resource on mount/book changes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void load();
   }, [load]);
 
@@ -106,6 +112,10 @@ export default function EBookLibraryAction({
         return;
       }
       setNotice(successMessage);
+      if (readAfterBorrow && path === "borrow") {
+        router.push(`/e-book/${bookId}/baca`);
+        return;
+      }
       await load();
       router.refresh();
     } catch {
@@ -125,10 +135,12 @@ export default function EBookLibraryAction({
           className={styles.detailLink}
           type="button"
           onClick={() =>
-            router.push(`/login?next=${encodeURIComponent(`/koleksi/${bookId}`)}`)
+            router.push(
+              `/login?next=${encodeURIComponent(`/koleksi/${bookId}`)}`,
+            )
           }
         >
-          Masuk untuk Pinjam E-Book
+          Masuk untuk Baca E-Book
         </button>
       </div>
     );
@@ -149,9 +161,15 @@ export default function EBookLibraryAction({
           className={styles.detailLink}
           type="button"
           disabled={pending}
-          onClick={() => void act("borrow", "E-Book berhasil dipinjam selama 7 hari.")}
+          onClick={() =>
+            void act("borrow", "E-Book berhasil dipinjam selama 7 hari.")
+          }
         >
-          {pending ? "Memproses..." : "Pinjam E-Book"}
+          {pending
+            ? "Memproses..."
+            : readAfterBorrow
+              ? "Baca E-Book"
+              : "Pinjam E-Book"}
         </button>
       ) : null}
 
@@ -160,7 +178,9 @@ export default function EBookLibraryAction({
           className={styles.detailLink}
           type="button"
           disabled={pending}
-          onClick={() => void act("queue", "Anda berhasil masuk antrean E-Book.")}
+          onClick={() =>
+            void act("queue", "Anda berhasil masuk antrean E-Book.")
+          }
         >
           {pending ? "Memproses..." : "Masuk Antrean"}
         </button>
@@ -168,7 +188,10 @@ export default function EBookLibraryAction({
 
       {status?.state === "BORROWED_BY_ME" ? (
         <>
-          <Link className={styles.primaryButton} href={`/e-book/${bookId}/baca`}>
+          <Link
+            className={styles.primaryButton}
+            href={`/e-book/${bookId}/baca`}
+          >
             Baca E-Book
           </Link>
           <button
@@ -185,13 +208,16 @@ export default function EBookLibraryAction({
       {status?.state === "QUEUED" ? (
         <>
           <p className={styles.ctaNotice}>
-            Posisi antrean Anda: <strong>#{status.queue?.position ?? "-"}</strong>
+            Posisi antrean Anda:{" "}
+            <strong>#{status.queue?.position ?? "-"}</strong>
           </p>
           <button
             className={styles.detailLink}
             type="button"
             disabled={pending}
-            onClick={() => void act("queue/cancel", "Antrean E-Book berhasil dibatalkan.")}
+            onClick={() =>
+              void act("queue/cancel", "Antrean E-Book berhasil dibatalkan.")
+            }
           >
             {pending ? "Memproses..." : "Batalkan Antrean"}
           </button>
@@ -201,21 +227,30 @@ export default function EBookLibraryAction({
       {status?.state === "OFFERED_TO_ME" ? (
         <>
           <p className={styles.ctaNotice}>
-            <strong>Giliran Anda tersedia.</strong> Sisa prioritas: {formatRemaining(status.queue?.claimExpiresAt, now)}.
+            <strong>Giliran Anda tersedia.</strong> Sisa prioritas:{" "}
+            {formatRemaining(status.queue?.claimExpiresAt, now)}.
           </p>
           <button
             className={styles.detailLink}
             type="button"
             disabled={pending}
-            onClick={() => void act("borrow", "E-Book berhasil dipinjam selama 7 hari.")}
+            onClick={() =>
+              void act("borrow", "E-Book berhasil dipinjam selama 7 hari.")
+            }
           >
-            {pending ? "Memproses..." : "Pinjam E-Book"}
+            {pending
+              ? "Memproses..."
+              : readAfterBorrow
+                ? "Baca E-Book"
+                : "Pinjam E-Book"}
           </button>
           <button
             className={styles.detailLink}
             type="button"
             disabled={pending}
-            onClick={() => void act("queue/cancel", "Antrean E-Book berhasil dibatalkan.")}
+            onClick={() =>
+              void act("queue/cancel", "Antrean E-Book berhasil dibatalkan.")
+            }
           >
             Batalkan Antrean
           </button>
@@ -223,7 +258,9 @@ export default function EBookLibraryAction({
       ) : null}
 
       {status?.state === "UNAVAILABLE" ? (
-        <p className={styles.ctaNotice}>E-Book sedang tidak tersedia untuk dipinjam.</p>
+        <p className={styles.ctaNotice}>
+          E-Book sedang tidak tersedia untuk dipinjam.
+        </p>
       ) : null}
 
       {notice ? (

@@ -1,16 +1,14 @@
-import { safeCoverUrl } from "../shared/displayUrls.cjs";
-import Image from "next/image";
+import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getCurrentUser } from "@/auth/serverAuth";
 import CatalogShell from "./CatalogShell";
 import BorrowAction from "./BorrowAction";
 import EBookLibraryAction from "./EBookLibraryAction";
-import { getCurrentUser } from "@/auth/serverAuth";
-import { BookStatus } from "./BookCard";
+import BookDetailLayout from "./BookDetailLayout";
+import RelatedBooks, { RelatedBooksLoading } from "./RelatedBooks";
 import { getBook } from "./serverApi";
-import { typeLabels } from "./types";
-import styles from "./Catalog.module.css";
-import memberStyles from "./MemberCatalogEnhancements.module.css";
+import styles from "./BookDetail.module.css";
 
 export default async function BookDetail({
   id,
@@ -24,151 +22,75 @@ export default async function BookDetail({
     getCurrentUser(),
   ]);
   const basePath = member ? "/dashboard/koleksi" : "/koleksi";
-
   if (unavailable) {
     const state = (
-      <div className={styles.state}>
-        <h1>Data koleksi belum dapat dimuat. Silakan coba lagi.</h1>
-        <Link className={styles.detailLink} href={`${basePath}/${id}`}>
+      <section className={`${styles.page} ${styles.error}`} role="alert">
+        <h1>Koleksi belum dapat dimuat.</h1>
+        <p>Silakan coba lagi untuk melihat informasi buku.</p>
+        <Link className={styles.primaryLink} href={`${basePath}/${id}`}>
           Coba Lagi
         </Link>
-        <Link href={basePath}>Kembali ke Katalog</Link>
-      </div>
+        <Link className={styles.secondaryLink} href={basePath}>
+          Kembali ke Koleksi
+        </Link>
+      </section>
     );
-
-    if (member) return <div className={styles.main}>{state}</div>;
-    return (
+    return member ? (
+      state
+    ) : (
       <CatalogShell>
-        <main className={styles.main}>{state}</main>
+        <main>{state}</main>
       </CatalogShell>
     );
   }
-
   if (!book) notFound();
-
   const ebook = book.type === "EBOOK";
-  const metadata = [
-    ["Kode Buku", book.code],
-    ["ISBN/ISSN", book.isbnIssn ?? "Belum tersedia"],
-    ["Penerbit", book.publisher],
-    ["Tahun Terbit", book.year],
-    ["Edisi", book.edition ?? "Tidak dicantumkan"],
-    ["Bahasa", book.language],
-    ["Subjek", book.subject],
-    ["Jenis Koleksi", typeLabels[book.type]],
-    ["Format", book.format],
-    ...(!ebook
-      ? [
-          ["Lokasi / Rak", book.shelf ?? "Belum ditentukan"],
-          ["Total Eksemplar", book.totalCopies],
-          ["Jumlah Tersedia", book.availableCopies],
-        ]
-      : []),
-  ];
-
-  const content = (
+  const loginHref = `/login?next=${encodeURIComponent(`/koleksi/${book.id}`)}`;
+  const action = !user ? (
     <>
-      {!member ? (
-        <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-          <Link href="/">Beranda</Link>
-          <span>/</span>
-          <Link href={ebook ? "/e-book" : "/koleksi"}>
-            {ebook ? "E-Book" : "Koleksi"}
-          </Link>
-          <span>/</span>
-          <span>Detail Buku</span>
-        </nav>
-      ) : (
-        <Link className={memberStyles.memberBackButton} href={basePath}>
-          Kembali
+      {ebook || book.availableCopies > 0 ? (
+        <Link className={styles.primaryLink} href={loginHref}>
+          {ebook ? "Masuk untuk Baca E-Book" : "Masuk untuk Ajukan Peminjaman"}
         </Link>
+      ) : (
+        <button className={styles.primaryLink} disabled>
+          Tidak Tersedia
+        </button>
       )}
-
-      <article className={styles.detail}>
-        <div className={styles.detailCover}>
-          <Image
-            src={safeCoverUrl(book.coverUrl)}
-            alt={`Sampul ${book.title}`}
-            fill
-            priority
-            sizes="(max-width: 600px) 280px, 340px"
-          />
-        </div>
-
-        <div>
-          <h1>{book.title}</h1>
-          <p>{book.author}</p>
-          <BookStatus book={book} />
-          {book.isDemo ? <p>Data contoh pengembangan.</p> : null}
-
-          <dl className={styles.metadata}>
-            {metadata.map(([label, value]) => (
-              <div key={label}>
-                <dt>{label}</dt>
-                <dd>{value}</dd>
-              </div>
-            ))}
-          </dl>
-
-          <h2>Deskripsi</h2>
-          <p>{book.description}</p>
-
-          {ebook ? (
-            <EBookLibraryAction
-              key={book.id}
-              bookId={book.id}
-              role={user?.role ?? null}
-            />
-          ) : (
-            <BorrowAction
-              key={book.id}
-              available={book.availableCopies > 0}
-              bookId={book.id}
-              role={user?.role ?? null}
-            />
-          )}
-        </div>
-      </article>
-
-      {!ebook && !member ? (
-        <section className={styles.tableWrap}>
-          <h2>Eksemplar Buku</h2>
-          <table className={styles.copyTable}>
-            <thead>
-              <tr>
-                <th>Kode Eksemplar</th>
-                <th>Status</th>
-                <th>Lokasi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {book.copies.map((copy) => (
-                <tr key={copy.id}>
-                  <td>{copy.code}</td>
-                  <td>
-                    {copy.status === "TERSEDIA"
-                      ? "Tersedia"
-                      : copy.status === "DIRESERVASI"
-                        ? "Direservasi"
-                        : copy.status === "HILANG"
-                          ? "Hilang"
-                          : "Dipinjam"}
-                  </td>
-                  <td>{copy.location}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
-      ) : null}
+      <Link className={styles.secondaryLink} href="/register">
+        Daftar Anggota
+      </Link>
     </>
+  ) : ebook ? (
+    <EBookLibraryAction
+      key={book.id}
+      bookId={book.id}
+      role={user.role}
+      readAfterBorrow
+    />
+  ) : (
+    <BorrowAction
+      key={book.id}
+      available={book.availableCopies > 0}
+      bookId={book.id}
+      role={user.role}
+    />
   );
-
-  if (member) return <div className={styles.main}>{content}</div>;
-
-  return (
-    <CatalogShell ebook={ebook}>
-      <main className={styles.main}>{content}</main>
-    </CatalogShell>
+  const content = (
+    <BookDetailLayout
+      book={book}
+      member={member}
+      action={action}
+      related={
+        <Suspense fallback={<RelatedBooksLoading />}>
+          <RelatedBooks book={book} member={member} />
+        </Suspense>
+      }
+    />
+  );
+  return member ? (
+    content
+  ) : (
+    <CatalogShell ebook={ebook}>{content}</CatalogShell>
   );
 }

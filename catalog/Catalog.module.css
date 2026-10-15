@@ -1739,3 +1739,18 @@
   outline: 3px solid #ffd000;
   outline-offset: 3px;
 }
+
+/* Compact recommendations reuse BookCard in both public and member details. */
+.relatedCard { border-radius: 10px; animation: none; transition: border-color 180ms ease, box-shadow 180ms ease; }
+.relatedCard:hover { border-color: #bdc1d2; box-shadow: 0 4px 12px #0006330c; }
+.relatedCard .cover { aspect-ratio: 4 / 5; max-height: 176px; border-bottom: 1px solid #e8e9ee; background: #f0f1f5; }
+.relatedCard .cover img { object-fit: contain; padding: 12px; transform: none; }
+.relatedCard .typeBadge { top: 8px; left: 8px; padding: 4px 6px; font-size: 9px; }
+.relatedCard .cardBody { padding: 12px; gap: 0; }
+.relatedCard h2 { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; height: 38px; margin: 0; overflow: hidden; font-size: 14px; font-weight: 600; line-height: 19px; }
+.relatedCard p { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; line-height: 18px; }
+.relatedCard small { font-size: 11px; line-height: 17px; }
+.relatedCard .memberCardFooter { gap: 10px; padding-top: 12px; }
+.relatedCard .status { font-size: 10px; min-height: 21px; }
+.relatedCard .detailLink { min-height: 33px; margin-top: 0; padding: 7px; font-size: 11px; }
+.relatedCard .detailLink:hover { background: #2b3056; border-color: #2b3056; color: #fff; }
