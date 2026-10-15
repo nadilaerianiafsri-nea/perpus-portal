@@ -1,2 +1,5 @@
-import HistoryPage from "@/members/HistoryPage";
-export default function Page() { return <HistoryPage />; }
+import { redirect } from "next/navigation";
+
+export default function Page() {
+  redirect("/dashboard/pinjaman#riwayat-peminjaman");
+}

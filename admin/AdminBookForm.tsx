@@ -14,6 +14,7 @@ import {
   type AdminBookPayload,
 } from "./adminBooks";
 import styles from "./AdminBooks.module.css";
+import enhancements from "./AdminBooksEnhancements.module.css";
 
 type FormState = Omit<AdminBookPayload, "year" | "totalStock"> & {
   year: string;
@@ -179,8 +180,15 @@ export default function AdminBookForm({
     if (saving) return;
 
     const textError = adminBookTextError(form);
-    if (textError) { setError(textError); return; }
-    if (!SUBJECT_CATEGORIES.includes(form.subject.trim() as (typeof SUBJECT_CATEGORIES)[number])) {
+    if (textError) {
+      setError(textError);
+      return;
+    }
+    if (
+      !SUBJECT_CATEGORIES.includes(
+        form.subject.trim() as (typeof SUBJECT_CATEGORIES)[number],
+      )
+    ) {
       setError("Pilih Subjek / Kategori dari daftar yang tersedia.");
       return;
     }
@@ -246,7 +254,10 @@ export default function AdminBookForm({
       ? `/admin/koleksi/data-buku/${id}`
       : "/admin/koleksi/data-buku";
   const subjectCategories =
-    form.subject && !SUBJECT_CATEGORIES.includes(form.subject as (typeof SUBJECT_CATEGORIES)[number])
+    form.subject &&
+    !SUBJECT_CATEGORIES.includes(
+      form.subject as (typeof SUBJECT_CATEGORIES)[number],
+    )
       ? [form.subject, ...SUBJECT_CATEGORIES]
       : SUBJECT_CATEGORIES;
 
@@ -376,20 +387,21 @@ export default function AdminBookForm({
                 <span>
                   Subjek / Kategori <b>*</b>
                 </span>
-                <input
-                  list="book-subject-categories"
+                <select
+                  className={enhancements.subjectSelect}
                   value={form.subject}
                   onChange={(e) => update("subject", e.target.value)}
-                  placeholder="Cari atau pilih Subjek / Kategori"
-                  autoComplete="off"
                   required
-                  maxLength={191}
-                />
-                <datalist id="book-subject-categories">
+                >
+                  <option value="" disabled>
+                    Pilih Subjek / Kategori
+                  </option>
                   {subjectCategories.map((subject) => (
-                    <option key={subject} value={subject} />
+                    <option key={subject} value={subject}>
+                      {subject}
+                    </option>
                   ))}
-                </datalist>
+                </select>
               </label>
             </div>
           </section>

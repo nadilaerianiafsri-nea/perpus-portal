@@ -1,5 +1,7 @@
 import { type FilterOptions, availabilityLabels, typeLabels } from "./types";
 import styles from "./Catalog.module.css";
+import enhancements from "./MemberCatalogEnhancements.module.css";
+
 type Props = {
   query: URLSearchParams;
   options: FilterOptions;
@@ -7,6 +9,7 @@ type Props = {
   update: (values: Record<string, string | null>) => void;
   clear: () => void;
 };
+
 export default function Filters({
   query,
   options,
@@ -44,6 +47,7 @@ export default function Filters({
       </fieldset>
     );
   }
+
   return (
     <div className={styles.filters}>
       <div className={styles.filterHeading}>
@@ -84,6 +88,7 @@ export default function Filters({
           <label>
             <span className={styles.srOnly}>Tahun terbit dari</span>
             <select
+              className={enhancements.catalogDropdown}
               value={query.get("yearFrom") ?? ""}
               onChange={(e) => update({ yearFrom: e.target.value || null })}
             >
@@ -97,6 +102,7 @@ export default function Filters({
           <label>
             <span className={styles.srOnly}>Tahun terbit sampai</span>
             <select
+              className={enhancements.catalogDropdown}
               value={query.get("yearTo") ?? ""}
               onChange={(e) => update({ yearTo: e.target.value || null })}
             >

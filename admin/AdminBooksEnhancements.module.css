@@ -115,6 +115,49 @@
   box-shadow: 0 0 0 3px #00063318;
 }
 
+.subjectSelect {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 13px;
+  border: 1px solid #dfe2e8;
+  border-radius: 12px;
+  outline: 0;
+  background: var(--white);
+  color: var(--navy);
+  cursor: pointer;
+  font-family: var(--font-outfit), "Outfit", sans-serif;
+  font-size: inherit;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.subjectSelect:hover {
+  border-color: var(--navy-soft);
+  background: #f4f4f7;
+  color: var(--navy);
+  transform: scale(1.01);
+}
+
+.subjectSelect:focus-visible {
+  border-color: #1f3150;
+  box-shadow: 0 0 0 2px rgb(31 49 80 / .08);
+}
+
+.subjectSelect option {
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--navy);
+}
+
+.subjectSelect option:hover,
+.subjectSelect option:checked {
+  background: #f4f4f7;
+}
+
 @media (max-width: 920px) {
   .filterPanel {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -140,13 +183,20 @@
   .stockRange {
     gap: 6px;
   }
+
+  .subjectSelect {
+    min-height: 42px;
+    border-radius: 10px;
+    padding-inline: 12px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .filterPanel,
   .filterField select,
   .stockRange input,
-  .applyButton {
+  .applyButton,
+  .subjectSelect {
     animation: none;
     transition: none;
   }

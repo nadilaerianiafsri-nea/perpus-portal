@@ -64,6 +64,48 @@
   }
 }
 
+.catalogDropdown {
+  min-height: 40px;
+  border: 1px solid #d4d4d8 !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  color: #2b3056 !important;
+  cursor: pointer;
+  font-family: var(--font-outfit), "Outfit", sans-serif !important;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.catalogDropdown:hover {
+  border-color: #2b3056 !important;
+  background: #f4f4f5 !important;
+  color: #000633 !important;
+  transform: scale(1.02);
+  box-shadow: 0 5px 12px rgba(0, 6, 51, 0.08);
+}
+
+.catalogDropdown:focus-visible {
+  outline: none;
+  border-color: #2b3056 !important;
+  box-shadow: 0 0 0 3px rgba(43, 48, 86, 0.16);
+}
+
+.catalogDropdown option {
+  border-radius: 8px;
+  background: #ffffff;
+  color: #2b3056;
+}
+
+.catalogDropdown option:hover,
+.catalogDropdown option:checked {
+  background: #e6e6eb;
+  color: #000633;
+}
+
 .memberBackButton {
   width: fit-content;
   min-height: 42px;
@@ -111,6 +153,12 @@
     border-radius: 9px;
   }
 
+  .catalogDropdown {
+    min-height: 40px;
+    border-radius: 10px !important;
+    font-size: 13px !important;
+  }
+
   .memberBackButton {
     width: 100%;
     margin-bottom: 14px;
@@ -125,7 +173,8 @@
 @media (prefers-reduced-motion: reduce) {
   .memberFilterButton,
   .memberBackButton,
-  .memberFilterDialog[open] {
+  .memberFilterDialog[open],
+  .catalogDropdown {
     animation: none;
     transition: none;
   }

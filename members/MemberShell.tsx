@@ -7,7 +7,6 @@ import {
   FiBell,
   FiBookOpen,
   FiCalendar,
-  FiClock,
   FiGrid,
   FiLogOut,
   FiMenu,
@@ -29,7 +28,6 @@ const navigation = [
   { href: "/dashboard/koleksi", label: "Koleksi", icon: FiBookOpen },
   { href: "/dashboard/reservasi", label: "Reservasi Saya", icon: FiCalendar },
   { href: "/dashboard/pinjaman", label: "Pinjaman Saya", icon: FiBookOpen },
-  { href: "/dashboard/riwayat", label: "Riwayat Peminjaman", icon: FiClock },
   { href: "/dashboard/e-book", label: "E-Book Saya", icon: FiMonitor },
   { href: "/dashboard/notifikasi", label: "Notifikasi", icon: FiBell },
   { href: "/dashboard/profil", label: "Profil Saya", icon: FiUser },
@@ -57,7 +55,6 @@ export default function MemberShell({
     "/dashboard/reservasi",
     "/dashboard/pinjaman",
     "/dashboard/e-book",
-    "/dashboard/riwayat",
   ].includes(pathname) || pathname.startsWith("/dashboard/koleksi");
   const router = useRouter();
   const resource = useMemberResource<MemberSummary>("dashboard");
@@ -163,7 +160,11 @@ export default function MemberShell({
         </nav>
 
         <div className={styles.sidebarBottom}>
-          {logoutError ? <p className={styles.formError} role="alert">{logoutError}</p> : null}
+          {logoutError ? (
+            <p className={styles.formError} role="alert">
+              {logoutError}
+            </p>
+          ) : null}
           <button onClick={logout} disabled={loggingOut}>
             <FiLogOut aria-hidden />
             {loggingOut ? "Sedang keluar..." : "Keluar"}
@@ -184,7 +185,9 @@ export default function MemberShell({
       }}
     >
       <div className={`${styles.shell} ${circulationPage ? styles.circulationShell : ""}`}>
-        <a className={styles.skipLink} href="#member-content">Lewati ke konten</a>
+        <a className={styles.skipLink} href="#member-content">
+          Lewati ke konten
+        </a>
         <aside className={styles.sidebar}>{sidebar()}</aside>
         <dialog
           ref={dialog}
@@ -230,7 +233,9 @@ export default function MemberShell({
                   );
                 }}
               >
-                <button aria-label="Cari koleksi" type="submit"><FiSearch /></button>
+                <button aria-label="Cari koleksi" type="submit">
+                  <FiSearch />
+                </button>
                 <input name="search" aria-label="Cari koleksi" placeholder="Cari koleksi..." />
               </form>
 
@@ -240,7 +245,9 @@ export default function MemberShell({
                 aria-label={`Notifikasi${unread !== undefined ? `, ${unread} belum dibaca` : ""}`}
               >
                 <FiBell />
-                {unread !== undefined && unread > 0 ? <span className={styles.bellDot} /> : null}
+                {unread !== undefined && unread > 0 ? (
+                  <span className={styles.bellDot} />
+                ) : null}
               </Link>
               <Link className={styles.avatar} href="/dashboard/profil" aria-label="Profil saya">
                 {initials(name)}
@@ -249,7 +256,9 @@ export default function MemberShell({
           </header>
 
           <div className={styles.contentGrid}>
-            <main id="member-content" className={styles.main} tabIndex={-1}>{children}</main>
+            <main id="member-content" className={styles.main} tabIndex={-1}>
+              {children}
+            </main>
             {!circulationPage ? <MemberRightPanel /> : null}
           </div>
         </div>

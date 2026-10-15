@@ -123,27 +123,39 @@ export default function AdminShell({ children, user }: AdminShellProps) {
 
   useEffect(() => {
     const controller = new AbortController();
-    fetch("/api/members/admin/operations/notifications/unread-count", {
-      cache: "no-store",
-      signal: controller.signal,
-    })
-      .then(async (response) => {
-        if (!response.ok) throw new Error();
-        return (await response.json()) as { unread?: number };
+
+    const loadUnreadNotifications = () => {
+      fetch("/api/members/admin/operations/notifications/unread-count", {
+        cache: "no-store",
+        signal: controller.signal,
       })
-      .then((payload) => {
-        if (!controller.signal.aborted) {
-          setUnreadNotifications(
-            Number.isSafeInteger(payload.unread) && (payload.unread ?? 0) > 0
-              ? payload.unread!
-              : 0,
-          );
-        }
-      })
-      .catch(() => {
-        if (!controller.signal.aborted) setUnreadNotifications(0);
-      });
-    return () => controller.abort();
+        .then(async (response) => {
+          if (!response.ok) throw new Error();
+          return (await response.json()) as { unread?: number };
+        })
+        .then((payload) => {
+          if (!controller.signal.aborted) {
+            setUnreadNotifications(
+              Number.isSafeInteger(payload.unread) && (payload.unread ?? 0) > 0
+                ? payload.unread!
+                : 0,
+            );
+          }
+        })
+        .catch(() => {
+          if (!controller.signal.aborted) setUnreadNotifications(0);
+        });
+    };
+
+    loadUnreadNotifications();
+    const interval = window.setInterval(loadUnreadNotifications, 15000);
+    window.addEventListener("focus", loadUnreadNotifications);
+
+    return () => {
+      controller.abort();
+      window.clearInterval(interval);
+      window.removeEventListener("focus", loadUnreadNotifications);
+    };
   }, [pathname]);
 
   function toggleMenu(item: MenuItem) {
@@ -233,7 +245,11 @@ export default function AdminShell({ children, user }: AdminShellProps) {
                   <Icon size={18} />
                   <span>{item.label}</span>
                   {item.id === "notifikasi" && unreadNotifications > 0 ? (
-                    <b className={`${enhancements.notificationBadge} ${enhancements.menuNotificationBadge}`}>{unreadNotifications}</b>
+                    <b
+                      className={`${enhancements.notificationBadge} ${enhancements.menuNotificationBadge}`}
+                    >
+                      {unreadNotifications}
+                    </b>
                   ) : null}
                 </Link>
               );
@@ -293,15 +309,7 @@ export default function AdminShell({ children, user }: AdminShellProps) {
       </aside>
 
       <section className={styles.workspace}>
-        <header
-          className={styles.topbar}
-          style={{
-            position: "sticky",
-            top: "clamp(12px, 2vw, 26px)",
-            zIndex: 35,
-            background: "var(--surface)",
-          }}
-        >
+        <header className={styles.topbar}>
           <div className={styles.topbarLeft}>
             <button
               type="button"
@@ -349,7 +357,11 @@ export default function AdminShell({ children, user }: AdminShellProps) {
             >
               <FiBell size={18} />
               {unreadNotifications > 0 ? (
-                <b className={`${enhancements.notificationBadge} ${enhancements.bellNotificationBadge}`}>{unreadNotifications}</b>
+                <b
+                  className={`${enhancements.notificationBadge} ${enhancements.bellNotificationBadge}`}
+                >
+                  {unreadNotifications}
+                </b>
               ) : null}
             </Link>
             <span className={styles.avatar} title={`${user.name} · ${user.email}`}>

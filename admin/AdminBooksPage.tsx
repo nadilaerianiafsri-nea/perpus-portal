@@ -260,7 +260,7 @@ export default function AdminBooksPage() {
               setAvailabilityInput(event.target.value as AvailabilityFilter)
             }
           >
-            <option value="ALL">Semua Ketersediaan</option>
+            <option value="ALL">Semua</option>
             <option value="TERSEDIA">Tersedia</option>
             <option value="STOK_HABIS">Stok Habis</option>
           </select>

@@ -56,7 +56,9 @@ export default function Catalog({
     apiQuery.delete("availability");
   }
   const queryString = apiQuery.toString();
-  const apiBase = member ? "/api/members/me/catalog" : `/api/${ebook ? "ebooks" : "collections"}`;
+  const apiBase = member
+    ? "/api/members/me/catalog"
+    : `/api/${ebook ? "ebooks" : "collections"}`;
   const filterBase = member ? "/api/members/me/catalog/filters" : "/api/collections/filters";
   const filterQuery = ebook ? "?type=EBOOK" : "";
   const detailBasePath = member ? "/dashboard/koleksi" : "/koleksi";
@@ -193,6 +195,7 @@ export default function Catalog({
           <label>
             <span className={styles.srOnly}>Kategori pencarian</span>
             <select
+              className={memberStyles.catalogDropdown}
               aria-label="Kategori pencarian"
               value={
                 (query.get("subject") ?? "").includes(",")
@@ -233,7 +236,10 @@ export default function Catalog({
                 <FiSliders aria-hidden="true" />
               </button>
             ) : (
-              <button className={styles.mobileFilter} onClick={() => dialog.current?.showModal()}>
+              <button
+                className={styles.mobileFilter}
+                onClick={() => dialog.current?.showModal()}
+              >
                 <FiSliders /> Filter
               </button>
             )}
@@ -241,7 +247,9 @@ export default function Catalog({
               {loading ? (
                 "Memuat koleksi..."
               ) : response ? (
-                <><strong>{response.meta.total}</strong> hasil ditemukan</>
+                <>
+                  <strong>{response.meta.total}</strong> hasil ditemukan
+                </>
               ) : (
                 "Hasil pencarian"
               )}
@@ -251,6 +259,7 @@ export default function Catalog({
               <label className={styles.pageSize}>
                 <span className={styles.srOnly}>Jumlah koleksi per halaman</span>
                 <select
+                  className={memberStyles.catalogDropdown}
                   aria-label="Jumlah koleksi per halaman"
                   value={query.get("limit") ?? (ebook ? "8" : "20")}
                   onChange={(event) => update({ limit: event.target.value })}
@@ -263,7 +272,9 @@ export default function Catalog({
                       ...(query.get("limit") ? [Number(query.get("limit"))] : []),
                     ]),
                   ].map((limit) => (
-                    <option key={limit} value={limit}>{limit} / halaman</option>
+                    <option key={limit} value={limit}>
+                      {limit} / halaman
+                    </option>
                   ))}
                 </select>
               </label>
@@ -271,27 +282,38 @@ export default function Catalog({
               <label>
                 <span className={styles.srOnly}>Urutkan koleksi</span>
                 <select
+                  className={memberStyles.catalogDropdown}
                   value={query.get("sort") ?? "relevance"}
                   onChange={(event) => update({ sort: event.target.value })}
                 >
                   {sorts.map(([value, label]) => (
-                    <option key={value} value={value}>{label}</option>
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
                   ))}
                 </select>
               </label>
 
               <div className={styles.viewToggle}>
-                <button aria-label="Tampilan grid" aria-pressed={view === "grid"} onClick={() => update({ view: null })}>
+                <button
+                  aria-label="Tampilan grid"
+                  aria-pressed={view === "grid"}
+                  onClick={() => update({ view: null })}
+                >
                   <FiGrid />
                 </button>
-                <button aria-label="Tampilan list" aria-pressed={view === "list"} onClick={() => update({ view: "list" })}>
+                <button
+                  aria-label="Tampilan list"
+                  aria-pressed={view === "list"}
+                  onClick={() => update({ view: "list" })}
+                >
                   <FiList />
                 </button>
               </div>
             </div>
           </div>
 
-          {(ebook || chips.length > 0) ? (
+          {ebook || chips.length > 0 ? (
             <div className={styles.chips}>
               {ebook ? (
                 <Link
@@ -316,7 +338,8 @@ export default function Catalog({
                     })
                   }
                 >
-                  {chip.label}<FiX />
+                  {chip.label}
+                  <FiX />
                 </button>
               ))}
 
@@ -352,7 +375,10 @@ export default function Catalog({
               </div>
 
               <nav className={styles.pagination} aria-label="Halaman katalog">
-                <button disabled={currentPage <= 1} onClick={() => update({ page: String(currentPage - 1) })}>
+                <button
+                  disabled={currentPage <= 1}
+                  onClick={() => update({ page: String(currentPage - 1) })}
+                >
                   Sebelumnya
                 </button>
                 {pages.map((page) => (
@@ -364,7 +390,10 @@ export default function Catalog({
                     {page}
                   </button>
                 ))}
-                <button disabled={currentPage >= totalPages} onClick={() => update({ page: String(currentPage + 1) })}>
+                <button
+                  disabled={currentPage >= totalPages}
+                  onClick={() => update({ page: String(currentPage + 1) })}
+                >
                   Berikutnya
                 </button>
               </nav>
@@ -376,7 +405,9 @@ export default function Catalog({
               <p>Coba kata kunci lain atau hapus filter yang dipilih.</p>
               <button onClick={clear}>Bersihkan Filter</button>
               {totalPages > 0 ? (
-                <button onClick={() => update({ page: "1" })}>Kembali ke Halaman Pertama</button>
+                <button onClick={() => update({ page: "1" })}>
+                  Kembali ke Halaman Pertama
+                </button>
               ) : null}
             </div>
           )}
@@ -388,7 +419,11 @@ export default function Catalog({
         className={`${styles.filterDialog} ${member ? memberStyles.memberFilterDialog : ""}`}
         aria-label="Filter koleksi"
       >
-        <button className={styles.closeDialog} aria-label="Tutup filter" onClick={() => dialog.current?.close()}>
+        <button
+          className={styles.closeDialog}
+          aria-label="Tutup filter"
+          onClick={() => dialog.current?.close()}
+        >
           <FiX />
         </button>
         <Filters {...filterProps} />
