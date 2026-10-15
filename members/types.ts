@@ -21,7 +21,7 @@ export interface MemberNotification {
 }
 export interface HistoryItem {
   id: number; sourceType: "LOAN" | "RESERVATION";
-  bookId: number; title: string; bookCode: string; type: "FISIK";
+  bookId: number; title: string; bookCode: string; coverUrl: string; type: "FISIK";
   borrowedAt: string | null; reservedAt: string | null; returnedAt: string | null;
   completedAt: string | null; extensionCount: number;
   status: "DIKEMBALIKAN" | "KEDALUWARSA" | "DIBATALKAN";

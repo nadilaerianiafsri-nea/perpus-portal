@@ -10,12 +10,19 @@ import LoanCard from "./LoanCard";
 import LoanDialog, { type LoanDialogSelection } from "./LoanDialog";
 import HistoryPage from "./HistoryPage";
 import { loanState } from "./format";
-import type { Loan } from "./types";
+import type { HistoryItem, Loan } from "./types";
 import shared from "./Members.module.css";
 import styles from "./Loans.module.css";
 
+type LoanView = "current" | "history";
+
+function viewFromHash(hash: string): LoanView {
+  return hash === "#riwayat-peminjaman" ? "history" : "current";
+}
+
 export default function LoansPage() {
   const resource = useMemberResource<{ loans: Loan[] }>("loans");
+  const historyResource = useMemberResource<{ history: HistoryItem[] }>("loans/history");
   const { refresh } = useMember();
   const [busy, setBusy] = useState<number | null>(null);
   const pending = useRef(false);
@@ -23,6 +30,7 @@ export default function LoansPage() {
   const [notice, setNotice] = useState("");
   const [actionError, setActionError] = useState("");
   const [now, setNow] = useState<number | null>(null);
+  const [view, setView] = useState<LoanView>("current");
 
   useEffect(() => {
     const tick = () => setNow(Date.now());
@@ -30,6 +38,24 @@ export default function LoansPage() {
     const timer = window.setInterval(tick, 1000);
     return () => window.clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    const syncView = () => setView(viewFromHash(window.location.hash));
+    syncView();
+    window.addEventListener("hashchange", syncView);
+    window.addEventListener("popstate", syncView);
+    return () => {
+      window.removeEventListener("hashchange", syncView);
+      window.removeEventListener("popstate", syncView);
+    };
+  }, []);
+
+  function selectView(nextView: LoanView) {
+    setView(nextView);
+    const base = `${window.location.pathname}${window.location.search}`;
+    const href = nextView === "history" ? `${base}#riwayat-peminjaman` : base;
+    window.history.pushState(null, "", href);
+  }
 
   function open(kind: LoanDialogSelection["kind"], loan: Loan) {
     setActionError("");
@@ -79,12 +105,63 @@ export default function LoansPage() {
       (a, b) => urgency(a) - urgency(b) || Date.parse(a.dueAt) - Date.parse(b.dueAt),
     );
 
+  const history = historyResource.data?.history ?? [];
+  const overdueCount =
+    now === null
+      ? 0
+      : loans.filter(
+          (loan) => loan.status === "AKTIF" && Date.parse(loan.dueAt) <= now,
+        ).length;
+  const readBookCount = new Set(
+    history
+      .filter(
+        (item) => item.sourceType === "LOAN" && item.status === "DIKEMBALIKAN",
+      )
+      .map((item) => item.bookId),
+  ).size;
+
   return (
     <div className={shared.pageStack}>
       <PageHeading
         title="Pinjaman Saya"
-        description="Kelola buku yang sedang Anda pinjam, ajukan perpanjangan 7 hari, dan lihat riwayat peminjaman."
+        description="Kelola pinjaman aktif dan lihat riwayat buku yang pernah Anda pinjam."
       />
+
+      <section className={styles.statsGrid} aria-label="Statistik pinjaman saya">
+        <article className={styles.statCard}>
+          <span>Sedang Dipinjam</span>
+          <strong>{resource.loading ? "–" : loans.length}</strong>
+        </article>
+        <article className={styles.statCard}>
+          <span>Jatuh Tempo</span>
+          <strong>{resource.loading || now === null ? "–" : overdueCount}</strong>
+        </article>
+        <article className={styles.statCard}>
+          <span>Sudah Dibaca</span>
+          <strong>{historyResource.loading ? "–" : readBookCount}</strong>
+        </article>
+      </section>
+
+      <div className={styles.viewTabs} role="tablist" aria-label="Tampilan pinjaman">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={view === "current"}
+          className={`${styles.viewTab} ${view === "current" ? styles.viewTabActive : ""}`}
+          onClick={() => selectView("current")}
+        >
+          Pinjaman Saya
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={view === "history"}
+          className={`${styles.viewTab} ${view === "history" ? styles.viewTabActive : ""}`}
+          onClick={() => selectView("history")}
+        >
+          Riwayat Pinjaman
+        </button>
+      </div>
 
       {notice ? (
         <p className={shared.success} role="status">
@@ -92,39 +169,50 @@ export default function LoansPage() {
         </p>
       ) : null}
 
-      {resource.loading || now === null ? (
-        <LoadingCards />
-      ) : resource.error ? (
-        <ErrorState
-          message="Data pinjaman belum dapat dimuat. Silakan coba lagi."
-          retry={resource.reload}
-        />
-      ) : !loans.length ? (
-        <div className={styles.empty}>
-          <FiBookOpen size={32} aria-hidden />
-          <h2>Belum ada buku yang sedang dipinjam.</h2>
-          <p>Buku yang sudah Anda ambil dari perpustakaan akan muncul di sini.</p>
-          <Link href="/dashboard/koleksi" className={styles.extendButton}>
-            Cari Koleksi
-          </Link>
-        </div>
-      ) : (
-        <div className={styles.list}>
-          {loans.map((loan) => (
-            <LoanCard
-              key={loan.id}
-              loan={loan}
-              now={now}
-              busy={busy !== null}
-              extending={busy === loan.id}
-              onExtend={() => open("extend", loan)}
-              onReplacement={() => open("replacement", loan)}
+      {view === "current" ? (
+        <section className={styles.viewPanel} aria-label="Pinjaman saya">
+          {resource.loading || now === null ? (
+            <LoadingCards />
+          ) : resource.error ? (
+            <ErrorState
+              message="Data pinjaman belum dapat dimuat. Silakan coba lagi."
+              retry={resource.reload}
             />
-          ))}
+          ) : !loans.length ? (
+            <div className={styles.empty}>
+              <FiBookOpen size={32} aria-hidden />
+              <h2>Belum ada buku yang sedang dipinjam.</h2>
+              <p>Buku yang sudah Anda ambil dari perpustakaan akan muncul di sini.</p>
+              <Link href="/dashboard/koleksi" className={styles.extendButton}>
+                Cari Koleksi
+              </Link>
+            </div>
+          ) : (
+            <div className={styles.list}>
+              {loans.map((loan) => (
+                <LoanCard
+                  key={loan.id}
+                  loan={loan}
+                  now={now}
+                  busy={busy !== null}
+                  extending={busy === loan.id}
+                  onExtend={() => open("extend", loan)}
+                  onReplacement={() => open("replacement", loan)}
+                />
+              ))}
+            </div>
+          )}
+        </section>
+      ) : (
+        <div className={styles.viewPanel}>
+          <HistoryPage
+            history={history}
+            loading={historyResource.loading}
+            error={historyResource.error}
+            retry={historyResource.reload}
+          />
         </div>
       )}
-
-      <HistoryPage embedded />
 
       <LoanDialog
         selection={selection}

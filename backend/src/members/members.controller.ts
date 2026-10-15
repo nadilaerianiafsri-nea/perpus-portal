@@ -86,8 +86,28 @@ export class MembersController {
     return this.members.loans(req.user!.sub);
   }
 
-  @Get('loans/history') history(@Req() req: AuthenticatedRequest) {
-    return this.members.loans(req.user!.sub, true);
+  @Get('loans/history')
+  async history(@Req() req: AuthenticatedRequest) {
+    const result = await this.members.loans(req.user!.sub, true);
+    if (!('history' in result) || !result.history.length) {
+      return { history: 'history' in result ? result.history : [] };
+    }
+
+    const bookIds = [...new Set(result.history.map((item) => item.bookId))];
+    const books = await this.prisma.book.findMany({
+      where: { id: { in: bookIds } },
+      select: { id: true, coverUrl: true },
+    });
+    const coverByBookId = new Map(
+      books.map((book) => [book.id, book.coverUrl] as const),
+    );
+
+    return {
+      history: result.history.map((item) => ({
+        ...item,
+        coverUrl: coverByBookId.get(item.bookId) ?? '',
+      })),
+    };
   }
 
   @Post('loans/:id/extend') extend(

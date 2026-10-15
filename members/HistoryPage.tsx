@@ -1,9 +1,10 @@
 "use client";
 
+import { safeCoverUrl } from "../shared/displayUrls.cjs";
+import Image from "next/image";
 import Link from "next/link";
 import { FiCheckCircle, FiClock, FiSearch, FiXCircle } from "react-icons/fi";
-import { useMemberResource } from "./api";
-import { Badge, ErrorState, PageHeading } from "./MemberUI";
+import { Badge, ErrorState } from "./MemberUI";
 import { historyDate } from "./format";
 import type { HistoryItem } from "./types";
 import shared from "./Members.module.css";
@@ -17,6 +18,7 @@ function Status({ item }: { item: HistoryItem }) {
     : item.status === "KEDALUWARSA"
       ? "Reservasi Kedaluwarsa"
       : "Reservasi Dibatalkan";
+
   return (
     <span className={returned ? styles.returned : styles.neutral}>
       <Badge tone={returned ? "green" : "neutral"}>
@@ -34,47 +36,49 @@ function activityDate(item: HistoryItem) {
   );
 }
 
-export default function HistoryPage({ embedded = false }: { embedded?: boolean }) {
-  const resource = useMemberResource<{ history: HistoryItem[] }>("loans/history");
-  const history = resource.data?.history ?? [];
+interface HistoryPageProps {
+  history: HistoryItem[];
+  loading: boolean;
+  error: string;
+  retry: () => Promise<void>;
+}
 
+export default function HistoryPage({
+  history,
+  loading,
+  error,
+  retry,
+}: HistoryPageProps) {
   return (
-    <div
-      id={embedded ? "riwayat-peminjaman" : undefined}
+    <section
+      id="riwayat-peminjaman"
       className={`${shared.pageStack} ${styles.historySection}`}
+      aria-labelledby="riwayat-peminjaman-title"
     >
-      {embedded ? (
-        <div className={styles.embeddedHeading}>
-          <h2>Riwayat Peminjaman</h2>
-          <p>Catatan seluruh peminjaman buku fisik yang telah selesai.</p>
-        </div>
-      ) : (
-        <PageHeading
-          title="Riwayat Peminjaman"
-          description="Catatan seluruh peminjaman yang telah selesai."
-        />
-      )}
+      <div className={styles.pageHeading}>
+        <h2 id="riwayat-peminjaman-title">Riwayat Pinjaman</h2>
+        <p>Catatan buku fisik yang telah selesai dipinjam serta reservasi yang berakhir.</p>
+      </div>
 
-      {resource.loading ? (
+      {loading ? (
         <div
           className={styles.loading}
           role="status"
           aria-label="Memuat riwayat peminjaman"
         >
           <span className={shared.srOnly}>Memuat riwayat peminjaman...</span>
-          <div className={styles.loadingHeader} aria-hidden />
           {[1, 2, 3].map((id) => (
             <div
               key={id}
-              className={`${shared.skeleton} ${styles.loadingRow}`}
+              className={`${shared.skeleton} ${styles.loadingCard}`}
               aria-hidden
             />
           ))}
         </div>
-      ) : resource.error ? (
+      ) : error ? (
         <ErrorState
           message="Riwayat peminjaman belum dapat dimuat. Silakan coba lagi."
-          retry={resource.reload}
+          retry={retry}
         />
       ) : !history.length ? (
         <div className={`${shared.empty} ${styles.empty}`}>
@@ -87,85 +91,29 @@ export default function HistoryPage({ embedded = false }: { embedded?: boolean }
           </Link>
         </div>
       ) : (
-        <>
-          <div className={styles.tablePanel}>
-            <table className={styles.table}>
-              <caption className={shared.srOnly}>
-                Riwayat peminjaman dan reservasi selesai milik Anda. Tanggal
-                reservasi menunjukkan waktu pengajuan.
-              </caption>
-              <colgroup>
-                {[
-                  styles.titleColumn,
-                  styles.codeColumn,
-                  styles.typeColumn,
-                  styles.borrowedColumn,
-                  styles.returnedColumn,
-                  styles.extensionsColumn,
-                  styles.statusColumn,
-                ].map((className) => (
-                  <col key={className} className={className} />
-                ))}
-              </colgroup>
-              <thead>
-                <tr>
-                  {[
-                    "Judul",
-                    "Kode Buku",
-                    "Tipe",
-                    "Dipinjam",
-                    "Kembali",
-                    "Perpanjangan",
-                    "Status",
-                  ].map((label) => (
-                    <th key={label} scope="col">
-                      {label}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {history.map((item) => (
-                  <tr key={`${item.sourceType}-${item.id}`}>
-                    <td>
-                      <Link
-                        className={styles.title}
-                        href={`/dashboard/koleksi/${item.bookId}`}
-                      >
-                        {item.title}
-                      </Link>
-                    </td>
-                    <td>{item.bookCode}</td>
-                    <td>
-                      <span className={styles.type}>Fisik</span>
-                    </td>
-                    <td>{activityDate(item)}</td>
-                    <td>{historyDate(item.returnedAt)}</td>
-                    <td>{item.extensionCount}×</td>
-                    <td>
-                      <Status item={item} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <ul className={styles.cards} aria-label="Riwayat peminjaman">
-            {history.map((item) => (
-              <li key={`${item.sourceType}-${item.id}`}>
-                <article className={styles.card}>
+        <ul className={styles.cards} aria-label="Riwayat peminjaman">
+          {history.map((item, index) => (
+            <li
+              key={`${item.sourceType}-${item.id}`}
+              style={{ animationDelay: `${Math.min(index, 5) * 45}ms` }}
+            >
+              <article className={styles.card}>
+                <div className={styles.cardContent}>
                   <div className={styles.cardHeading}>
-                    <h2>
-                      <Link
-                        className={styles.title}
-                        href={`/dashboard/koleksi/${item.bookId}`}
-                      >
-                        {item.title}
-                      </Link>
-                    </h2>
-                    <span className={styles.type}>Fisik</span>
+                    <div>
+                      <span className={styles.type}>Fisik</span>
+                      <h3>
+                        <Link
+                          className={styles.title}
+                          href={`/dashboard/koleksi/${item.bookId}`}
+                        >
+                          {item.title}
+                        </Link>
+                      </h3>
+                    </div>
+                    <Status item={item} />
                   </div>
+
                   <dl className={styles.details}>
                     <div>
                       <dt>Kode Buku</dt>
@@ -184,13 +132,26 @@ export default function HistoryPage({ embedded = false }: { embedded?: boolean }
                       <dd>{historyDate(item.returnedAt)}</dd>
                     </div>
                   </dl>
-                  <Status item={item} />
-                </article>
-              </li>
-            ))}
-          </ul>
-        </>
+                </div>
+
+                <Link
+                  className={styles.cover}
+                  href={`/dashboard/koleksi/${item.bookId}`}
+                  aria-label={`Lihat detail ${item.title}`}
+                >
+                  <Image
+                    src={safeCoverUrl(item.coverUrl)}
+                    alt={`Sampul ${item.title}`}
+                    fill
+                    sizes="(max-width: 600px) 72px, 92px"
+                    unoptimized
+                  />
+                </Link>
+              </article>
+            </li>
+          ))}
+        </ul>
       )}
-    </div>
+    </section>
   );
 }

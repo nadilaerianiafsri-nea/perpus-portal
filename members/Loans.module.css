@@ -52,5 +52,141 @@
 .contact a,.contact p { display: flex; gap: 10px; align-items: start; margin: 0; font-size: 14px; overflow-wrap: anywhere; }
 .contact a { color: #2B3056; text-decoration: underline; }
 .contact svg { flex: 0 0 17px; margin-top: 3px; }
+
+.statsGrid,
+.viewTabs,
+.viewPanel {
+  font-family: var(--font-outfit), "Outfit", sans-serif;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.statCard {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  border: 1px solid #e7e7ed;
+  border-radius: 16px;
+  padding: 16px 18px;
+  background: #fff;
+  box-shadow: 0 2px 3px #0006330c;
+  animation: loanPanelIn 220ms ease both;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.statCard:hover {
+  border-color: #dadce5;
+  border-radius: 18px;
+  background: #f4f4f7;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 4px 12px #00063315;
+}
+
+.statCard span {
+  color: #666;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.statCard strong {
+  color: #000633;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.viewTabs {
+  display: flex;
+  gap: 10px;
+  padding: 5px;
+  border: 1px solid #e7e7ed;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.viewTab {
+  min-height: 42px;
+  flex: 1;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 9px 14px;
+  background: transparent;
+  color: #2B3056;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.viewTab:hover {
+  border-color: #dddde4;
+  background: #f4f4f7;
+  color: #000633;
+  transform: scale(1.02);
+}
+
+.viewTabActive {
+  border-color: #2B3056;
+  background: #2B3056;
+  color: #fff;
+}
+
+.viewTabActive:hover {
+  border-color: #000633;
+  background: #000633;
+  color: #fff;
+}
+
+.viewTab:focus-visible {
+  outline: 2px solid #2B3056;
+  outline-offset: 2px;
+}
+
+.viewPanel {
+  animation: loanPanelIn 220ms ease both;
+}
+
+@keyframes loanPanelIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 @media (max-width: 1200px) { .body { grid-template-columns: 80px minmax(0, 1fr) 172px; gap: 14px; padding: 17px; }.cover { width: 80px; height: 110px; }.metadata { grid-template-columns: minmax(0, 1fr); }.information h2 { font-size: 20px; }.extendButton,.replacementButton,.detailLink { font-size: 14px; } }
-@media (max-width: 600px) { .list { gap: 16px; }.body { grid-template-columns: minmax(0, 1fr); padding: 18px; gap: 16px; }.cover { width: 96px; height: 128px; }.information h2 { font-size: 20px; margin-top: 12px; }.actions { width: 100%; }.warning { padding: 12px 16px; align-items: start; line-height: 1.5; }.warning svg { margin-top: 2px; }.dialog { padding: 22px 18px; }.dialogActions > button { flex: 1; }.dialogDates dd { font-size: 14px; } }
+@media (max-width: 600px) { .list { gap: 16px; }.body { grid-template-columns: minmax(0, 1fr); padding: 18px; gap: 16px; }.cover { width: 96px; height: 128px; }.information h2 { font-size: 20px; margin-top: 12px; }.actions { width: 100%; }.warning { padding: 12px 16px; align-items: start; line-height: 1.5; }.warning svg { margin-top: 2px; }.dialog { padding: 22px 18px; }.dialogActions > button { flex: 1; }.dialogDates dd { font-size: 14px; }
+  .statsGrid { gap: 8px; }
+  .statCard { padding: 13px 10px; border-radius: 13px; text-align: center; }
+  .statCard span { font-size: 11px; }
+  .statCard strong { font-size: 23px; }
+  .viewTabs { gap: 6px; padding: 4px; }
+  .viewTab { min-height: 44px; padding-inline: 9px; font-size: 13px; }
+}
+
+@media (max-width: 380px) {
+  .statsGrid { grid-template-columns: minmax(0, 1fr); }
+  .statCard { text-align: left; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .statCard,
+  .viewTab,
+  .viewPanel {
+    animation: none;
+    transition: none;
+  }
+
+  .statCard:hover,
+  .viewTab:hover {
+    transform: none;
+  }
+}

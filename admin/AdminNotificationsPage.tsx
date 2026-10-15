@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type KeyboardEvent } from "react";
 import { useRouter } from "next/navigation";
 import { FiSearch } from "react-icons/fi";
 import {
@@ -11,7 +11,6 @@ import {
   type NotificationChannel,
 } from "./adminOperations";
 import styles from "./AdminNotifications.module.css";
-import enhancements from "./AdminEnhancements.module.css";
 
 const emptyResult: AdminNotificationsResponse = {
   counts: { all: 0, email: 0, whatsapp: 0, failed: 0, unread: 0 },
@@ -45,6 +44,12 @@ function contactLabel(row: AdminNotificationRow) {
   if (row.channel === "SYSTEM") return "Notifikasi Sistem";
   if (row.channel === "EMAIL") return row.memberEmail;
   return row.memberWhatsapp || "Nomor belum tersedia";
+}
+
+function canOpenNotification(
+  row: AdminNotificationRow,
+): row is AdminNotificationRow & { channel: "SYSTEM"; href: string } {
+  return row.channel === "SYSTEM" && Boolean(row.href);
 }
 
 export default function AdminNotificationsPage() {
@@ -119,7 +124,7 @@ export default function AdminNotificationsPage() {
   ];
 
   async function openNotification(row: AdminNotificationRow) {
-    if (row.channel !== "SYSTEM" || !row.href) return;
+    if (!canOpenNotification(row)) return;
 
     setError("");
     try {
@@ -162,6 +167,16 @@ export default function AdminNotificationsPage() {
     } catch {
       setError("Notifikasi belum dapat dibuka. Silakan coba lagi.");
     }
+  }
+
+  function handleNotificationKeyDown(
+    event: KeyboardEvent<HTMLElement>,
+    row: AdminNotificationRow,
+  ) {
+    if (!canOpenNotification(row)) return;
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    void openNotification(row);
   }
 
   const first = result.meta.total ? (result.meta.page - 1) * result.meta.limit + 1 : 0;
@@ -243,58 +258,62 @@ export default function AdminNotificationsPage() {
                   </td>
                 </tr>
               ) : result.data.length ? (
-                result.data.map((row) => (
-                  <tr key={row.id}>
-                    <td>
-                      <div className={styles.memberCell}>
-                        <strong>{row.memberName}</strong>
-                        <small>{contactLabel(row)}</small>
-                      </div>
-                    </td>
-                    <td>
-                      {row.channel === "SYSTEM" && row.href ? (
-                        <button
-                          type="button"
-                          className={enhancements.notificationLink}
-                          onClick={() => void openNotification(row)}
-                        >
-                          {row.transactionCode}
-                        </button>
-                      ) : (
-                        row.transactionCode
-                      )}
-                    </td>
-                    <td>
-                      <div className={styles.memberCell}>
-                        {row.channel === "SYSTEM" && row.href ? (
-                          <button
-                            type="button"
-                            className={enhancements.notificationLink}
-                            onClick={() => void openNotification(row)}
-                          >
-                            {row.reminderType}
-                          </button>
-                        ) : (
+                result.data.map((row) => {
+                  const clickable = canOpenNotification(row);
+                  const readState =
+                    row.channel === "SYSTEM"
+                      ? row.readAt
+                        ? styles.notificationRead
+                        : styles.notificationUnread
+                      : "";
+
+                  return (
+                    <tr
+                      key={row.id}
+                      className={`${clickable ? styles.notificationClickable : ""} ${readState}`}
+                      onClick={clickable ? () => void openNotification(row) : undefined}
+                      onKeyDown={
+                        clickable
+                          ? (event) => handleNotificationKeyDown(event, row)
+                          : undefined
+                      }
+                      tabIndex={clickable ? 0 : undefined}
+                      role={clickable ? "link" : undefined}
+                      aria-label={
+                        clickable
+                          ? `Buka notifikasi ${row.reminderType} untuk ${row.memberName}`
+                          : undefined
+                      }
+                    >
+                      <td>
+                        <div className={styles.memberCell}>
+                          <strong>{row.memberName}</strong>
+                          <small>{contactLabel(row)}</small>
+                        </div>
+                      </td>
+                      <td>{row.transactionCode}</td>
+                      <td>
+                        <div className={styles.memberCell}>
                           <strong>{row.reminderType}</strong>
-                        )}
-                        {row.bookTitle ? <small>{row.bookTitle}</small> : null}
-                      </div>
-                    </td>
-                    <td>
-                      <span className={styles.channelPill}>
-                        {channelLabel(row.channel)}
-                      </span>
-                    </td>
-                    <td>{formatAdminOperationDate(row.time)}</td>
-                    <td>
-                      <span
-                        className={`${styles.statusPill} ${styles[`status${row.status}`]}`}
-                      >
-                        {statusLabel(row)}
-                      </span>
-                    </td>
-                  </tr>
-                ))
+                          {row.bookTitle ? <small>{row.bookTitle}</small> : null}
+                        </div>
+                      </td>
+                      <td>
+                        <span className={styles.channelPill}>
+                          {channelLabel(row.channel)}
+                        </span>
+                      </td>
+                      <td>{formatAdminOperationDate(row.time)}</td>
+                      <td>
+                        <span
+                          className={`${styles.statusPill} ${styles[`status${row.status}`]}`}
+                        >
+                          {statusLabel(row)}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })
               ) : (
                 <tr>
                   <td colSpan={6} className={styles.stateCell}>
@@ -310,43 +329,57 @@ export default function AdminNotificationsPage() {
           {loading && !result.data.length ? (
             <div className={styles.mobileState}>Memuat log notifikasi...</div>
           ) : result.data.length ? (
-            result.data.map((row) => (
-              <article key={row.id} className={styles.mobileCard}>
-                <div className={styles.mobileHeading}>
-                  <div>
-                    <strong>{row.memberName}</strong>
-                    {row.channel === "SYSTEM" && row.href ? (
-                      <button
-                        type="button"
-                        className={enhancements.notificationLink}
-                        onClick={() => void openNotification(row)}
-                      >
-                        {row.transactionCode}
-                      </button>
-                    ) : (
+            result.data.map((row) => {
+              const clickable = canOpenNotification(row);
+              const readState =
+                row.channel === "SYSTEM"
+                  ? row.readAt
+                    ? styles.mobileRead
+                    : styles.mobileUnread
+                  : "";
+
+              return (
+                <article
+                  key={row.id}
+                  className={`${styles.mobileCard} ${clickable ? styles.mobileClickable : ""} ${readState}`}
+                  onClick={clickable ? () => void openNotification(row) : undefined}
+                  onKeyDown={
+                    clickable
+                      ? (event) => handleNotificationKeyDown(event, row)
+                      : undefined
+                  }
+                  tabIndex={clickable ? 0 : undefined}
+                  role={clickable ? "link" : undefined}
+                  aria-label={
+                    clickable
+                      ? `Buka notifikasi ${row.reminderType} untuk ${row.memberName}`
+                      : undefined
+                  }
+                >
+                  <div className={styles.mobileHeading}>
+                    <div>
+                      <strong>{row.memberName}</strong>
                       <small>{row.transactionCode}</small>
-                    )}
+                    </div>
+                    <span
+                      className={`${styles.statusPill} ${styles[`status${row.status}`]}`}
+                    >
+                      {statusLabel(row)}
+                    </span>
                   </div>
-                  <span
-                    className={`${styles.statusPill} ${styles[`status${row.status}`]}`}
-                  >
-                    {statusLabel(row)}
-                  </span>
-                </div>
-                <dl>
-                  <div><dt>Jenis Pengingat</dt><dd>{row.channel === "SYSTEM" && row.href ? (
-                    <button type="button" className={enhancements.notificationLink} onClick={() => void openNotification(row)}>{row.reminderType}</button>
-                  ) : row.reminderType}</dd></div>
-                  {row.bookTitle ? <div><dt>Buku</dt><dd>{row.bookTitle}</dd></div> : null}
-                  <div><dt>Kanal</dt><dd>{channelLabel(row.channel)}</dd></div>
-                  <div><dt>Waktu</dt><dd>{formatAdminOperationDate(row.time)}</dd></div>
-                  <div>
-                    <dt>Kontak</dt>
-                    <dd>{contactLabel(row)}</dd>
-                  </div>
-                </dl>
-              </article>
-            ))
+                  <dl>
+                    <div><dt>Jenis Pengingat</dt><dd>{row.reminderType}</dd></div>
+                    {row.bookTitle ? <div><dt>Buku</dt><dd>{row.bookTitle}</dd></div> : null}
+                    <div><dt>Kanal</dt><dd>{channelLabel(row.channel)}</dd></div>
+                    <div><dt>Waktu</dt><dd>{formatAdminOperationDate(row.time)}</dd></div>
+                    <div>
+                      <dt>Kontak</dt>
+                      <dd>{contactLabel(row)}</dd>
+                    </div>
+                  </dl>
+                </article>
+              );
+            })
           ) : (
             <div className={styles.mobileState}>Tidak ada log notifikasi yang sesuai.</div>
           )}
