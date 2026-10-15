@@ -47,5 +47,3 @@ backend/.claude/
 backend/.windsurf/
 backend/skills-lock.json
 
-# Runtime cover uploads
-/backend/storage/covers/
