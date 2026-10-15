@@ -213,6 +213,28 @@
 }
 
 /* ================================
+   PROFIL ADMIN
+   ================================ */
+
+.profileTrigger {
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    transform 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.profileTrigger:hover,
+.profileTrigger:focus-visible,
+.profileTrigger[aria-current="page"] {
+  background: var(--navy);
+  transform: scale(1.04);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--yellow);
+}
+
+/* ================================
    PENGAMBILAN
    ================================ */
 
@@ -252,6 +274,12 @@
     transform: scale(1.01);
   }
 
+  .profileTrigger:hover,
+  .profileTrigger:focus-visible,
+  .profileTrigger[aria-current="page"] {
+    transform: scale(1.02);
+  }
+
   .chartTooltip {
     min-width: 126px;
     padding: 8px 10px;
@@ -287,14 +315,18 @@
 @media (prefers-reduced-motion: reduce) {
   .clickableStatCard,
   .chartPoint,
-  .memberDonutSegment {
+  .memberDonutSegment,
+  .profileTrigger {
     transition: none;
   }
 
   .clickableStatCard:hover,
   .clickableStatCard:focus-visible,
   .chartPoint:hover,
-  .chartPoint:focus-visible {
+  .chartPoint:focus-visible,
+  .profileTrigger:hover,
+  .profileTrigger:focus-visible,
+  .profileTrigger[aria-current="page"] {
     transform: none;
   }
 }

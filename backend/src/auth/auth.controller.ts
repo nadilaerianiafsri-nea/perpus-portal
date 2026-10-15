@@ -16,6 +16,7 @@ import {
 import type { Response } from 'express';
 
 import { AuthService } from './auth.service';
+import { AdminProfileService } from './admin-profile.service';
 import { RecaptchaService } from './recaptcha.service';
 import { authEmail, authObject } from './input-validation';
 
@@ -26,6 +27,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly passwordReset: PasswordResetService,
+    private readonly adminProfile: AdminProfileService,
     private readonly recaptcha: RecaptchaService,
   ) {}
 
@@ -135,6 +137,38 @@ export class AuthController {
     request: AuthenticatedRequest,
   ) {
     return this.authService.getUserById(request.user!.sub);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('admin-profile')
+  @Header('Cache-Control', 'no-store')
+  async updateAdminProfile(
+    @Req() request: AuthenticatedRequest,
+    @Body() body: unknown,
+  ) {
+    return this.adminProfile.updateProfile(request.user!.sub, body);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('admin-profile/password/request')
+  @HttpCode(200)
+  @Header('Cache-Control', 'no-store')
+  async requestAdminPasswordChange(
+    @Req() request: AuthenticatedRequest,
+    @Body() body: unknown,
+  ) {
+    return this.adminProfile.requestPasswordChange(request.user!.sub, body);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('admin-profile/password/confirm')
+  @HttpCode(200)
+  @Header('Cache-Control', 'no-store')
+  async confirmAdminPasswordChange(
+    @Req() request: AuthenticatedRequest,
+    @Body() body: unknown,
+  ) {
+    return this.adminProfile.confirmPasswordChange(request.user!.sub, body);
   }
 
   @Post('logout')

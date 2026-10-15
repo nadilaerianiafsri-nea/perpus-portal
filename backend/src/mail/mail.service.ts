@@ -33,6 +33,30 @@ export class MailService {
   async sendPasswordResetEmail(email: string, link: string): Promise<boolean> {
     return this.send(email, link, true);
   }
+  async sendAdminPasswordChangeEmail(
+    email: string,
+    link: string,
+  ): Promise<boolean> {
+    return this.deliver({
+      to: email,
+      subject: 'Verifikasi Ganti Kata Sandi — Perpustakaan Kemenkum Riau',
+      ...emailTemplate({
+        badge: 'KEAMANAN AKUN',
+        heading: 'Verifikasi Ganti Kata Sandi',
+        paragraphs: [
+          'Kami menerima permintaan untuk mengganti kata sandi akun admin Anda.',
+          'Buka link berikut untuk melanjutkan pembuatan kata sandi baru.',
+        ],
+        action: {
+          label: 'Verifikasi & Lanjutkan',
+          url: link,
+        },
+        alert:
+          'Link berlaku selama 15 menit dan otomatis tidak dapat digunakan setelah kata sandi berubah.',
+        note: 'Jika Anda tidak meminta perubahan kata sandi, abaikan email ini dan jangan bagikan link kepada siapa pun.',
+      }),
+    });
+  }
 
   async sendMemberReminder(
     email: string,

@@ -103,6 +103,7 @@ function routeMatches(pathname: string, route: string) {
 }
 
 function currentPageTitle(pathname: string) {
+  if (routeMatches(pathname, "/admin/profil")) return "Profil Admin";
   for (const item of menuItems) {
     if (item.route && routeMatches(pathname, item.route)) return item.label;
     const child = item.children?.find((entry) => routeMatches(pathname, entry.route));
@@ -364,9 +365,16 @@ export default function AdminShell({ children, user }: AdminShellProps) {
                 </b>
               ) : null}
             </Link>
-            <span className={styles.avatar} title={`${user.name} · ${user.email}`}>
+            <Link
+              href="/admin/profil"
+              className={`${styles.avatar} ${enhancements.profileTrigger}`}
+              title={`${user.name} · ${user.email}`}
+              aria-label="Buka profil admin"
+              aria-current={pathname === "/admin/profil" ? "page" : undefined}
+              onClick={() => setOpenMenu(null)}
+            >
               {initials(user.name)}
-            </span>
+            </Link>
           </div>
         </header>
 
