@@ -25,6 +25,7 @@ type FormState = Omit<AdminEBookPayload, "year" | "accessDurationDays"> & {
 };
 
 const MAX_COVER_BYTES = 5 * 1024 * 1024;
+const MAX_EBOOK_BYTES = 50 * 1024 * 1024;
 const COVER_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const SUBJECT_CATEGORIES = [
   "Hukum",
@@ -42,6 +43,10 @@ const SUBJECT_CATEGORIES = [
   "Anak",
   "Umum",
 ] as const;
+
+const privateEBookSource =
+  /^\/private-ebooks\/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.pdf$/;
+const legacyWebsiteSource = /^\/ebooks\/[A-Za-z0-9_-]+\.(?:html|pdf)$/;
 
 const emptyForm: FormState = {
   code: "",
@@ -62,6 +67,10 @@ const emptyForm: FormState = {
   isActive: true,
 };
 
+function isStoredWebsiteSource(value: string) {
+  return privateEBookSource.test(value) || legacyWebsiteSource.test(value);
+}
+
 async function uploadCover(file: File): Promise<string> {
   const body = new FormData();
   body.append("cover", file);
@@ -79,6 +88,25 @@ async function uploadCover(file: File): Promise<string> {
   return data.coverUrl;
 }
 
+async function uploadEBook(file: File): Promise<string> {
+  const body = new FormData();
+  body.append("ebook", file);
+  const response = await fetch("/api/admin/uploads/ebook", {
+    method: "POST",
+    body,
+  });
+  if (!response.ok) {
+    throw new Error(
+      await ebookApiMessage(response, "File E-Book gagal diunggah."),
+    );
+  }
+  const data = (await response.json()) as { ebookUrl?: unknown };
+  if (typeof data.ebookUrl !== "string" || !data.ebookUrl) {
+    throw new Error("Respons upload E-Book tidak valid.");
+  }
+  return data.ebookUrl;
+}
+
 export default function AdminEBookForm({
   mode,
   id,
@@ -88,9 +116,11 @@ export default function AdminEBookForm({
 }) {
   const router = useRouter();
   const coverInput = useRef<HTMLInputElement>(null);
+  const ebookInput = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState("");
+  const [ebookFile, setEbookFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(mode === "edit");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -156,17 +186,23 @@ export default function AdminEBookForm({
   }
 
   function updateAccessMode(value: EBookAccessMode) {
+    setEbookFile(null);
+    if (ebookInput.current) ebookInput.current.value = "";
     setForm((current) => ({
       ...current,
       accessMode: value,
-      ...(value === "TIDAK_TERSEDIA" ? { ebookUrl: "" } : {}),
+      ebookUrl: value === current.accessMode ? current.ebookUrl : "",
     }));
+    setError("");
   }
 
   function chooseCover(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0] ?? null;
     if (!file) return;
-    if (!COVER_TYPES.includes(file.type) || !/\.(?:jpe?g|png|webp)$/i.test(file.name)) {
+    if (
+      !COVER_TYPES.includes(file.type) ||
+      !/\.(?:jpe?g|png|webp)$/i.test(file.name)
+    ) {
       setError("Format cover harus JPG, PNG, atau WEBP.");
       event.target.value = "";
       return;
@@ -182,6 +218,28 @@ export default function AdminEBookForm({
       if (current) URL.revokeObjectURL(current);
       return URL.createObjectURL(file);
     });
+  }
+
+  function chooseEBook(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0] ?? null;
+    if (!file) {
+      setEbookFile(null);
+      return;
+    }
+    if (file.type !== "application/pdf" || !/\.pdf$/i.test(file.name)) {
+      setError("Format file E-Book harus PDF.");
+      event.target.value = "";
+      setEbookFile(null);
+      return;
+    }
+    if (file.size > MAX_EBOOK_BYTES) {
+      setError("Ukuran file E-Book maksimal 50 MB.");
+      event.target.value = "";
+      setEbookFile(null);
+      return;
+    }
+    setError("");
+    setEbookFile(file);
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -217,14 +275,28 @@ export default function AdminEBookForm({
       setError("Durasi Akses harus berupa jumlah hari yang valid.");
       return;
     }
-    if (form.accessMode !== "TIDAK_TERSEDIA" && !form.ebookUrl.trim()) {
-      setError("URL / Sumber E-Book wajib diisi untuk mode akses ini.");
+
+    if (
+      form.accessMode === "BACA_DI_WEBSITE" &&
+      !ebookFile &&
+      !isStoredWebsiteSource(form.ebookUrl)
+    ) {
+      setError("Pilih file PDF E-Book untuk mode Baca di Website.");
       return;
     }
-    if (form.ebookUrl && !adminEBookSourceUrl(form.ebookUrl.trim())) {
-      setError("URL / Sumber E-Book tidak valid.");
-      return;
+
+    if (form.accessMode === "PENYEDIA_EKSTERNAL") {
+      const source = form.ebookUrl.trim();
+      if (!source) {
+        setError("URL Penyedia E-Book wajib diisi.");
+        return;
+      }
+      if (!/^https?:\/\//i.test(source) || !adminEBookSourceUrl(source)) {
+        setError("URL Penyedia E-Book tidak valid.");
+        return;
+      }
     }
+
     if (!coverFile && !form.coverUrl) {
       setError("Cover wajib diunggah.");
       return;
@@ -234,11 +306,21 @@ export default function AdminEBookForm({
     setError("");
     try {
       const coverUrl = coverFile ? await uploadCover(coverFile) : form.coverUrl;
+      const ebookUrl =
+        form.accessMode === "BACA_DI_WEBSITE"
+          ? ebookFile
+            ? await uploadEBook(ebookFile)
+            : form.ebookUrl
+          : form.accessMode === "PENYEDIA_EKSTERNAL"
+            ? form.ebookUrl.trim()
+            : "";
+
       const payload: AdminEBookPayload = {
         ...form,
         year,
         accessDurationDays,
         coverUrl,
+        ebookUrl,
       };
       const response = await fetch(
         mode === "create" ? "/api/admin/ebooks" : `/api/admin/ebooks/${id}`,
@@ -325,102 +407,48 @@ export default function AdminEBookForm({
             </div>
             <div className={styles.fieldsGrid}>
               <label>
-                <span>
-                  Kode E-Book <b>*</b>
-                </span>
-                <input
-                  value={form.code}
-                  onChange={(e) => update("code", e.target.value)}
-                  required
-                  maxLength={64}
-                />
+                <span>Kode E-Book <b>*</b></span>
+                <input value={form.code} onChange={(e) => update("code", e.target.value)} required maxLength={64} />
               </label>
               <label>
-                <span>
-                  Judul <b>*</b>
-                </span>
-                <input
-                  value={form.title}
-                  onChange={(e) => update("title", e.target.value)}
-                  required
-                />
+                <span>Judul <b>*</b></span>
+                <input value={form.title} onChange={(e) => update("title", e.target.value)} required />
               </label>
               <label>
-                <span>
-                  Penulis / Pengarang <b>*</b>
-                </span>
-                <input
-                  value={form.author}
-                  onChange={(e) => update("author", e.target.value)}
-                  required
-                />
+                <span>Penulis / Pengarang <b>*</b></span>
+                <input value={form.author} onChange={(e) => update("author", e.target.value)} required />
               </label>
               <label>
                 <span>ISBN/ISSN</span>
-                <input
-                  value={form.isbnIssn}
-                  onChange={(e) => update("isbnIssn", e.target.value)}
-                  maxLength={64}
-                />
+                <input value={form.isbnIssn} onChange={(e) => update("isbnIssn", e.target.value)} maxLength={64} />
               </label>
               <label>
-                <span>
-                  Penerbit <b>*</b>
-                </span>
-                <input
-                  value={form.publisher}
-                  onChange={(e) => update("publisher", e.target.value)}
-                  required
-                />
+                <span>Penerbit <b>*</b></span>
+                <input value={form.publisher} onChange={(e) => update("publisher", e.target.value)} required />
               </label>
               <label>
-                <span>
-                  Tahun Terbit <b>*</b>
-                </span>
-                <input
-                  type="number"
-                  min="1000"
-                  max="9999"
-                  value={form.year}
-                  onChange={(e) => update("year", e.target.value)}
-                  required
-                />
+                <span>Tahun Terbit <b>*</b></span>
+                <input type="number" min="1000" max="9999" value={form.year} onChange={(e) => update("year", e.target.value)} required />
               </label>
               <label>
                 <span>Edisi</span>
-                <input
-                  value={form.edition}
-                  onChange={(e) => update("edition", e.target.value)}
-                />
+                <input value={form.edition} onChange={(e) => update("edition", e.target.value)} />
               </label>
               <label>
-                <span>
-                  Bahasa <b>*</b>
-                </span>
-                <input
-                  value={form.language}
-                  onChange={(e) => update("language", e.target.value)}
-                  required
-                  maxLength={64}
-                />
+                <span>Bahasa <b>*</b></span>
+                <input value={form.language} onChange={(e) => update("language", e.target.value)} required maxLength={64} />
               </label>
               <label className={styles.spanTwo}>
-                <span>
-                  Subjek / Kategori <b>*</b>
-                </span>
+                <span>Subjek / Kategori <b>*</b></span>
                 <select
                   className={enhancements.subjectSelect}
                   value={form.subject}
                   onChange={(e) => update("subject", e.target.value)}
                   required
                 >
-                  <option value="" disabled>
-                    Pilih Subjek / Kategori
-                  </option>
+                  <option value="" disabled>Pilih Subjek / Kategori</option>
                   {subjectCategories.map((subject) => (
-                    <option key={subject} value={subject}>
-                      {subject}
-                    </option>
+                    <option key={subject} value={subject}>{subject}</option>
                   ))}
                 </select>
               </label>
@@ -434,23 +462,15 @@ export default function AdminEBookForm({
             </div>
             <div className={styles.fieldsGrid}>
               <label>
-                <span>
-                  Mode Akses <b>*</b>
-                </span>
+                <span>Mode Akses <b>*</b></span>
                 <select
                   value={form.accessMode}
                   onChange={(e) => updateAccessMode(e.target.value as EBookAccessMode)}
                   required
                 >
-                  <option value="BACA_DI_WEBSITE">
-                    {accessModeLabel("BACA_DI_WEBSITE")}
-                  </option>
-                  <option value="PENYEDIA_EKSTERNAL">
-                    {accessModeLabel("PENYEDIA_EKSTERNAL")}
-                  </option>
-                  <option value="TIDAK_TERSEDIA">
-                    {accessModeLabel("TIDAK_TERSEDIA")}
-                  </option>
+                  <option value="BACA_DI_WEBSITE">{accessModeLabel("BACA_DI_WEBSITE")}</option>
+                  <option value="PENYEDIA_EKSTERNAL">{accessModeLabel("PENYEDIA_EKSTERNAL")}</option>
+                  <option value="TIDAK_TERSEDIA">{accessModeLabel("TIDAK_TERSEDIA")}</option>
                 </select>
               </label>
               <label>
@@ -464,19 +484,43 @@ export default function AdminEBookForm({
                   placeholder="Kosong = tidak dibatasi"
                 />
               </label>
-              <label className={styles.spanTwo}>
-                <span>
-                  URL / Sumber E-Book{" "}
-                  {form.accessMode !== "TIDAK_TERSEDIA" ? <b>*</b> : null}
-                </span>
-                <input
-                  value={form.ebookUrl}
-                  onChange={(e) => update("ebookUrl", e.target.value)}
-                  disabled={form.accessMode === "TIDAK_TERSEDIA"}
-                  required={form.accessMode !== "TIDAK_TERSEDIA"}
-                  placeholder="https://..."
-                />
-              </label>
+
+              {form.accessMode === "BACA_DI_WEBSITE" ? (
+                <label className={styles.spanTwo}>
+                  <span>File E-Book PDF <b>*</b></span>
+                  <input
+                    ref={ebookInput}
+                    type="file"
+                    accept="application/pdf,.pdf"
+                    onChange={chooseEBook}
+                    required={!ebookFile && !isStoredWebsiteSource(form.ebookUrl)}
+                  />
+                  <small className={styles.coverHint}>
+                    PDF · Maks. 50 MB. File disimpan oleh sistem dan hanya dapat dibaca saat pinjaman aktif.
+                  </small>
+                  {ebookFile ? (
+                    <small className={styles.coverFileName}>{ebookFile.name}</small>
+                  ) : isStoredWebsiteSource(form.ebookUrl) ? (
+                    <small className={styles.coverFileName}>
+                      File E-Book sudah tersimpan. Pilih PDF baru hanya jika ingin menggantinya.
+                    </small>
+                  ) : null}
+                </label>
+              ) : null}
+
+              {form.accessMode === "PENYEDIA_EKSTERNAL" ? (
+                <label className={styles.spanTwo}>
+                  <span>URL Penyedia E-Book <b>*</b></span>
+                  <input
+                    type="url"
+                    value={form.ebookUrl}
+                    onChange={(e) => update("ebookUrl", e.target.value)}
+                    required
+                    placeholder="https://..."
+                  />
+                </label>
+              ) : null}
+
               <label className={styles.spanTwo}>
                 <span>Catatan Lisensi</span>
                 <textarea
@@ -495,9 +539,7 @@ export default function AdminEBookForm({
               <p>Ringkasan yang tampil di halaman detail E-Book.</p>
             </div>
             <label className={styles.descriptionField}>
-              <span>
-                Deskripsi <b>*</b>
-              </span>
+              <span>Deskripsi <b>*</b></span>
               <textarea
                 rows={6}
                 value={form.description}
@@ -542,8 +584,7 @@ export default function AdminEBookForm({
               <div>
                 <strong>Tampilkan di katalog</strong>
                 <small>
-                  Menonaktifkan E-Book menyembunyikannya dari katalog tanpa
-                  menghapus data.
+                  Menonaktifkan E-Book menyembunyikannya dari katalog tanpa menghapus data.
                 </small>
               </div>
               <input
@@ -562,9 +603,7 @@ export default function AdminEBookForm({
       </div>
 
       <footer className={styles.formFooter}>
-        <Link href={backHref} className={styles.cancelButton}>
-          Batal
-        </Link>
+        <Link href={backHref} className={styles.cancelButton}>Batal</Link>
         <button type="submit" className={styles.saveButton} disabled={saving}>
           <FiCheckCircle aria-hidden />
           {saving

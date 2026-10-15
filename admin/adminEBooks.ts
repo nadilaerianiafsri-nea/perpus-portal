@@ -86,13 +86,31 @@ export function adminEBookTextError(fields: Record<string, unknown>): string | n
   for (const [key, value] of Object.entries(fields)) {
     if (typeof value !== 'string') continue;
     if (containsHtml(value)) return 'HTML tidak diperbolehkan pada kolom ini.';
-    const max = ['description', 'licenseNote'].includes(key) ? 10000 : key === 'note' ? 3000 : ['code', 'isbnIssn', 'language'].includes(key) ? 64 : 191;
-    const error = textInputError(value, { max, required: false, multiline: ['description', 'licenseNote', 'note'].includes(key) });
+    const max = ['description', 'licenseNote'].includes(key)
+      ? 10000
+      : key === 'note'
+        ? 3000
+        : ['code', 'isbnIssn', 'language'].includes(key)
+          ? 64
+          : 191;
+    const error = textInputError(value, {
+      max,
+      required: false,
+      multiline: ['description', 'licenseNote', 'note'].includes(key),
+    });
     if (error) return error;
   }
   return null;
 }
 
-export function adminEBookSourceUrl(value: string | null | undefined): string | null {
-  return typeof value === 'string' && (isSafeUrl(value) || /^\/ebooks\/[A-Za-z0-9_-]+\.(?:html|pdf)$/.test(value)) ? value : null;
+export function adminEBookSourceUrl(
+  value: string | null | undefined,
+): string | null {
+  const local =
+    typeof value === 'string' &&
+    (/^\/ebooks\/[A-Za-z0-9_-]+\.(?:html|pdf)$/.test(value) ||
+      /^\/private-ebooks\/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.pdf$/.test(
+        value,
+      ));
+  return typeof value === 'string' && (isSafeUrl(value) || local) ? value : null;
 }
