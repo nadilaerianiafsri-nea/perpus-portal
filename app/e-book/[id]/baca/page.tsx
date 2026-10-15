@@ -9,6 +9,8 @@ import { getCurrentUser } from "@/auth/serverAuth";
 import EBookReader from "@/catalog/EBookReader";
 
 const API_URL = process.env.API_URL ?? "http://127.0.0.1:3001";
+const privatePdf =
+  /^\/private-ebooks\/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.pdf$/;
 
 async function hasActiveEBookAccess(bookId: string) {
   const cookieStore = await cookies();
@@ -22,7 +24,9 @@ async function hasActiveEBookAccess(bookId: string) {
         cache: "no-store",
       },
     );
-    if (response.status === 401) return { authorized: false, unavailable: false };
+    if (response.status === 401) {
+      return { authorized: false, unavailable: false };
+    }
     if (!response.ok) return { authorized: false, unavailable: true };
     const status = (await response.json()) as { state?: string };
     return {
@@ -44,15 +48,20 @@ export default async function Page({
     getBook(id),
     getCurrentUser(),
   ]);
-  if (!user || !user.emailVerified)
+  if (!user || !user.emailVerified) {
     redirect(`/login?next=${encodeURIComponent(`/e-book/${id}/baca`)}`);
+  }
   if (user.role !== "PENGUNJUNG") redirect("/admin");
   if (!book && !unavailable) notFound();
   if (book && book.type !== "EBOOK") notFound();
 
   const access = await hasActiveEBookAccess(id);
-  // Only resolve/embed the local reader source after the server has verified an active loan.
-  const source = access.authorized ? localReaderSource(book?.ebookUrl) : null;
+  const storedSource = book?.ebookUrl ?? null;
+  const source = access.authorized
+    ? storedSource && privatePdf.test(storedSource)
+      ? `/api/members/me/ebooks/${encodeURIComponent(id)}/file.pdf`
+      : localReaderSource(storedSource)
+    : null;
 
   return (
     <CatalogShell ebook>
@@ -69,15 +78,18 @@ export default async function Page({
         {unavailable || access.unavailable ? (
           <div className={styles.state}>
             <h2>Akses E-Book belum dapat diverifikasi.</h2>
-            <p>Silakan coba lagi. Reader tidak dibuka sampai status pinjaman berhasil diverifikasi.</p>
+            <p>
+              Silakan coba lagi. Reader tidak dibuka sampai status pinjaman
+              berhasil diverifikasi.
+            </p>
             <Link href={`/koleksi/${id}`}>Kembali ke Detail</Link>
           </div>
         ) : !access.authorized ? (
           <div className={styles.state}>
             <h2>Akses E-Book tidak aktif.</h2>
             <p>
-              E-Book hanya dapat dibaca selama masa pinjaman aktif. Pinjam kembali
-              dari halaman detail apabila E-Book tersedia.
+              E-Book hanya dapat dibaca selama masa pinjaman aktif. Pinjam
+              kembali dari halaman detail apabila E-Book tersedia.
             </p>
             <Link href={`/koleksi/${id}`}>Kembali ke Detail E-Book</Link>
           </div>
@@ -101,8 +113,8 @@ export default async function Page({
           <div className={styles.state}>
             <h2>Berkas E-Book belum tersedia.</h2>
             <p>
-              Silakan hubungi petugas perpustakaan untuk informasi koleksi digital
-              ini.
+              Silakan hubungi petugas perpustakaan untuk informasi koleksi
+              digital ini.
             </p>
             <Link href={`/koleksi/${id}`}>Kembali ke Detail</Link>
           </div>

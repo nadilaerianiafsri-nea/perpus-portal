@@ -1,17 +1,29 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Post,
   Req,
+  Res,
   SetMetadata,
+  StreamableFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import type { Response } from 'express';
+import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import type { AuthenticatedRequest } from '../auth/jwt-auth.guard';
+import {
+  resolvePrivateEBookAccess,
+  validateEBookFile,
+} from '../admin-uploads/ebook-file';
+import { PrismaService } from '../prisma/prisma.service';
 import { ActiveBookGuard } from './active-book.guard';
 import { EBookCirculationService } from './ebook-circulation.service';
 import { MemberRoleGuard } from './member-role.guard';
@@ -26,34 +38,41 @@ export class MembersController {
   constructor(
     private readonly members: MembersService,
     private readonly ebookCirculation: EBookCirculationService,
+    private readonly prisma: PrismaService,
   ) {}
 
   @Get('dashboard') dashboard(@Req() req: AuthenticatedRequest) {
     return this.members.dashboard(req.user!.sub);
   }
+
   @Get('profile') profile(@Req() req: AuthenticatedRequest) {
     return this.members.profile(req.user!.sub);
   }
+
   @Patch('profile') updateProfile(
     @Req() req: AuthenticatedRequest,
     @Body() body: unknown,
   ) {
     return this.members.updateProfile(req.user!.sub, body);
   }
+
   @Get('books/:bookId/borrowing-status')
   @UseGuards(ActiveBookGuard)
   borrowingStatus(@Param('bookId') bookId: string) {
     positiveId(bookId);
     return { available: true };
   }
+
   @Get('reservations') reservations(@Req() req: AuthenticatedRequest) {
     return this.members.reservations(req.user!.sub);
   }
+
   @Post('reservations')
   @UseGuards(ActiveBookGuard)
   reserve(@Req() req: AuthenticatedRequest, @Body() body: unknown) {
     return this.members.reserve(req.user!.sub, body);
   }
+
   @Patch('reservations/:id/cancel') cancel(
     @Req() req: AuthenticatedRequest,
     @Param('id') id: string,
@@ -62,12 +81,15 @@ export class MembersController {
     emptyInput(body);
     return this.members.cancel(req.user!.sub, positiveId(id));
   }
+
   @Get('loans') loans(@Req() req: AuthenticatedRequest) {
     return this.members.loans(req.user!.sub);
   }
+
   @Get('loans/history') history(@Req() req: AuthenticatedRequest) {
     return this.members.loans(req.user!.sub, true);
   }
+
   @Post('loans/:id/extend') extend(
     @Req() req: AuthenticatedRequest,
     @Param('id') id: string,
@@ -75,9 +97,11 @@ export class MembersController {
   ) {
     return this.members.extend(req.user!.sub, positiveId(id), body);
   }
+
   @Get('notifications') notifications(@Req() req: AuthenticatedRequest) {
     return this.members.notifications(req.user!.sub);
   }
+
   @Patch('notifications/read-all') readAll(
     @Req() req: AuthenticatedRequest,
     @Body() body: unknown,
@@ -85,6 +109,7 @@ export class MembersController {
     emptyInput(body);
     return this.members.readAll(req.user!.sub);
   }
+
   @Patch('notifications/:id/read') read(
     @Req() req: AuthenticatedRequest,
     @Param('id') id: string,
@@ -110,6 +135,69 @@ export class MembersController {
     @Param('bookId') bookId: string,
   ) {
     return this.ebookCirculation.getStatus(req.user!.sub, positiveId(bookId));
+  }
+
+  @Get('ebooks/:bookId/file.pdf')
+  async eBookFile(
+    @Req() req: AuthenticatedRequest,
+    @Param('bookId') bookId: string,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const id = positiveId(bookId);
+    const now = new Date();
+
+    const [book, activeLoan] = await Promise.all([
+      this.prisma.book.findFirst({
+        where: { id, type: 'EBOOK' },
+        select: {
+          isActive: true,
+          accessMode: true,
+          ebookUrl: true,
+        },
+      }),
+      this.prisma.eBookLoan.findFirst({
+        where: {
+          userId: req.user!.sub,
+          bookId: id,
+          status: 'AKTIF',
+          dueAt: { gt: now },
+        },
+        select: { id: true },
+      }),
+    ]);
+
+    const access = resolvePrivateEBookAccess(book, !!activeLoan);
+    if ('reason' in access) {
+      if (
+        access.reason === 'NO_ACTIVE_LOAN' ||
+        access.reason === 'BOOK_INACTIVE'
+      ) {
+        throw new ForbiddenException('Akses E-Book tidak aktif.');
+      }
+      throw new NotFoundException('Berkas E-Book tidak ditemukan.');
+    }
+
+    let buffer: Buffer;
+    try {
+      buffer = await readFile(
+        resolve(process.cwd(), 'storage', 'ebooks', access.filename),
+      );
+      validateEBookFile(buffer, 'application/pdf');
+    } catch {
+      throw new NotFoundException('Berkas E-Book tidak ditemukan.');
+    }
+
+    response.setHeader('Content-Type', 'application/pdf');
+    response.setHeader(
+      'Content-Disposition',
+      `inline; filename="ebook-${id}.pdf"`,
+    );
+    response.setHeader('Content-Length', String(buffer.length));
+    response.setHeader('Cache-Control', 'private, no-store');
+    response.setHeader('X-Content-Type-Options', 'nosniff');
+    response.setHeader('Content-Security-Policy', "default-src 'none'; sandbox");
+
+    return new StreamableFile(buffer);
   }
 
   @Post('ebooks/:bookId/borrow')
@@ -191,16 +279,19 @@ export class MembersController {
 @SetMetadata('memberRole', 'ADMIN')
 export class MemberCirculationController {
   constructor(private readonly members: MembersService) {}
+
   @Post('reservations/:id/pickup')
   pickup(@Param('id') id: string, @Body() body: unknown) {
     emptyInput(body);
     return this.members.pickup(positiveId(id));
   }
+
   @Post('loans/:id/return')
   returnLoan(@Param('id') id: string, @Body() body: unknown) {
     emptyInput(body);
     return this.members.finishLoan(positiveId(id), false);
   }
+
   @Post('loans/:id/lost')
   lost(@Param('id') id: string, @Body() body: unknown) {
     emptyInput(body);

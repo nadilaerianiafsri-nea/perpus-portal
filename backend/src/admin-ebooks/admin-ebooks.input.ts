@@ -1,5 +1,6 @@
 import { textInputError, isSafeUrl } from '../../../shared/inputValidation.cjs';
 import { isSafeCoverFilename } from '../admin-uploads/cover-file';
+import { privateEBookFilename } from '../admin-uploads/ebook-file';
 
 export type EBookAccessMode =
   | 'BACA_DI_WEBSITE'
@@ -50,7 +51,11 @@ function optionalText(
 ): string | null {
   if (value === undefined || value === null || value === '') return null;
   if (typeof value !== 'string') throw new Error(`${label} tidak valid.`);
-  const error = textInputError(value, { max, required: false, multiline: max > 191 });
+  const error = textInputError(value, {
+    max,
+    required: false,
+    multiline: max > 191,
+  });
   if (error) throw new Error(error);
   const result = value.trim();
   if (!result) return null;
@@ -92,20 +97,72 @@ export function positiveEBookId(value: string): number {
 
 function coverUrlInput(value: unknown): string {
   const url = requiredText(value, 'Cover', 191);
-  const local = /^\/images\/(?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9_-]+\.(?:svg|jpg|jpeg|png|webp)$/.test(url)
-    || (url.startsWith('/uploads/covers/') && isSafeCoverFilename(url.slice('/uploads/covers/'.length)));
+  const local =
+    /^\/images\/(?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9_-]+\.(?:svg|jpg|jpeg|png|webp)$/.test(
+      url,
+    ) ||
+    (url.startsWith('/uploads/covers/') &&
+      isSafeCoverFilename(url.slice('/uploads/covers/'.length)));
   if (!isSafeUrl(url) && !local) throw new Error('URL cover tidak valid.');
   return url;
 }
 
+function eBookSourceInput(
+  value: unknown,
+  accessMode: EBookAccessMode,
+): string | null {
+  if (accessMode === 'TIDAK_TERSEDIA') return null;
+
+  const ebookUrl = optionalText(value, 'URL / Sumber E-Book', 191);
+
+  if (accessMode === 'BACA_DI_WEBSITE') {
+    if (!ebookUrl) {
+      throw new Error('File E-Book PDF wajib diunggah untuk mode Baca di Website.');
+    }
+
+    const legacyLocal = /^\/ebooks\/[A-Za-z0-9_-]+\.(?:html|pdf)$/.test(
+      ebookUrl,
+    );
+    if (!privateEBookFilename(ebookUrl) && !legacyLocal) {
+      throw new Error('Sumber E-Book untuk mode Baca di Website tidak valid.');
+    }
+    return ebookUrl;
+  }
+
+  if (!ebookUrl) {
+    throw new Error('URL Penyedia E-Book wajib diisi.');
+  }
+  if (!isSafeUrl(ebookUrl)) {
+    throw new Error('URL Penyedia E-Book tidak valid.');
+  }
+  return ebookUrl;
+}
+
 export function parseAdminEBookInput(body: unknown): AdminEBookInput {
   const input = record(body);
-  const allowed = new Set(["code", "title", "author", "isbnIssn", "publisher", "year", "edition", "language", "subject", "description", "coverUrl", "isActive", "accessMode", "ebookUrl", "accessDurationDays", "licenseNote"]);
+  const allowed = new Set([
+    'code',
+    'title',
+    'author',
+    'isbnIssn',
+    'publisher',
+    'year',
+    'edition',
+    'language',
+    'subject',
+    'description',
+    'coverUrl',
+    'isActive',
+    'accessMode',
+    'ebookUrl',
+    'accessDurationDays',
+    'licenseNote',
+  ]);
   if (Object.keys(input).some((key) => !allowed.has(key))) {
     throw new Error('Terdapat field yang tidak diizinkan.');
   }
-  const accessMode = input.accessMode;
 
+  const accessMode = input.accessMode;
   if (
     accessMode !== 'BACA_DI_WEBSITE' &&
     accessMode !== 'PENYEDIA_EKSTERNAL' &&
@@ -114,13 +171,7 @@ export function parseAdminEBookInput(body: unknown): AdminEBookInput {
     throw new Error('Mode Akses tidak valid.');
   }
 
-  const ebookUrl = optionalText(input.ebookUrl, 'URL / Sumber E-Book', 191);
-  if (ebookUrl && !isSafeUrl(ebookUrl) && !/^\/ebooks\/[A-Za-z0-9_-]+\.(?:html|pdf)$/.test(ebookUrl)) {
-    throw new Error('URL / Sumber E-Book tidak valid.');
-  }
-  if (accessMode !== 'TIDAK_TERSEDIA' && !ebookUrl) {
-    throw new Error('URL / Sumber E-Book wajib diisi untuk mode akses ini.');
-  }
+  const ebookUrl = eBookSourceInput(input.ebookUrl, accessMode);
 
   const isActive = input.isActive;
   if (typeof isActive !== 'boolean') {
