@@ -30,11 +30,44 @@ export function BookStatus({ book }: { book: Book }) {
 export default function BookCard({
   book,
   basePath = "/koleksi",
+  member = false,
 }: {
   book: Book;
   basePath?: string;
+  member?: boolean;
 }) {
   const detailHref = `${basePath}/${book.id}`;
+  const details = (
+    <>
+      <h2>
+        <Link href={detailHref} title={member ? book.title : undefined}>
+          {book.title}
+        </Link>
+      </h2>
+      <p title={member ? book.author : undefined}>{book.author}</p>
+      <small>
+        {member ? (
+          <>
+            {book.year}
+            {book.language ? ` · ${book.language}` : ""}
+            <span className={styles.memberBookCode}>{book.code}</span>
+          </>
+        ) : (
+          <>
+            {book.code} · {book.year}
+          </>
+        )}
+      </small>
+    </>
+  );
+  const actions = (
+    <>
+      <BookStatus book={book} />
+      <Link className={styles.detailLink} href={detailHref}>
+        Lihat Detail
+      </Link>
+    </>
+  );
 
   return (
     <article className={styles.card}>
@@ -47,7 +80,11 @@ export default function BookCard({
           src={safeCoverUrl(book.coverUrl)}
           alt={`Sampul ${book.title}`}
           fill
-          sizes="(max-width: 600px) 50vw, (max-width: 1000px) 33vw, 25vw"
+          sizes={
+            member
+              ? "(max-width: 600px) 90vw, (max-width: 900px) 45vw, (max-width: 1200px) 30vw, 20vw"
+              : "(max-width: 600px) 50vw, (max-width: 1000px) 33vw, 25vw"
+          }
         />
         <span className={styles.typeBadge}>
           {book.type === "EBOOK" ? <FiMonitor /> : <FiBookOpen />}
@@ -55,17 +92,16 @@ export default function BookCard({
         </span>
       </Link>
       <div className={styles.cardBody}>
-        <h2>
-          <Link href={detailHref}>{book.title}</Link>
-        </h2>
-        <p>{book.author}</p>
-        <small>
-          {book.code} · {book.year}
-        </small>
-        <BookStatus book={book} />
-        <Link className={styles.detailLink} href={detailHref}>
-          Lihat Detail
-        </Link>
+        {member ? (
+          <div className={styles.memberCardCopy}>{details}</div>
+        ) : (
+          details
+        )}
+        {member ? (
+          <div className={styles.memberCardFooter}>{actions}</div>
+        ) : (
+          actions
+        )}
       </div>
     </article>
   );

@@ -59,7 +59,9 @@ export default function Catalog({
   const apiBase = member
     ? "/api/members/me/catalog"
     : `/api/${ebook ? "ebooks" : "collections"}`;
-  const filterBase = member ? "/api/members/me/catalog/filters" : "/api/collections/filters";
+  const filterBase = member
+    ? "/api/members/me/catalog/filters"
+    : "/api/collections/filters";
   const filterQuery = ebook ? "?type=EBOOK" : "";
   const detailBasePath = member ? "/dashboard/koleksi" : "/koleksi";
   const key = `${member}:${ebook}:${queryString}:${retry}`;
@@ -150,7 +152,8 @@ export default function Catalog({
           name === "type"
             ? (typeLabels[value as keyof typeof typeLabels] ?? value)
             : name === "availability"
-              ? (availabilityLabels[value as keyof typeof availabilityLabels] ?? value)
+              ? (availabilityLabels[value as keyof typeof availabilityLabels] ??
+                value)
               : value,
       })),
   );
@@ -184,8 +187,16 @@ export default function Catalog({
       ) : null}
 
       <h1>{ebook ? "Katalog E-Book" : "Katalog Koleksi"}</h1>
+      {member ? (
+        <p className={styles.memberSubtitle}>
+          Temukan buku fisik dan E-Book yang tersedia di Perpustakaan Kemenkum
+          Riau.
+        </p>
+      ) : null}
 
-      <div className={`${styles.searchRow} ${member ? memberStyles.memberSearchRow : ""}`}>
+      <div
+        className={`${styles.searchRow} ${member ? memberStyles.memberSearchRow : ""}`}
+      >
         <SearchInput
           key={searchRevision}
           initialValue={query.get("search") ?? ""}
@@ -202,7 +213,9 @@ export default function Catalog({
                   ? ""
                   : (query.get("subject") ?? "")
               }
-              onChange={(event) => update({ subject: event.target.value || null })}
+              onChange={(event) =>
+                update({ subject: event.target.value || null })
+              }
             >
               <option value="">Semua</option>
               {options.subjects.map((subject) => (
@@ -213,7 +226,11 @@ export default function Catalog({
         ) : null}
       </div>
 
-      <div className={member ? memberStyles.memberCatalogLayout : styles.catalogLayout}>
+      <div
+        className={
+          member ? memberStyles.memberCatalogLayout : styles.catalogLayout
+        }
+      >
         {!member ? (
           <aside className={styles.sidebar}>
             <Filters {...filterProps} />
@@ -223,26 +240,20 @@ export default function Catalog({
           </aside>
         ) : null}
 
-        <section className={styles.results} aria-label="Hasil pencarian" aria-busy={loading}>
+        <section
+          className={styles.results}
+          aria-label="Hasil pencarian"
+          aria-busy={loading}
+        >
           <div className={styles.toolbar}>
-            {member ? (
-              <button
-                type="button"
-                className={memberStyles.memberFilterButton}
-                aria-label="Buka filter koleksi"
-                title="Filter koleksi"
-                onClick={() => dialog.current?.showModal()}
-              >
-                <FiSliders aria-hidden="true" />
-              </button>
-            ) : (
+            {!member ? (
               <button
                 className={styles.mobileFilter}
                 onClick={() => dialog.current?.showModal()}
               >
                 <FiSliders /> Filter
               </button>
-            )}
+            ) : null}
             <p aria-live="polite">
               {loading ? (
                 "Memuat koleksi..."
@@ -256,10 +267,25 @@ export default function Catalog({
             </p>
 
             <div className={styles.sortTools}>
+              {member ? (
+                <button
+                  type="button"
+                  className={styles.memberFilterButton}
+                  aria-label="Buka filter koleksi"
+                  aria-haspopup="dialog"
+                  title="Filter koleksi"
+                  onClick={() => dialog.current?.showModal()}
+                >
+                  <FiSliders aria-hidden="true" /> Filter
+                  {chips.length > 0 ? <span>{chips.length}</span> : null}
+                </button>
+              ) : null}
               <label className={styles.pageSize}>
-                <span className={styles.srOnly}>Jumlah koleksi per halaman</span>
+                <span className={styles.srOnly}>
+                  Jumlah koleksi per halaman
+                </span>
                 <select
-                  className={memberStyles.catalogDropdown}
+                  className={member ? undefined : memberStyles.catalogDropdown}
                   aria-label="Jumlah koleksi per halaman"
                   value={query.get("limit") ?? (ebook ? "8" : "20")}
                   onChange={(event) => update({ limit: event.target.value })}
@@ -269,7 +295,9 @@ export default function Catalog({
                       8,
                       12,
                       20,
-                      ...(query.get("limit") ? [Number(query.get("limit"))] : []),
+                      ...(query.get("limit")
+                        ? [Number(query.get("limit"))]
+                        : []),
                     ]),
                   ].map((limit) => (
                     <option key={limit} value={limit}>
@@ -282,7 +310,7 @@ export default function Catalog({
               <label>
                 <span className={styles.srOnly}>Urutkan koleksi</span>
                 <select
-                  className={memberStyles.catalogDropdown}
+                  className={member ? undefined : memberStyles.catalogDropdown}
                   value={query.get("sort") ?? "relevance"}
                   onChange={(event) => update({ sort: event.target.value })}
                 >
@@ -350,7 +378,10 @@ export default function Catalog({
           ) : null}
 
           {loading ? (
-            <div className={styles.grid} aria-label="Memuat koleksi">
+            <div
+              className={member && view === "list" ? styles.list : styles.grid}
+              aria-label="Memuat koleksi"
+            >
               {Array.from({ length: ebook ? 8 : 12 }, (_, index) => (
                 <div className={styles.skeleton} key={index}>
                   <div />
@@ -361,16 +392,27 @@ export default function Catalog({
             </div>
           ) : error ? (
             <div className={styles.state} role="alert">
-              <h2>Data koleksi belum dapat dimuat. Silakan coba lagi.</h2>
+              <h2>
+                {member
+                  ? "Koleksi belum dapat dimuat."
+                  : "Data koleksi belum dapat dimuat. Silakan coba lagi."}
+              </h2>
               {error === "Rentang tahun tidak valid." ? <p>{error}</p> : null}
-              <button onClick={() => setRetry((value) => value + 1)}>Coba Lagi</button>
+              <button onClick={() => setRetry((value) => value + 1)}>
+                Coba Lagi
+              </button>
               <button onClick={clear}>Bersihkan Filter</button>
             </div>
           ) : response?.data.length ? (
             <>
               <div className={view === "grid" ? styles.grid : styles.list}>
                 {response.data.map((book) => (
-                  <BookCard key={book.id} book={book} basePath={detailBasePath} />
+                  <BookCard
+                    key={book.id}
+                    book={book}
+                    basePath={detailBasePath}
+                    member={member}
+                  />
                 ))}
               </div>
 
@@ -401,9 +443,19 @@ export default function Catalog({
           ) : (
             <div className={styles.state}>
               <FiSearch />
-              <h2>Tidak ada koleksi yang sesuai.</h2>
-              <p>Coba kata kunci lain atau hapus filter yang dipilih.</p>
-              <button onClick={clear}>Bersihkan Filter</button>
+              <h2>
+                {member
+                  ? "Koleksi tidak ditemukan"
+                  : "Tidak ada koleksi yang sesuai."}
+              </h2>
+              <p>
+                {member
+                  ? "Coba ubah kata kunci atau filter pencarian Anda."
+                  : "Coba kata kunci lain atau hapus filter yang dipilih."}
+              </p>
+              <button onClick={clear}>
+                {member ? "Reset Filter" : "Bersihkan Filter"}
+              </button>
               {totalPages > 0 ? (
                 <button onClick={() => update({ page: "1" })}>
                   Kembali ke Halaman Pertama
@@ -428,7 +480,10 @@ export default function Catalog({
         </button>
         <Filters {...filterProps} />
         {filtersError ? <p>Filter belum dapat dimuat.</p> : null}
-        <button className={styles.primaryButton} onClick={() => dialog.current?.close()}>
+        <button
+          className={styles.primaryButton}
+          onClick={() => dialog.current?.close()}
+        >
           Lihat Hasil
         </button>
       </dialog>
@@ -436,7 +491,7 @@ export default function Catalog({
   );
 
   return member ? (
-    <div className={styles.main}>{content}</div>
+    <div className={`${styles.main} ${styles.memberCatalog}`}>{content}</div>
   ) : (
     <main className={styles.main}>{content}</main>
   );

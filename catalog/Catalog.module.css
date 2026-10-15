@@ -1185,6 +1185,555 @@
   margin-top: 14px;
 }
 
+/* Keep the member catalogue compact without changing the public catalogue. */
+.main.memberCatalog {
+  width: 100%;
+  max-width: 1240px;
+  margin: 8px auto 0;
+  padding: 0 8px 32px;
+}
+
+.memberCatalog > h1 {
+  margin-bottom: 8px;
+  font-size: clamp(27px, 2.5vw, 34px);
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+}
+
+.memberCatalog .memberSubtitle {
+  max-width: 680px;
+  margin: 0 0 22px;
+  color: #686a77;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.memberCatalog .searchRow {
+  margin-bottom: 14px;
+}
+
+.memberCatalog .searchInput {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+
+.memberCatalog .searchInput > svg {
+  top: 15px;
+  left: 16px;
+}
+
+.memberCatalog .searchInput input {
+  height: 46px;
+  padding-left: 44px;
+  border-color: #dedfe6;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.memberCatalog .toolbar {
+  min-height: 60px;
+  padding: 10px 14px;
+  margin-bottom: 20px;
+  gap: 12px;
+  border-color: #e2e3e9;
+  border-radius: 12px;
+}
+
+.memberCatalog .toolbar p {
+  margin: 0;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.memberCatalog .sortTools {
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.memberCatalog .sortTools label {
+  display: block;
+}
+
+.memberCatalog .sortTools select {
+  height: 38px;
+  min-height: 38px;
+  width: 145px;
+  padding: 0 10px;
+  border: 1px solid #dedfe6;
+  border-radius: 8px;
+  background: #fff;
+  color: #2b3056;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.memberCatalog .sortTools .pageSize select {
+  width: 117px;
+}
+
+.memberFilterButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  gap: 7px;
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid #dedfe6;
+  border-radius: 8px;
+  background: #fff;
+  color: #2b3056;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.memberFilterButton > span {
+  display: grid;
+  place-items: center;
+  min-width: 19px;
+  height: 19px;
+  padding-inline: 4px;
+  border-radius: 5px;
+  background: #e6e6eb;
+  color: #000633;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.memberCatalog .memberFilterButton:hover,
+.memberCatalog .sortTools select:hover {
+  border-color: #b6b8ca;
+  background: #f8f8fa;
+}
+
+.memberCatalog .viewToggle {
+  height: 38px;
+  padding: 3px;
+  gap: 2px;
+  background: #f6f6f8;
+}
+
+.memberCatalog .viewToggle button {
+  width: 30px;
+  height: 30px;
+  color: #727686;
+}
+
+.memberCatalog .viewToggle button[aria-pressed="true"] {
+  background: #2b3056;
+  color: #fff;
+}
+
+.memberCatalog .viewToggle button:not([aria-pressed="true"]):hover {
+  background: #e6e6eb;
+  color: #000633;
+}
+
+.memberCatalog .grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  align-items: stretch;
+}
+
+.memberCatalog .card {
+  border-color: #e1e3ea;
+  border-radius: 12px;
+  box-shadow: 0 2px 5px #00063305;
+  animation: none;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.memberCatalog .card:hover {
+  transform: translateY(-2px);
+  border-color: #bdc1d2;
+  box-shadow: 0 6px 16px #0006330c;
+}
+
+.memberCatalog .card .cover {
+  aspect-ratio: 4 / 5;
+  max-height: 240px;
+  background: #f0f1f5;
+  border-bottom: 1px solid #e8e9ee;
+}
+
+.memberCatalog .cover img {
+  object-fit: contain;
+  padding: 16px;
+  transform: none;
+  transition: none;
+}
+
+.memberCatalog .typeBadge {
+  top: 12px;
+  left: 12px;
+  padding: 5px 8px;
+  gap: 5px;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.memberCatalog .cardBody {
+  padding: 16px;
+  gap: 0;
+}
+
+.memberCardCopy {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.memberCatalog .card h2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  min-height: 44px;
+  max-height: 44px;
+  overflow: hidden;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 22px;
+}
+
+.memberCatalog .card p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #666a78;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.memberCatalog .card small {
+  display: block;
+  color: #7b7f8b;
+  font-size: 12px;
+  line-height: 19px;
+  overflow-wrap: anywhere;
+}
+
+.memberBookCode {
+  display: block;
+  font-size: 11px;
+}
+
+.memberCardFooter {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  padding-top: 12px;
+  margin-top: auto;
+}
+
+.memberCatalog .status {
+  min-height: 23px;
+  padding: 5px 8px;
+  font-size: 11px;
+}
+
+.memberCatalog .detailLink {
+  min-height: 36px;
+  margin-top: 0;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.memberCatalog .detailLink:hover {
+  background: #2b3056;
+  border-color: #2b3056;
+  color: #fff;
+}
+
+.memberCatalog .list {
+  gap: 14px;
+}
+
+.memberCatalog .list .card {
+  flex-direction: row;
+}
+
+.memberCatalog .list .cover {
+  width: 124px;
+  max-height: none;
+  align-self: stretch;
+  border-right: 1px solid #e8e9ee;
+  border-bottom: 0;
+}
+
+.memberCatalog .list .cover img {
+  padding: 12px;
+}
+
+.memberCatalog .list .typeBadge {
+  top: 8px;
+  left: 8px;
+  padding: 4px 6px;
+  font-size: 9px;
+}
+
+.memberCatalog .list .cardBody {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 140px;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 20px;
+}
+
+.memberCatalog .list h2 {
+  min-height: 0;
+}
+
+.memberCatalog .list .memberCardFooter {
+  align-items: flex-end;
+  margin: 0;
+  padding: 0;
+}
+
+.memberCatalog .list .detailLink {
+  width: 100%;
+  min-width: 0;
+}
+
+.memberCatalog .skeleton {
+  min-height: 471px;
+  border: 1px solid #e1e3ea;
+  border-radius: 12px;
+  padding-bottom: 20px;
+}
+
+.memberCatalog .skeleton > div {
+  aspect-ratio: 4 / 5;
+  max-height: 240px;
+}
+
+.memberCatalog .skeleton span {
+  margin-top: 14px;
+}
+
+.memberCatalog .skeleton span:last-child {
+  margin-bottom: 76px;
+}
+
+.memberCatalog .list .skeleton {
+  display: grid;
+  grid-template-columns: 124px minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  min-height: 155px;
+  gap: 12px;
+  padding-bottom: 0;
+}
+
+.memberCatalog .list .skeleton > div {
+  grid-row: 1 / 3;
+  aspect-ratio: 4 / 5;
+}
+
+.memberCatalog .list .skeleton span {
+  margin: 20px 16px 0 0;
+}
+
+.memberCatalog .state {
+  padding: 48px 20px;
+  border: 1px solid #e1e3ea;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.memberCatalog .state h2 {
+  margin: 12px 0 8px;
+  font-size: 20px;
+}
+
+.memberCatalog .state p {
+  font-size: 14px;
+}
+
+.memberCatalog .state button:first-of-type {
+  border-color: #2b3056;
+  background: #2b3056;
+  color: #fff;
+  font-weight: 600;
+}
+
+.memberCatalog .pagination {
+  margin-top: 28px;
+}
+
+.memberCatalog .filterDialog select:hover {
+  transform: none;
+}
+
+.memberCatalog :is(a, button, input, select):focus-visible {
+  outline: 3px solid #b08800;
+  outline-offset: 3px;
+}
+
+@media (min-width: 901px) and (max-width: 1200px) {
+  .memberCatalog .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .memberCatalog .toolbar {
+    flex-wrap: wrap;
+  }
+
+  .memberCatalog .sortTools {
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 1100px) {
+  .memberCatalog .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .main.memberCatalog {
+    padding-inline: 0;
+  }
+
+}
+
+@media (max-width: 600px) {
+  .memberCatalog > h1 {
+    margin-bottom: 8px;
+    font-size: 27px;
+  }
+
+  .memberCatalog .memberSubtitle {
+    margin-bottom: 18px;
+    font-size: 13px;
+  }
+
+  .memberCatalog .searchInput input {
+    font-size: 13px;
+  }
+
+  .memberCatalog .toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+
+  .memberCatalog .sortTools {
+    display: contents;
+  }
+
+  .memberCatalog .toolbar p {
+    grid-column: 1 / 3;
+    grid-row: 1;
+  }
+
+  .memberCatalog .memberFilterButton {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: end;
+  }
+
+  .memberCatalog .sortTools label {
+    grid-row: 2;
+  }
+
+  .memberCatalog .viewToggle {
+    grid-column: 3;
+    grid-row: 2;
+    justify-self: end;
+  }
+
+  .memberCatalog .sortTools select,
+  .memberCatalog .sortTools .pageSize select {
+    width: 100%;
+    max-width: 100%;
+    padding-inline: 6px;
+    font-size: 11px;
+  }
+
+  .memberCatalog .grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .memberCatalog .card .cover,
+  .memberCatalog .skeleton > div {
+    max-height: 260px;
+  }
+
+  .memberCatalog .cardBody {
+    padding: 18px;
+  }
+
+  .memberCatalog .list .card {
+    flex-direction: column;
+  }
+
+  .memberCatalog .list .cover {
+    width: 100%;
+    border-right: 0;
+    border-bottom: 1px solid #e8e9ee;
+  }
+
+  .memberCatalog .list .cardBody {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    padding: 18px;
+  }
+
+  .memberCatalog .list .memberCardFooter {
+    align-items: flex-start;
+  }
+
+  .memberCatalog .skeleton,
+  .memberCatalog .list .skeleton {
+    min-height: 495px;
+  }
+
+  .memberCatalog .list .skeleton {
+    display: block;
+    padding-bottom: 20px;
+  }
+
+  .memberCatalog .list .skeleton span {
+    margin: 14px 18px 0;
+  }
+
+  .memberCatalog .pagination {
+    gap: 5px;
+  }
+
+  .memberCatalog .pagination button {
+    padding: 9px 10px;
+    font-size: 11px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .memberCatalog .card,
+  .memberCatalog .memberFilterButton,
+  .memberCatalog .sortTools select {
+    transition: none;
+  }
+
+  .memberCatalog .card:hover {
+    transform: none;
+  }
+}
+
 .reservationDialog button:focus-visible,
 .libraryAction button:focus-visible {
   outline: 3px solid #ffd000;
