@@ -13,16 +13,21 @@ import {
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import type { AuthenticatedRequest } from '../auth/jwt-auth.guard';
 import { ActiveBookGuard } from './active-book.guard';
+import { EBookCirculationService } from './ebook-circulation.service';
 import { MemberRoleGuard } from './member-role.guard';
 import { MembersService } from './members.service';
-import { positiveId, emptyInput } from './member.validation';
+import { bookInput, emptyInput, positiveId } from './member.validation';
 import { MemberCacheInterceptor } from './members-cache.interceptor';
 
 @Controller('members/me')
 @UseGuards(JwtAuthGuard, MemberRoleGuard)
 @UseInterceptors(MemberCacheInterceptor)
 export class MembersController {
-  constructor(private readonly members: MembersService) {}
+  constructor(
+    private readonly members: MembersService,
+    private readonly ebookCirculation: EBookCirculationService,
+  ) {}
+
   @Get('dashboard') dashboard(@Req() req: AuthenticatedRequest) {
     return this.members.dashboard(req.user!.sub);
   }
@@ -73,7 +78,10 @@ export class MembersController {
   @Get('notifications') notifications(@Req() req: AuthenticatedRequest) {
     return this.members.notifications(req.user!.sub);
   }
-  @Patch('notifications/read-all') readAll(@Req() req: AuthenticatedRequest, @Body() body: unknown) {
+  @Patch('notifications/read-all') readAll(
+    @Req() req: AuthenticatedRequest,
+    @Body() body: unknown,
+  ) {
     emptyInput(body);
     return this.members.readAll(req.user!.sub);
   }
@@ -85,26 +93,91 @@ export class MembersController {
     emptyInput(body);
     return this.members.read(req.user!.sub, positiveId(id));
   }
+
   @Get('ebooks') ebooks(@Req() req: AuthenticatedRequest) {
-    return this.members.ebooks(req.user!.sub);
+    return this.ebookCirculation.listMine(req.user!.sub);
   }
+
+  // Compatibility endpoint: the old "save" action now means borrowing.
   @Post('ebooks')
-  @UseGuards(ActiveBookGuard)
-  addEBook(@Req() req: AuthenticatedRequest, @Body() body: unknown) {
-    return this.members.addEBook(req.user!.sub, body);
+  borrowEBookLegacy(@Req() req: AuthenticatedRequest, @Body() body: unknown) {
+    return this.ebookCirculation.borrow(req.user!.sub, bookInput(body));
   }
-  @Post('ebooks/:bookId/open')
-  @UseGuards(ActiveBookGuard)
-  openEBook(@Req() req: AuthenticatedRequest, @Param('bookId') bookId: string, @Body() body: unknown) {
-    emptyInput(body);
-    return this.members.openEBook(req.user!.sub, positiveId(bookId));
+
+  @Get('ebooks/:bookId/status')
+  eBookStatus(
+    @Req() req: AuthenticatedRequest,
+    @Param('bookId') bookId: string,
+  ) {
+    return this.ebookCirculation.getStatus(req.user!.sub, positiveId(bookId));
   }
-  @Patch('ebooks/:bookId/progress') updateEBookProgress(
+
+  @Post('ebooks/:bookId/borrow')
+  borrowEBook(
     @Req() req: AuthenticatedRequest,
     @Param('bookId') bookId: string,
     @Body() body: unknown,
   ) {
-    return this.members.updateEBookProgress(
+    emptyInput(body);
+    return this.ebookCirculation.borrow(req.user!.sub, positiveId(bookId));
+  }
+
+  @Post('ebooks/:bookId/return')
+  returnEBook(
+    @Req() req: AuthenticatedRequest,
+    @Param('bookId') bookId: string,
+    @Body() body: unknown,
+  ) {
+    emptyInput(body);
+    return this.ebookCirculation.returnBook(
+      req.user!.sub,
+      positiveId(bookId),
+    );
+  }
+
+  @Post('ebooks/:bookId/queue')
+  joinEBookQueue(
+    @Req() req: AuthenticatedRequest,
+    @Param('bookId') bookId: string,
+    @Body() body: unknown,
+  ) {
+    emptyInput(body);
+    return this.ebookCirculation.joinQueue(
+      req.user!.sub,
+      positiveId(bookId),
+    );
+  }
+
+  @Post('ebooks/:bookId/queue/cancel')
+  cancelEBookQueue(
+    @Req() req: AuthenticatedRequest,
+    @Param('bookId') bookId: string,
+    @Body() body: unknown,
+  ) {
+    emptyInput(body);
+    return this.ebookCirculation.cancelQueue(
+      req.user!.sub,
+      positiveId(bookId),
+    );
+  }
+
+  @Post('ebooks/:bookId/open')
+  openEBook(
+    @Req() req: AuthenticatedRequest,
+    @Param('bookId') bookId: string,
+    @Body() body: unknown,
+  ) {
+    emptyInput(body);
+    return this.ebookCirculation.open(req.user!.sub, positiveId(bookId));
+  }
+
+  @Patch('ebooks/:bookId/progress')
+  updateEBookProgress(
+    @Req() req: AuthenticatedRequest,
+    @Param('bookId') bookId: string,
+    @Body() body: unknown,
+  ) {
+    return this.ebookCirculation.updateProgress(
       req.user!.sub,
       positiveId(bookId),
       body,
@@ -118,15 +191,18 @@ export class MembersController {
 @SetMetadata('memberRole', 'ADMIN')
 export class MemberCirculationController {
   constructor(private readonly members: MembersService) {}
-  @Post('reservations/:id/pickup') pickup(@Param('id') id: string, @Body() body: unknown) {
+  @Post('reservations/:id/pickup')
+  pickup(@Param('id') id: string, @Body() body: unknown) {
     emptyInput(body);
     return this.members.pickup(positiveId(id));
   }
-  @Post('loans/:id/return') returnLoan(@Param('id') id: string, @Body() body: unknown) {
+  @Post('loans/:id/return')
+  returnLoan(@Param('id') id: string, @Body() body: unknown) {
     emptyInput(body);
     return this.members.finishLoan(positiveId(id), false);
   }
-  @Post('loans/:id/lost') lost(@Param('id') id: string, @Body() body: unknown) {
+  @Post('loans/:id/lost')
+  lost(@Param('id') id: string, @Body() body: unknown) {
     emptyInput(body);
     return this.members.finishLoan(positiveId(id), true);
   }

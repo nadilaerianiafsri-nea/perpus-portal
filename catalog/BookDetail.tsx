@@ -114,12 +114,11 @@ export default async function BookDetail({
           <p>{book.description}</p>
 
           {ebook ? (
-            <>
-              <Link className={styles.primaryButton} href={`/e-book/${book.id}/baca`}>
-                Baca E-Book
-              </Link>
-              <EBookLibraryAction key={book.id} bookId={book.id} role={user?.role ?? null} />
-            </>
+            <EBookLibraryAction
+              key={book.id}
+              bookId={book.id}
+              role={user?.role ?? null}
+            />
           ) : (
             <BorrowAction
               key={book.id}

@@ -27,9 +27,55 @@ export interface HistoryItem {
   status: "DIKEMBALIKAN" | "KEDALUWARSA" | "DIBATALKAN";
 }
 export interface MemberEBook {
-  id: number; bookId: number; book: MemberBook & { format: string };
+  id: number; bookId: number;
+  book: MemberBook & { format: string; isActive?: boolean };
   addedAt: string; lastOpenedAt: string | null;
   progress: number; lastPosition: number; progressVersion: number;
+}
+export type EBookCirculationState =
+  | "AVAILABLE"
+  | "BORROWED_BY_ME"
+  | "BORROWED_BY_OTHER"
+  | "QUEUED"
+  | "OFFERED_TO_ME"
+  | "UNAVAILABLE";
+export interface EBookCirculationStatus {
+  state: EBookCirculationState;
+  bookId: number;
+  canBorrow: boolean;
+  canQueue: boolean;
+  activeBorrowerDueAt?: string | null;
+  loan?: EBookLoan;
+  queue?: EBookQueue;
+}
+export interface EBookLoan {
+  id: number;
+  status: "AKTIF" | "DIKEMBALIKAN" | "KEDALUWARSA";
+  borrowedAt: string;
+  dueAt: string;
+  endedAt: string | null;
+  bookId: number;
+  book: MemberBook & { format: string; isActive?: boolean };
+  reading?: MemberEBook | null;
+}
+export interface EBookQueue {
+  id: number;
+  status: "MENUNGGU" | "DITAWARKAN";
+  bookId: number;
+  book: MemberBook & { format: string; isActive?: boolean };
+  queuedAt: string;
+  offeredAt: string | null;
+  claimExpiresAt: string | null;
+  position: number | null;
+}
+export interface ReadEBookHistory extends MemberEBook {
+  circulation: EBookCirculationStatus;
+}
+export interface MemberEBooksPayload {
+  activeLoans: EBookLoan[];
+  queues: EBookQueue[];
+  readHistory: ReadEBookHistory[];
+  ebooks: MemberEBook[];
 }
 export interface MemberSummary {
   currentUser: MemberProfile;

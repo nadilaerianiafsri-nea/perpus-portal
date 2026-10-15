@@ -11,6 +11,7 @@ import { AdminMembersController } from './admin-members.controller';
 import { AdminMembersService } from './admin-members.service';
 import { AdminTransactionsController } from './admin-transactions.controller';
 import { AdminTransactionsService } from './admin-transactions.service';
+import { EBookCirculationService } from './ebook-circulation.service';
 import { MemberRoleGuard } from './member-role.guard';
 import {
   MemberCirculationController,
@@ -30,12 +31,18 @@ import { MembersService } from './members.service';
   ],
   providers: [
     MembersService,
+    EBookCirculationService,
     AdminMembersService,
     AdminTransactionsService,
     AdminOperationsService,
     MemberRoleGuard,
     ActiveBookGuard,
   ],
-  exports: [MembersService, AdminOperationsService, MemberRoleGuard],
+  exports: [
+    MembersService,
+    EBookCirculationService,
+    AdminOperationsService,
+    MemberRoleGuard,
+  ],
 })
 export class MembersModule {}

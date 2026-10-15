@@ -22,6 +22,11 @@ export class AdminEBooksController {
     return this.ebooks.list(query);
   }
 
+  @Get('circulation')
+  circulation(@Query() query: Record<string, unknown>) {
+    return this.ebooks.circulation(query);
+  }
+
   @Get(':id')
   detail(@Param('id') id: string) {
     return this.ebooks.detail(id);

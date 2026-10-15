@@ -51,13 +51,44 @@ export class MailService {
       ),
     });
   }
+
+  async sendEBookNotification(
+    email: string,
+    title: string,
+    message: string,
+  ): Promise<boolean> {
+    const warning = /habis|kedaluwarsa/i.test(title);
+    return this.deliver({
+      to: email,
+      subject: `${title} — Perpustakaan Kemenkum Riau`,
+      ...emailTemplate({
+        badge: 'SIRKULASI E-BOOK',
+        heading: title,
+        paragraphs: [message],
+        tone: warning ? 'warning' : 'info',
+        action: this.memberEBookUrl()
+          ? {
+              label: 'Buka E-Book Saya',
+              url: this.memberEBookUrl()!,
+            }
+          : undefined,
+        note: 'Status terbaru, antrean, dan progres membaca tersedia pada Dashboard Anggota.',
+      }),
+    });
+  }
+
   async sendContactEmail(input: ContactInput): Promise<boolean> {
     // Defense in depth for any internal caller bypassing the contact DTO.
-    if (/[\r\n]/.test(input.name) || !/^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]+$/.test(input.email)) return false;
+    if (
+      /[\r\n]/.test(input.name) ||
+      !/^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]+$/.test(input.email)
+    )
+      return false;
     const recipient =
       this.config.get<string>('CONTACT_RECIPIENT_EMAIL')?.trim() ||
       serviceInfo.email;
-    if (!/^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]+$/.test(recipient)) return false;
+    if (!/^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]+$/.test(recipient))
+      return false;
     return this.deliver({
       to: recipient,
       replyTo: { address: input.email, name: input.name },
@@ -81,6 +112,7 @@ export class MailService {
       }),
     });
   }
+
   private async send(
     email: string,
     link: string,
@@ -117,12 +149,13 @@ export class MailService {
       }),
     });
   }
-  private memberDashboardUrl(): string | undefined {
+
+  private frontendUrl(pathname: string): string | undefined {
     const endpoint =
       this.config.get<string>('FRONTEND_URL')?.split(',')[0]?.trim() ||
       this.config.get<string>('EMAIL_VERIFICATION_URL');
     try {
-      const url = new URL('/dashboard/pinjaman', endpoint);
+      const url = new URL(pathname, endpoint);
       if (
         !['http:', 'https:'].includes(url.protocol) ||
         url.username ||
@@ -134,6 +167,15 @@ export class MailService {
       return undefined;
     }
   }
+
+  private memberDashboardUrl(): string | undefined {
+    return this.frontendUrl('/dashboard/pinjaman');
+  }
+
+  private memberEBookUrl(): string | undefined {
+    return this.frontendUrl('/dashboard/e-book');
+  }
+
   private async deliver(
     options: Mail.Options & { to: string },
   ): Promise<boolean> {

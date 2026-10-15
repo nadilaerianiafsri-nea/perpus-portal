@@ -66,6 +66,15 @@ function parseId(id: string): number {
   }
 }
 
+function pageMeta(page: number, limit: number, total: number) {
+  return {
+    page,
+    limit,
+    total,
+    totalPages: Math.max(1, Math.ceil(total / limit)),
+  };
+}
+
 @Injectable()
 export class AdminEBooksService {
   constructor(private readonly prisma: PrismaService) {}
@@ -134,11 +143,154 @@ export class AdminEBooksService {
         accessMode: book.accessMode ?? (book.ebookUrl ? 'BACA_DI_WEBSITE' : 'TIDAK_TERSEDIA'),
         isActive: book.isActive,
       })),
-      meta: {
-        page,
-        limit,
-        total,
-        totalPages: Math.max(1, Math.ceil(total / limit)),
+      meta: pageMeta(page, limit, total),
+    };
+  }
+
+  async circulation(query: AdminEBooksQuery) {
+    if (
+      Object.keys(query).some(
+        (key) => !['section', 'search', 'page', 'limit'].includes(key),
+      )
+    )
+      throw new BadRequestException('Parameter tidak diizinkan.');
+
+    const section =
+      queryText(query.section, 'Bagian', 16).toUpperCase() || 'ALL';
+    if (!['ALL', 'ACTIVE', 'QUEUE', 'HISTORY'].includes(section))
+      throw new BadRequestException('Bagian monitoring tidak valid.');
+    const search = queryText(query.search, 'Pencarian', 100);
+    const page = queryInteger(query.page, 1, 1, 100000);
+    const limit = queryInteger(query.limit, 30, 1, 100);
+    const skip = (page - 1) * limit;
+    void section;
+
+    const loanSearch: Prisma.EBookLoanWhereInput = search
+      ? {
+          OR: [
+            { book: { title: { contains: search } } },
+            { book: { code: { contains: search } } },
+            { user: { name: { contains: search } } },
+            { user: { email: { contains: search } } },
+          ],
+        }
+      : {};
+    const queueSearch: Prisma.EBookQueueWhereInput = search
+      ? {
+          OR: [
+            { book: { title: { contains: search } } },
+            { book: { code: { contains: search } } },
+            { user: { name: { contains: search } } },
+            { user: { email: { contains: search } } },
+          ],
+        }
+      : {};
+
+    const includeLoan = {
+      user: { select: { id: true, name: true, email: true } },
+      book: { select: { id: true, title: true, code: true, coverUrl: true } },
+    } as const;
+    const includeQueue = {
+      user: { select: { id: true, name: true, email: true } },
+      book: { select: { id: true, title: true, code: true, coverUrl: true } },
+    } as const;
+
+    const activeWhere: Prisma.EBookLoanWhereInput = {
+      status: 'AKTIF',
+      ...loanSearch,
+    };
+    const historyWhere: Prisma.EBookLoanWhereInput = {
+      status: { in: ['DIKEMBALIKAN', 'KEDALUWARSA'] },
+      ...loanSearch,
+    };
+    const queueWhere: Prisma.EBookQueueWhereInput = {
+      status: { in: ['MENUNGGU', 'DITAWARKAN'] },
+      ...queueSearch,
+    };
+
+    const [activeTotal, activeRows, queueTotal, queueRows, historyTotal, historyRows] =
+      await Promise.all([
+        this.prisma.eBookLoan.count({ where: activeWhere }),
+        this.prisma.eBookLoan.findMany({
+          where: activeWhere,
+          include: includeLoan,
+          orderBy: [{ dueAt: 'asc' }, { id: 'asc' }],
+          skip,
+          take: limit,
+        }),
+        this.prisma.eBookQueue.count({ where: queueWhere }),
+        this.prisma.eBookQueue.findMany({
+          where: queueWhere,
+          include: includeQueue,
+          orderBy: [{ bookId: 'asc' }, { queuedAt: 'asc' }, { id: 'asc' }],
+          skip,
+          take: limit,
+        }),
+        this.prisma.eBookLoan.count({ where: historyWhere }),
+        this.prisma.eBookLoan.findMany({
+          where: historyWhere,
+          include: includeLoan,
+          orderBy: [{ endedAt: 'desc' }, { id: 'desc' }],
+          skip,
+          take: limit,
+        }),
+      ]);
+
+    const queueBookIds = [...new Set(queueRows.map((row) => row.bookId))];
+    const orderedQueue = queueBookIds.length
+      ? await this.prisma.eBookQueue.findMany({
+          where: {
+            bookId: { in: queueBookIds },
+            status: { in: ['MENUNGGU', 'DITAWARKAN'] },
+          },
+          select: { id: true, bookId: true },
+          orderBy: [{ bookId: 'asc' }, { queuedAt: 'asc' }, { id: 'asc' }],
+        })
+      : [];
+    const queuePositions = new Map<number, number>();
+    const counts = new Map<number, number>();
+    for (const row of orderedQueue) {
+      const position = (counts.get(row.bookId) ?? 0) + 1;
+      counts.set(row.bookId, position);
+      queuePositions.set(row.id, position);
+    }
+
+    return {
+      activeLoans: {
+        data: activeRows.map((row) => ({
+          id: row.id,
+          status: row.status,
+          borrowedAt: row.borrowedAt,
+          dueAt: row.dueAt,
+          user: row.user,
+          book: row.book,
+        })),
+        meta: pageMeta(page, limit, activeTotal),
+      },
+      queues: {
+        data: queueRows.map((row) => ({
+          id: row.id,
+          status: row.status,
+          queuedAt: row.queuedAt,
+          offeredAt: row.offeredAt,
+          claimExpiresAt: row.claimExpiresAt,
+          position: queuePositions.get(row.id) ?? null,
+          user: row.user,
+          book: row.book,
+        })),
+        meta: pageMeta(page, limit, queueTotal),
+      },
+      history: {
+        data: historyRows.map((row) => ({
+          id: row.id,
+          status: row.status,
+          borrowedAt: row.borrowedAt,
+          dueAt: row.dueAt,
+          endedAt: row.endedAt,
+          user: row.user,
+          book: row.book,
+        })),
+        meta: pageMeta(page, limit, historyTotal),
       },
     };
   }

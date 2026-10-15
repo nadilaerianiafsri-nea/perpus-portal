@@ -73,6 +73,7 @@ const menuItems: MenuItem[] = [
       { label: "Reservasi", route: "/admin/transaksi/reservasi" },
       { label: "Peminjaman", route: "/admin/transaksi/peminjaman" },
       { label: "Pengembalian", route: "/admin/transaksi/pengembalian" },
+      { label: "Sirkulasi E-Book", route: "/admin/transaksi/e-book" },
       {
         label: "Buku Hilang & Penggantian",
         route: "/admin/transaksi/buku-hilang-penggantian",

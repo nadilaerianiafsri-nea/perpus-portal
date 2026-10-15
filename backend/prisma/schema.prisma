@@ -34,6 +34,8 @@ model User {
   loans                  Loan[]
   notifications          Notification[]
   ebooks                 UserEBook[]
+  ebookLoans             EBookLoan[]
+  ebookQueues            EBookQueue[]
   adminNotificationReads AdminNotificationRead[] @relation("AdminNotificationReadAdmin")
   createdAt              DateTime                @default(now())
   updatedAt              DateTime                @updatedAt
@@ -94,6 +96,8 @@ model Book {
   reservations       Reservation[]
   loans              Loan[]
   userEBooks          UserEBook[]
+  ebookLoans          EBookLoan[]
+  ebookQueues         EBookQueue[]
   createdAt           DateTime       @default(now())
   updatedAt           DateTime       @updatedAt
 
@@ -246,6 +250,59 @@ model UserEBook {
   @@unique([userId, bookId])
   @@index([userId, addedAt])
   @@map("user_ebooks")
+}
+
+enum EBookLoanStatus {
+  AKTIF
+  DIKEMBALIKAN
+  KEDALUWARSA
+}
+
+enum EBookQueueStatus {
+  MENUNGGU
+  DITAWARKAN
+  DIKLAIM
+  DIBATALKAN
+  KEDALUWARSA
+}
+
+model EBookLoan {
+  id           Int             @id @default(autoincrement())
+  userId       Int
+  user         User            @relation(fields: [userId], references: [id], onDelete: Restrict)
+  bookId       Int
+  book         Book            @relation(fields: [bookId], references: [id], onDelete: Restrict)
+  activeBookId Int?            @unique
+  status       EBookLoanStatus @default(AKTIF)
+  borrowedAt   DateTime        @default(now())
+  dueAt        DateTime
+  endedAt      DateTime?
+
+  @@index([bookId, status, dueAt])
+  @@index([userId, status, dueAt])
+  @@index([userId, bookId, borrowedAt])
+  @@map("ebook_loans")
+}
+
+model EBookQueue {
+  id             Int              @id @default(autoincrement())
+  userId         Int
+  user           User             @relation(fields: [userId], references: [id], onDelete: Restrict)
+  bookId         Int
+  book           Book             @relation(fields: [bookId], references: [id], onDelete: Restrict)
+  activeKey      String?          @unique @db.VarChar(191)
+  status         EBookQueueStatus @default(MENUNGGU)
+  queuedAt       DateTime         @default(now())
+  offeredAt      DateTime?
+  claimExpiresAt DateTime?
+  claimedAt      DateTime?
+  cancelledAt    DateTime?
+  expiredAt      DateTime?
+
+  @@index([bookId, status, queuedAt, id])
+  @@index([userId, bookId, status])
+  @@index([status, claimExpiresAt])
+  @@map("ebook_queues")
 }
 
 enum GrantStatus {
