@@ -1,12 +1,12 @@
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { localReaderSource } from "@/shared/displayUrls.cjs";
-import CatalogShell from "@/catalog/CatalogShell";
-import { getBook } from "@/catalog/serverApi";
-import styles from "@/catalog/Catalog.module.css";
+
 import { getCurrentUser } from "@/auth/serverAuth";
 import EBookReader from "@/catalog/EBookReader";
+import styles from "@/catalog/Reader.module.css";
+import { getBook } from "@/catalog/serverApi";
+import { localReaderSource } from "@/shared/displayUrls.cjs";
 
 const API_URL = process.env.API_URL ?? "http://127.0.0.1:3001";
 const privatePdf =
@@ -16,6 +16,7 @@ async function hasActiveEBookAccess(bookId: string) {
   const cookieStore = await cookies();
   const token = cookieStore.get("perpus_session")?.value;
   if (!token) return { authorized: false, unavailable: false };
+
   try {
     const response = await fetch(
       `${API_URL}/members/me/ebooks/${encodeURIComponent(bookId)}/status`,
@@ -24,10 +25,12 @@ async function hasActiveEBookAccess(bookId: string) {
         cache: "no-store",
       },
     );
+
     if (response.status === 401) {
       return { authorized: false, unavailable: false };
     }
     if (!response.ok) return { authorized: false, unavailable: true };
+
     const status = (await response.json()) as { state?: string };
     return {
       authorized: status.state === "BORROWED_BY_ME",
@@ -36,6 +39,30 @@ async function hasActiveEBookAccess(bookId: string) {
   } catch {
     return { authorized: false, unavailable: true };
   }
+}
+
+function ReaderState({
+  title,
+  message,
+  href,
+}: {
+  title: string;
+  message: string;
+  href: string;
+}) {
+  return (
+    <main className={styles.readerPage}>
+      <section className={styles.readerState}>
+        <div className={styles.readerStateCard}>
+          <h1>{title}</h1>
+          <p>{message}</p>
+          <Link className={styles.stateAction} href={href}>
+            Kembali ke Detail E-Book
+          </Link>
+        </div>
+      </section>
+    </main>
+  );
 }
 
 export default async function Page({
@@ -48,6 +75,7 @@ export default async function Page({
     getBook(id),
     getCurrentUser(),
   ]);
+
   if (!user || !user.emailVerified) {
     redirect(`/login?next=${encodeURIComponent(`/e-book/${id}/baca`)}`);
   }
@@ -63,63 +91,44 @@ export default async function Page({
       : localReaderSource(storedSource)
     : null;
 
-  return (
-    <CatalogShell ebook>
-      <main className={styles.main}>
-        <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-          <Link href="/e-book">E-Book</Link>
-          <span>/</span>
-          <Link href={`/koleksi/${id}`}>Detail Buku</Link>
-          <span>/</span>
-          <span>Baca</span>
-        </nav>
-        <h1>{book?.title ?? "Baca E-Book"}</h1>
+  if (unavailable || access.unavailable) {
+    return (
+      <ReaderState
+        title="Akses E-Book belum dapat diverifikasi."
+        message="Silakan coba lagi. Reader tidak dibuka sampai status pinjaman berhasil diverifikasi."
+        href={`/koleksi/${id}`}
+      />
+    );
+  }
 
-        {unavailable || access.unavailable ? (
-          <div className={styles.state}>
-            <h2>Akses E-Book belum dapat diverifikasi.</h2>
-            <p>
-              Silakan coba lagi. Reader tidak dibuka sampai status pinjaman
-              berhasil diverifikasi.
-            </p>
-            <Link href={`/koleksi/${id}`}>Kembali ke Detail</Link>
-          </div>
-        ) : !access.authorized ? (
-          <div className={styles.state}>
-            <h2>Akses E-Book tidak aktif.</h2>
-            <p>
-              E-Book hanya dapat dibaca selama masa pinjaman aktif. Pinjam
-              kembali dari halaman detail apabila E-Book tersedia.
-            </p>
-            <Link href={`/koleksi/${id}`}>Kembali ke Detail E-Book</Link>
-          </div>
-        ) : source ? (
-          <>
-            <p>
-              {book?.isDemo
-                ? "Bacaan contoh pengembangan, bukan isi publikasi resmi."
-                : "Baca koleksi digital melalui halaman ini."}
-            </p>
-            {book ? (
-              <EBookReader
-                key={book.id}
-                bookId={book.id}
-                source={source}
-                title={book.title}
-              />
-            ) : null}
-          </>
-        ) : (
-          <div className={styles.state}>
-            <h2>Berkas E-Book belum tersedia.</h2>
-            <p>
-              Silakan hubungi petugas perpustakaan untuk informasi koleksi
-              digital ini.
-            </p>
-            <Link href={`/koleksi/${id}`}>Kembali ke Detail</Link>
-          </div>
-        )}
-      </main>
-    </CatalogShell>
+  if (!access.authorized) {
+    return (
+      <ReaderState
+        title="Akses E-Book tidak aktif."
+        message="E-Book hanya dapat dibaca selama masa pinjaman aktif. Pinjam kembali dari halaman detail apabila E-Book tersedia."
+        href={`/koleksi/${id}`}
+      />
+    );
+  }
+
+  if (!source || !book) {
+    return (
+      <ReaderState
+        title="Berkas E-Book belum tersedia."
+        message="Silakan hubungi petugas perpustakaan untuk informasi koleksi digital ini."
+        href={`/koleksi/${id}`}
+      />
+    );
+  }
+
+  return (
+    <main className={styles.readerPage}>
+      <EBookReader
+        key={book.id}
+        bookId={book.id}
+        source={source}
+        title={book.title}
+      />
+    </main>
   );
 }
