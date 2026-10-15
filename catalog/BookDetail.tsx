@@ -26,19 +26,13 @@ export default async function BookDetail({
   if (unavailable) {
     const state = (
       <section className={`${styles.page} ${styles.error}`} role="alert">
-        <h1>Detail buku atau E-Book belum dapat dimuat.</h1>
+        <h1>Detail koleksi belum dapat dimuat.</h1>
         <p>Silakan coba lagi untuk melihat informasi buku.</p>
         <Link className={styles.primaryLink} href={`${basePath}/${id}`}>
           Coba Lagi
         </Link>
         <Link className={styles.secondaryLink} href={basePath}>
-          Kembali ke Koleksi
-        </Link>
-        <Link
-          className={styles.secondaryLink}
-          href={member ? "/dashboard/koleksi?type=EBOOK" : "/e-book"}
-        >
-          Kembali ke E-Book
+          {member ? "Kembali ke Katalog" : "Kembali ke Koleksi"}
         </Link>
       </section>
     );
@@ -52,35 +46,46 @@ export default async function BookDetail({
   }
   if (!book) notFound();
   const ebook = book.type === "EBOOK";
-  const loginHref = `/login?next=${encodeURIComponent(`/koleksi/${book.id}`)}`;
-  const action = !user ? (
-    <>
-      {ebook || book.availableCopies > 0 ? (
-        <Link className={styles.primaryLink} href={loginHref}>
-          {ebook ? "Masuk untuk Baca E-Book" : "Masuk untuk Ajukan Peminjaman"}
-        </Link>
-      ) : (
-        <button className={styles.primaryLink} disabled>
-          Tidak Tersedia
-        </button>
-      )}
-      <Link className={styles.secondaryLink} href="/register">
-        Daftar Anggota
+  const memberHref = `/dashboard/koleksi/${book.id}`;
+  const loginHref = `/login?returnUrl=${encodeURIComponent(memberHref)}`;
+  const action = !member ? (
+    user ? (
+      <Link
+        className={styles.primaryLink}
+        href={user.role === "ADMIN" ? "/admin" : memberHref}
+      >
+        Buka di Dashboard
       </Link>
-    </>
+    ) : (
+      <>
+        {ebook || book.availableCopies > 0 ? (
+          <Link className={styles.primaryLink} href={loginHref}>
+            {ebook
+              ? "Masuk untuk Pinjam E-Book"
+              : "Masuk untuk Ajukan Peminjaman"}
+          </Link>
+        ) : (
+          <button className={styles.primaryLink} disabled>
+            Tidak Tersedia
+          </button>
+        )}
+        <Link className={styles.secondaryLink} href="/register">
+          Daftar Anggota
+        </Link>
+      </>
+    )
   ) : ebook ? (
     <EBookLibraryAction
       key={book.id}
       bookId={book.id}
-      role={user.role}
-      readAfterBorrow
+      role={user?.role ?? null}
     />
   ) : (
     <BorrowAction
       key={book.id}
       available={book.availableCopies > 0}
       bookId={book.id}
-      role={user.role}
+      role={user?.role ?? null}
     />
   );
   const Layout = ebook ? EBookDetailLayout : BookDetailLayout;

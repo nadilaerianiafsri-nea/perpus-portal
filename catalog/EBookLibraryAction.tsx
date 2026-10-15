@@ -19,11 +19,9 @@ function formatRemaining(deadline: string | null | undefined, now: number) {
 export default function EBookLibraryAction({
   bookId,
   role,
-  readAfterBorrow = false,
 }: {
   bookId: number;
   role: "ADMIN" | "PENGUNJUNG" | null;
-  readAfterBorrow?: boolean;
 }) {
   const router = useRouter();
   const locked = useRef(false);
@@ -35,7 +33,7 @@ export default function EBookLibraryAction({
   const [now, setNow] = useState(() => Date.now());
 
   const load = useCallback(async () => {
-    if (role !== "PENGUNJUNG") return;
+    if (role !== "PENGUNJUNG") return false;
     setLoading(true);
     try {
       const [response, history] = await Promise.all([
@@ -45,22 +43,20 @@ export default function EBookLibraryAction({
           signal: AbortSignal.timeout(12000),
         }),
         // Read the existing library resource; opening/tracking still belongs to the reader.
-        readAfterBorrow
-          ? fetch("/api/members/me/ebooks", {
-              credentials: "same-origin",
-              cache: "no-store",
-              signal: AbortSignal.timeout(12000),
-            })
-              .then(async (response) => (response.ok ? response.json() : null))
-              .catch(() => null)
-          : null,
+        fetch("/api/members/me/ebooks", {
+          credentials: "same-origin",
+          cache: "no-store",
+          signal: AbortSignal.timeout(12000),
+        })
+          .then(async (response) => (response.ok ? response.json() : null))
+          .catch(() => null),
       ]);
       const data = await response.json().catch(() => null);
       if (response.status === 401) {
         router.replace(
-          `/login?next=${encodeURIComponent(`/koleksi/${bookId}`)}`,
+          `/login?returnUrl=${encodeURIComponent(`/dashboard/koleksi/${bookId}`)}`,
         );
-        return;
+        return false;
       }
       if (!response.ok) {
         throw new Error(
@@ -76,16 +72,19 @@ export default function EBookLibraryAction({
         library.activeLoans.find((item) => item.bookId === bookId)?.reading;
       setProgress(reading?.progress ?? 0);
       setNotice("");
+      return true;
     } catch (failure) {
+      setStatus(null);
       setNotice(
-        failure instanceof Error
+        failure instanceof Error && failure.name === "Error"
           ? failure.message
           : "Status E-Book belum dapat dimuat. Silakan coba lagi.",
       );
+      return false;
     } finally {
       setLoading(false);
     }
-  }, [bookId, role, router, readAfterBorrow]);
+  }, [bookId, role, router]);
 
   useEffect(() => {
     // Synchronize the existing circulation resource on mount/book changes.
@@ -101,7 +100,9 @@ export default function EBookLibraryAction({
 
   async function act(path: string, successMessage: string) {
     if (!role) {
-      router.push(`/login?next=${encodeURIComponent(`/koleksi/${bookId}`)}`);
+      router.push(
+        `/login?returnUrl=${encodeURIComponent(`/dashboard/koleksi/${bookId}`)}`,
+      );
       return;
     }
     if (role !== "PENGUNJUNG" || locked.current) return;
@@ -119,10 +120,13 @@ export default function EBookLibraryAction({
       });
       const data = await response.json().catch(() => null);
       if (response.status === 401) {
-        router.push(`/login?next=${encodeURIComponent(`/koleksi/${bookId}`)}`);
+        router.push(
+          `/login?returnUrl=${encodeURIComponent(`/dashboard/koleksi/${bookId}`)}`,
+        );
         return;
       }
       if (!response.ok) {
+        if (response.status === 409) await load();
         setNotice(
           typeof data?.message === "string"
             ? data.message
@@ -130,12 +134,7 @@ export default function EBookLibraryAction({
         );
         return;
       }
-      setNotice(successMessage);
-      if (readAfterBorrow && path === "borrow") {
-        router.push(`/e-book/${bookId}/baca`);
-        return;
-      }
-      await load();
+      if (await load()) setNotice(successMessage);
       router.refresh();
     } catch {
       setNotice("Layanan anggota belum dapat dihubungi. Silakan coba lagi.");
@@ -155,11 +154,11 @@ export default function EBookLibraryAction({
           type="button"
           onClick={() =>
             router.push(
-              `/login?next=${encodeURIComponent(`/koleksi/${bookId}`)}`,
+              `/login?returnUrl=${encodeURIComponent(`/dashboard/koleksi/${bookId}`)}`,
             )
           }
         >
-          Masuk untuk Baca E-Book
+          Masuk untuk Pinjam E-Book
         </button>
       </div>
     );
@@ -177,22 +176,14 @@ export default function EBookLibraryAction({
     <div className={styles.libraryAction}>
       {status?.state === "AVAILABLE" ? (
         <button
-          className={`${styles.detailLink} ${readAfterBorrow ? styles.primaryButton : ""}`}
+          className={styles.primaryButton}
           type="button"
           disabled={pending}
           onClick={() =>
             void act("borrow", "E-Book berhasil dipinjam selama 7 hari.")
           }
         >
-          {pending
-            ? "Memproses..."
-            : readAfterBorrow
-              ? progress >= 100
-                ? "Baca Lagi"
-                : progress > 0
-                  ? "Lanjut Baca"
-                  : "Baca E-Book"
-              : "Pinjam E-Book"}
+          {pending ? "Memproses..." : "Pinjam E-Book"}
         </button>
       ) : null}
 
@@ -211,13 +202,14 @@ export default function EBookLibraryAction({
 
       {status?.state === "BORROWED_BY_ME" ? (
         <>
+          <p className={styles.ctaNotice}>Akses E-Book aktif.</p>
           <Link
             className={styles.primaryButton}
             href={`/e-book/${bookId}/baca`}
           >
-            {readAfterBorrow && progress >= 100
+            {progress >= 100
               ? "Baca Lagi"
-              : readAfterBorrow && progress > 0
+              : progress > 0
                 ? "Lanjut Baca"
                 : "Baca E-Book"}
           </Link>
@@ -235,8 +227,12 @@ export default function EBookLibraryAction({
       {status?.state === "QUEUED" ? (
         <>
           <p className={styles.ctaNotice}>
-            Posisi antrean Anda:{" "}
-            <strong>#{status.queue?.position ?? "-"}</strong>
+            Anda sedang dalam antrean. Posisi antrean:{" "}
+            <strong>
+              {status.queue?.position
+                ? `#${status.queue.position}`
+                : "Sedang diperbarui"}
+            </strong>
           </p>
           <button
             className={styles.detailLink}
@@ -258,22 +254,14 @@ export default function EBookLibraryAction({
             {formatRemaining(status.queue?.claimExpiresAt, now)}.
           </p>
           <button
-            className={`${styles.detailLink} ${readAfterBorrow ? styles.primaryButton : ""}`}
+            className={styles.primaryButton}
             type="button"
             disabled={pending}
             onClick={() =>
               void act("borrow", "E-Book berhasil dipinjam selama 7 hari.")
             }
           >
-            {pending
-              ? "Memproses..."
-              : readAfterBorrow
-                ? progress >= 100
-                  ? "Baca Lagi"
-                  : progress > 0
-                    ? "Lanjut Baca"
-                    : "Baca E-Book"
-                : "Pinjam E-Book"}
+            {pending ? "Memproses..." : "Pinjam E-Book"}
           </button>
           <button
             className={styles.detailLink}
@@ -283,7 +271,7 @@ export default function EBookLibraryAction({
               void act("queue/cancel", "Antrean E-Book berhasil dibatalkan.")
             }
           >
-            Batalkan Antrean
+            {pending ? "Memproses..." : "Batalkan Antrean"}
           </button>
         </>
       ) : null}

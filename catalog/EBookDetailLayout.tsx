@@ -19,7 +19,7 @@ export default function EBookDetailLayout({
   related: ReactNode;
 }) {
   const Container = member ? "div" : "main";
-  const listHref = member ? "/dashboard/koleksi?type=EBOOK" : "/e-book";
+  const listHref = member ? "/dashboard/koleksi" : "/koleksi";
   const metadata = [
     ["ISBN / ISSN", book.isbnIssn || "Belum tersedia"],
     ["Penerbit", book.publisher || "Belum tersedia"],
@@ -50,12 +50,13 @@ export default function EBookDetailLayout({
               <span>/</span>
             </>
           ) : null}
-          <Link href={listHref}>E-Book</Link>
+          <Link href={listHref}>Koleksi</Link>
           <span>/</span>
-          <span aria-current="page">{member ? "Detail" : book.title}</span>
+          <span aria-current="page">Detail</span>
         </nav>
         <Link href={listHref} className={styles.backLink}>
-          <FiArrowLeft aria-hidden /> Kembali ke E-Book
+          <FiArrowLeft aria-hidden />{" "}
+          {member ? "Kembali ke Katalog" : "Kembali ke Koleksi"}
         </Link>
       </div>
       <section className={styles.hero} aria-labelledby="ebook-title">

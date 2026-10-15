@@ -8,10 +8,11 @@ import AuthShell from "./AuthShell";
 import styles from "./Auth.module.css";
 import { loginReturn } from "./loginReturn";
 import LoginCaptcha, { type LoginCaptchaHandle } from "./LoginCaptcha";
-import { plaintextError } from '@/catalog/plaintextInput.cjs';
+import { plaintextError } from "@/catalog/plaintextInput.cjs";
 
 const captchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY?.trim() ?? "";
-const captchaRequired = Boolean(captchaSiteKey) || process.env.NODE_ENV === "production";
+const captchaRequired =
+  Boolean(captchaSiteKey) || process.env.NODE_ENV === "production";
 
 type LoginResponse = {
   user?: {
@@ -43,7 +44,10 @@ export default function Login() {
 
     if (submissionLocked.current) return;
     const emailError = plaintextError(email, { required: true });
-    if (emailError) { setError(emailError); return; }
+    if (emailError) {
+      setError(emailError);
+      return;
+    }
     if (captchaRequired && !captchaToken) {
       setError("Selesaikan CAPTCHA sebelum masuk.");
       return;
@@ -71,7 +75,8 @@ export default function Login() {
       const data = (await response.json()) as LoginResponse;
 
       if (!response.ok || !data.user) {
-        if (data.code === "EMAIL_NOT_VERIFIED") setPendingEmail(email.trim().toLowerCase());
+        if (data.code === "EMAIL_NOT_VERIFIED")
+          setPendingEmail(email.trim().toLowerCase());
         setError(
           (typeof data.message === "string" ? data.message : undefined) ??
             "Login gagal. Periksa kembali email dan kata sandi.",
@@ -82,14 +87,15 @@ export default function Login() {
       router.replace(
         data.user.role === "ADMIN"
           ? "/admin"
-          : loginReturn(new URLSearchParams(window.location.search).get("next")),
+          : loginReturn(
+              new URLSearchParams(window.location.search).get("returnUrl") ??
+                new URLSearchParams(window.location.search).get("next"),
+            ),
       );
 
       router.refresh();
     } catch {
-      setError(
-        "Server tidak dapat dihubungi. Silakan coba lagi.",
-      );
+      setError("Server tidak dapat dihubungi. Silakan coba lagi.");
     } finally {
       // Google tokens are single-use; unsuccessful attempts need a new challenge.
       captcha.current?.reset();
@@ -101,20 +107,26 @@ export default function Login() {
   return (
     <AuthShell login>
       <div className={styles.loginContent}>
-        <Link className={styles.loginBack} href="/"><FiArrowLeft aria-hidden /> Kembali ke Beranda</Link>
-        <Link href="/" className={styles.brand} aria-label="Perpustakaan Kemenkum Riau — Beranda">
+        <Link className={styles.loginBack} href="/">
+          <FiArrowLeft aria-hidden /> Kembali ke Beranda
+        </Link>
+        <Link
+          href="/"
+          className={styles.brand}
+          aria-label="Perpustakaan Kemenkum Riau — Beranda"
+        >
           <span className={styles.brandMark}>P</span>
-          <span className={styles.brandCopy}><strong>Perpustakaan</strong><small>Kemenkum Riau</small></span>
+          <span className={styles.brandCopy}>
+            <strong>Perpustakaan</strong>
+            <small>Kemenkum Riau</small>
+          </span>
         </Link>
         <header className={styles.heading}>
           <h1 id="login-title">Masuk</h1>
           <p>Masuk ke akun anggota Anda.</p>
         </header>
 
-        <form
-          className={styles.loginForm}
-          onSubmit={handleLogin}
-        >
+        <form className={styles.loginForm} method="post" onSubmit={handleLogin}>
           <div className={styles.field}>
             <label htmlFor="login-email">
               Email <b>*</b>
@@ -128,9 +140,7 @@ export default function Login() {
               autoComplete="email"
               maxLength={191}
               value={email}
-              onChange={(event) =>
-                setEmail(event.target.value)
-              }
+              onChange={(event) => setEmail(event.target.value)}
               required
             />
           </div>
@@ -144,17 +154,11 @@ export default function Login() {
               <input
                 id="login-password"
                 name="password"
-                type={
-                  showPassword
-                    ? "text"
-                    : "password"
-                }
+                type={showPassword ? "text" : "password"}
                 placeholder="Masukkan kata sandi"
                 autoComplete="current-password"
                 value={password}
-                onChange={(event) =>
-                  setPassword(event.target.value)
-                }
+                onChange={(event) => setPassword(event.target.value)}
                 required
               />
 
@@ -167,11 +171,7 @@ export default function Login() {
                     ? "Sembunyikan kata sandi"
                     : "Tampilkan kata sandi"
                 }
-                onClick={() =>
-                  setShowPassword(
-                    (value) => !value,
-                  )
-                }
+                onClick={() => setShowPassword((value) => !value)}
               >
                 {showPassword ? (
                   <FiEyeOff aria-hidden />
@@ -187,46 +187,56 @@ export default function Login() {
               <input
                 type="checkbox"
                 checked={remember}
-                onChange={(event) =>
-                  setRemember(
-                    event.target.checked,
-                  )
-                }
+                onChange={(event) => setRemember(event.target.checked)}
               />
               <span>Ingat saya</span>
             </label>
 
-            <Link className={styles.linkButton} href="/forgot-password">Lupa kata sandi?</Link>
+            <Link className={styles.linkButton} href="/forgot-password">
+              Lupa kata sandi?
+            </Link>
           </div>
 
-          {captchaSiteKey ? <LoginCaptcha ref={captcha} siteKey={captchaSiteKey} onTokenChange={setCaptchaToken} /> : (
-            <p className={styles.captchaNotice} role="status">{captchaRequired
-              ? "Verifikasi keamanan belum tersedia. Silakan coba lagi nanti."
-              : "CAPTCHA belum aktif di mode pengembangan."}</p>
+          {captchaSiteKey ? (
+            <LoginCaptcha
+              ref={captcha}
+              siteKey={captchaSiteKey}
+              onTokenChange={setCaptchaToken}
+            />
+          ) : (
+            <p className={styles.captchaNotice} role="status">
+              {captchaRequired
+                ? "Verifikasi keamanan belum tersedia. Silakan coba lagi nanti."
+                : "CAPTCHA belum aktif di mode pengembangan."}
+            </p>
           )}
 
-          {error && <p className={styles.loginError} role="alert">{error}</p>}
-          {pendingEmail && <Link className={styles.actionLink} href={`/check-email?email=${encodeURIComponent(pendingEmail)}`}>Kirim ulang email verifikasi</Link>}
+          {error && (
+            <p className={styles.loginError} role="alert">
+              {error}
+            </p>
+          )}
+          {pendingEmail && (
+            <Link
+              className={styles.actionLink}
+              href={`/check-email?email=${encodeURIComponent(pendingEmail)}`}
+            >
+              Kirim ulang email verifikasi
+            </Link>
+          )}
 
           <button
             className={styles.primaryButton}
             type="submit"
             disabled={loading || (captchaRequired && !captchaToken)}
           >
-            {loading
-              ? "Memproses..."
-              : "Masuk"}
+            {loading ? "Memproses..." : "Masuk"}
           </button>
-
         </form>
 
         <p className={styles.switchText}>
-          Belum punya akun?{" "}
-          <Link href="/register">
-            Daftar Anggota
-          </Link>
+          Belum punya akun? <Link href="/register">Daftar Anggota</Link>
         </p>
-
       </div>
     </AuthShell>
   );

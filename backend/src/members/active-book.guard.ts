@@ -6,10 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { bookInput, positiveId } from './member.validation';
-import {
-  isEBookAccessActive,
-  sameBookTitle,
-} from './active-book-title';
+import { isEBookAccessActive, sameBookTitle } from './active-book-title';
 
 @Injectable()
 export class ActiveBookGuard implements CanActivate {
@@ -89,7 +86,10 @@ export class ActiveBookGuard implements CanActivate {
       }),
     ]);
 
-    const physicalConflict = [...reservations, ...loans].some((row) =>
+    const reservationConflict = reservations.some((row) =>
+      sameBookTitle(row.book.title, book.title),
+    );
+    const loanConflict = loans.some((row) =>
       sameBookTitle(row.book.title, book.title),
     );
 
@@ -100,10 +100,16 @@ export class ActiveBookGuard implements CanActivate {
         isEBookAccessActive(row.addedAt, row.book.accessDurationDays, now),
     );
 
-    if (physicalConflict || ebookConflict) {
-      throw new ConflictException(
-        `Anda masih memiliki akses aktif untuk “${book.title}”. Selesaikan reservasi, pinjaman, atau masa akses E-Book sebelum mengambil judul yang sama lagi.`,
-      );
+    if (reservationConflict || loanConflict || ebookConflict) {
+      throw new ConflictException({
+        statusCode: 409,
+        code: reservationConflict
+          ? 'ACTIVE_RESERVATION'
+          : loanConflict
+            ? 'ACTIVE_LOAN'
+            : 'ACTIVE_EBOOK',
+        message: `Anda masih memiliki akses aktif untuk “${book.title}”. Selesaikan reservasi, pinjaman, atau masa akses E-Book sebelum mengambil judul yang sama lagi.`,
+      });
     }
 
     return true;

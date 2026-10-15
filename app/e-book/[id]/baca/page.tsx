@@ -96,7 +96,7 @@ export default async function Page({
       <ReaderState
         title="Akses E-Book belum dapat diverifikasi."
         message="Silakan coba lagi. Reader tidak dibuka sampai status pinjaman berhasil diverifikasi."
-        href={`/koleksi/${id}`}
+        href={`/dashboard/koleksi/${id}`}
       />
     );
   }
@@ -106,7 +106,7 @@ export default async function Page({
       <ReaderState
         title="Akses E-Book tidak aktif."
         message="E-Book hanya dapat dibaca selama masa pinjaman aktif. Pinjam kembali dari halaman detail apabila E-Book tersedia."
-        href={`/koleksi/${id}`}
+        href={`/dashboard/koleksi/${id}`}
       />
     );
   }
@@ -116,7 +116,7 @@ export default async function Page({
       <ReaderState
         title="Berkas E-Book belum tersedia."
         message="Silakan hubungi petugas perpustakaan untuk informasi koleksi digital ini."
-        href={`/koleksi/${id}`}
+        href={`/dashboard/koleksi/${id}`}
       />
     );
   }

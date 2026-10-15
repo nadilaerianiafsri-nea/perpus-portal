@@ -1747,8 +1747,8 @@
 .relatedCard .cover img { object-fit: contain; padding: 12px; transform: none; }
 .relatedCard .typeBadge { top: 8px; left: 8px; padding: 4px 6px; font-size: 9px; }
 .relatedCard .cardBody { padding: 12px; gap: 0; }
-.relatedCard h2 { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; height: 38px; margin: 0; overflow: hidden; font-size: 14px; font-weight: 600; line-height: 19px; }
-.relatedCard p { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; line-height: 18px; }
+.relatedCard .cardBody h2 { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; height: 38px; margin: 0; overflow: hidden; font-size: 14px; font-weight: 600; line-height: 19px; }
+.relatedCard .cardBody p { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; line-height: 18px; }
 .relatedCard small { font-size: 11px; line-height: 17px; }
 .relatedCard .memberCardFooter { gap: 10px; padding-top: 12px; }
 .relatedCard .status { font-size: 10px; min-height: 21px; }

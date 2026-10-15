@@ -67,20 +67,23 @@ export default function BookDetailLayout({
   return (
     <Container className={`${styles.page} ${member ? styles.memberPage : ""}`}>
       <nav className={styles.breadcrumb} aria-label="Detail koleksi">
-        {!member ? (
+        <Link href="/">Beranda</Link>
+        <span>/</span>
+        {member ? (
           <>
-            <Link href="/">Beranda</Link>
+            <Link href="/dashboard">Dashboard</Link>
             <span>/</span>
           </>
         ) : null}
         <Link href={basePath}>Koleksi</Link>
         <span>/</span>
-        <span aria-current="page">Detail Buku</span>
+        <span aria-current="page">Detail</span>
       </nav>
       <header className={styles.heading}>
         <h1>Detail Buku</h1>
         <Link className={styles.backLink} href={basePath}>
-          <FiArrowLeft aria-hidden /> Kembali ke Koleksi
+          <FiArrowLeft aria-hidden />{" "}
+          {member ? "Kembali ke Katalog" : "Kembali ke Koleksi"}
         </Link>
       </header>
       <div className={styles.cardGrid}>
@@ -167,7 +170,7 @@ export default function BookDetailLayout({
           <div className={styles.actions}>{action}</div>
           <p className={styles.note}>
             {ebook
-              ? "Akses baca mengikuti status peminjaman E-Book Anda."
+              ? "Akses baca tersedia melalui area anggota."
               : "Reservasi mengunci 1 stok buku selama 24 jam. Masa pinjam 7 hari dimulai setelah petugas mengonfirmasi pengambilan."}
           </p>
         </DetailCard>
