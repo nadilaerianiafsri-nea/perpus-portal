@@ -15,7 +15,7 @@ import { BookStatus } from "./BookCard";
 import { type BookDetail, typeLabels } from "./types";
 import styles from "./BookDetail.module.css";
 
-function Card({
+export function DetailCard({
   title,
   id,
   children,
@@ -84,7 +84,7 @@ export default function BookDetailLayout({
         </Link>
       </header>
       <div className={styles.cardGrid}>
-        <Card title="Informasi Buku" id="book-information-title">
+        <DetailCard title="Informasi Buku" id="book-information-title">
           <div className={styles.bookSummary}>
             <div className={styles.cover}>
               <Image
@@ -119,8 +119,8 @@ export default function BookDetailLayout({
           {book.isDemo ? (
             <p className={styles.note}>Data contoh pengembangan.</p>
           ) : null}
-        </Card>
-        <Card title="Detail Katalog" id="book-catalog-title">
+        </DetailCard>
+        <DetailCard title="Detail Katalog" id="book-catalog-title">
           <dl className={styles.catalogFields}>
             {metadata.map(([label, value]) => (
               <div key={label}>
@@ -129,8 +129,8 @@ export default function BookDetailLayout({
               </div>
             ))}
           </dl>
-        </Card>
-        <Card title="Ketersediaan" id="book-availability-title">
+        </DetailCard>
+        <DetailCard title="Ketersediaan" id="book-availability-title">
           <dl className={styles.availabilityFields}>
             <div>
               <dt>Status Koleksi</dt>
@@ -170,8 +170,8 @@ export default function BookDetailLayout({
               ? "Akses baca mengikuti status peminjaman E-Book Anda."
               : "Reservasi mengunci 1 stok buku selama 24 jam. Masa pinjam 7 hari dimulai setelah petugas mengonfirmasi pengambilan."}
           </p>
-        </Card>
-        <Card title="Deskripsi" id="book-description-title">
+        </DetailCard>
+        <DetailCard title="Deskripsi" id="book-description-title">
           <p className={styles.description}>
             {book.description || "Deskripsi belum tersedia."}
           </p>
@@ -179,7 +179,7 @@ export default function BookDetailLayout({
             <span>Kode Katalog</span>
             <strong>{book.code}</strong>
           </div>
-        </Card>
+        </DetailCard>
       </div>
       <section
         className={`${styles.card} ${styles.loanInfo}`}

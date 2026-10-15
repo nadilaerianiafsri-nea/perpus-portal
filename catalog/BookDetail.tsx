@@ -6,6 +6,7 @@ import CatalogShell from "./CatalogShell";
 import BorrowAction from "./BorrowAction";
 import EBookLibraryAction from "./EBookLibraryAction";
 import BookDetailLayout from "./BookDetailLayout";
+import EBookDetailLayout from "./EBookDetailLayout";
 import RelatedBooks, { RelatedBooksLoading } from "./RelatedBooks";
 import { getBook } from "./serverApi";
 import styles from "./BookDetail.module.css";
@@ -25,13 +26,19 @@ export default async function BookDetail({
   if (unavailable) {
     const state = (
       <section className={`${styles.page} ${styles.error}`} role="alert">
-        <h1>Koleksi belum dapat dimuat.</h1>
+        <h1>Detail buku atau E-Book belum dapat dimuat.</h1>
         <p>Silakan coba lagi untuk melihat informasi buku.</p>
         <Link className={styles.primaryLink} href={`${basePath}/${id}`}>
           Coba Lagi
         </Link>
         <Link className={styles.secondaryLink} href={basePath}>
           Kembali ke Koleksi
+        </Link>
+        <Link
+          className={styles.secondaryLink}
+          href={member ? "/dashboard/koleksi?type=EBOOK" : "/e-book"}
+        >
+          Kembali ke E-Book
         </Link>
       </section>
     );
@@ -76,13 +83,14 @@ export default async function BookDetail({
       role={user.role}
     />
   );
+  const Layout = ebook ? EBookDetailLayout : BookDetailLayout;
   const content = (
-    <BookDetailLayout
+    <Layout
       book={book}
       member={member}
       action={action}
       related={
-        <Suspense fallback={<RelatedBooksLoading />}>
+        <Suspense fallback={<RelatedBooksLoading ebook={ebook} />}>
           <RelatedBooks book={book} member={member} />
         </Suspense>
       }

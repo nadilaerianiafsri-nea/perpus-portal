@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { EBookCirculationStatus } from "@/members/types";
+import { normalizeMemberEBooksPayload } from "@/members/ebookPayload";
 import styles from "./Catalog.module.css";
 
 function formatRemaining(deadline: string | null | undefined, now: number) {
@@ -30,17 +31,30 @@ export default function EBookLibraryAction({
   const [loading, setLoading] = useState(role === "PENGUNJUNG");
   const [pending, setPending] = useState(false);
   const [notice, setNotice] = useState("");
+  const [progress, setProgress] = useState(0);
   const [now, setNow] = useState(() => Date.now());
 
   const load = useCallback(async () => {
     if (role !== "PENGUNJUNG") return;
     setLoading(true);
     try {
-      const response = await fetch(`/api/members/me/ebooks/${bookId}/status`, {
-        credentials: "same-origin",
-        cache: "no-store",
-        signal: AbortSignal.timeout(12000),
-      });
+      const [response, history] = await Promise.all([
+        fetch(`/api/members/me/ebooks/${bookId}/status`, {
+          credentials: "same-origin",
+          cache: "no-store",
+          signal: AbortSignal.timeout(12000),
+        }),
+        // Read the existing library resource; opening/tracking still belongs to the reader.
+        readAfterBorrow
+          ? fetch("/api/members/me/ebooks", {
+              credentials: "same-origin",
+              cache: "no-store",
+              signal: AbortSignal.timeout(12000),
+            })
+              .then(async (response) => (response.ok ? response.json() : null))
+              .catch(() => null)
+          : null,
+      ]);
       const data = await response.json().catch(() => null);
       if (response.status === 401) {
         router.replace(
@@ -56,6 +70,11 @@ export default function EBookLibraryAction({
         );
       }
       setStatus(data as EBookCirculationStatus);
+      const library = normalizeMemberEBooksPayload(history);
+      const reading =
+        library.readHistory.find((item) => item.bookId === bookId) ??
+        library.activeLoans.find((item) => item.bookId === bookId)?.reading;
+      setProgress(reading?.progress ?? 0);
       setNotice("");
     } catch (failure) {
       setNotice(
@@ -66,7 +85,7 @@ export default function EBookLibraryAction({
     } finally {
       setLoading(false);
     }
-  }, [bookId, role, router]);
+  }, [bookId, role, router, readAfterBorrow]);
 
   useEffect(() => {
     // Synchronize the existing circulation resource on mount/book changes.
@@ -158,7 +177,7 @@ export default function EBookLibraryAction({
     <div className={styles.libraryAction}>
       {status?.state === "AVAILABLE" ? (
         <button
-          className={styles.detailLink}
+          className={`${styles.detailLink} ${readAfterBorrow ? styles.primaryButton : ""}`}
           type="button"
           disabled={pending}
           onClick={() =>
@@ -168,7 +187,11 @@ export default function EBookLibraryAction({
           {pending
             ? "Memproses..."
             : readAfterBorrow
-              ? "Baca E-Book"
+              ? progress >= 100
+                ? "Baca Lagi"
+                : progress > 0
+                  ? "Lanjut Baca"
+                  : "Baca E-Book"
               : "Pinjam E-Book"}
         </button>
       ) : null}
@@ -192,7 +215,11 @@ export default function EBookLibraryAction({
             className={styles.primaryButton}
             href={`/e-book/${bookId}/baca`}
           >
-            Baca E-Book
+            {readAfterBorrow && progress >= 100
+              ? "Baca Lagi"
+              : readAfterBorrow && progress > 0
+                ? "Lanjut Baca"
+                : "Baca E-Book"}
           </Link>
           <button
             className={styles.detailLink}
@@ -231,7 +258,7 @@ export default function EBookLibraryAction({
             {formatRemaining(status.queue?.claimExpiresAt, now)}.
           </p>
           <button
-            className={styles.detailLink}
+            className={`${styles.detailLink} ${readAfterBorrow ? styles.primaryButton : ""}`}
             type="button"
             disabled={pending}
             onClick={() =>
@@ -241,7 +268,11 @@ export default function EBookLibraryAction({
             {pending
               ? "Memproses..."
               : readAfterBorrow
-                ? "Baca E-Book"
+                ? progress >= 100
+                  ? "Baca Lagi"
+                  : progress > 0
+                    ? "Lanjut Baca"
+                    : "Baca E-Book"
                 : "Pinjam E-Book"}
           </button>
           <button
@@ -267,6 +298,15 @@ export default function EBookLibraryAction({
         <p className={styles.ctaNotice} role="status">
           {notice} <Link href="/dashboard/e-book">Lihat E-Book Saya</Link>
         </p>
+      ) : null}
+      {!status && notice ? (
+        <button
+          className={styles.detailLink}
+          type="button"
+          onClick={() => void load()}
+        >
+          Coba Lagi
+        </button>
       ) : null}
     </div>
   );

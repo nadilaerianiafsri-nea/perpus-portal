@@ -23,6 +23,8 @@ export type BookDetail = Book & {
   description: string;
   shelf: string | null;
   ebookUrl: string | null;
+  accessMode?: string | null;
+  licenseNote?: string | null;
   copies: { id: number; code: string; status: string; location: string }[];
 };
 export type CatalogResponse = {
