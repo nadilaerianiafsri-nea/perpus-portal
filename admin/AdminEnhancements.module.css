@@ -1,26 +1,23 @@
 .clickableStatCard {
-  color: var(--white);
   cursor: pointer;
   text-decoration: none;
   transition:
     transform 160ms ease,
-    filter 160ms ease,
+    border-color 160ms ease,
     box-shadow 160ms ease;
 }
 
 .clickableStatCard:hover,
 .clickableStatCard:focus-visible {
-  transform: scale(1.02);
-  filter: brightness(0.94);
-  outline: none;
-  box-shadow:
-    0 12px 28px #0006332e,
-    0 0 0 3px #00063318;
+  transform: translateY(-2px);
+  border-color: #c9cedb;
+  border-left-color: var(--stat-accent);
+  box-shadow: 0 8px 16px #0006330a;
 }
 
-.forceWhiteStatCard,
-.forceWhiteStatCard :is(span, strong, svg) {
-  color: var(--white) !important;
+.clickableStatCard:focus-visible {
+  outline: 2px solid var(--dashboard-primary);
+  outline-offset: 3px;
 }
 
 .chartFrame {
@@ -29,7 +26,7 @@
 
 .chartPoint {
   fill: var(--white);
-  stroke-width: 4;
+  stroke-width: 2.5;
   cursor: pointer;
   transition:
     transform 140ms ease,
@@ -40,23 +37,24 @@
 
 .chartPoint:hover,
 .chartPoint:focus-visible {
-  transform: scale(1.35);
-  stroke-width: 5;
+  transform: scale(1.15);
+  stroke-width: 3.5;
   outline: none;
 }
 
-.chartPointDark {
-  stroke: #252c5e;
+.borrowingPoint {
+  stroke: var(--dashboard-primary);
 }
 
-.chartPointBlue {
-  stroke: #29aef3;
+.returnPoint {
+  stroke: var(--dashboard-return);
 }
 
 .chartTooltip {
   position: absolute;
   z-index: 4;
-  min-width: 142px;
+  width: 176px;
+  max-width: calc(100% - 24px);
   padding: 10px 12px;
   display: grid;
   gap: 3px;
@@ -75,7 +73,7 @@
 }
 
 .chartTooltip strong {
-  color: var(--yellow);
+  color: var(--white);
   font-size: 12px;
 }
 
@@ -101,13 +99,13 @@
 .memberDonutTrack,
 .memberDonutSegment {
   fill: none;
-  stroke-width: 24;
+  stroke-width: 16;
   transform: rotate(-90deg);
   transform-origin: 60px 60px;
 }
 
 .memberDonutTrack {
-  stroke: #dedfe5;
+  stroke: var(--dashboard-grid);
 }
 
 .memberDonutSegment {
@@ -119,21 +117,42 @@
 
 .memberDonutSegment:hover,
 .memberDonutSegment:focus-visible {
-  stroke-width: 28;
+  stroke-width: 19;
   filter: brightness(0.9);
   outline: none;
 }
 
 .memberSegmentNavy {
-  stroke: #2d345f;
+  stroke: var(--dashboard-primary);
 }
 
 .memberSegmentBlue {
-  stroke: #2aaef3;
+  stroke: var(--dashboard-info);
 }
 
 .memberSegmentYellow {
   stroke: #ffd000;
+}
+
+.memberDonutTotal {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 3px;
+  pointer-events: none;
+}
+
+.memberDonutTotal strong {
+  color: var(--navy);
+  font-size: 28px;
+  line-height: 1;
+}
+
+.memberDonutTotal span {
+  color: var(--dashboard-muted);
+  font-size: 12px;
 }
 
 .memberChartTooltip {
@@ -271,7 +290,7 @@
 @media (max-width: 700px) {
   .clickableStatCard:hover,
   .clickableStatCard:focus-visible {
-    transform: scale(1.01);
+    transform: translateY(-2px);
   }
 
   .profileTrigger:hover,
@@ -281,7 +300,6 @@
   }
 
   .chartTooltip {
-    min-width: 126px;
     padding: 8px 10px;
     font-size: 11px;
   }

@@ -244,6 +244,7 @@ export default function AdminDashboard() {
   }, [range, revision]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Keep the existing fetch/loading lifecycle when the selected date range changes.
     void load();
 
     const interval = window.setInterval(() => {
@@ -290,7 +291,7 @@ export default function AdminDashboard() {
           label: "TOTAL STOK BUKU",
           value: dashboard.stats.totalStock.toLocaleString("id-ID"),
           icon: FiLayers,
-          tone: styles.statSlate,
+          tone: styles.statNavy,
           href: "/admin/koleksi/data-buku",
         },
         {
@@ -311,7 +312,7 @@ export default function AdminDashboard() {
           label: "PEMINJAMAN AKTIF",
           value: dashboard.stats.activeLoans.toLocaleString("id-ID"),
           icon: FiPackage,
-          tone: styles.statTeal,
+          tone: styles.statNavy,
           href: "/admin/transaksi/peminjaman?status=ACTIVE",
         },
         {
@@ -332,21 +333,21 @@ export default function AdminDashboard() {
           label: "BUKU HILANG (PROSES)",
           value: dashboard.stats.lostInProcess.toLocaleString("id-ID"),
           icon: FiBox,
-          tone: styles.statCoral,
+          tone: styles.statRed,
           href: "/admin/transaksi/buku-hilang-penggantian?status=PROCESS",
         },
         {
           label: "TOTAL ANGGOTA",
           value: dashboard.stats.totalMembers.toLocaleString("id-ID"),
           icon: FiUsers,
-          tone: styles.statMember,
+          tone: styles.statNavy,
           href: "/admin/keanggotaan",
         },
         {
           label: "E-BOOK",
           value: dashboard.stats.ebooks.toLocaleString("id-ID"),
           icon: FiMonitor,
-          tone: styles.statYellow,
+          tone: styles.statBlue,
           href: "/admin/koleksi/e-book",
         },
       ]
@@ -490,11 +491,11 @@ export default function AdminDashboard() {
                 <Link
                   key={card.label}
                   href={card.href}
-                  className={`${styles.statCard} ${card.tone} ${enhancements.clickableStatCard} ${enhancements.forceWhiteStatCard}`}
+                  className={`${styles.statCard} ${card.tone} ${enhancements.clickableStatCard}`}
                   aria-label={`${card.label}: ${card.value}. Buka halaman terkait.`}
                 >
                   <span className={styles.statIcon}>
-                    <Icon size={24} />
+                    <Icon size={21} aria-hidden="true" />
                   </span>
 
                   <div>
@@ -516,16 +517,15 @@ export default function AdminDashboard() {
                 </p>
 
                 <div
-                  className={controls.legend}
+                  className={styles.transactionLegend}
                   aria-label="Legenda transaksi peminjaman"
-                  style={{ marginTop: 10 }}
                 >
                   <span>
-                    <i className={controls.borrowLegend} />
+                    <i className={styles.borrowingLegend} aria-hidden="true" />
                     Peminjaman
                   </span>
                   <span>
-                    <i className={controls.returnLegend} />
+                    <i className={styles.returnLegend} aria-hidden="true" />
                     Pengembalian
                   </span>
                 </div>
@@ -577,14 +577,14 @@ export default function AdminDashboard() {
 
                     {borrowingPoints ? (
                       <polyline
-                        className={styles.lineDark}
+                        className={styles.borrowingLine}
                         points={borrowingPoints}
                       />
                     ) : null}
 
                     {returnPoints ? (
                       <polyline
-                        className={styles.lineBlue}
+                        className={styles.returnLine}
                         points={returnPoints}
                       />
                     ) : null}
@@ -606,10 +606,10 @@ export default function AdminDashboard() {
                       return (
                         <g key={`points-${row.key}`}>
                           <circle
-                            className={`${enhancements.chartPoint} ${enhancements.chartPointDark}`}
+                            className={`${enhancements.chartPoint} ${enhancements.borrowingPoint}`}
                             cx={borrowing.x}
                             cy={borrowing.y}
-                            r="6"
+                            r="4"
                             tabIndex={0}
                             aria-label={`${row.label}: ${row.borrowings} peminjaman, ${row.returns} pengembalian`}
                             onMouseEnter={() => setActiveTrend(index)}
@@ -617,10 +617,10 @@ export default function AdminDashboard() {
                             onClick={() => setActiveTrend(index)}
                           />
                           <circle
-                            className={`${enhancements.chartPoint} ${enhancements.chartPointBlue}`}
+                            className={`${enhancements.chartPoint} ${enhancements.returnPoint}`}
                             cx={returned.x}
                             cy={returned.y}
-                            r="6"
+                            r="4"
                             tabIndex={0}
                             aria-label={`${row.label}: ${row.borrowings} peminjaman, ${row.returns} pengembalian`}
                             onMouseEnter={() => setActiveTrend(index)}
@@ -647,7 +647,7 @@ export default function AdminDashboard() {
                         }`}
                         role="status"
                         style={{
-                          left: `${(point.x / 860) * 100}%`,
+                          left: `clamp(96px, ${(point.x / 860) * 100}%, calc(100% - 96px))`,
                           top: `${(point.y / 300) * 100}%`,
                         }}
                       >
@@ -691,7 +691,7 @@ export default function AdminDashboard() {
                     className={enhancements.memberDonut}
                     viewBox="0 0 120 120"
                     role="img"
-                    aria-label="Diagram kategori anggota. Arahkan kursor ke segmen untuk melihat jumlah dan persentase."
+                    aria-label={`Diagram kategori anggota, total ${memberTotal.toLocaleString("id-ID")} anggota. Arahkan kursor atau fokuskan segmen untuk melihat jumlah dan persentase.`}
                   >
                     <circle
                       className={enhancements.memberDonutTrack}
@@ -717,6 +717,11 @@ export default function AdminDashboard() {
                       />
                     ))}
                   </svg>
+
+                  <div className={enhancements.memberDonutTotal} data-member-total aria-hidden="true">
+                    <strong>{memberTotal.toLocaleString("id-ID")}</strong>
+                    <span>Anggota</span>
+                  </div>
 
                   {activeMember ? (
                     <div className={enhancements.memberChartTooltip} role="status">
