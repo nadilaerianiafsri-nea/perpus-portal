@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import ConfirmDialog from "@/components/ConfirmDialog";
 import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import { plainTextMessage } from "../members/inputSecurity";
 
@@ -20,6 +21,13 @@ import styles from "./AdminTransactions.module.css";
 type StatusFilter = "ALL" | "DUE_TODAY" | "OVERDUE";
 
 type MemberFilter = "ALL" | "UMUM" | "MAHASISWA" | "PEGAWAI";
+
+type FinishTarget = {
+  id: number;
+  mode: "return" | "lost";
+  memberName: string;
+  bookTitle: string;
+};
 
 const emptyResult: ReturnsResponse = {
   stats: {
@@ -49,6 +57,7 @@ export default function AdminReturnsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [processingId, setProcessingId] = useState<number | null>(null);
+  const [finishTarget, setFinishTarget] = useState<FinishTarget | null>(null);
   const [revision, setRevision] = useState(0);
 
   useEffect(() => {
@@ -119,21 +128,10 @@ export default function AdminReturnsPage() {
     void load();
   }, [load]);
 
-  async function finishLoan(
-    id: number,
-    mode: "return" | "lost",
-    memberName: string,
-    bookTitle: string,
-  ) {
-    const approved = window.confirm(
-      mode === "return"
-        ? `Konfirmasi buku “${bookTitle}” dari ${memberName} sudah dikembalikan?`
-        : `Tandai buku “${bookTitle}” yang dipinjam ${memberName} sebagai hilang?`,
-    );
+  async function finishLoan() {
+    if (!finishTarget || processingId !== null) return;
 
-    if (!approved) {
-      return;
-    }
+    const { id, mode } = finishTarget;
 
     setProcessingId(id);
     setError("");
@@ -154,6 +152,7 @@ export default function AdminReturnsPage() {
         );
       }
 
+      setFinishTarget(null);
       setRevision((value) => value + 1);
     } catch (reason) {
       setError(
@@ -358,14 +357,15 @@ export default function AdminReturnsPage() {
                             type="button"
                             className={styles.primaryAction}
                             disabled={processingId === loan.id}
-                            onClick={() =>
-                              void finishLoan(
-                                loan.id,
-                                "return",
-                                loan.member.name,
-                                loan.book.title,
-                              )
-                            }
+                            onClick={() => {
+                              setError("");
+                              setFinishTarget({
+                                id: loan.id,
+                                mode: "return",
+                                memberName: loan.member.name,
+                                bookTitle: loan.book.title,
+                              });
+                            }}
                           >
                             Kembalikan
                           </button>
@@ -377,14 +377,15 @@ export default function AdminReturnsPage() {
                             type="button"
                             className={styles.dangerAction}
                             disabled={processingId === loan.id}
-                            onClick={() =>
-                              void finishLoan(
-                                loan.id,
-                                "lost",
-                                loan.member.name,
-                                loan.book.title,
-                              )
-                            }
+                            onClick={() => {
+                              setError("");
+                              setFinishTarget({
+                                id: loan.id,
+                                mode: "lost",
+                                memberName: loan.member.name,
+                                bookTitle: loan.book.title,
+                              });
+                            }}
                           >
                             Buku Hilang
                           </button>
@@ -434,6 +435,28 @@ export default function AdminReturnsPage() {
           </nav>
         ) : null}
       </section>
+
+      {finishTarget ? (
+        <ConfirmDialog
+          open
+          title={finishTarget.mode === "lost" ? "Tandai Buku Hilang?" : "Konfirmasi Pengembalian"}
+          description={finishTarget.mode === "lost"
+            ? "Pastikan laporan kehilangan sudah diperiksa sebelum mengubah status pinjaman."
+            : "Pastikan buku sudah diterima sebelum mengonfirmasi pengembalian."}
+          variant={finishTarget.mode === "lost" ? "danger" : "primary"}
+          confirmLabel={finishTarget.mode === "lost" ? "Tandai Hilang" : "Konfirmasi Pengembalian"}
+          loadingLabel="Memproses..."
+          pending={processingId !== null}
+          error={error}
+          onConfirm={finishLoan}
+          onCancel={() => setFinishTarget(null)}
+        >
+          <ul>
+            <li><strong>Anggota:</strong> {finishTarget.memberName}</li>
+            <li><strong>Buku:</strong> {finishTarget.bookTitle}</li>
+          </ul>
+        </ConfirmDialog>
+      ) : null}
     </div>
   );
 }

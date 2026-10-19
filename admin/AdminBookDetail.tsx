@@ -3,6 +3,7 @@
 
 import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import Link from "next/link";
+import ConfirmDialog from "@/components/ConfirmDialog";
 import { useCallback, useEffect, useState } from "react";
 import { FiArrowLeft, FiCheckCircle, FiEdit2, FiPower } from "react-icons/fi";
 import {
@@ -18,6 +19,7 @@ export default function AdminBookDetailPage({ id }: { id: string }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [changingStatus, setChangingStatus] = useState(false);
+  const [statusDialogOpen, setStatusDialogOpen] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -48,13 +50,6 @@ export default function AdminBookDetailPage({ id }: { id: string }) {
   async function toggleStatus() {
     if (!book || changingStatus) return;
     const next = !book.isActive;
-    const approved = window.confirm(
-      next
-        ? `Aktifkan kembali “${book.title}” di katalog?`
-        : `Nonaktifkan “${book.title}” dari katalog pengunjung?`,
-    );
-    if (!approved) return;
-
     setChangingStatus(true);
     setError("");
     try {
@@ -68,6 +63,7 @@ export default function AdminBookDetailPage({ id }: { id: string }) {
       }
       const payload = (await response.json()) as AdminBookDetailResponse;
       setBook(payload.book);
+      setStatusDialogOpen(false);
     } catch (reason) {
       setError(
         reason instanceof Error ? reason.message : "Status buku gagal diubah.",
@@ -151,7 +147,10 @@ export default function AdminBookDetailPage({ id }: { id: string }) {
             data-button-loading={changingStatus}
             type="button"
             className={styles.darkAction}
-            onClick={() => void toggleStatus()}
+            onClick={() => {
+              setError("");
+              setStatusDialogOpen(true);
+            }}
             disabled={changingStatus}
           >
             <FiPower aria-hidden />
@@ -224,6 +223,23 @@ export default function AdminBookDetailPage({ id }: { id: string }) {
           <p className={styles.emptyText}>Tidak ada transaksi aktif untuk buku ini.</p>
         )}
       </section>
+      <ConfirmDialog
+        open={statusDialogOpen}
+        title={book.isActive ? "Nonaktifkan Buku?" : "Aktifkan Buku?"}
+        description={
+          book.isActive
+            ? `"${book.title}" akan dinonaktifkan dari katalog pengunjung.`
+            : `"${book.title}" akan diaktifkan kembali di katalog.`
+        }
+        variant={book.isActive ? "danger" : "primary"}
+        confirmLabel={book.isActive ? "Nonaktifkan" : "Aktifkan"}
+        pending={changingStatus}
+        error={error}
+        onConfirm={toggleStatus}
+        onCancel={() => {
+          if (!changingStatus) setStatusDialogOpen(false);
+        }}
+      />
     </div>
   );
 }

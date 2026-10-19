@@ -3,6 +3,7 @@
 import { plainTextMessage } from "../members/inputSecurity";
 
 import Link from "next/link";
+import ConfirmDialog from "@/components/ConfirmDialog";
 import { useCallback, useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 
@@ -45,6 +46,11 @@ export default function AdminMembersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [changingId, setChangingId] = useState<number | null>(null);
+  const [statusTarget, setStatusTarget] = useState<{
+    id: number;
+    current: boolean;
+    title: string;
+  } | null>(null);
   const [revision, setRevision] = useState(0);
 
   useEffect(() => {
@@ -112,22 +118,16 @@ export default function AdminMembersPage() {
     void load();
   }, [load]);
 
-  async function toggleStatus(
-    id: number,
-    currentStatus: boolean,
-    memberName: string,
-  ) {
-    const nextStatus = !currentStatus;
+  function requestStatus(id: number, current: boolean, title: string) {
+    if (changingId !== null) return;
+    setError("");
+    setStatusTarget({ id, current, title });
+  }
 
-    const approved = window.confirm(
-      nextStatus
-        ? `Aktifkan kembali akun ${memberName}?`
-        : `Nonaktifkan akun ${memberName}? Anggota tidak dapat masuk ke akun sampai diaktifkan kembali.`,
-    );
-
-    if (!approved) {
-      return;
-    }
+  async function toggleStatus() {
+    if (!statusTarget || changingId !== null) return;
+    const { id, current } = statusTarget;
+    const nextStatus = !current;
 
     setChangingId(id);
     setError("");
@@ -149,6 +149,7 @@ export default function AdminMembersPage() {
         );
       }
 
+      setStatusTarget(null);
       setRevision((value) => value + 1);
     } catch (reason) {
       setError(
@@ -367,7 +368,7 @@ export default function AdminMembersPage() {
                           }
                           disabled={changingId === member.id}
                           onClick={() =>
-                            void toggleStatus(
+                            requestStatus(
                               member.id,
                               member.isActive,
                               member.name,
@@ -480,7 +481,7 @@ export default function AdminMembersPage() {
                     }
                     disabled={changingId === member.id}
                     onClick={() =>
-                      void toggleStatus(member.id, member.isActive, member.name)
+                      requestStatus(member.id, member.isActive, member.name)
                     }
                   >
                     {changingId === member.id
@@ -531,6 +532,23 @@ export default function AdminMembersPage() {
           </nav>
         ) : null}
       </section>
+      <ConfirmDialog
+        open={statusTarget !== null}
+        title={statusTarget?.current ? "Nonaktifkan Anggota?" : "Aktifkan Anggota?"}
+        description={
+          statusTarget?.current
+            ? `Akun ${statusTarget.title} akan dinonaktifkan. Anggota tidak dapat masuk sampai akun diaktifkan kembali.`
+            : `Akun ${statusTarget?.title ?? ""} akan diaktifkan kembali.`
+        }
+        variant={statusTarget?.current ? "danger" : "primary"}
+        confirmLabel={statusTarget?.current ? "Nonaktifkan" : "Aktifkan"}
+        pending={changingId !== null}
+        error={error}
+        onConfirm={toggleStatus}
+        onCancel={() => {
+          if (changingId === null) setStatusTarget(null);
+        }}
+      />
     </div>
   );
 }

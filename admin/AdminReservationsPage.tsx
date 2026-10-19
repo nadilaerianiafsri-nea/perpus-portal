@@ -2,6 +2,7 @@
 "use client";
 
 import { ButtonLabel } from '@/components/Button';
+import ConfirmDialog from '@/components/ConfirmDialog';
 import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import { plainTextMessage } from "../members/inputSecurity";
 
@@ -163,19 +164,6 @@ export default function AdminReservationsPage() {
     void load();
   }, [load]);
 
-  useEffect(() => {
-    if (!pickupTarget) return;
-
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && processingId === null) {
-        setPickupTarget(null);
-      }
-    };
-
-    document.addEventListener("keydown", closeOnEscape);
-    return () => document.removeEventListener("keydown", closeOnEscape);
-  }, [pickupTarget, processingId]);
-
   async function confirmPickup() {
     if (!pickupTarget || processingId !== null) return;
 
@@ -207,7 +195,6 @@ export default function AdminReservationsPage() {
           ? reason.message
           : "Pengambilan buku gagal dikonfirmasi.",
       );
-      setPickupTarget(null);
     } finally {
       setProcessingId(null);
     }
@@ -395,13 +382,14 @@ export default function AdminReservationsPage() {
                           type="button"
                           className={styles.primaryAction}
                           disabled={processingId === reservation.id}
-                          onClick={() =>
+                          onClick={() => {
+                            setError("");
                             setPickupTarget({
                               id: reservation.id,
                               memberName: reservation.member.name,
                               bookTitle: reservation.book.title,
-                            })
-                          }
+                            });
+                          }}
                         >
                           <ButtonLabel loading={processingId === reservation.id} pending="Memproses...">Konfirmasi Pengambilan</ButtonLabel>
                         </button>
@@ -455,60 +443,25 @@ export default function AdminReservationsPage() {
       </section>
 
       {pickupTarget ? (
-        <div
-          className={styles.modalBackdrop}
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget && processingId === null) {
-              setPickupTarget(null);
-            }
-          }}
+        <ConfirmDialog
+          open
+          title="Konfirmasi Pengambilan"
+          description="Periksa kembali sebelum mengonfirmasi pengambilan."
+          variant="primary"
+          confirmLabel="Konfirmasi Pengambilan"
+          loadingLabel="Mengonfirmasi..."
+          pending={processingId !== null}
+          error={error}
+          onConfirm={confirmPickup}
+          onCancel={() => setPickupTarget(null)}
         >
-          <section
-            className={styles.confirmModal}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="pickup-confirmation-title"
-            aria-describedby="pickup-confirmation-description"
-          >
-            <div className={styles.confirmModalHeader}>
-              <h2 id="pickup-confirmation-title">Konfirmasi Pengambilan</h2>
-            </div>
-            <div className={styles.confirmModalBody}>
-              <p id="pickup-confirmation-description">
-                Periksa kembali sebelum mengonfirmasi pengambilan.
-              </p>
-              <ul className={styles.confirmPoints}>
-                <li><strong>Anggota:</strong> {pickupTarget.memberName}</li>
-                <li><strong>Buku:</strong> {pickupTarget.bookTitle}</li>
-                <li>Pastikan buku sudah diserahkan kepada anggota.</li>
-                <li>Reservasi akan berubah menjadi pinjaman aktif.</li>
-              </ul>
-            </div>
-            <div className={styles.confirmModalActions}>
-              <button
-                data-button="ghost"
-                data-button-size="md"
-                type="button"
-                className={styles.secondaryAction}
-                disabled={processingId !== null}
-                onClick={() => setPickupTarget(null)}
-              >
-                Batal
-              </button>
-              <button
-                data-button="primary"
-                data-button-size="md"
-                data-button-loading={processingId !== null}
-                type="button"
-                className={styles.primaryAction}
-                disabled={processingId !== null}
-                onClick={() => void confirmPickup()}
-              >
-                <ButtonLabel loading={processingId !== null} pending="Memproses...">Konfirmasi Pengambilan</ButtonLabel>
-              </button>
-            </div>
-          </section>
-        </div>
+          <ul>
+            <li><strong>Anggota:</strong> {pickupTarget.memberName}</li>
+            <li><strong>Buku:</strong> {pickupTarget.bookTitle}</li>
+            <li>Pastikan buku sudah diserahkan kepada anggota.</li>
+            <li>Reservasi akan berubah menjadi pinjaman aktif.</li>
+          </ul>
+        </ConfirmDialog>
       ) : null}
     </div>
   );

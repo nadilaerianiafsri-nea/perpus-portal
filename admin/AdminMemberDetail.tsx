@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import ConfirmDialog from "@/components/ConfirmDialog";
 import { useCallback, useEffect, useState } from "react";
 
 import {
@@ -21,6 +22,7 @@ export default function AdminMemberDetail({ id }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [changingStatus, setChangingStatus] = useState(false);
+  const [statusDialogOpen, setStatusDialogOpen] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -63,16 +65,6 @@ export default function AdminMemberDetail({ id }: Props) {
 
     const next = !data.member.isActive;
 
-    const approved = window.confirm(
-      next
-        ? `Aktifkan kembali akun ${data.member.name}?`
-        : `Nonaktifkan akun ${data.member.name}? Anggota tidak akan dapat masuk sampai diaktifkan kembali.`,
-    );
-
-    if (!approved) {
-      return;
-    }
-
     setChangingStatus(true);
     setError("");
 
@@ -99,6 +91,7 @@ export default function AdminMemberDetail({ id }: Props) {
         );
       }
 
+      setStatusDialogOpen(false);
       await load();
     } catch (reason) {
       setError(
@@ -165,7 +158,10 @@ export default function AdminMemberDetail({ id }: Props) {
                 : styles.successButton
             }
             disabled={changingStatus}
-            onClick={() => void toggleStatus()}
+            onClick={() => {
+              setError("");
+              setStatusDialogOpen(true);
+            }}
           >
             {changingStatus
               ? "Memproses..."
@@ -403,6 +399,23 @@ export default function AdminMemberDetail({ id }: Props) {
           </p>
         )}
       </section>
+      <ConfirmDialog
+        open={statusDialogOpen}
+        title={member.isActive ? "Nonaktifkan Anggota?" : "Aktifkan Anggota?"}
+        description={
+          member.isActive
+            ? `Akun ${member.name} akan dinonaktifkan. Anggota tidak akan dapat masuk sampai akun diaktifkan kembali.`
+            : `Akun ${member.name} akan diaktifkan kembali.`
+        }
+        variant={member.isActive ? "danger" : "primary"}
+        confirmLabel={member.isActive ? "Nonaktifkan" : "Aktifkan"}
+        pending={changingStatus}
+        error={error}
+        onConfirm={toggleStatus}
+        onCancel={() => {
+          if (!changingStatus) setStatusDialogOpen(false);
+        }}
+      />
     </div>
   );
 }

@@ -4,6 +4,7 @@
 import { safeEBookUrl } from "../shared/displayUrls.cjs";
 import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import Link from "next/link";
+import ConfirmDialog from "@/components/ConfirmDialog";
 import { useCallback, useEffect, useState } from "react";
 import { FiArrowLeft, FiEdit2, FiPower } from "react-icons/fi";
 import {
@@ -19,6 +20,7 @@ export default function AdminEBookDetailPage({ id }: { id: string }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [changingStatus, setChangingStatus] = useState(false);
+  const [statusDialogOpen, setStatusDialogOpen] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -47,13 +49,6 @@ export default function AdminEBookDetailPage({ id }: { id: string }) {
   async function toggleStatus() {
     if (!book || changingStatus) return;
     const next = !book.isActive;
-    const approved = window.confirm(
-      next
-        ? `Aktifkan kembali “${book.title}” di katalog?`
-        : `Nonaktifkan “${book.title}” dari katalog pengunjung?`,
-    );
-    if (!approved) return;
-
     setChangingStatus(true);
     setError("");
     try {
@@ -67,6 +62,7 @@ export default function AdminEBookDetailPage({ id }: { id: string }) {
       }
       const payload = (await response.json()) as AdminEBookDetailResponse;
       setBook(payload.book);
+      setStatusDialogOpen(false);
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "Status E-Book gagal diubah.");
     } finally {
@@ -122,7 +118,18 @@ export default function AdminEBookDetailPage({ id }: { id: string }) {
             <FiEdit2 aria-hidden />
             Edit
           </Link>
-          <button data-button={book.isActive ? "danger" : "success"} data-button-size="md" data-button-loading={changingStatus} type="button" className={styles.darkAction} onClick={() => void toggleStatus()} disabled={changingStatus}>
+          <button
+            data-button={book.isActive ? "danger" : "success"}
+            data-button-size="md"
+            data-button-loading={changingStatus}
+            type="button"
+            className={styles.darkAction}
+            onClick={() => {
+              setError("");
+              setStatusDialogOpen(true);
+            }}
+            disabled={changingStatus}
+          >
             <FiPower aria-hidden />
             {changingStatus ? "Memproses..." : book.isActive ? "Nonaktifkan" : "Aktifkan"}
           </button>
@@ -164,6 +171,23 @@ export default function AdminEBookDetailPage({ id }: { id: string }) {
         <h3>Deskripsi</h3>
         <p className={styles.description}>{book.description}</p>
       </section>
+      <ConfirmDialog
+        open={statusDialogOpen}
+        title={book.isActive ? "Nonaktifkan E-Book?" : "Aktifkan E-Book?"}
+        description={
+          book.isActive
+            ? `"${book.title}" akan dinonaktifkan dari katalog pengunjung.`
+            : `"${book.title}" akan diaktifkan kembali di katalog.`
+        }
+        variant={book.isActive ? "danger" : "primary"}
+        confirmLabel={book.isActive ? "Nonaktifkan" : "Aktifkan"}
+        pending={changingStatus}
+        error={error}
+        onConfirm={toggleStatus}
+        onCancel={() => {
+          if (!changingStatus) setStatusDialogOpen(false);
+        }}
+      />
     </div>
   );
 }

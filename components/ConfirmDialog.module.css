@@ -1,0 +1,56 @@
+.dialog {
+  --dialog-navy: #000633;
+  --dialog-muted: #596174;
+  position: fixed;
+  inset: 0;
+  width: min(560px, calc(100vw - 32px));
+  max-width: none;
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 36px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  box-sizing: border-box;
+  border: 1px solid #e4e6ee;
+  border-radius: 24px;
+  background: #fff;
+  color: var(--dialog-navy);
+  box-shadow: 0 24px 64px #0006332e;
+  font-family: var(--font-outfit), Outfit, sans-serif;
+  text-align: center;
+}
+.dialog::backdrop { background: #00063366; backdrop-filter: blur(3px); }
+.icon { width: 72px; height: 72px; margin: 0 auto 20px; display: grid; place-items: center; border-radius: 50%; background: #eef0f7; color: #2b3056; }
+.icon svg { width: 30px; height: 30px; }
+.dialog[data-dialog-variant="info"] .icon { background: #e9f7ff; color: #086ca3; }
+.dialog[data-dialog-variant="warning"] .icon { background: #fff4e5; color: #965600; }
+.dialog[data-dialog-variant="danger"] .icon { background: #fff0ef; color: #c52b23; }
+.dialog[data-dialog-variant="success"] .icon { background: #eef9e9; color: #3b8519; }
+.dialog .title { margin: 0; color: var(--dialog-navy); font-size: 26px; font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; }
+.dialog .description { margin-top: 12px; color: var(--dialog-muted); font-size: 15px; line-height: 1.7; overflow-wrap: anywhere; }
+.description p { margin: 0; }
+.description p + p { margin-top: 10px; }
+.details { margin-top: 22px; padding: 16px; border: 1px solid #e4e6ee; border-radius: 14px; background: #f6f7fa; text-align: left; color: var(--dialog-navy); font-size: 14px; line-height: 1.65; overflow-wrap: anywhere; }
+.details > :first-child { margin-top: 0; }
+.details > :last-child { margin-bottom: 0; }
+.details p { margin: 10px 0; }
+.details ul { margin: 0; padding-left: 20px; }
+.details li + li { margin-top: 8px; }
+.details dl { margin: 0; }
+.details dl > div { display: grid; gap: 3px; }
+.details dl > div + div { margin-top: 12px; }
+.details dt { color: var(--dialog-muted); }
+.details dd { margin: 0; font-weight: 600; }
+.error { margin: 18px 0 0; padding: 12px; border: 1px solid #ffd0cc; border-radius: 12px; background: #fff0ef; color: #a8231b; font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+.actions { margin-top: 28px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+.actions > button { width: 100%; }
+.singleAction { grid-template-columns: minmax(0, 1fr); }
+/* Use existing button variants; darker semantic shades keep modal action text white and legible. */
+.dialog .actions [data-dialog-confirm][data-button="danger"] { --button-bg: #c52b23; --button-fg: #fff; --button-hover-bg: #a8231b; --button-hover-fg: #fff; }
+.dialog .actions [data-dialog-confirm][data-button="success"] { --button-bg: #3b8519; --button-fg: #fff; --button-hover-bg: #286713; --button-hover-fg: #fff; }
+@media (max-width: 480px) {
+  .dialog { padding: 24px; }
+  .icon { width: 64px; height: 64px; margin-bottom: 18px; }
+  .dialog .title { font-size: 23px; }
+  .actions { grid-template-columns: minmax(0, 1fr); margin-top: 24px; }
+}

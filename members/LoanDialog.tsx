@@ -1,8 +1,7 @@
 "use client";
 
-import { ButtonLabel } from '@/components/Button';
-import { useEffect, useRef } from "react";
-import { FiMapPin, FiMail, FiPhone } from "react-icons/fi";
+import ConfirmDialog from "@/components/ConfirmDialog";
+import { FiClock, FiInfo, FiMapPin, FiMail, FiPhone } from "react-icons/fi";
 import { serviceInfo } from "@/shared/serviceInfo.cjs";
 import { memberDate } from "./format";
 import type { Loan } from "./types";
@@ -14,25 +13,31 @@ export default function LoanDialog({ selection, pending, error, onDismiss, onCon
   selection: LoanDialogSelection | null; pending: boolean; error: string;
   onDismiss: () => void; onConfirm: () => void;
 }) {
-  const dialog = useRef<HTMLDialogElement>(null);
-  useEffect(() => {
-    const element = dialog.current;
-    if (selection && !element?.open) element?.showModal();
-    if (!selection && element?.open) element.close();
-  }, [selection]);
   const extending = selection?.kind === "extend";
-  return <dialog ref={dialog} className={styles.dialog} aria-labelledby="loan-dialog-title" onClose={onDismiss} onCancel={event => { if (pending) event.preventDefault(); }}>
+  return <ConfirmDialog
+    open={selection !== null}
+    title={extending ? "Konfirmasi Perpanjangan" : "Informasi Penggantian Buku"}
+    description={extending
+      ? "Masa pinjam akan diperpanjang selama 7 hari dari tanggal jatuh tempo saat ini."
+      : "Buku ini telah dinyatakan hilang. Silakan hubungi petugas perpustakaan untuk proses penggantian dengan buku yang sama atau mengikuti kebijakan perpustakaan yang berlaku."}
+    variant={extending ? "primary" : "info"}
+    icon={extending ? <FiClock aria-hidden /> : <FiInfo aria-hidden />}
+    confirmLabel={extending ? "Perpanjang 7 Hari" : undefined}
+    cancelLabel={extending ? "Batal" : "Tutup"}
+    loadingLabel="Memperpanjang..."
+    pending={pending}
+    error={error}
+    onCancel={onDismiss}
+    onConfirm={extending ? onConfirm : undefined}
+  >
     {selection && <>
-      <h2 id="loan-dialog-title">{extending ? "Perpanjang Masa Pinjam" : "Informasi Penggantian Buku"}</h2>
-      <p className={styles.dialogBook}>{selection.loan.book.title}</p>
-      {extending ? <>
-        <p>Masa pinjam akan diperpanjang selama 7 hari dari tanggal jatuh tempo saat ini.</p>
+      <p><strong>{selection.loan.book.title}</strong></p>
+      {extending ?
         <dl className={styles.dialogDates}>
           <div><dt>Jatuh tempo saat ini:</dt><dd>{memberDate(selection.loan.dueAt, true)}</dd></div>
           <div><dt>Jatuh tempo setelah perpanjangan:</dt><dd>{memberDate(new Date(Date.parse(selection.loan.dueAt) + 7 * 86400000).toISOString(), true)}</dd></div>
         </dl>
-      </> : <>
-        <p>Buku ini telah dinyatakan hilang. Silakan hubungi petugas perpustakaan untuk proses penggantian dengan buku yang sama atau mengikuti kebijakan perpustakaan yang berlaku.</p>
+       : <>
         <p>Tidak ada denda uang.</p>
         <address className={styles.contact}>
           <a href={serviceInfo.phoneUrl}><FiPhone aria-hidden />{serviceInfo.phone}</a>
@@ -40,11 +45,6 @@ export default function LoanDialog({ selection, pending, error, onDismiss, onCon
           <p><FiMapPin aria-hidden /><span>{serviceInfo.address}</span></p>
         </address>
       </>}
-      {error && <p role="alert" className={styles.dialogError}>{error}</p>}
-      <div className={styles.dialogActions}>
-        <button data-button="ghost" className={styles.replacementButton} disabled={pending} onClick={onDismiss}>{extending ? "Batal" : "Tutup"}</button>
-        {extending && <button data-button="primary" data-button-loading={pending} aria-busy={pending} className={styles.extendButton} disabled={pending} onClick={onConfirm}><ButtonLabel loading={pending} pending="Memperpanjang...">Perpanjang 7 Hari</ButtonLabel></button>}
-      </div>
     </>}
-  </dialog>;
+  </ConfirmDialog>;
 }

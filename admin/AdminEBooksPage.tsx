@@ -3,6 +3,7 @@
 
 import { adminCoverUrl, adminBookTextError } from "./adminBooks";
 import Link from "next/link";
+import ConfirmDialog from "@/components/ConfirmDialog";
 import { useCallback, useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
@@ -33,6 +34,11 @@ export default function AdminEBooksPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [changingId, setChangingId] = useState<number | null>(null);
+  const [statusTarget, setStatusTarget] = useState<{
+    id: number;
+    current: boolean;
+    title: string;
+  } | null>(null);
   const [revision, setRevision] = useState(0);
 
   const load = useCallback(async () => {
@@ -94,14 +100,16 @@ export default function AdminEBooksPage() {
     setPage(1);
   }
 
-  async function toggleStatus(id: number, current: boolean, title: string) {
+  function requestStatus(id: number, current: boolean, title: string) {
+    if (changingId !== null) return;
+    setError("");
+    setStatusTarget({ id, current, title });
+  }
+
+  async function toggleStatus() {
+    if (!statusTarget || changingId !== null) return;
+    const { id, current } = statusTarget;
     const next = !current;
-    const approved = window.confirm(
-      next
-        ? `Aktifkan kembali “${title}” di katalog?`
-        : `Nonaktifkan “${title}” dari katalog pengunjung?`,
-    );
-    if (!approved) return;
 
     setChangingId(id);
     setError("");
@@ -114,6 +122,7 @@ export default function AdminEBooksPage() {
       if (!response.ok) {
         throw new Error(await ebookApiMessage(response, "Status E-Book gagal diubah."));
       }
+      setStatusTarget(null);
       setRevision((value) => value + 1);
     } catch (reason) {
       setError(
@@ -248,7 +257,7 @@ export default function AdminEBooksPage() {
                           aria-label={book.isActive ? `Nonaktifkan ${book.title}` : `Aktifkan ${book.title}`}
                           title={book.isActive ? "Nonaktifkan" : "Aktifkan"}
                           disabled={changingId === book.id}
-                          onClick={() => void toggleStatus(book.id, book.isActive, book.title)}
+                          onClick={() => requestStatus(book.id, book.isActive, book.title)}
                         >
                           <FiPower />
                         </button>
@@ -273,6 +282,23 @@ export default function AdminEBooksPage() {
           </nav>
         ) : null}
       </section>
+      <ConfirmDialog
+        open={statusTarget !== null}
+        title={statusTarget?.current ? "Nonaktifkan E-Book?" : "Aktifkan E-Book?"}
+        description={
+          statusTarget?.current
+            ? `"${statusTarget.title}" akan dinonaktifkan dari katalog pengunjung.`
+            : `"${statusTarget?.title ?? ""}" akan diaktifkan kembali di katalog.`
+        }
+        variant={statusTarget?.current ? "danger" : "primary"}
+        confirmLabel={statusTarget?.current ? "Nonaktifkan" : "Aktifkan"}
+        pending={changingId !== null}
+        error={error}
+        onConfirm={toggleStatus}
+        onCancel={() => {
+          if (changingId === null) setStatusTarget(null);
+        }}
+      />
     </div>
   );
 }

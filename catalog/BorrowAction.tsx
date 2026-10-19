@@ -1,9 +1,10 @@
 "use client";
 
-import { ButtonLabel } from '@/components/Button';
+import ConfirmDialog from "@/components/ConfirmDialog";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { FiBookOpen } from "react-icons/fi";
 import styles from "./Catalog.module.css";
 
 type BorrowStatus =
@@ -34,7 +35,7 @@ export default function BorrowAction({
   role: "ADMIN" | "PENGUNJUNG" | null;
 }) {
   const router = useRouter();
-  const dialog = useRef<HTMLDialogElement>(null);
+  const [open, setOpen] = useState(false);
   const locked = useRef(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
@@ -114,7 +115,7 @@ export default function BorrowAction({
         return;
       }
       if (response.status === 409) {
-        dialog.current?.close();
+        setOpen(false);
         if (data?.code) setBorrowStatus(conflictStatus(data.code));
         else {
           const status = await checkStatus();
@@ -136,7 +137,7 @@ export default function BorrowAction({
         );
         return;
       }
-      dialog.current?.close();
+      setOpen(false);
       setSuccess(true);
       setBorrowStatus("reservation");
       router.refresh();
@@ -225,55 +226,36 @@ export default function BorrowAction({
         disabled={!available || stockChanged || pending}
         onClick={() => {
           setError("");
-          dialog.current?.showModal();
+          setOpen(true);
         }}
       >
         {!available || stockChanged ? "Tidak Tersedia" : "Ajukan Peminjaman"}
       </button>
-      {error && (
+      {error && !open && (
         <p role="alert" className={styles.ctaNotice}>
           {error}
         </p>
       )}
-      <dialog
-        ref={dialog}
-        className={styles.reservationDialog}
-        aria-labelledby="reservation-title"
-        onCancel={(event) => {
-          if (pending) event.preventDefault();
-        }}
-      >
-        <h2 id="reservation-title">Konfirmasi Reservasi</h2>
-        <p>
+      <ConfirmDialog
+        open={open}
+        title="Konfirmasi Reservasi"
+        description={<>
           Anda akan mereservasi buku ini selama <strong>24 jam</strong>. Buku
           harus diambil sebelum batas waktu reservasi berakhir.
-        </p>
+        </>}
+        variant="primary"
+        icon={<FiBookOpen aria-hidden />}
+        confirmLabel="Konfirmasi Reservasi"
+        pending={pending}
+        error={error}
+        onCancel={() => setOpen(false)}
+        onConfirm={reserve}
+      >
         <p>
           Masa pinjam 7 hari dimulai setelah petugas mengonfirmasi pengambilan.
           Tidak ada denda uang.
         </p>
-        {error && (
-          <p role="alert" className={styles.ctaNotice}>
-            {error}
-          </p>
-        )}
-        <div className={styles.actionRow}>
-          <button aria-busy={pending} data-button="ghost" data-button-size="md"
-            className={styles.detailLink}
-            disabled={pending}
-            onClick={() => dialog.current?.close()}
-          >
-            Batal
-          </button>
-          <button aria-busy={pending} data-button="primary" data-button-size="md"
-            className={styles.primaryButton}
-            disabled={pending}
-            onClick={() => void reserve()}
-          >
-            <ButtonLabel loading={pending} pending="Memproses...">Konfirmasi Reservasi</ButtonLabel>
-          </button>
-        </div>
-      </dialog>
+      </ConfirmDialog>
     </>
   );
 }
