@@ -41,14 +41,19 @@
 
 .brandRow {
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 33px;
 }
 
 .brand {
   display: flex;
+  flex: 1;
   align-items: center;
   gap: 10px;
   padding: 0 4px;
-  margin-bottom: 33px;
+  margin-bottom: 0;
   color: var(--navy);
   text-decoration: none;
 }
@@ -84,7 +89,7 @@
   font-weight: 500;
 }
 
-.sidebarClose {
+.adminPage .sidebarClose {
   display: none;
 }
 
@@ -272,7 +277,7 @@
   font-weight: 600;
 }
 
-.mobileMenuButton {
+.adminPage .mobileMenuButton {
   display: none;
 }
 
@@ -677,11 +682,13 @@
     left: 18px;
     z-index: 60;
     transform: translateX(calc(-100% - 40px));
+    visibility: hidden;
     transition: transform 0.2s ease;
   }
 
   .sidebarOpen {
     transform: translateX(0);
+    visibility: visible;
   }
 
   .sidebarOverlay {
@@ -693,18 +700,12 @@
     background: #00063330;
   }
 
-  .sidebarClose {
+  .adminPage .sidebarClose {
     display: grid;
-    position: absolute;
-    top: 0;
-    right: 0;
+    position: static;
   }
 
-  .brand {
-    padding-right: 48px;
-  }
-
-  .mobileMenuButton {
+  .adminPage .mobileMenuButton {
     display: grid;
   }
 
@@ -735,7 +736,7 @@
     border-radius: 22px;
   }
 
-  .brand {
+  .brandRow {
     margin-bottom: 24px;
   }
 

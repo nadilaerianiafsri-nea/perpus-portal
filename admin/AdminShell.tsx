@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import type { ComponentType, FormEvent, ReactNode } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
   FiBarChart2,
@@ -119,8 +119,50 @@ export default function AdminShell({ children, user }: AdminShellProps) {
   const [search, setSearch] = useState("");
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const menuTrigger = useRef<HTMLButtonElement>(null);
+  const closeMenuButton = useRef<HTMLButtonElement>(null);
+  const sidebar = useRef<HTMLElement>(null);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const currentTitle = useMemo(() => currentPageTitle(pathname), [pathname]);
+
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 901px)");
+    const resized = () => {
+      if (desktop.matches) setMobileMenuOpen(false);
+    };
+    desktop.addEventListener("change", resized);
+    return () => desktop.removeEventListener("change", resized);
+  }, []);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const trigger = menuTrigger.current;
+    closeMenuButton.current?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setMobileMenuOpen(false);
+      } else if (event.key === "Tab") {
+        const controls = Array.from(sidebar.current?.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled])',
+        ) ?? []).filter((element) => element.getClientRects().length > 0);
+        const first = controls[0];
+        const last = controls.at(-1);
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last?.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first?.focus();
+        }
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      if (trigger?.getClientRects().length) trigger.focus();
+    };
+  }, [mobileMenuOpen]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -197,7 +239,14 @@ export default function AdminShell({ children, user }: AdminShellProps) {
         />
       ) : null}
 
-      <aside className={`${styles.sidebar} ${mobileMenuOpen ? styles.sidebarOpen : ""}`}>
+      <aside
+        ref={sidebar}
+        id="admin-sidebar"
+        role={mobileMenuOpen ? "dialog" : undefined}
+        aria-modal={mobileMenuOpen || undefined}
+        aria-label="Menu admin"
+        className={`${styles.sidebar} ${mobileMenuOpen ? styles.sidebarOpen : ""}`}
+      >
         <div className={styles.brandRow}>
           <Link
             href="/admin"
@@ -213,17 +262,18 @@ export default function AdminShell({ children, user }: AdminShellProps) {
               <small>KEMENKUM RIAU</small>
             </div>
           </Link>
-          <button
+          {mobileMenuOpen ? <button
+            ref={closeMenuButton}
             data-button="ghost"
             data-button-size="sm"
             data-button-shape="square"
             type="button"
             className={styles.sidebarClose}
-            aria-label="Tutup menu admin"
+            aria-label="Tutup menu"
             onClick={() => setMobileMenuOpen(false)}
           >
             <FiX size={20} />
-          </button>
+          </button> : null}
         </div>
 
         <nav className={styles.menu} aria-label="Menu admin perpustakaan">
@@ -316,6 +366,7 @@ export default function AdminShell({ children, user }: AdminShellProps) {
         <header className={styles.topbar}>
           <div className={styles.topbarLeft}>
             <button
+              ref={menuTrigger}
               data-button="icon"
               data-button-size="sm"
               data-button-shape="square"
@@ -323,6 +374,7 @@ export default function AdminShell({ children, user }: AdminShellProps) {
               className={styles.mobileMenuButton}
               aria-label="Buka menu admin"
               aria-expanded={mobileMenuOpen}
+              aria-controls="admin-sidebar"
               onClick={() => setMobileMenuOpen(true)}
             >
               <FiMenu size={20} />
