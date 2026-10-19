@@ -121,7 +121,7 @@ export default async function Home() {
                 <h2>Koleksi Terbaru</h2>
                 <p>Temukan koleksi yang baru ditambahkan.</p>
               </div>
-              <a data-button="ghost" data-button-size="sm" href="#">Lihat semua koleksi <FiArrowRight /></a>
+              <a data-button="secondary" data-button-size="sm" href="#">Lihat semua koleksi <FiArrowRight /></a>
             </div>
 
             <div className="book-grid">
@@ -268,11 +268,11 @@ export default async function Home() {
             <div className="reminder-grid">
               <article>
                 <div className="reminder-icon"><FiCalendar /></div>
-                <div><span>Perpanjangan</span><h3>Perpanjang Pinjaman +{settings.extensionDurationDays} Hari</h3><p>Ajukan perpanjangan langsung dari akun tanpa harus datang.</p><a data-button="ghost" data-button-size="sm" href="#">Kelola Pinjaman <FiArrowRight /></a></div>
+                <div><span>Perpanjangan</span><h3>Perpanjang Pinjaman +{settings.extensionDurationDays} Hari</h3><p>Ajukan perpanjangan langsung dari akun tanpa harus datang.</p><a data-button="secondary" data-button-size="sm" href="#">Kelola Pinjaman <FiArrowRight /></a></div>
               </article>
               <article>
                 <div className="reminder-icon"><FiBell /></div>
-                <div><span>Reminder Otomatis</span><h3>Reminder via Email</h3><p>Notifikasi sebelum dan setelah masa pinjaman Anda berakhir.</p><a data-button="ghost" data-button-size="sm" href="#">Lihat Panduan <FiArrowRight /></a></div>
+                <div><span>Reminder Otomatis</span><h3>Reminder via Email</h3><p>Notifikasi sebelum dan setelah masa pinjaman Anda berakhir.</p><a data-button="secondary" data-button-size="sm" href="#">Lihat Panduan <FiArrowRight /></a></div>
               </article>
             </div>
           </div>

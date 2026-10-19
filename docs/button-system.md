@@ -20,7 +20,7 @@ ButtonLabel shares that stable-width label treatment with existing native button
 
 Existing buttons and links opt into the same style with `data-button="secondary"`, optional `data-button-size="sm"`, `data-button-shape="square|circle|pill"`, and `data-button-inverse` on dark surfaces. All rules and tokens live in `components/buttons.css`, imported after globals in the root layout. Existing classes continue to control placement, responsive width and other layout details. No repeated CSS theme per page is needed.
 
-Primary is navy; secondary uses a soft navy tint and becomes navy on hover. Ghost is transparent with a soft hover surface. Danger is soft red; danger-solid uses a darker error tint for legible white confirmation text. Success and warning use soft status surfaces and dark text. Selected tabs, filters and pages retain navy through hover/focus using existing aria-selected, aria-pressed, aria-current or data-button-active.
+Primary is navy. Secondary uses brand yellow `#FFD000` with dark navy text and a darker yellow `#E6BC00` hover; pressed uses `#D1AA00`, and disabled uses a muted yellow surface. Secondary keeps this palette on dark hero surfaces too. Ghost is transparent with a soft hover surface and is reserved for light dismiss/reset actions. Danger is soft red; danger-solid uses a darker error tint for legible white confirmation text. Success and warning use soft status surfaces and dark text. Selected tabs, filters and pages retain navy through hover/focus using existing aria-selected, aria-pressed, aria-current or data-button-active.
 
 Sizes have minimum heights 36/42/50px; regular mobile controls are at least 44px. Radius is 11px; navbar pills and circular shell icons are intentional exceptions. All opt-in actions share focus-visible, pressed and disabled states and respect reduced motion.
 
@@ -35,6 +35,12 @@ Sizes have minimum heights 36/42/50px; regular mobile controls are at least 44px
 - Legacy module files may still declare white backgrounds for old action classes. Annotated live actions resolve their appearance from the shared system; these declarations are not a second button theme.
 
 Browser checks use an isolated HTTP fixture, with no database writes, real emails or live destructive actions.
+
+## Brand-yellow secondary revision
+
+Secondary actions across public, member and admin screens now use the shared yellow tokens. Detail/edit table icons, auth navigation actions, member section actions and notification detail affordances are explicitly mapped to secondary. The notification detail affordance remains part of the existing stretched link; independent mark-read controls and read-before-navigation behavior are preserved.
+
+Verification: 93 page/viewport checks at 1440/768/390px; inverse hero hover/pressed/focus; muted disabled controls; notification mark-read/detail interactions; and contrast 13.29:1 for yellow/navy. Inputs/selects, card/modal/table surfaces, FAQ disclosures and neutral icon-only shell/reader controls keep their intentional appearance. Primary, danger, success and semantic warning palettes remain unchanged.
 
 ## Final verification (2026-10-19)
 

@@ -152,7 +152,7 @@ export default function EBooksPage() {
 
           <div className={styles.viewTabs} role="tablist" aria-label="Tampilan E-Book saya">
             <button
-              data-button="ghost"
+              data-button="secondary"
               type="button"
               role="tab"
               aria-selected={view === "active"}
@@ -162,7 +162,7 @@ export default function EBooksPage() {
               Sedang Dipinjam
             </button>
             <button
-              data-button="ghost"
+              data-button="secondary"
               type="button"
               role="tab"
               aria-selected={view === "queue"}
@@ -172,7 +172,7 @@ export default function EBooksPage() {
               Antrean Saya
             </button>
             <button
-              data-button="ghost"
+              data-button="secondary"
               type="button"
               role="tab"
               aria-selected={view === "history"}

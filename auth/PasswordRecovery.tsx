@@ -36,8 +36,8 @@ export default function PasswordRecovery({ token, reset = false }: { token?: str
       </> : <label className={styles.field}><span>Email <b>*</b></span><input type="email" autoComplete="email" maxLength={191} required value={email} disabled={loading} onChange={(e) => setEmail(e.target.value)} /></label>}
       {!done && <button aria-busy={loading} data-button="primary" data-button-size="lg" className={styles.primaryButton} disabled={loading || (reset && !token)}><ButtonLabel loading={loading} pending={reset ? 'Menyimpan...' : 'Mengirim...'}>{reset ? 'Simpan Kata Sandi' : 'Kirim Link Reset'}</ButtonLabel></button>}
       {message && <p className={styles.inlineInfo} role="status">{message}</p>}
-      <Link data-button="ghost" data-button-size="md" className={styles.actionLink} href="/login">{done ? 'Masuk' : 'Masuk ke Akun'}</Link>
-      {reset && !done && <Link data-button="ghost" data-button-size="md" className={styles.actionLink} href="/forgot-password">Minta link reset baru</Link>}
+      <Link data-button="secondary" data-button-size="md" className={styles.actionLink} href="/login">{done ? 'Masuk' : 'Masuk ke Akun'}</Link>
+      {reset && !done && <Link data-button="secondary" data-button-size="md" className={styles.actionLink} href="/forgot-password">Minta link reset baru</Link>}
     </form>
   </div></AuthShell>;
 }

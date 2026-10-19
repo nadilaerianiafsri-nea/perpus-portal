@@ -114,6 +114,7 @@ export default function AdminNotificationsPage() {
   }, [channel, limit, page, revision, search]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Preserve the existing notification fetch/loading lifecycle while changing action styles.
     void load();
   }, [load]);
 
@@ -406,7 +407,7 @@ export default function AdminNotificationsPage() {
               </select>
             </label>
             <button
-              data-button="icon"
+              data-button="secondary"
               data-button-size="sm"
               data-button-shape="square"
               type="button"
@@ -418,7 +419,7 @@ export default function AdminNotificationsPage() {
             </button>
             <span className={styles.pageNumber}>{result.meta.page}</span>
             <button
-              data-button="icon"
+              data-button="secondary"
               data-button-size="sm"
               data-button-shape="square"
               type="button"

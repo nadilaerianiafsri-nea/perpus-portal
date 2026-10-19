@@ -193,7 +193,7 @@ export default function Login() {
               <span>Ingat saya</span>
             </label>
 
-            <Link data-button="ghost" data-button-size="md" className={styles.linkButton} href="/forgot-password">
+            <Link data-button="secondary" data-button-size="md" className={styles.linkButton} href="/forgot-password">
               Lupa kata sandi?
             </Link>
           </div>
@@ -218,7 +218,7 @@ export default function Login() {
             </p>
           )}
           {pendingEmail && (
-            <Link data-button="ghost" data-button-size="md"
+            <Link data-button="secondary" data-button-size="md"
               className={styles.actionLink}
               href={`/check-email?email=${encodeURIComponent(pendingEmail)}`}
             >

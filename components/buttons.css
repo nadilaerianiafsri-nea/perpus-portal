@@ -7,6 +7,9 @@
   --button-primary: #2b3056;
   --button-soft: #eef0f7;
   --button-border: #d5d9e7;
+  --button-secondary: #ffd000;
+  --button-secondary-hover: #e6bc00;
+  --button-secondary-pressed: #d1aa00;
   --button-radius: 11px;
   --button-error: #ff3b2f;
   --button-success: #55be24;
@@ -55,10 +58,14 @@
 }
 
 :root body [data-button="secondary"][data-button] {
-  --button-bg: var(--button-soft);
+  --button-bg: var(--button-secondary);
   --button-fg: var(--button-navy);
-  --button-stroke: var(--button-border);
-  --button-hover-bg: var(--button-navy);
+  --button-stroke: #0006331f;
+  --button-hover-bg: var(--button-secondary-hover);
+  --button-hover-fg: var(--button-navy);
+  --button-hover-stroke: #00063333;
+  --button-pressed-bg: var(--button-secondary-pressed);
+  font-weight: 600;
 }
 :root body :is([data-button="ghost"], [data-button="icon"])[data-button] {
   --button-bg: transparent;
@@ -100,14 +107,13 @@
 :root
   body
   [data-button][data-button][data-button-inverse]:not(
-    [data-button-inverse="false"]
-  ) {
+    [data-button="secondary"]
+  ):not([data-button-inverse="false"]) {
   --button-stroke: #ffffff38;
 }
 :root
   body
   :is(
-    [data-button="secondary"],
     [data-button="ghost"],
     [data-button="icon"]
   )[data-button][data-button-inverse]:not([data-button-inverse="false"]) {
@@ -189,6 +195,7 @@
   --button-hover-bg: var(--button-primary);
   --button-hover-fg: #fff;
   --button-hover-stroke: var(--button-primary);
+  --button-pressed-bg: var(--button-primary);
 }
 @media (hover: hover) {
   :root
@@ -209,15 +216,28 @@
   transform: translateY(1px);
   box-shadow: none;
 }
+:root
+  body
+  [data-button="secondary"][data-button]:active:not(:disabled):not(
+    [aria-disabled="true"]
+  ) {
+  background: var(--button-pressed-bg);
+  color: var(--button-hover-fg);
+}
 :root body [data-button][data-button]:focus-visible {
   outline: 2px solid var(--button-primary);
   outline-offset: 3px;
   box-shadow: 0 0 0 2px #fff;
 }
-:root body [data-button][data-button][data-button-inverse]:focus-visible {
+:root
+  body
+  [data-button][data-button][data-button-inverse]:not(
+    [data-button="secondary"]
+  ):focus-visible {
   outline-color: #ffd000;
   box-shadow: none;
 }
+
 :root body [data-button][data-button]:is(:disabled, [aria-disabled="true"]) {
   background: #eff0f4;
   color: #808697;
@@ -226,6 +246,15 @@
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+}
+
+:root
+  body
+  [data-button="secondary"][data-button]:is(:disabled, [aria-disabled="true"]) {
+  background: #fff0a8;
+  color: #626478;
+  border-color: #e1d79c;
+  opacity: 0.55;
 }
 
 /* Both labels contribute to width, so pending text cannot move adjacent actions. */

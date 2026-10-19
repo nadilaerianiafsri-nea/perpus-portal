@@ -17,4 +17,9 @@
 .actionButton:disabled { cursor: wait; }
 .detail { display: inline-flex; align-items: center; gap: 5px; margin-left: auto; color: #086caa; white-space: nowrap; }
 .detail svg { flex-shrink: 0; }
+.clickable:has(.cardLink:hover) .detail[data-button="secondary"] {
+  background: var(--button-hover-bg);
+  color: var(--button-hover-fg);
+  border-color: var(--button-hover-stroke);
+}
 @media (prefers-reduced-motion: reduce) { .clickable { transition: none; } }

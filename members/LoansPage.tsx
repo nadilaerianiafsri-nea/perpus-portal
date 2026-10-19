@@ -144,7 +144,7 @@ export default function LoansPage() {
 
       <div className={styles.viewTabs} role="tablist" aria-label="Tampilan pinjaman">
         <button
-          data-button="ghost"
+          data-button="secondary"
           type="button"
           role="tab"
           aria-selected={view === "current"}
@@ -154,7 +154,7 @@ export default function LoansPage() {
           Pinjaman Saya
         </button>
         <button
-          data-button="ghost"
+          data-button="secondary"
           type="button"
           role="tab"
           aria-selected={view === "history"}

@@ -10,7 +10,7 @@ export default function WaitingVerification({ email, notice }: { email: string; 
       <p className={styles.statusCopy}>Periksa kotak masuk dan folder spam{email ? <> untuk <strong>{email}</strong></> : ''}.</p>
       {notice && <p className={styles.inlineInfo} role="status">{notice}</p>}
       <ResendVerification email={email} />
-      <Link data-button="ghost" data-button-size="md" className={styles.actionLink} href="/login">Masuk ke Akun</Link>
+      <Link data-button="secondary" data-button-size="md" className={styles.actionLink} href="/login">Masuk ke Akun</Link>
     </div>
   </div></AuthShell>;
 }

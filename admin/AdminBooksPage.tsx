@@ -374,7 +374,7 @@ export default function AdminBooksPage() {
                     <td>
                       <div className={styles.actions}>
                         <Link
-                          data-button="icon"
+                          data-button="secondary"
                           data-button-size="sm"
                           data-button-shape="square"
                           href={`/admin/koleksi/data-buku/${book.id}`}
@@ -385,7 +385,7 @@ export default function AdminBooksPage() {
                           <FiEye />
                         </Link>
                         <Link
-                          data-button="icon"
+                          data-button="secondary"
                           data-button-size="sm"
                           data-button-shape="square"
                           href={`/admin/koleksi/data-buku/${book.id}/edit`}
