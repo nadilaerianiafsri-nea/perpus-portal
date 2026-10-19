@@ -3,10 +3,23 @@
 import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { FiGrid, FiList, FiSearch, FiSliders, FiX } from "react-icons/fi";
+import {
+  FiChevronDown,
+  FiGrid,
+  FiList,
+  FiSearch,
+  FiSliders,
+  FiX,
+} from "react-icons/fi";
 import BookCard from "./BookCard";
 import SearchInput from "@/components/SearchField";
 import Filters from "./Filters";
+import MemberFilterDrawer from "./MemberFilterDrawer";
+import {
+  catalogFilterKeys,
+  memberFilterChips,
+  type FilterChip,
+} from "./filterOptions";
 import {
   type CatalogResponse,
   type FilterOptions,
@@ -48,6 +61,9 @@ export default function Catalog({
     error?: string;
   } | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
+  const filterButton = useRef<HTMLButtonElement>(null);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [expandedChips, setExpandedChips] = useState(false);
 
   const apiQuery = new URLSearchParams(query);
   apiQuery.delete("view");
@@ -68,7 +84,7 @@ export default function Catalog({
   const loading = result?.key !== key;
   const response = !loading ? result?.data : undefined;
   const error = !loading ? result?.error : undefined;
-  const view = query.get("view") === "list" ? "list" : "grid";
+  const view = !member && query.get("view") === "list" ? "list" : "grid";
 
   useEffect(() => {
     const controller = new AbortController();
@@ -132,33 +148,39 @@ export default function Catalog({
   }
 
   function clear() {
+    if (member) {
+      update(Object.fromEntries(catalogFilterKeys.map((key) => [key, null])));
+      return;
+    }
     setSearchRevision((value) => value + 1);
     router.push(pathname, { scroll: false });
   }
 
   const filterProps = { query, options, ebook, update, clear };
-  const chips = (
-    ebook
-      ? ["subject", "language"]
-      : ["type", "availability", "subject", "language"]
-  ).flatMap((name) =>
-    (query.get(name) ?? "")
-      .split(",")
-      .filter(Boolean)
-      .map((value) => ({
-        name,
-        value,
-        label:
-          name === "type"
-            ? (typeLabels[value as keyof typeof typeLabels] ?? value)
-            : name === "availability"
-              ? (availabilityLabels[value as keyof typeof availabilityLabels] ??
-                value)
-              : value,
-      })),
-  );
+  const chips: FilterChip[] = member
+    ? memberFilterChips(query, options, ebook)
+    : (ebook
+        ? ["subject", "language"]
+        : ["type", "availability", "subject", "language"]
+      ).flatMap((name) =>
+        (query.get(name) ?? "")
+          .split(",")
+          .filter(Boolean)
+          .map((value) => ({
+            name,
+            value,
+            label:
+              name === "type"
+                ? (typeLabels[value as keyof typeof typeLabels] ?? value)
+                : name === "availability"
+                  ? (availabilityLabels[
+                      value as keyof typeof availabilityLabels
+                    ] ?? value)
+                  : value,
+          })),
+      );
 
-  for (const name of ["yearFrom", "yearTo"]) {
+  for (const name of member ? [] : ["yearFrom", "yearTo"]) {
     if (query.get(name)) {
       chips.push({
         name,
@@ -269,47 +291,56 @@ export default function Catalog({
             <div className={styles.sortTools}>
               {member ? (
                 <button
+                  ref={filterButton}
                   type="button"
                   className={styles.memberFilterButton}
                   aria-label="Buka filter koleksi"
                   aria-haspopup="dialog"
+                  aria-expanded={filterOpen}
+                  aria-controls="member-catalog-filters"
                   title="Filter koleksi"
-                  onClick={() => dialog.current?.showModal()}
+                  onClick={() => setFilterOpen(true)}
                 >
                   <FiSliders aria-hidden="true" /> Filter
                   {chips.length > 0 ? <span>{chips.length}</span> : null}
                 </button>
               ) : null}
-              <label className={styles.pageSize}>
-                <span className={styles.srOnly}>
-                  Jumlah koleksi per halaman
-                </span>
-                <select
-                  className={member ? undefined : memberStyles.catalogDropdown}
-                  aria-label="Jumlah koleksi per halaman"
-                  value={query.get("limit") ?? (ebook ? "8" : "20")}
-                  onChange={(event) => update({ limit: event.target.value })}
-                >
-                  {[
-                    ...new Set([
-                      8,
-                      12,
-                      20,
-                      ...(query.get("limit")
-                        ? [Number(query.get("limit"))]
-                        : []),
-                    ]),
-                  ].map((limit) => (
-                    <option key={limit} value={limit}>
-                      {limit} / halaman
-                    </option>
-                  ))}
-                </select>
-              </label>
+              {!member ? (
+                <label className={styles.pageSize}>
+                  <span className={styles.srOnly}>
+                    Jumlah koleksi per halaman
+                  </span>
+                  <select
+                    className={
+                      member ? undefined : memberStyles.catalogDropdown
+                    }
+                    aria-label="Jumlah koleksi per halaman"
+                    value={query.get("limit") ?? (ebook ? "8" : "20")}
+                    onChange={(event) => update({ limit: event.target.value })}
+                  >
+                    {[
+                      ...new Set([
+                        8,
+                        12,
+                        20,
+                        ...(query.get("limit")
+                          ? [Number(query.get("limit"))]
+                          : []),
+                      ]),
+                    ].map((limit) => (
+                      <option key={limit} value={limit}>
+                        {limit} / halaman
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ) : null}
 
-              <label>
+              <label className={member ? styles.memberSort : undefined}>
+                {member ? <span aria-hidden="true">Urutkan:</span> : null}
                 <span className={styles.srOnly}>Urutkan koleksi</span>
                 <select
+                  aria-label="Urutkan koleksi"
                   className={member ? undefined : memberStyles.catalogDropdown}
                   value={query.get("sort") ?? "relevance"}
                   onChange={(event) => update({ sort: event.target.value })}
@@ -320,24 +351,27 @@ export default function Catalog({
                     </option>
                   ))}
                 </select>
+                {member ? <FiChevronDown aria-hidden="true" /> : null}
               </label>
 
-              <div className={styles.viewToggle}>
-                <button
-                  aria-label="Tampilan grid"
-                  aria-pressed={view === "grid"}
-                  onClick={() => update({ view: null })}
-                >
-                  <FiGrid />
-                </button>
-                <button
-                  aria-label="Tampilan list"
-                  aria-pressed={view === "list"}
-                  onClick={() => update({ view: "list" })}
-                >
-                  <FiList />
-                </button>
-              </div>
+              {!member ? (
+                <div className={styles.viewToggle}>
+                  <button
+                    aria-label="Tampilan grid"
+                    aria-pressed={view === "grid"}
+                    onClick={() => update({ view: null })}
+                  >
+                    <FiGrid />
+                  </button>
+                  <button
+                    aria-label="Tampilan list"
+                    aria-pressed={view === "list"}
+                    onClick={() => update({ view: "list" })}
+                  >
+                    <FiList />
+                  </button>
+                </div>
+              ) : null}
             </div>
           </div>
 
@@ -352,28 +386,48 @@ export default function Catalog({
                 </Link>
               ) : null}
 
-              {chips.map((chip) => (
+              {(member && !expandedChips ? chips.slice(0, 5) : chips).map(
+                (chip) => (
+                  <button
+                    key={`${chip.name}:${chip.value}`}
+                    aria-label={`Hapus filter ${chip.label}`}
+                    onClick={() =>
+                      update({
+                        [chip.name]: ["yearFrom", "yearTo"].includes(chip.name)
+                          ? null
+                          : (query.get(chip.name) ?? "")
+                              .split(",")
+                              .filter(
+                                (value) =>
+                                  !(chip.values ?? [chip.value]).includes(
+                                    value,
+                                  ),
+                              )
+                              .join(",") || null,
+                      })
+                    }
+                  >
+                    {chip.label}
+                    <FiX />
+                  </button>
+                ),
+              )}
+              {member && chips.length > 5 ? (
                 <button
-                  key={`${chip.name}:${chip.value}`}
-                  onClick={() =>
-                    update({
-                      [chip.name]: ["yearFrom", "yearTo"].includes(chip.name)
-                        ? null
-                        : (query.get(chip.name) ?? "")
-                            .split(",")
-                            .filter((value) => value !== chip.value)
-                            .join(",") || null,
-                    })
-                  }
+                  aria-expanded={expandedChips}
+                  onClick={() => setExpandedChips((value) => !value)}
                 >
-                  {chip.label}
-                  <FiX />
+                  {expandedChips
+                    ? "Ringkas filter"
+                    : `+${chips.length - 5} lainnya`}
                 </button>
-              ))}
+              ) : null}
 
-              <button className={styles.clearChips} onClick={clear}>
-                <FiX /> Hapus semua
-              </button>
+              {!member || chips.length > 1 ? (
+                <button className={styles.clearChips} onClick={clear}>
+                  <FiX /> Hapus semua
+                </button>
+              ) : null}
             </div>
           ) : null}
 
@@ -450,12 +504,10 @@ export default function Catalog({
               </h2>
               <p>
                 {member
-                  ? "Coba ubah kata kunci atau filter pencarian Anda."
+                  ? "Coba ubah atau hapus beberapa filter."
                   : "Coba kata kunci lain atau hapus filter yang dipilih."}
               </p>
-              <button onClick={clear}>
-                {member ? "Reset Filter" : "Bersihkan Filter"}
-              </button>
+              <button onClick={clear}>Bersihkan Filter</button>
               {totalPages > 0 ? (
                 <button onClick={() => update({ page: "1" })}>
                   Kembali ke Halaman Pertama
@@ -466,27 +518,41 @@ export default function Catalog({
         </section>
       </div>
 
-      <dialog
-        ref={dialog}
-        className={`${styles.filterDialog} ${member ? memberStyles.memberFilterDialog : ""}`}
-        aria-label="Filter koleksi"
-      >
-        <button
-          className={styles.closeDialog}
-          aria-label="Tutup filter"
-          onClick={() => dialog.current?.close()}
+      {member ? (
+        filterOpen ? (
+          <MemberFilterDrawer
+            query={query}
+            options={options}
+            ebook={ebook}
+            unavailable={filtersError}
+            onApply={update}
+            onClose={() => setFilterOpen(false)}
+            returnFocus={filterButton}
+          />
+        ) : null
+      ) : (
+        <dialog
+          ref={dialog}
+          className={`${styles.filterDialog} ${member ? memberStyles.memberFilterDialog : ""}`}
+          aria-label="Filter koleksi"
         >
-          <FiX />
-        </button>
-        <Filters {...filterProps} />
-        {filtersError ? <p>Filter belum dapat dimuat.</p> : null}
-        <button
-          className={styles.primaryButton}
-          onClick={() => dialog.current?.close()}
-        >
-          Lihat Hasil
-        </button>
-      </dialog>
+          <button
+            className={styles.closeDialog}
+            aria-label="Tutup filter"
+            onClick={() => dialog.current?.close()}
+          >
+            <FiX />
+          </button>
+          <Filters {...filterProps} />
+          {filtersError ? <p>Filter belum dapat dimuat.</p> : null}
+          <button
+            className={styles.primaryButton}
+            onClick={() => dialog.current?.close()}
+          >
+            Lihat Hasil
+          </button>
+        </dialog>
+      )}
     </>
   );
 

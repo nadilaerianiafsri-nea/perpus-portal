@@ -1210,6 +1210,7 @@
 
 .memberCatalog .searchRow {
   margin-bottom: 14px;
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .memberCatalog .searchInput {
@@ -1219,12 +1220,12 @@
 }
 
 .memberCatalog .searchInput > svg {
-  top: 15px;
+  top: 17px;
   left: 16px;
 }
 
 .memberCatalog .searchInput input {
-  height: 46px;
+  height: 50px;
   padding-left: 44px;
   border-color: #dedfe6;
   border-radius: 10px;
@@ -1232,12 +1233,13 @@
 }
 
 .memberCatalog .toolbar {
-  min-height: 60px;
-  padding: 10px 14px;
+  min-height: 44px;
+  padding: 0;
   margin-bottom: 20px;
   gap: 12px;
-  border-color: #e2e3e9;
-  border-radius: 12px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
 .memberCatalog .toolbar p {
@@ -1259,13 +1261,14 @@
   height: 38px;
   min-height: 38px;
   width: 145px;
-  padding: 0 10px;
-  border: 1px solid #dedfe6;
-  border-radius: 8px;
-  background: #fff;
+  padding: 0 22px 0 0;
+  border: 0;
+  border-radius: 0;
+  appearance: none;
+  background: transparent;
   color: #2b3056;
   font: inherit;
-  font-size: 12px;
+  font-size: 13px;
   cursor: pointer;
   transition: border-color 160ms ease, background 160ms ease;
 }
@@ -1280,14 +1283,14 @@
   justify-content: center;
   flex-shrink: 0;
   gap: 7px;
-  height: 38px;
+  height: 40px;
   padding: 0 12px;
   border: 1px solid #dedfe6;
   border-radius: 8px;
   background: #fff;
   color: #2b3056;
   font: inherit;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: border-color 160ms ease, background 160ms ease;
@@ -1307,9 +1310,44 @@
 }
 
 .memberCatalog .memberFilterButton:hover,
-.memberCatalog .sortTools select:hover {
+.memberCatalog .memberSort:hover {
   border-color: #b6b8ca;
   background: #f8f8fa;
+}
+
+.memberCatalog .sortTools label.memberSort {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #dedfe6;
+  border-radius: 8px;
+  background: #fff;
+  color: #737787;
+  font-size: 12px;
+}
+.memberSort > svg {
+  position: absolute;
+  right: 12px;
+  pointer-events: none;
+  color: #2b3056;
+}
+
+.memberCatalog .memberSort:focus-within {
+  border-color: #2b3056;
+  box-shadow: 0 0 0 3px #2b305614;
+}
+
+.memberCatalog .memberSort select:focus-visible {
+  outline: none;
+}
+
+.memberCatalog .searchInput input:focus-visible {
+  outline: none;
+  border-color: #2b3056;
+  box-shadow: 0 0 0 3px #2b305614;
 }
 
 .memberCatalog .viewToggle {
@@ -1623,31 +1661,31 @@
   }
 
   .memberCatalog .toolbar {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 12px;
-    padding: 12px;
+    padding: 0;
     margin-bottom: 16px;
   }
 
   .memberCatalog .sortTools {
-    display: contents;
+    display: flex;
+    width: 100%;
+    gap: 10px;
   }
 
   .memberCatalog .toolbar p {
-    grid-column: 1 / 3;
-    grid-row: 1;
+    width: 100%;
   }
 
   .memberCatalog .memberFilterButton {
-    grid-column: 3;
-    grid-row: 1;
-    justify-self: end;
+    min-width: 94px;
   }
 
-  .memberCatalog .sortTools label {
-    grid-row: 2;
+  .memberCatalog .sortTools label.memberSort {
+    flex: 1;
+    min-width: 0;
   }
 
   .memberCatalog .viewToggle {
@@ -1660,8 +1698,9 @@
   .memberCatalog .sortTools .pageSize select {
     width: 100%;
     max-width: 100%;
-    padding-inline: 6px;
-    font-size: 11px;
+    min-width: 0;
+    padding: 0 22px 0 0;
+    font-size: 13px;
   }
 
   .memberCatalog .grid {

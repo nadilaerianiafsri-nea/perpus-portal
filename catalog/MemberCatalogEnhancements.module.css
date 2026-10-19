@@ -6,7 +6,356 @@
 }
 
 .memberSearchRow {
-  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* Member-only filter sheet: the header and actions sit outside the scroll area. */
+.drawer {
+  position: fixed;
+  inset: 0 0 0 auto;
+  width: min(420px, 100vw);
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  border: 0;
+  border-left: 1px solid #e4e6ec;
+  border-radius: 16px 0 0 16px;
+  background: #fff;
+  color: #000633;
+  font-family: inherit;
+  box-shadow: -12px 0 48px #00063318;
+}
+.drawer[open] {
+  display: flex;
+  animation: drawerIn 180ms ease-out;
+}
+.drawer::backdrop {
+  background: #00063347;
+}
+.drawerForm {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+.drawerHeader {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-shrink: 0;
+  padding: 24px;
+  border-bottom: 1px solid #eceef2;
+  background: #fff;
+}
+.drawer .drawerHeader h2 {
+  margin: 0 0 5px;
+  color: #000633;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.025em;
+}
+.drawer .drawerHeader p {
+  margin: 0;
+  color: #777d8b;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.drawerClose {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border: 1px solid #e4e6ec;
+  border-radius: 8px;
+  background: #fff;
+  color: #2b3056;
+  font-size: 18px;
+  cursor: pointer;
+}
+.drawerClose:hover {
+  background: #f5f6f8;
+}
+.drawerBody {
+  flex: 1;
+  min-height: 0;
+  padding: 24px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
+.filterSection {
+  min-width: 0;
+  padding: 0 0 24px;
+  margin: 0 0 24px;
+  border: 0;
+  border-bottom: 1px solid #eceef2;
+}
+.filterSection:last-of-type {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+.filterSection legend {
+  padding: 0;
+  margin-bottom: 10px;
+  color: #000633;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.optionRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  padding: 7px 8px;
+  margin: 0 -8px 3px;
+  border-radius: 7px;
+  color: #50596c;
+  font-size: 14px;
+  line-height: 1.5;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    color 160ms ease;
+}
+.optionRow:hover {
+  background: #f6f7fa;
+  color: #000633;
+}
+.optionRow input {
+  position: absolute;
+  left: 8px;
+  width: 18px;
+  height: 18px;
+  opacity: 0;
+  margin: 0;
+}
+.checkboxMark {
+  display: grid;
+  place-items: center;
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  border: 1px solid #bfc5d0;
+  border-radius: 4px;
+  background: #fff;
+  color: #fff;
+}
+.checkboxMark svg {
+  width: 13px;
+  height: 13px;
+  opacity: 0;
+  stroke-width: 2.5;
+}
+.optionRow input:checked + .checkboxMark {
+  background: #2b3056;
+  border-color: #2b3056;
+}
+.optionRow input:checked + .checkboxMark svg {
+  opacity: 1;
+}
+.optionRow input:focus-visible + .checkboxMark {
+  outline: 2px solid #2b3056;
+  outline-offset: 3px;
+}
+.optionRow input:checked ~ span:last-child {
+  color: #000633;
+}
+.categorySearch {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.categorySearch > svg {
+  position: absolute;
+  left: 11px;
+  color: #8a91a0;
+  width: 15px;
+  height: 15px;
+  pointer-events: none;
+}
+.categorySearch input {
+  width: 100%;
+  min-width: 0;
+  height: 38px;
+  padding: 0 12px 0 34px;
+  border: 1px solid #e1e4eb;
+  border-radius: 8px;
+  background: #fff;
+  color: #2b3056;
+  font: inherit;
+  font-size: 13px;
+}
+.categoryOptions {
+  max-height: 236px;
+  padding-inline: 8px;
+  margin-inline: -8px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
+.showCategories {
+  padding: 6px 0;
+  margin-top: 5px;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  color: #2b3056;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.showCategories:hover {
+  border-bottom-color: #2b3056;
+}
+.filterHint {
+  margin: 10px 0;
+  color: #777d8b;
+  font-size: 13px;
+}
+.yearFields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.yearLabel {
+  display: block;
+  margin-bottom: 7px;
+  color: #737b89;
+  font-size: 12px;
+}
+.yearControl {
+  position: relative;
+  display: block;
+}
+.yearControl > svg {
+  position: absolute;
+  right: 11px;
+  top: 13px;
+  width: 14px;
+  height: 14px;
+  color: #737b89;
+  pointer-events: none;
+}
+.yearSelect {
+  appearance: none;
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  padding: 0 30px 0 11px;
+  border: 1px solid #dfe3eb;
+  border-radius: 8px;
+  background: #fff;
+  color: #2b3056;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.filterError {
+  margin: 12px 0 0;
+  color: #a63030;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.drawerFooter {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: 12px;
+  flex-shrink: 0;
+  padding: 18px 24px max(18px, env(safe-area-inset-bottom));
+  border-top: 1px solid #eceef2;
+  background: #fff;
+}
+.drawerFooter button {
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #dfe3eb;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease;
+}
+.resetFilters {
+  background: #fff;
+  color: #2b3056;
+}
+.resetFilters:hover {
+  background: #f5f6f8;
+  border-color: #bdc3d1;
+}
+.drawerFooter .applyFilters {
+  border-color: #2b3056;
+  background: #2b3056;
+  color: #fff;
+}
+.drawerFooter .applyFilters:hover {
+  border-color: #000633;
+  background: #000633;
+}
+.applyFilters:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.drawer :is(button, select, input):focus-visible {
+  outline: 2px solid #2b3056;
+  outline-offset: 3px;
+}
+@keyframes drawerIn {
+  from {
+    opacity: 0.7;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@media (max-width: 600px) {
+  .drawer {
+    width: 100vw;
+    border: 0;
+    border-radius: 0;
+  }
+  .drawerHeader,
+  .drawerBody {
+    padding: 22px;
+  }
+  .drawerFooter {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding-inline: 22px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .drawer[open] {
+    animation: none;
+  }
+  .optionRow,
+  .drawerFooter button {
+    transition: none;
+  }
 }
 
 .memberFilterButton {
