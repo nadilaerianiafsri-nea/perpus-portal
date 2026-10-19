@@ -214,6 +214,9 @@ export default function AdminShell({ children, user }: AdminShellProps) {
             </div>
           </Link>
           <button
+            data-button="ghost"
+            data-button-size="sm"
+            data-button-shape="square"
             type="button"
             className={styles.sidebarClose}
             aria-label="Tutup menu admin"
@@ -302,7 +305,7 @@ export default function AdminShell({ children, user }: AdminShellProps) {
             <FiHome size={18} />
             <span>Lihat Situs Publik</span>
           </Link>
-          <button type="button" onClick={handleLogout} disabled={loggingOut}>
+          <button data-button="danger" data-button-size="md" data-button-loading={loggingOut} type="button" onClick={handleLogout} disabled={loggingOut}>
             <FiLogOut size={18} />
             <span>{loggingOut ? "Keluar..." : "Keluar"}</span>
           </button>
@@ -313,6 +316,9 @@ export default function AdminShell({ children, user }: AdminShellProps) {
         <header className={styles.topbar}>
           <div className={styles.topbarLeft}>
             <button
+              data-button="icon"
+              data-button-size="sm"
+              data-button-shape="square"
               type="button"
               className={styles.mobileMenuButton}
               aria-label="Buka menu admin"
@@ -338,7 +344,7 @@ export default function AdminShell({ children, user }: AdminShellProps) {
 
           <div className={styles.topbarActions}>
             <form className={styles.searchBox} onSubmit={handleSearch}>
-              <button type="submit" aria-label="Cari koleksi">
+              <button data-button="icon" data-button-size="sm" data-button-shape="square" type="submit" aria-label="Cari koleksi">
                 <FiSearch size={17} />
               </button>
               <input
@@ -351,6 +357,9 @@ export default function AdminShell({ children, user }: AdminShellProps) {
               />
             </form>
             <Link
+              data-button="icon"
+              data-button-size="sm"
+              data-button-shape="square"
               href="/admin/notifikasi"
               className={styles.iconButton}
               aria-label={`Notifikasi admin${unreadNotifications ? `, ${unreadNotifications} belum dibaca` : ""}`}

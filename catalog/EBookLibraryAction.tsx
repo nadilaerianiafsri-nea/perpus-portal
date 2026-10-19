@@ -1,5 +1,6 @@
 "use client";
 
+import { ButtonLabel } from '@/components/Button';
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -149,7 +150,7 @@ export default function EBookLibraryAction({
   if (!role) {
     return (
       <div className={styles.libraryAction}>
-        <button
+        <button data-button="primary" data-button-size="md"
           className={styles.detailLink}
           type="button"
           onClick={() =>
@@ -175,7 +176,7 @@ export default function EBookLibraryAction({
   return (
     <div className={styles.libraryAction}>
       {status?.state === "AVAILABLE" ? (
-        <button
+        <button aria-busy={pending} data-button="primary" data-button-size="md"
           className={styles.primaryButton}
           type="button"
           disabled={pending}
@@ -183,12 +184,12 @@ export default function EBookLibraryAction({
             void act("borrow", "E-Book berhasil dipinjam selama 7 hari.")
           }
         >
-          {pending ? "Memproses..." : "Pinjam E-Book"}
+          <ButtonLabel loading={pending} pending="Memproses...">Pinjam E-Book</ButtonLabel>
         </button>
       ) : null}
 
       {status?.state === "BORROWED_BY_OTHER" ? (
-        <button
+        <button aria-busy={pending} data-button="primary" data-button-size="md"
           className={styles.detailLink}
           type="button"
           disabled={pending}
@@ -196,14 +197,14 @@ export default function EBookLibraryAction({
             void act("queue", "Anda berhasil masuk antrean E-Book.")
           }
         >
-          {pending ? "Memproses..." : "Masuk Antrean"}
+          <ButtonLabel loading={pending} pending="Memproses...">Masuk Antrean</ButtonLabel>
         </button>
       ) : null}
 
       {status?.state === "BORROWED_BY_ME" ? (
         <>
           <p className={styles.ctaNotice}>Akses E-Book aktif.</p>
-          <Link
+          <Link data-button="primary" data-button-size="md"
             className={styles.primaryButton}
             href={`/e-book/${bookId}/baca`}
           >
@@ -213,13 +214,13 @@ export default function EBookLibraryAction({
                 ? "Lanjut Baca"
                 : "Baca E-Book"}
           </Link>
-          <button
+          <button aria-busy={pending} data-button="warning" data-button-size="md"
             className={styles.detailLink}
             type="button"
             disabled={pending}
             onClick={() => void act("return", "E-Book berhasil dikembalikan.")}
           >
-            {pending ? "Memproses..." : "Kembalikan E-Book"}
+            <ButtonLabel loading={pending} pending="Memproses...">Kembalikan E-Book</ButtonLabel>
           </button>
         </>
       ) : null}
@@ -234,7 +235,7 @@ export default function EBookLibraryAction({
                 : "Sedang diperbarui"}
             </strong>
           </p>
-          <button
+          <button aria-busy={pending} data-button="danger" data-button-size="md"
             className={styles.detailLink}
             type="button"
             disabled={pending}
@@ -242,7 +243,7 @@ export default function EBookLibraryAction({
               void act("queue/cancel", "Antrean E-Book berhasil dibatalkan.")
             }
           >
-            {pending ? "Memproses..." : "Batalkan Antrean"}
+            <ButtonLabel loading={pending} pending="Memproses...">Batalkan Antrean</ButtonLabel>
           </button>
         </>
       ) : null}
@@ -253,7 +254,7 @@ export default function EBookLibraryAction({
             <strong>Giliran Anda tersedia.</strong> Sisa prioritas:{" "}
             {formatRemaining(status.queue?.claimExpiresAt, now)}.
           </p>
-          <button
+          <button aria-busy={pending} data-button="primary" data-button-size="md"
             className={styles.primaryButton}
             type="button"
             disabled={pending}
@@ -261,9 +262,9 @@ export default function EBookLibraryAction({
               void act("borrow", "E-Book berhasil dipinjam selama 7 hari.")
             }
           >
-            {pending ? "Memproses..." : "Pinjam E-Book"}
+            <ButtonLabel loading={pending} pending="Memproses...">Pinjam E-Book</ButtonLabel>
           </button>
-          <button
+          <button aria-busy={pending} data-button="danger" data-button-size="md"
             className={styles.detailLink}
             type="button"
             disabled={pending}
@@ -271,7 +272,7 @@ export default function EBookLibraryAction({
               void act("queue/cancel", "Antrean E-Book berhasil dibatalkan.")
             }
           >
-            {pending ? "Memproses..." : "Batalkan Antrean"}
+            <ButtonLabel loading={pending} pending="Memproses...">Batalkan Antrean</ButtonLabel>
           </button>
         </>
       ) : null}
@@ -288,7 +289,7 @@ export default function EBookLibraryAction({
         </p>
       ) : null}
       {!status && notice ? (
-        <button
+        <button data-button="primary" data-button-size="md"
           className={styles.detailLink}
           type="button"
           onClick={() => void load()}

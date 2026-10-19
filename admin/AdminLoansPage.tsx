@@ -257,6 +257,8 @@ export default function AdminLoansPage() {
           <div className={styles.errorBox} role="alert">
             <p>{error}</p>
             <button
+              data-button="secondary"
+              data-button-size="md"
               type="button"
               onClick={() => setRevision((value) => value + 1)}
             >
@@ -354,6 +356,8 @@ export default function AdminLoansPage() {
                       <td>
                         {loanStatus !== "AKTIF" && whatsappHref ? (
                           <a
+                            data-button="secondary"
+                            data-button-size="sm"
                             href={whatsappHref}
                             target="_blank"
                             rel="noreferrer"
@@ -382,6 +386,8 @@ export default function AdminLoansPage() {
         {!loading && result.meta.totalPages > 1 ? (
           <nav className={styles.pagination} aria-label="Halaman peminjaman">
             <button
+              data-button="secondary"
+              data-button-size="sm"
               type="button"
               disabled={page <= 1}
               onClick={() => setPage((value) => Math.max(1, value - 1))}
@@ -394,6 +400,8 @@ export default function AdminLoansPage() {
             </span>
 
             <button
+              data-button="secondary"
+              data-button-size="sm"
               type="button"
               disabled={page >= result.meta.totalPages}
               onClick={() =>

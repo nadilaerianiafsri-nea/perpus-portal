@@ -1,5 +1,6 @@
 "use client";
 
+import { ButtonLabel } from '@/components/Button';
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -274,7 +275,7 @@ export default function AdminGrantForm({ mode, id }: Props) {
           <p>Satu penerimaan dapat berisi satu atau beberapa judul buku.</p>
         </div>
 
-        <Link href={cancelHref} className={styles.secondaryButton}>
+        <Link data-button="secondary" data-button-size="md" href={cancelHref} className={styles.secondaryButton}>
           Kembali
         </Link>
       </header>
@@ -422,6 +423,8 @@ export default function AdminGrantForm({ mode, id }: Props) {
                 </label>
 
                 <button
+                  data-button="danger"
+                  data-button-size="sm"
                   type="button"
                   className={styles.removeButton}
                   disabled={form.items.length <= 1}
@@ -434,6 +437,8 @@ export default function AdminGrantForm({ mode, id }: Props) {
           </div>
 
           <button
+            data-button="secondary"
+            data-button-size="md"
             type="button"
             className={styles.addItemButton}
             style={{
@@ -452,16 +457,19 @@ export default function AdminGrantForm({ mode, id }: Props) {
             marginTop: "15px",
           }}
         >
-          <Link href={cancelHref} className={styles.secondaryButton}>
+          <Link data-button="ghost" data-button-size="md" href={cancelHref} className={styles.secondaryButton}>
             Batal
           </Link>
 
           <button
+            data-button="primary"
+            data-button-size="md"
+            data-button-loading={saving}
             type="submit"
             className={styles.primaryButton}
             disabled={saving}
           >
-            {saving ? "Menyimpan..." : "Simpan Data Hibah"}
+            <ButtonLabel loading={saving} pending="Menyimpan...">Simpan Data Hibah</ButtonLabel>
           </button>
         </footer>
       </form>

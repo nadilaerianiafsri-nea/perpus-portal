@@ -21,9 +21,9 @@ export default function VerifyEmail({ token }: { token: string }) {
     <header className={styles.heading}><h2>Verifikasi Email</h2></header>
     <div className={styles.loginCard} aria-busy={!!token && !result}>
       <p className={styles.statusCopy} role="status">{message}</p>
-      {result && !result.ok && <button className={styles.linkButton} onClick={() => { setResult(null); setAttempt((n) => n + 1); }}>Coba lagi</button>}
-      <Link className={styles.actionLink} href="/login">Masuk ke Akun</Link>
-      {(!token || (result && !result.ok)) && <Link className={styles.actionLink} href="/check-email">Kirim ulang email verifikasi</Link>}
+      {result && !result.ok && <button data-button="primary" data-button-size="lg" className={styles.linkButton} onClick={() => { setResult(null); setAttempt((n) => n + 1); }}>Coba lagi</button>}
+      <Link data-button="ghost" data-button-size="md" className={styles.actionLink} href="/login">Masuk ke Akun</Link>
+      {(!token || (result && !result.ok)) && <Link data-button="ghost" data-button-size="md" className={styles.actionLink} href="/check-email">Kirim ulang email verifikasi</Link>}
     </div>
   </div></AuthShell>;
 }

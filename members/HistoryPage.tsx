@@ -85,7 +85,7 @@ export default function HistoryPage({
           <FiClock size={32} aria-hidden />
           <h2>Belum ada riwayat peminjaman.</h2>
           <p>Peminjaman yang telah selesai akan muncul di sini.</p>
-          <Link className={shared.button} href="/dashboard/koleksi">
+          <Link data-button="primary" className={shared.button} href="/dashboard/koleksi">
             <FiSearch aria-hidden />
             Cari Koleksi
           </Link>

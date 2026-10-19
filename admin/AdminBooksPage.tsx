@@ -229,7 +229,7 @@ export default function AdminBooksPage() {
             aria-label="Cari data buku"
           />
         </form>
-        <Link href="/admin/koleksi/data-buku/tambah" className={styles.addButton}>
+        <Link data-button="primary" data-button-size="md" href="/admin/koleksi/data-buku/tambah" className={styles.addButton}>
           <FiPlus aria-hidden />
           Tambah Buku
         </Link>
@@ -238,6 +238,9 @@ export default function AdminBooksPage() {
       <div className={styles.filters} role="group" aria-label="Filter status buku">
         {filters.map((filter) => (
           <button
+            data-button="secondary"
+            data-button-size="md"
+            data-button-active={status === filter.value}
             key={filter.value}
             type="button"
             className={status === filter.value ? styles.filterActive : ""}
@@ -293,7 +296,7 @@ export default function AdminBooksPage() {
           </div>
         </div>
 
-        <button type="submit" className={enhancements.applyButton}>
+        <button data-button="primary" data-button-size="md" type="submit" className={enhancements.applyButton}>
           Terapkan Filter
         </button>
       </form>
@@ -301,7 +304,7 @@ export default function AdminBooksPage() {
       {error ? (
         <div className={styles.errorBox} role="alert">
           <p>{error}</p>
-          <button type="button" onClick={() => setRevision((value) => value + 1)}>
+          <button data-button="secondary" data-button-size="md" type="button" onClick={() => setRevision((value) => value + 1)}>
             Coba Lagi
           </button>
         </div>
@@ -371,6 +374,9 @@ export default function AdminBooksPage() {
                     <td>
                       <div className={styles.actions}>
                         <Link
+                          data-button="icon"
+                          data-button-size="sm"
+                          data-button-shape="square"
                           href={`/admin/koleksi/data-buku/${book.id}`}
                           className={styles.iconAction}
                           aria-label={`Lihat detail ${book.title}`}
@@ -379,6 +385,9 @@ export default function AdminBooksPage() {
                           <FiEye />
                         </Link>
                         <Link
+                          data-button="icon"
+                          data-button-size="sm"
+                          data-button-shape="square"
                           href={`/admin/koleksi/data-buku/${book.id}/edit`}
                           className={styles.iconAction}
                           aria-label={`Edit ${book.title}`}
@@ -387,6 +396,10 @@ export default function AdminBooksPage() {
                           <FiEdit2 />
                         </Link>
                         <button
+                          data-button={book.isActive ? "danger" : "success"}
+                          data-button-size="sm"
+                          data-button-shape="square"
+                          data-button-loading={changingId === book.id}
                           type="button"
                           className={`${styles.iconAction} ${
                             book.isActive ? styles.powerOff : styles.powerOn
@@ -422,6 +435,8 @@ export default function AdminBooksPage() {
         {!loading && result.meta.totalPages > 1 ? (
           <nav className={styles.pagination} aria-label="Halaman data buku">
             <button
+              data-button="secondary"
+              data-button-size="sm"
               type="button"
               disabled={page <= 1}
               onClick={() => setPage((value) => Math.max(1, value - 1))}
@@ -432,6 +447,8 @@ export default function AdminBooksPage() {
               Halaman {result.meta.page} dari {result.meta.totalPages}
             </span>
             <button
+              data-button="secondary"
+              data-button-size="sm"
               type="button"
               disabled={page >= result.meta.totalPages}
               onClick={() =>

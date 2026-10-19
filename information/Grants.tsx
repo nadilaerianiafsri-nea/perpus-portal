@@ -164,10 +164,10 @@ export default function Grants() {
         ) : error ? (
           <div className={common.state} role="alert">
             <h2>{errorMessage}</h2>
-            <button onClick={() => setRetry((value) => value + 1)}>
+            <button data-button="primary" data-button-size="md" onClick={() => setRetry((value) => value + 1)}>
               Coba Lagi
             </button>
-            {active && <button onClick={clear}>Bersihkan Filter</button>}
+            {active && <button data-button="ghost" data-button-size="md" onClick={clear}>Bersihkan Filter</button>}
           </div>
         ) : response?.data.length ? (
           <>
@@ -231,7 +231,7 @@ export default function Grants() {
             {active && (
               <div className={styles.resultsCount}>
                 {response.meta.total} hasil ditemukan ·{" "}
-                <button className={common.clearChips} onClick={clear}>
+                <button data-button="ghost" data-button-size="md" className={common.clearChips} onClick={clear}>
                   Bersihkan Filter
                 </button>
               </div>
@@ -240,9 +240,9 @@ export default function Grants() {
         ) : (
           <div className={common.state}>
             <h2>Tidak ada data hibah yang sesuai.</h2>
-            {active && <button onClick={clear}>Bersihkan Filter</button>}
+            {active && <button data-button="ghost" data-button-size="md" onClick={clear}>Bersihkan Filter</button>}
             {totalPages > 0 && (
-              <button onClick={() => update({ page: "1" })}>
+              <button data-button="secondary" data-button-size="md" onClick={() => update({ page: "1" })}>
                 Kembali ke Halaman Pertama
               </button>
             )}
@@ -251,14 +251,14 @@ export default function Grants() {
       </section>
       {totalPages > 1 && !loading && !error && (
         <nav className={common.pagination} aria-label="Halaman hibah">
-          <button
+          <button data-button="secondary" data-button-size="md"
             disabled={page <= 1}
             onClick={() => update({ page: String(page - 1) })}
           >
             Sebelumnya
           </button>
           {pages.map((value) => (
-            <button
+            <button data-button="secondary" data-button-size="sm"
               key={value}
               aria-current={page === value ? "page" : undefined}
               onClick={() => update({ page: String(value) })}
@@ -266,7 +266,7 @@ export default function Grants() {
               {value}
             </button>
           ))}
-          <button
+          <button data-button="secondary" data-button-size="md"
             disabled={page >= totalPages}
             onClick={() => update({ page: String(page + 1) })}
           >

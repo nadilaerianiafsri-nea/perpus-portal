@@ -2,6 +2,7 @@
 "use client";
 
 import { adminCoverUrl } from "./adminBooks";
+import { ButtonLabel } from '@/components/Button';
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
@@ -283,7 +284,7 @@ export default function AdminBookForm({
               : `Memperbarui data ${form.code}. Perubahan langsung berlaku di katalog setelah disimpan.`}
           </p>
         </div>
-        <Link href={backHref} className={styles.backButton}>
+        <Link data-button="secondary" data-button-size="md" href={backHref} className={styles.backButton}>
           <FiArrowLeft aria-hidden />
           Kembali
         </Link>
@@ -501,6 +502,8 @@ export default function AdminBookForm({
               onChange={chooseCover}
             />
             <button
+              data-button="secondary"
+              data-button-size="md"
               type="button"
               className={styles.coverButton}
               onClick={() => coverInput.current?.click()}
@@ -540,16 +543,12 @@ export default function AdminBookForm({
       </div>
 
       <footer className={styles.formFooter}>
-        <Link href={backHref} className={styles.cancelButton}>
+        <Link data-button="ghost" data-button-size="md" href={backHref} className={styles.cancelButton}>
           Batal
         </Link>
-        <button type="submit" className={styles.saveButton} disabled={saving}>
+        <button data-button="primary" data-button-size="md" data-button-loading={saving} type="submit" className={styles.saveButton} disabled={saving}>
           <FiCheckCircle aria-hidden />
-          {saving
-            ? "Menyimpan..."
-            : mode === "create"
-              ? "Simpan Buku"
-              : "Simpan Perubahan"}
+          <ButtonLabel loading={saving} pending="Menyimpan...">{mode === "create" ? "Simpan Buku" : "Simpan Perubahan"}</ButtonLabel>
         </button>
       </footer>
     </form>

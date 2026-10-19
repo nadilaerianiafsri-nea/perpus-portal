@@ -1,5 +1,6 @@
 "use client";
 
+import { ButtonLabel } from '@/components/Button';
 import Link from "next/link";
 import type { ComponentType } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -435,6 +436,9 @@ export default function AdminDashboard() {
         </label>
 
         <button
+          data-button="primary"
+          data-button-size="md"
+          data-button-loading={loading && !dashboard}
           type="button"
           className={controls.primaryButton}
           onClick={applyRange}
@@ -445,12 +449,15 @@ export default function AdminDashboard() {
         </button>
 
         <button
+          data-button="secondary"
+          data-button-size="md"
+          data-button-loading={loading}
           type="button"
           className={controls.secondaryButton}
           onClick={() => setRevision((value) => value + 1)}
           disabled={loading}
         >
-          {loading && dashboard ? "Memuat..." : "Segarkan"}
+          <ButtonLabel loading={Boolean(loading && dashboard)} pending="Memuat...">Segarkan</ButtonLabel>
         </button>
       </section>
 
@@ -458,6 +465,8 @@ export default function AdminDashboard() {
         <div className={controls.errorBox} role="alert">
           <span>{error}</span>
           <button
+            data-button="secondary"
+            data-button-size="md"
             type="button"
             onClick={() => setRevision((value) => value + 1)}
           >

@@ -3,6 +3,7 @@ import { useRef, useState, type FormEvent } from "react";
 import { validateContact, type ContactInput, type ContactErrors } from "@/shared/contactValidation.cjs";
 import styles from "./Contact.module.css";
 import { plaintextError } from '@/catalog/plaintextInput.cjs';
+import { Button } from '@/components/Button';
 
 const empty: ContactInput = { name: "", email: "", message: "" };
 export default function ContactForm() {
@@ -87,7 +88,7 @@ export default function ContactForm() {
           </div>
         );
       })}
-      <button type="submit" disabled={busy}>{busy ? "Mengirim..." : "Kirim Pesan"}</button>
+      <Button variant="primary" type="submit" loading={busy} loadingLabel="Mengirim..." fullWidth>Kirim Pesan</Button>
       <div role="status" aria-live="polite">
         {feedback && <p className={feedback.success ? styles.success : styles.failure}>{feedback.text}</p>}
       </div>

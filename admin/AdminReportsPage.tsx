@@ -115,10 +115,10 @@ export default function AdminReportsPage() {
           <span>Sampai Tanggal</span>
           <input type="date" value={toInput} onChange={(event) => setToInput(event.target.value)} />
         </label>
-        <button type="button" className={styles.primaryButton} onClick={applyRange} disabled={loading && !report}>
+        <button data-button="primary" data-button-size="md" data-button-loading={loading && !report} type="button" className={styles.primaryButton} onClick={applyRange} disabled={loading && !report}>
           <FiSearch aria-hidden="true" /> Terapkan
         </button>
-        <button type="button" className={styles.secondaryButton} onClick={exportReport} disabled={!report || loading}>
+        <button data-button="secondary" data-button-size="md" data-button-loading={loading} type="button" className={styles.secondaryButton} onClick={exportReport} disabled={!report || loading}>
           Ekspor
         </button>
       </section>
@@ -126,7 +126,7 @@ export default function AdminReportsPage() {
       {error ? (
         <div className={styles.errorBox} role="alert">
           <span>{error}</span>
-          <button type="button" onClick={() => setRevision((value) => value + 1)}>Coba Lagi</button>
+          <button data-button="secondary" data-button-size="md" type="button" onClick={() => setRevision((value) => value + 1)}>Coba Lagi</button>
         </div>
       ) : null}
 

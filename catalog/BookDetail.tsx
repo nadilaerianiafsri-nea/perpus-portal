@@ -28,10 +28,10 @@ export default async function BookDetail({
       <section className={`${styles.page} ${styles.error}`} role="alert">
         <h1>Detail koleksi belum dapat dimuat.</h1>
         <p>Silakan coba lagi untuk melihat informasi buku.</p>
-        <Link className={styles.primaryLink} href={`${basePath}/${id}`}>
+        <Link data-button="primary" data-button-size="md" className={styles.primaryLink} href={`${basePath}/${id}`}>
           Coba Lagi
         </Link>
-        <Link className={styles.secondaryLink} href={basePath}>
+        <Link data-button="secondary" data-button-size="md" className={styles.secondaryLink} href={basePath}>
           {member ? "Kembali ke Katalog" : "Kembali ke Koleksi"}
         </Link>
       </section>
@@ -50,7 +50,7 @@ export default async function BookDetail({
   const loginHref = `/login?returnUrl=${encodeURIComponent(memberHref)}`;
   const action = !member ? (
     user ? (
-      <Link
+      <Link data-button="primary" data-button-size="md"
         className={styles.primaryLink}
         href={user.role === "ADMIN" ? "/admin" : memberHref}
       >
@@ -59,17 +59,17 @@ export default async function BookDetail({
     ) : (
       <>
         {ebook || book.availableCopies > 0 ? (
-          <Link className={styles.primaryLink} href={loginHref}>
+          <Link data-button="primary" data-button-size="md" className={styles.primaryLink} href={loginHref}>
             {ebook
               ? "Masuk untuk Pinjam E-Book"
               : "Masuk untuk Ajukan Peminjaman"}
           </Link>
         ) : (
-          <button className={styles.primaryLink} disabled>
+          <button data-button="secondary" data-button-size="md" className={styles.primaryLink} disabled>
             Tidak Tersedia
           </button>
         )}
-        <Link className={styles.secondaryLink} href="/register">
+        <Link data-button="secondary" data-button-size="md" className={styles.secondaryLink} href="/register">
           Daftar Anggota
         </Link>
       </>

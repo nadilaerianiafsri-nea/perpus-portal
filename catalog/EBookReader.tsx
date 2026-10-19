@@ -36,7 +36,7 @@ export default function EBookReader({
 
   return (
     <section className={styles.readerStage} aria-label={`Pembaca ${title}`}>
-      <button
+      <button aria-busy={closing} data-button="icon" data-button-size="sm" data-button-shape="square"
         type="button"
         className={styles.readerBackButton}
         disabled={!reading || closing}
@@ -61,7 +61,7 @@ export default function EBookReader({
           <p>{error || saveError}</p>
           <div className={styles.errorActions}>
             {saveError ? (
-              <button
+              <button aria-busy={saving} data-button="primary" data-button-size="md"
                 type="button"
                 className={styles.secondary}
                 disabled={saving}
@@ -70,7 +70,7 @@ export default function EBookReader({
                 Coba Simpan Lagi
               </button>
             ) : null}
-            <button
+            <button data-button="secondary" data-button-size="md"
               type="button"
               className={styles.secondary}
               onClick={() => window.location.reload()}

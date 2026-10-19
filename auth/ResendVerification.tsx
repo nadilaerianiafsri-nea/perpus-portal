@@ -1,4 +1,5 @@
 "use client";
+import { ButtonLabel } from '@/components/Button';
 import { useRef, useState } from 'react';
 import { authRequest } from './authApi';
 import styles from './Auth.module.css';
@@ -16,7 +17,7 @@ export default function ResendVerification({ email }: { email: string }) {
     setMessage(result.message); setLoading(false); locked.current = false;
   }
   return <>
-    <button type="button" className={styles.primaryButton} disabled={loading || !email} onClick={resend}>{loading ? 'Mengirim...' : 'Kirim Ulang Email Verifikasi'}</button>
+    <button aria-busy={loading} data-button="primary" data-button-size="lg" type="button" className={styles.primaryButton} disabled={loading || !email} onClick={resend}><ButtonLabel loading={loading} pending="Mengirim...">Kirim Ulang Email Verifikasi</ButtonLabel></button>
     {message && <p className={styles.inlineInfo} role="status">{message}</p>}
   </>;
 }

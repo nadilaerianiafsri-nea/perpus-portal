@@ -144,6 +144,7 @@ export default function LoansPage() {
 
       <div className={styles.viewTabs} role="tablist" aria-label="Tampilan pinjaman">
         <button
+          data-button="ghost"
           type="button"
           role="tab"
           aria-selected={view === "current"}
@@ -153,6 +154,7 @@ export default function LoansPage() {
           Pinjaman Saya
         </button>
         <button
+          data-button="ghost"
           type="button"
           role="tab"
           aria-selected={view === "history"}
@@ -183,7 +185,7 @@ export default function LoansPage() {
               <FiBookOpen size={32} aria-hidden />
               <h2>Belum ada buku yang sedang dipinjam.</h2>
               <p>Buku yang sudah Anda ambil dari perpustakaan akan muncul di sini.</p>
-              <Link href="/dashboard/koleksi" className={styles.extendButton}>
+              <Link data-button="primary" href="/dashboard/koleksi" className={styles.extendButton}>
                 Cari Koleksi
               </Link>
             </div>

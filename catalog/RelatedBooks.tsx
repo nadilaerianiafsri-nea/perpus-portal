@@ -60,7 +60,7 @@ export default async function RelatedBooks({
               ? `Rekomendasi ${ebook ? "E-Book" : "koleksi"} belum dapat dimuat.`
               : `Belum ada ${ebook ? "E-Book" : "koleksi"} terkait untuk ${ebook ? "E-Book" : "buku"} ini.`}
           </p>
-          <Link
+          <Link data-button="secondary" data-button-size="md"
             href={
               ebook
                 ? member

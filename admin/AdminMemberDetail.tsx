@@ -123,7 +123,7 @@ export default function AdminMemberDetail({ id }: Props) {
     return (
       <div className={styles.statePanel}>
         <p>{error || "Anggota tidak ditemukan."}</p>
-        <Link href="/admin/keanggotaan">Kembali ke Keanggotaan</Link>
+        <Link data-button="secondary" data-button-size="md" href="/admin/keanggotaan">Kembali ke Keanggotaan</Link>
       </div>
     );
   }
@@ -146,6 +146,8 @@ export default function AdminMemberDetail({ id }: Props) {
 
         <div className={styles.headingActions}>
           <Link
+            data-button="secondary"
+            data-button-size="md"
             href={`/admin/keanggotaan/${member.id}/edit`}
             className={styles.primaryButton}
           >
@@ -153,6 +155,9 @@ export default function AdminMemberDetail({ id }: Props) {
           </Link>
 
           <button
+            data-button={member.isActive ? "danger" : "success"}
+            data-button-size="md"
+            data-button-loading={changingStatus}
             type="button"
             className={
               member.isActive

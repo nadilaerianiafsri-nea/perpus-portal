@@ -1,5 +1,6 @@
 "use client";
 
+import { ButtonLabel } from '@/components/Button';
 import { FormEvent, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -107,7 +108,7 @@ export default function Login() {
   return (
     <AuthShell login>
       <div className={styles.loginContent}>
-        <Link className={styles.loginBack} href="/">
+        <Link data-button="secondary" data-button-size="md" className={styles.loginBack} href="/">
           <FiArrowLeft aria-hidden /> Kembali ke Beranda
         </Link>
         <Link
@@ -162,7 +163,7 @@ export default function Login() {
                 required
               />
 
-              <button
+              <button data-button="icon" data-button-size="sm" data-button-field
                 type="button"
                 aria-controls="login-password"
                 aria-pressed={showPassword}
@@ -192,7 +193,7 @@ export default function Login() {
               <span>Ingat saya</span>
             </label>
 
-            <Link className={styles.linkButton} href="/forgot-password">
+            <Link data-button="ghost" data-button-size="md" className={styles.linkButton} href="/forgot-password">
               Lupa kata sandi?
             </Link>
           </div>
@@ -217,7 +218,7 @@ export default function Login() {
             </p>
           )}
           {pendingEmail && (
-            <Link
+            <Link data-button="ghost" data-button-size="md"
               className={styles.actionLink}
               href={`/check-email?email=${encodeURIComponent(pendingEmail)}`}
             >
@@ -225,12 +226,12 @@ export default function Login() {
             </Link>
           )}
 
-          <button
+          <button aria-busy={loading} data-button="primary" data-button-size="lg"
             className={styles.primaryButton}
             type="submit"
             disabled={loading || (captchaRequired && !captchaToken)}
           >
-            {loading ? "Memproses..." : "Masuk"}
+            <ButtonLabel loading={loading} pending="Memproses...">Masuk</ButtonLabel>
           </button>
         </form>
 

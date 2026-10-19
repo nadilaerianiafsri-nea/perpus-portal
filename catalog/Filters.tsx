@@ -134,7 +134,7 @@ export default function Filters({
         key === "subject" &&
         !categorySearch.trim() &&
         choices.length > 6 ? (
-          <button
+          <button data-button="ghost" data-button-size="md"
             type="button"
             className={enhancements.showCategories}
             aria-expanded={allCategories}
@@ -154,7 +154,7 @@ export default function Filters({
       {!member ? (
         <div className={styles.filterHeading}>
           <h2>Filter</h2>
-          <button onClick={clear}>Bersihkan</button>
+          <button data-button="ghost" data-button-size="md" onClick={clear}>Bersihkan</button>
         </div>
       ) : null}
       {!ebook &&

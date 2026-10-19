@@ -75,12 +75,12 @@ export default async function Home() {
 
               <form className="hero-search">
                 <input placeholder="Cari judul, penulis, topik, ISBN..." />
-                <button type="button" aria-label="Cari"><FiSearch /></button>
+                <button data-button="primary" data-button-size="sm" data-button-shape="square" type="button" aria-label="Cari"><FiSearch /></button>
               </form>
 
               <div className="hero-actions">
-                <a className="navy-btn" href="#koleksi"><FiSearch /> Cari Koleksi</a>
-                <a className="soft-link" href="#ebook"><FiBookOpen /> Jelajahi E-Book</a>
+                <a data-button="primary" data-button-size="md" className="navy-btn" href="#koleksi"><FiSearch /> Cari Koleksi</a>
+                <a data-button="secondary" data-button-size="md" className="soft-link" href="#ebook"><FiBookOpen /> Jelajahi E-Book</a>
               </div>
             </div>
 
@@ -121,7 +121,7 @@ export default async function Home() {
                 <h2>Koleksi Terbaru</h2>
                 <p>Temukan koleksi yang baru ditambahkan.</p>
               </div>
-              <a href="#">Lihat semua koleksi <FiArrowRight /></a>
+              <a data-button="ghost" data-button-size="sm" href="#">Lihat semua koleksi <FiArrowRight /></a>
             </div>
 
             <div className="book-grid">
@@ -136,7 +136,7 @@ export default async function Home() {
                     <h3>{book.title}</h3>
                     <p>{settings.libraryName}</p>
                     <div className="availability"><FiCheckCircle /> Tersedia</div>
-                    <a href="#">Lihat Detail</a>
+                    <a data-button="secondary" data-button-size="sm" href="#">Lihat Detail</a>
                   </div>
                 </article>
               ))}
@@ -251,8 +251,8 @@ export default async function Home() {
                 <li><FiCheckCircle /> Tersedia untuk perangkat mobile</li>
               </ul>
               <div className="hero-actions">
-                <a className="navy-btn" href="#"><FiBookOpen /> Jelajahi E-Book</a>
-                <a className="outline-btn" href="#">Lihat Semua</a>
+                <a data-button="primary" data-button-size="md" className="navy-btn" href="#"><FiBookOpen /> Jelajahi E-Book</a>
+                <a data-button="secondary" data-button-size="md" className="outline-btn" href="#">Lihat Semua</a>
               </div>
             </div>
           </div>
@@ -268,11 +268,11 @@ export default async function Home() {
             <div className="reminder-grid">
               <article>
                 <div className="reminder-icon"><FiCalendar /></div>
-                <div><span>Perpanjangan</span><h3>Perpanjang Pinjaman +{settings.extensionDurationDays} Hari</h3><p>Ajukan perpanjangan langsung dari akun tanpa harus datang.</p><a href="#">Kelola Pinjaman <FiArrowRight /></a></div>
+                <div><span>Perpanjangan</span><h3>Perpanjang Pinjaman +{settings.extensionDurationDays} Hari</h3><p>Ajukan perpanjangan langsung dari akun tanpa harus datang.</p><a data-button="ghost" data-button-size="sm" href="#">Kelola Pinjaman <FiArrowRight /></a></div>
               </article>
               <article>
                 <div className="reminder-icon"><FiBell /></div>
-                <div><span>Reminder Otomatis</span><h3>Reminder via Email</h3><p>Notifikasi sebelum dan setelah masa pinjaman Anda berakhir.</p><a href="#">Lihat Panduan <FiArrowRight /></a></div>
+                <div><span>Reminder Otomatis</span><h3>Reminder via Email</h3><p>Notifikasi sebelum dan setelah masa pinjaman Anda berakhir.</p><a data-button="ghost" data-button-size="sm" href="#">Lihat Panduan <FiArrowRight /></a></div>
               </article>
             </div>
           </div>
@@ -292,7 +292,7 @@ export default async function Home() {
                 <div><FiBookOpen /><span><strong>Judul Buku Hibah B</strong><small>Penerimaan hibah koleksi</small></span><b>Dalam Proses</b></div>
                 <div><FiBookOpen /><span><strong>Judul Buku Hibah C</strong><small>Penerimaan hibah koleksi</small></span><b>Diterima</b></div>
               </div>
-              <a className="outline-btn" href="#">Lihat Informasi Hibah <FiArrowRight /></a>
+              <a data-button="secondary" data-button-size="md" className="outline-btn" href="#">Lihat Informasi Hibah <FiArrowRight /></a>
             </div>
             <div className="donation-art">
               <Image src="/images/ASSET PERPUS/asset buku kaca pembesar.png" alt="Informasi hibah buku" fill sizes="330px" />
@@ -313,8 +313,8 @@ export default async function Home() {
                 <li><FiCheckCircle /> Riwayat pinjaman terintegrasi</li>
               </ul>
               <div className="hero-actions">
-                <a className="yellow-btn" href="#">Daftar Anggota</a>
-                <a className="dark-outline-btn" href="#">Masuk</a>
+                <a data-button="primary" data-button-size="md" data-button-inverse className="yellow-btn" href="#">Daftar Anggota</a>
+                <a data-button="secondary" data-button-size="md" data-button-inverse className="dark-outline-btn" href="#">Masuk</a>
               </div>
             </div>
             <div className="member-art">
@@ -331,7 +331,7 @@ export default async function Home() {
               <article><FiMapPin /><div><span>ALAMAT</span><strong><a href={serviceInfo.openStreetMapUrl} target="_blank" rel="noopener noreferrer">{settings.address}</a></strong></div></article>
               <article><FiPhone /><div><span>KONTAK</span><strong><a href={`tel:${settings.phoneE164}`}>{formatPublicPhone(settings.phoneE164)}</a></strong><a href={`mailto:${serviceInfo.email}`}>{serviceInfo.email}</a></div></article>
             </div>
-            <div className="contact-center"><a className="outline-btn" href="/kontak"><FiMail /> Hubungi Kami</a></div>
+            <div className="contact-center"><a data-button="secondary" data-button-size="md" className="outline-btn" href="/kontak"><FiMail /> Hubungi Kami</a></div>
           </div>
         </section>
       </main>

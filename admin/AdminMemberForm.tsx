@@ -1,5 +1,6 @@
 "use client";
 
+import { ButtonLabel } from '@/components/Button';
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -322,6 +323,8 @@ export default function AdminMemberForm({ id }: Props) {
 
         <footer className={styles.formFooter}>
           <Link
+            data-button="ghost"
+            data-button-size="md"
             href={`/admin/keanggotaan/${id}`}
             className={styles.secondaryButton}
           >
@@ -329,11 +332,14 @@ export default function AdminMemberForm({ id }: Props) {
           </Link>
 
           <button
+            data-button="primary"
+            data-button-size="md"
+            data-button-loading={saving}
             type="submit"
             className={styles.primaryButton}
             disabled={saving}
           >
-            {saving ? "Menyimpan..." : "Simpan Perubahan"}
+            <ButtonLabel loading={saving} pending="Menyimpan...">Simpan Perubahan</ButtonLabel>
           </button>
         </footer>
       </form>

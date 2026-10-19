@@ -1,5 +1,6 @@
 "use client";
 
+import { ButtonLabel } from '@/components/Button';
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FiSave, FiUser } from "react-icons/fi";
@@ -246,9 +247,9 @@ export default function AdminProfilePage({ user }: AdminProfilePageProps) {
             <div className={styles.formFooter}>
               {profileError ? <p className={styles.error} role="alert">{profileError}</p> : null}
               {profileNotice ? <p className={styles.success} role="status">{profileNotice}</p> : null}
-              <button className={styles.primaryButton} type="submit" disabled={savingProfile}>
+              <button data-button="primary" data-button-size="md" data-button-loading={savingProfile} className={styles.primaryButton} type="submit" disabled={savingProfile}>
                 <FiSave aria-hidden="true" />
-                {savingProfile ? "Menyimpan..." : "Simpan Perubahan"}
+                <ButtonLabel loading={savingProfile} pending="Menyimpan...">Simpan Perubahan</ButtonLabel>
               </button>
             </div>
           </form>
@@ -296,6 +297,8 @@ export default function AdminProfilePage({ user }: AdminProfilePageProps) {
                 ) : null}
                 <div className={styles.buttonRow}>
                   <button
+                    data-button="ghost"
+                    data-button-size="md"
                     className={styles.secondaryButton}
                     type="button"
                     onClick={cancelVerification}
@@ -303,8 +306,8 @@ export default function AdminProfilePage({ user }: AdminProfilePageProps) {
                   >
                     Batal
                   </button>
-                  <button className={styles.primaryButton} type="submit" disabled={changingPassword}>
-                    {changingPassword ? "Mengubah Password..." : "Ubah Password"}
+                  <button data-button="primary" data-button-size="md" data-button-loading={changingPassword} className={styles.primaryButton} type="submit" disabled={changingPassword}>
+                    <ButtonLabel loading={changingPassword} pending="Mengubah Password...">Ubah Password</ButtonLabel>
                   </button>
                 </div>
               </div>
@@ -331,8 +334,8 @@ export default function AdminProfilePage({ user }: AdminProfilePageProps) {
                 {passwordRequestNotice ? (
                   <p className={styles.success} role="status">{passwordRequestNotice}</p>
                 ) : null}
-                <button className={styles.primaryButton} type="submit" disabled={requestingPassword}>
-                  {requestingPassword ? "Mengirim..." : "Kirim Verifikasi Email"}
+                <button data-button="primary" data-button-size="md" data-button-loading={requestingPassword} className={styles.primaryButton} type="submit" disabled={requestingPassword}>
+                  <ButtonLabel loading={requestingPassword} pending="Mengirim...">Kirim Verifikasi Email</ButtonLabel>
                 </button>
               </div>
             </form>

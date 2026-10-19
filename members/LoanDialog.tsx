@@ -1,5 +1,6 @@
 "use client";
 
+import { ButtonLabel } from '@/components/Button';
 import { useEffect, useRef } from "react";
 import { FiMapPin, FiMail, FiPhone } from "react-icons/fi";
 import { serviceInfo } from "@/shared/serviceInfo.cjs";
@@ -41,8 +42,8 @@ export default function LoanDialog({ selection, pending, error, onDismiss, onCon
       </>}
       {error && <p role="alert" className={styles.dialogError}>{error}</p>}
       <div className={styles.dialogActions}>
-        <button className={styles.replacementButton} disabled={pending} onClick={onDismiss}>{extending ? "Batal" : "Tutup"}</button>
-        {extending && <button className={styles.extendButton} disabled={pending} onClick={onConfirm}>{pending ? "Memperpanjang..." : "Perpanjang 7 Hari"}</button>}
+        <button data-button="ghost" className={styles.replacementButton} disabled={pending} onClick={onDismiss}>{extending ? "Batal" : "Tutup"}</button>
+        {extending && <button data-button="primary" data-button-loading={pending} aria-busy={pending} className={styles.extendButton} disabled={pending} onClick={onConfirm}><ButtonLabel loading={pending} pending="Memperpanjang...">Perpanjang 7 Hari</ButtonLabel></button>}
       </div>
     </>}
   </dialog>;

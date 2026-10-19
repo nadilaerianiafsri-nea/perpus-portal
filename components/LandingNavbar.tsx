@@ -54,7 +54,7 @@ export default function LandingNavbar({
   }, []);
 
   const actions = user ? (
-    <Link
+    <Link data-button="primary" data-button-size="md" data-button-shape="pill"
       className="member-btn"
       href={user.role === "ADMIN" ? "/admin" : "/dashboard"}
     >
@@ -62,10 +62,10 @@ export default function LandingNavbar({
     </Link>
   ) : (
     <>
-      <Link className="login-link" href="/login">
+      <Link data-button="ghost" data-button-size="md" data-button-shape="pill" className="login-link" href="/login">
         Masuk
       </Link>
-      <Link className="member-btn" href="/register">
+      <Link data-button="primary" data-button-size="md" data-button-shape="pill" className="member-btn" href="/register">
         Daftar Anggota
       </Link>
     </>

@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import { ButtonLabel } from '@/components/Button';
 import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import { plainTextMessage } from "../members/inputSecurity";
 
@@ -305,6 +306,8 @@ export default function AdminReservationsPage() {
           <div className={styles.errorBox} role="alert">
             <p>{error}</p>
             <button
+              data-button="secondary"
+              data-button-size="md"
               type="button"
               onClick={() => setRevision((value) => value + 1)}
             >
@@ -386,6 +389,9 @@ export default function AdminReservationsPage() {
                     <td>
                       {reservation.status === "MENUNGGU_PENGAMBILAN" ? (
                         <button
+                          data-button="primary"
+                          data-button-size="sm"
+                          data-button-loading={processingId === reservation.id}
                           type="button"
                           className={styles.primaryAction}
                           disabled={processingId === reservation.id}
@@ -397,9 +403,7 @@ export default function AdminReservationsPage() {
                             })
                           }
                         >
-                          {processingId === reservation.id
-                            ? "Memproses..."
-                            : "Konfirmasi Pengambilan"}
+                          <ButtonLabel loading={processingId === reservation.id} pending="Memproses...">Konfirmasi Pengambilan</ButtonLabel>
                         </button>
                       ) : (
                         "-"
@@ -422,6 +426,8 @@ export default function AdminReservationsPage() {
         {!loading && result.meta.totalPages > 1 ? (
           <nav className={styles.pagination} aria-label="Halaman reservasi">
             <button
+              data-button="secondary"
+              data-button-size="sm"
               type="button"
               disabled={page <= 1}
               onClick={() => setPage((value) => Math.max(1, value - 1))}
@@ -434,6 +440,8 @@ export default function AdminReservationsPage() {
             </span>
 
             <button
+              data-button="secondary"
+              data-button-size="sm"
               type="button"
               disabled={page >= result.meta.totalPages}
               onClick={() =>
@@ -478,6 +486,8 @@ export default function AdminReservationsPage() {
             </div>
             <div className={styles.confirmModalActions}>
               <button
+                data-button="ghost"
+                data-button-size="md"
                 type="button"
                 className={styles.secondaryAction}
                 disabled={processingId !== null}
@@ -486,12 +496,15 @@ export default function AdminReservationsPage() {
                 Batal
               </button>
               <button
+                data-button="primary"
+                data-button-size="md"
+                data-button-loading={processingId !== null}
                 type="button"
                 className={styles.primaryAction}
                 disabled={processingId !== null}
                 onClick={() => void confirmPickup()}
               >
-                {processingId !== null ? "Memproses..." : "Konfirmasi Pengambilan"}
+                <ButtonLabel loading={processingId !== null} pending="Memproses...">Konfirmasi Pengambilan</ButtonLabel>
               </button>
             </div>
           </section>

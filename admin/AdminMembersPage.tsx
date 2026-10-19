@@ -247,6 +247,8 @@ export default function AdminMembersPage() {
         <div className={styles.errorBox} role="alert">
           <p>{error}</p>
           <button
+            data-button="secondary"
+            data-button-size="md"
             type="button"
             onClick={() => setRevision((value) => value + 1)}
           >
@@ -336,6 +338,8 @@ export default function AdminMembersPage() {
                     <td>
                       <div className={styles.actions}>
                         <Link
+                          data-button="secondary"
+                          data-button-size="sm"
                           href={`/admin/keanggotaan/${member.id}`}
                           className={styles.detailAction}
                         >
@@ -343,6 +347,8 @@ export default function AdminMembersPage() {
                         </Link>
 
                         <Link
+                          data-button="secondary"
+                          data-button-size="sm"
                           href={`/admin/keanggotaan/${member.id}/edit`}
                           className={styles.editAction}
                         >
@@ -350,6 +356,9 @@ export default function AdminMembersPage() {
                         </Link>
 
                         <button
+                          data-button={member.isActive ? "danger" : "success"}
+                          data-button-size="sm"
+                          data-button-loading={changingId === member.id}
                           type="button"
                           className={
                             member.isActive
@@ -442,6 +451,8 @@ export default function AdminMembersPage() {
 
                 <div className={styles.mobileActions}>
                   <Link
+                    data-button="secondary"
+                    data-button-size="sm"
                     href={`/admin/keanggotaan/${member.id}`}
                     className={styles.detailAction}
                   >
@@ -449,6 +460,8 @@ export default function AdminMembersPage() {
                   </Link>
 
                   <Link
+                    data-button="secondary"
+                    data-button-size="sm"
                     href={`/admin/keanggotaan/${member.id}/edit`}
                     className={styles.editAction}
                   >
@@ -456,6 +469,9 @@ export default function AdminMembersPage() {
                   </Link>
 
                   <button
+                    data-button={member.isActive ? "danger" : "success"}
+                    data-button-size="sm"
+                    data-button-loading={changingId === member.id}
                     type="button"
                     className={
                       member.isActive
@@ -486,6 +502,8 @@ export default function AdminMembersPage() {
         {!loading && result.meta.totalPages > 1 ? (
           <nav className={styles.pagination} aria-label="Halaman data anggota">
             <button
+              data-button="secondary"
+              data-button-size="sm"
               type="button"
               disabled={page <= 1}
               onClick={() => setPage((current) => Math.max(1, current - 1))}
@@ -498,6 +516,8 @@ export default function AdminMembersPage() {
             </span>
 
             <button
+              data-button="secondary"
+              data-button-size="sm"
               type="button"
               disabled={page >= result.meta.totalPages}
               onClick={() =>

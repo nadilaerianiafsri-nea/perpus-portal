@@ -181,7 +181,7 @@ export default function PdfReader({
           <p className={styles.srOnly}>{text}</p>
 
           <div className={styles.pageControls} aria-label="Navigasi halaman">
-            <button
+            <button data-button="icon" data-button-size="sm" data-button-shape="square"
               type="button"
               className={styles.readerControl}
               disabled={!document || page <= 1}
@@ -193,7 +193,7 @@ export default function PdfReader({
             <span className={styles.pageIndicator} aria-live="polite">
               {document ? `${page} / ${document.numPages}` : "— / —"}
             </span>
-            <button
+            <button data-button="icon" data-button-size="sm" data-button-shape="square"
               type="button"
               className={styles.readerControl}
               disabled={!document || page >= document.numPages}

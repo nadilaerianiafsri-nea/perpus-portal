@@ -1,0 +1,264 @@
+/* Shared action system. Opt in explicitly: ordinary links, cards, inputs,
+   selects, navigation and disclosure rows retain their own layout and semantics.
+   Repeating the attribute gives actions priority over legacy module variants
+   without !important or route-specific overrides. */
+:root {
+  --button-navy: #000633;
+  --button-primary: #2b3056;
+  --button-soft: #eef0f7;
+  --button-border: #d5d9e7;
+  --button-radius: 11px;
+  --button-error: #ff3b2f;
+  --button-success: #55be24;
+  --button-warning: #ff9500;
+}
+
+:where([data-button]) {
+  display: inline-flex;
+  position: relative;
+}
+
+:root body [data-button][data-button] {
+  --button-bg: var(--button-navy);
+  --button-fg: #fff;
+  --button-stroke: transparent;
+  --button-hover-bg: var(--button-primary);
+  --button-hover-fg: #fff;
+  --button-hover-stroke: transparent;
+  --button-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--button-height);
+  max-width: 100%;
+  padding: 10px 16px;
+  border: 1px solid var(--button-stroke);
+  border-radius: var(--button-radius);
+  background: var(--button-bg);
+  color: var(--button-fg);
+  box-shadow: none;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+:root body [data-button="secondary"][data-button] {
+  --button-bg: var(--button-soft);
+  --button-fg: var(--button-navy);
+  --button-stroke: var(--button-border);
+  --button-hover-bg: var(--button-navy);
+}
+:root body :is([data-button="ghost"], [data-button="icon"])[data-button] {
+  --button-bg: transparent;
+  --button-fg: var(--button-primary);
+  --button-hover-bg: var(--button-soft);
+  --button-hover-fg: var(--button-navy);
+}
+:root body [data-button="danger"][data-button] {
+  --button-bg: #fff0ef;
+  --button-fg: #a8231b;
+  --button-stroke: #ffd0cc;
+  --button-hover-bg: #ffe1de;
+  --button-hover-fg: #8f1e17;
+  --button-hover-stroke: var(--button-error);
+}
+:root body [data-button="danger-solid"][data-button] {
+  /* Darken the error accent for legible white confirmation text. */
+  --button-bg: #c52b23;
+  --button-fg: #fff;
+  --button-hover-bg: #a8231b;
+}
+:root body [data-button="success"][data-button] {
+  --button-bg: #eef9e9;
+  --button-fg: #286713;
+  --button-stroke: #cce7c1;
+  --button-hover-bg: #def1d4;
+  --button-hover-fg: #205610;
+  --button-hover-stroke: var(--button-success);
+}
+:root body [data-button="warning"][data-button] {
+  --button-bg: #fff4e5;
+  --button-fg: #855000;
+  --button-stroke: #f2dbb7;
+  --button-hover-bg: #ffe7c3;
+  --button-hover-fg: #6b4000;
+  --button-hover-stroke: var(--button-warning);
+}
+
+:root
+  body
+  [data-button][data-button][data-button-inverse]:not(
+    [data-button-inverse="false"]
+  ) {
+  --button-stroke: #ffffff38;
+}
+:root
+  body
+  :is(
+    [data-button="secondary"],
+    [data-button="ghost"],
+    [data-button="icon"]
+  )[data-button][data-button-inverse]:not([data-button-inverse="false"]) {
+  --button-bg: #ffffff12;
+  --button-fg: #fff;
+  --button-hover-bg: #ffffff24;
+  --button-hover-fg: #fff;
+  --button-hover-stroke: #ffffff60;
+}
+:root body [data-button][data-button][data-button-size="sm"] {
+  --button-height: 36px;
+  padding: 7px 12px;
+  font-size: 13px;
+}
+:root body [data-button][data-button][data-button-size="lg"] {
+  --button-height: 50px;
+  padding: 13px 20px;
+  font-size: 15px;
+}
+:root
+  body
+  [data-button][data-button]:is(
+    [data-button-shape="square"],
+    [data-button-shape="circle"]
+  ) {
+  width: var(--button-height);
+  min-width: var(--button-height);
+  height: var(--button-height);
+  padding: 0;
+  flex-shrink: 0;
+}
+:root
+  body
+  [data-button][data-button]:is(
+    [data-button-shape="pill"],
+    [data-button-shape="circle"]
+  ) {
+  border-radius: 999px;
+}
+:root body [data-button][data-button][data-button-full-width="true"] {
+  width: 100%;
+}
+
+/* Input-adjacent actions fill the field instead of using a fixed square height. */
+:root body [data-button][data-button][data-button-field] {
+  width: 44px;
+  height: 100%;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0 var(--button-radius) var(--button-radius) 0;
+}
+:root body [data-button][data-button][data-button-field]:focus-visible {
+  outline-offset: -4px;
+  box-shadow: none;
+}
+:root body [data-button][data-button] > svg,
+:root body [data-button-icon] > svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+:root body [data-button-icon] {
+  display: inline-flex;
+}
+
+/* Keep selected filters/tabs/pages recognizable through hover and focus. */
+:root
+  body
+  [data-button][data-button]:is(
+    [aria-current="page"],
+    [aria-pressed="true"],
+    [aria-selected="true"],
+    [data-button-active="true"]
+  ) {
+  --button-bg: var(--button-navy);
+  --button-fg: #fff;
+  --button-stroke: var(--button-navy);
+  --button-hover-bg: var(--button-primary);
+  --button-hover-fg: #fff;
+  --button-hover-stroke: var(--button-primary);
+}
+@media (hover: hover) {
+  :root
+    body
+    [data-button][data-button]:hover:not(:disabled):not(
+      [aria-disabled="true"]
+    ) {
+    background: var(--button-hover-bg);
+    color: var(--button-hover-fg);
+    border-color: var(--button-hover-stroke);
+    box-shadow: 0 2px 5px #0006330d;
+    transform: none;
+  }
+}
+:root
+  body
+  [data-button][data-button]:active:not(:disabled):not([aria-disabled="true"]) {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+:root body [data-button][data-button]:focus-visible {
+  outline: 2px solid var(--button-primary);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 2px #fff;
+}
+:root body [data-button][data-button][data-button-inverse]:focus-visible {
+  outline-color: #ffd000;
+  box-shadow: none;
+}
+:root body [data-button][data-button]:is(:disabled, [aria-disabled="true"]) {
+  background: #eff0f4;
+  color: #808697;
+  border-color: #dfe2e9;
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Both labels contribute to width, so pending text cannot move adjacent actions. */
+:root body [data-button-labels] {
+  display: inline-grid;
+}
+:root body [data-button-label],
+:root body [data-button-pending] {
+  grid-area: 1 / 1;
+}
+:root body [data-button-pending] {
+  visibility: hidden;
+}
+:root body [data-button-labels][data-loading="true"] [data-button-label] {
+  visibility: hidden;
+}
+:root body [data-button-labels][data-loading="true"] [data-button-pending] {
+  visibility: visible;
+}
+
+@media (max-width: 600px) {
+  :root body [data-button][data-button]:not([data-button-size="sm"]) {
+    --button-height: 44px;
+  }
+  :root body [data-button][data-button][data-button-size="lg"] {
+    --button-height: 50px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root body [data-button][data-button] {
+    transition: none;
+  }
+  :root body [data-button][data-button]:active {
+    transform: none;
+  }
+}

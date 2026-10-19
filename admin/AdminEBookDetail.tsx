@@ -80,7 +80,7 @@ export default function AdminEBookDetailPage({ id }: { id: string }) {
     return (
       <div className={styles.statePanel} role="alert">
         <p>{error || "E-Book tidak ditemukan."}</p>
-        <button type="button" onClick={() => void load()}>Coba Lagi</button>
+        <button data-button="secondary" data-button-size="md" type="button" onClick={() => void load()}>Coba Lagi</button>
       </div>
     );
   }
@@ -96,7 +96,7 @@ export default function AdminEBookDetailPage({ id }: { id: string }) {
           </div>
           <h1>Detail E-Book</h1>
         </div>
-        <Link href="/admin/koleksi/e-book" className={styles.backButton}>
+        <Link data-button="secondary" data-button-size="md" href="/admin/koleksi/e-book" className={styles.backButton}>
           <FiArrowLeft aria-hidden />
           Kembali
         </Link>
@@ -118,11 +118,11 @@ export default function AdminEBookDetailPage({ id }: { id: string }) {
           <strong className={styles.codeBadge}>{book.code}</strong>
         </div>
         <div className={styles.heroActions}>
-          <Link href={`/admin/koleksi/e-book/${book.id}/edit`} className={styles.yellowAction}>
+          <Link data-button="secondary" data-button-size="md" data-button-inverse href={`/admin/koleksi/e-book/${book.id}/edit`} className={styles.yellowAction}>
             <FiEdit2 aria-hidden />
             Edit
           </Link>
-          <button type="button" className={styles.darkAction} onClick={() => void toggleStatus()} disabled={changingStatus}>
+          <button data-button={book.isActive ? "danger" : "success"} data-button-size="md" data-button-loading={changingStatus} type="button" className={styles.darkAction} onClick={() => void toggleStatus()} disabled={changingStatus}>
             <FiPower aria-hidden />
             {changingStatus ? "Memproses..." : book.isActive ? "Nonaktifkan" : "Aktifkan"}
           </button>

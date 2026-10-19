@@ -269,7 +269,7 @@ export default function Catalog({
         >
           <div className={styles.toolbar}>
             {!member ? (
-              <button
+              <button data-button="secondary" data-button-size="md"
                 className={styles.mobileFilter}
                 onClick={() => dialog.current?.showModal()}
               >
@@ -290,7 +290,7 @@ export default function Catalog({
 
             <div className={styles.sortTools}>
               {member ? (
-                <button
+                <button data-button="secondary" data-button-size="md"
                   ref={filterButton}
                   type="button"
                   className={styles.memberFilterButton}
@@ -356,14 +356,14 @@ export default function Catalog({
 
               {!member ? (
                 <div className={styles.viewToggle}>
-                  <button
+                  <button data-button="icon" data-button-size="sm" data-button-shape="square"
                     aria-label="Tampilan grid"
                     aria-pressed={view === "grid"}
                     onClick={() => update({ view: null })}
                   >
                     <FiGrid />
                   </button>
-                  <button
+                  <button data-button="icon" data-button-size="sm" data-button-shape="square"
                     aria-label="Tampilan list"
                     aria-pressed={view === "list"}
                     onClick={() => update({ view: "list" })}
@@ -378,7 +378,7 @@ export default function Catalog({
           {ebook || chips.length > 0 ? (
             <div className={styles.chips}>
               {ebook ? (
-                <Link
+                <Link data-button="ghost" data-button-size="sm"
                   href={member ? "/dashboard/koleksi" : "/koleksi"}
                   aria-label="Hapus pembatas E-Book, buka semua koleksi"
                 >
@@ -388,7 +388,7 @@ export default function Catalog({
 
               {(member && !expandedChips ? chips.slice(0, 5) : chips).map(
                 (chip) => (
-                  <button
+                  <button data-button="ghost" data-button-size="sm"
                     key={`${chip.name}:${chip.value}`}
                     aria-label={`Hapus filter ${chip.label}`}
                     onClick={() =>
@@ -413,7 +413,7 @@ export default function Catalog({
                 ),
               )}
               {member && chips.length > 5 ? (
-                <button
+                <button data-button="ghost" data-button-size="sm"
                   aria-expanded={expandedChips}
                   onClick={() => setExpandedChips((value) => !value)}
                 >
@@ -424,7 +424,7 @@ export default function Catalog({
               ) : null}
 
               {!member || chips.length > 1 ? (
-                <button className={styles.clearChips} onClick={clear}>
+                <button data-button="ghost" data-button-size="md" className={styles.clearChips} onClick={clear}>
                   <FiX /> Hapus semua
                 </button>
               ) : null}
@@ -452,10 +452,10 @@ export default function Catalog({
                   : "Data koleksi belum dapat dimuat. Silakan coba lagi."}
               </h2>
               {error === "Rentang tahun tidak valid." ? <p>{error}</p> : null}
-              <button onClick={() => setRetry((value) => value + 1)}>
+              <button data-button="primary" data-button-size="md" onClick={() => setRetry((value) => value + 1)}>
                 Coba Lagi
               </button>
-              <button onClick={clear}>Bersihkan Filter</button>
+              <button data-button="ghost" data-button-size="md" onClick={clear}>Bersihkan Filter</button>
             </div>
           ) : response?.data.length ? (
             <>
@@ -471,14 +471,14 @@ export default function Catalog({
               </div>
 
               <nav className={styles.pagination} aria-label="Halaman katalog">
-                <button
+                <button data-button="secondary" data-button-size="md"
                   disabled={currentPage <= 1}
                   onClick={() => update({ page: String(currentPage - 1) })}
                 >
                   Sebelumnya
                 </button>
                 {pages.map((page) => (
-                  <button
+                  <button data-button="secondary" data-button-size="sm"
                     key={page}
                     aria-current={page === currentPage ? "page" : undefined}
                     onClick={() => update({ page: String(page) })}
@@ -486,7 +486,7 @@ export default function Catalog({
                     {page}
                   </button>
                 ))}
-                <button
+                <button data-button="secondary" data-button-size="md"
                   disabled={currentPage >= totalPages}
                   onClick={() => update({ page: String(currentPage + 1) })}
                 >
@@ -507,9 +507,9 @@ export default function Catalog({
                   ? "Coba ubah atau hapus beberapa filter."
                   : "Coba kata kunci lain atau hapus filter yang dipilih."}
               </p>
-              <button onClick={clear}>Bersihkan Filter</button>
+              <button data-button="ghost" data-button-size="md" onClick={clear}>Bersihkan Filter</button>
               {totalPages > 0 ? (
-                <button onClick={() => update({ page: "1" })}>
+                <button data-button="secondary" data-button-size="md" onClick={() => update({ page: "1" })}>
                   Kembali ke Halaman Pertama
                 </button>
               ) : null}
@@ -536,7 +536,7 @@ export default function Catalog({
           className={`${styles.filterDialog} ${member ? memberStyles.memberFilterDialog : ""}`}
           aria-label="Filter koleksi"
         >
-          <button
+          <button data-button="icon" data-button-size="sm" data-button-shape="square"
             className={styles.closeDialog}
             aria-label="Tutup filter"
             onClick={() => dialog.current?.close()}
@@ -545,7 +545,7 @@ export default function Catalog({
           </button>
           <Filters {...filterProps} />
           {filtersError ? <p>Filter belum dapat dimuat.</p> : null}
-          <button
+          <button data-button="primary" data-button-size="md"
             className={styles.primaryButton}
             onClick={() => dialog.current?.close()}
           >

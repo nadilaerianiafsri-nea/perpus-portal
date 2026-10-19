@@ -212,6 +212,9 @@ export default function AdminNotificationsPage() {
         <div className={styles.tabs} role="tablist" aria-label="Kanal notifikasi">
           {tabs.map(([value, label, count]) => (
             <button
+              data-button="secondary"
+              data-button-size="md"
+              data-button-active={channel === value}
               key={value}
               type="button"
               role="tab"
@@ -231,7 +234,7 @@ export default function AdminNotificationsPage() {
       {error ? (
         <div className={styles.errorBox} role="alert">
           <span>{error}</span>
-          <button type="button" onClick={() => setRevision((value) => value + 1)}>
+          <button data-button="secondary" data-button-size="md" type="button" onClick={() => setRevision((value) => value + 1)}>
             Coba Lagi
           </button>
         </div>
@@ -403,6 +406,9 @@ export default function AdminNotificationsPage() {
               </select>
             </label>
             <button
+              data-button="icon"
+              data-button-size="sm"
+              data-button-shape="square"
               type="button"
               disabled={page <= 1}
               onClick={() => setPage((current) => Math.max(1, current - 1))}
@@ -412,6 +418,9 @@ export default function AdminNotificationsPage() {
             </button>
             <span className={styles.pageNumber}>{result.meta.page}</span>
             <button
+              data-button="icon"
+              data-button-size="sm"
+              data-button-shape="square"
               type="button"
               disabled={page >= result.meta.totalPages}
               onClick={() =>

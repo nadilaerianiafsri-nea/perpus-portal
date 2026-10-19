@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { type FormEvent, useRef, useState } from "react";
+import { ButtonLabel } from '@/components/Button';
 import Link from "next/link";
 import { FiArrowLeft, FiBriefcase, FiEye, FiEyeOff, FiUser } from "react-icons/fi";
 import { PiStudent } from "react-icons/pi";
@@ -113,7 +114,7 @@ function FormField({
       {password ? (
         <div className={styles.password}>
           {input}
-          <button
+          <button data-button="icon" data-button-size="sm" data-button-field
             type="button"
             disabled={disabled}
             aria-label={`${visible ? "Sembunyikan" : "Tampilkan"} ${label.toLowerCase()}`}
@@ -310,7 +311,7 @@ export default function Register() {
               })}
             </fieldset>
 
-            <button
+            <button data-button="primary" data-button-size="lg"
               className={styles.primaryButton}
               type="button"
               onClick={() => changeStep(2)}
@@ -323,7 +324,7 @@ export default function Register() {
           </>
         ) : (
           <>
-            <button
+            <button aria-busy={loading} data-button="ghost" data-button-size="md"
               className={`${styles.backToMembership} ${enhancements.backToMembership}`}
               type="button"
               disabled={loading || succeeded}
@@ -479,16 +480,12 @@ export default function Register() {
                 ) : null}
               </div>
 
-              <button
+              <button aria-busy={loading} data-button="primary" data-button-size="lg"
                 className={styles.primaryButton}
                 type="submit"
                 disabled={loading || succeeded}
               >
-                {loading
-                  ? "Mendaftar..."
-                  : succeeded
-                    ? "Terdaftar"
-                    : "Daftar"}
+                <ButtonLabel loading={loading} pending="Mendaftar...">{succeeded ? "Terdaftar" : "Daftar"}</ButtonLabel>
               </button>
 
               {notice ? (

@@ -107,7 +107,7 @@ export default function MemberFilterDrawer({
             <h2 id="catalog-filter-title">Filter Koleksi</h2>
             <p id="catalog-filter-description">Sesuaikan hasil katalog</p>
           </div>
-          <button
+          <button data-button="icon" data-button-size="sm" data-button-shape="square"
             ref={closeButton}
             type="button"
             className={styles.drawerClose}
@@ -134,10 +134,10 @@ export default function MemberFilterDrawer({
           />
         </div>
         <footer className={styles.drawerFooter}>
-          <button type="button" className={styles.resetFilters} onClick={clear}>
+          <button data-button="ghost" data-button-size="md" type="button" className={styles.resetFilters} onClick={clear}>
             Bersihkan
           </button>
-          <button
+          <button data-button="primary" data-button-size="md"
             type="submit"
             className={styles.applyFilters}
             disabled={!!validationError}

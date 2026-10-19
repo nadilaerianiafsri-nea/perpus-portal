@@ -1,5 +1,6 @@
 "use client";
 
+import { ButtonLabel } from '@/components/Button';
 import { useRef, useState } from "react";
 import { FiSave, FiUser } from "react-icons/fi";
 import { memberRequest, useMemberResource } from "./api";
@@ -46,7 +47,7 @@ function ProfileForm({ profile, onSaved }: { profile: MemberProfile; onSaved: (p
     <label className={styles.field}><span>{identityLabel}</span><input value={profile.identityNumber} readOnly /></label>
     {profile.memberType === "MAHASISWA" && <label className={styles.field}><span>Perguruan Tinggi</span><input name="universityName" aria-invalid={Boolean(fieldErrors.universityName)} aria-describedby={fieldErrors.universityName ? "profile-universityName-error" : undefined} defaultValue={profile.universityName ?? ""} required maxLength={191} />{feedback("universityName")}</label>}
     {profile.memberType === "PEGAWAI" && <label className={styles.field}><span>Unit Kerja/Divisi</span><input name="workUnit" aria-invalid={Boolean(fieldErrors.workUnit)} aria-describedby={fieldErrors.workUnit ? "profile-workUnit-error" : undefined} defaultValue={profile.workUnit ?? ""} required maxLength={191} />{feedback("workUnit")}</label>}
-    <div className={styles.fullWidth}>{error && <p className={styles.error} role="alert">{error}</p>}{notice && <p className={styles.success} role="status">{notice}</p>}<button className={styles.button} type="submit" disabled={busy}><FiSave />{busy ? "Menyimpan..." : "Simpan Perubahan"}</button></div>
+    <div className={styles.fullWidth}>{error && <p className={styles.error} role="alert">{error}</p>}{notice && <p className={styles.success} role="status">{notice}</p>}<button data-button="primary" data-button-loading={busy} aria-busy={busy} className={styles.button} type="submit" disabled={busy}><FiSave /><ButtonLabel loading={busy} pending="Menyimpan...">Simpan Perubahan</ButtonLabel></button></div>
   </form></section>;
 }
 export default function ProfilePage() {

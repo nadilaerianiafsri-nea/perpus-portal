@@ -236,6 +236,8 @@ export default function AdminLostBooksPage() {
           <div className={styles.errorBox} role="alert">
             <p>{error}</p>
             <button
+              data-button="secondary"
+              data-button-size="md"
               type="button"
               onClick={() => setRevision((value) => value + 1)}
             >
@@ -307,6 +309,8 @@ export default function AdminLostBooksPage() {
 
                     <td>
                       <Link
+                        data-button="secondary"
+                        data-button-size="sm"
                         href={`/admin/keanggotaan/${loan.member.id}`}
                         className={styles.linkAction}
                       >
@@ -330,6 +334,8 @@ export default function AdminLostBooksPage() {
         {!loading && result.meta.totalPages > 1 ? (
           <nav className={styles.pagination} aria-label="Halaman buku hilang">
             <button
+              data-button="secondary"
+              data-button-size="sm"
               type="button"
               disabled={page <= 1}
               onClick={() => setPage((value) => Math.max(1, value - 1))}
@@ -342,6 +348,8 @@ export default function AdminLostBooksPage() {
             </span>
 
             <button
+              data-button="secondary"
+              data-button-size="sm"
               type="button"
               disabled={page >= result.meta.totalPages}
               onClick={() =>

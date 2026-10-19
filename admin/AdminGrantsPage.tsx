@@ -136,7 +136,7 @@ export default function AdminGrantsPage() {
           </p>
         </div>
 
-        <Link href="/admin/hibah-buku/tambah" className={styles.addButton}>
+        <Link data-button="primary" data-button-size="md" href="/admin/hibah-buku/tambah" className={styles.addButton}>
           + Tambah Data Hibah
         </Link>
       </header>
@@ -236,6 +236,8 @@ export default function AdminGrantsPage() {
           <p>{error}</p>
 
           <button
+            data-button="secondary"
+            data-button-size="md"
             type="button"
             onClick={() => setRevision((value) => value + 1)}
           >
@@ -307,6 +309,8 @@ export default function AdminGrantsPage() {
                     <td>
                       <div className={styles.actions}>
                         <Link
+                          data-button="secondary"
+                          data-button-size="sm"
                           href={`/admin/hibah-buku/${grant.id}`}
                           className={styles.actionButton}
                         >
@@ -314,6 +318,8 @@ export default function AdminGrantsPage() {
                         </Link>
 
                         <Link
+                          data-button="secondary"
+                          data-button-size="sm"
                           href={`/admin/hibah-buku/${grant.id}/edit`}
                           className={styles.actionButton}
                         >
@@ -381,6 +387,8 @@ export default function AdminGrantsPage() {
 
                 <div className={styles.mobileActions}>
                   <Link
+                    data-button="secondary"
+                    data-button-size="sm"
                     href={`/admin/hibah-buku/${grant.id}`}
                     className={styles.actionButton}
                   >
@@ -388,6 +396,8 @@ export default function AdminGrantsPage() {
                   </Link>
 
                   <Link
+                    data-button="secondary"
+                    data-button-size="sm"
                     href={`/admin/hibah-buku/${grant.id}/edit`}
                     className={styles.actionButton}
                   >
@@ -401,6 +411,8 @@ export default function AdminGrantsPage() {
         {!loading && result.meta.totalPages > 1 ? (
           <nav className={styles.pagination} aria-label="Halaman data hibah">
             <button
+              data-button="secondary"
+              data-button-size="sm"
               type="button"
               disabled={page <= 1}
               onClick={() => setPage((value) => Math.max(1, value - 1))}
@@ -413,6 +425,8 @@ export default function AdminGrantsPage() {
             </span>
 
             <button
+              data-button="secondary"
+              data-button-size="sm"
               type="button"
               disabled={page >= result.meta.totalPages}
               onClick={() =>

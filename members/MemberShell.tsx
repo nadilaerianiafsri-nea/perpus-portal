@@ -1,5 +1,6 @@
 "use client";
 
+import { ButtonLabel } from '@/components/Button';
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -127,6 +128,8 @@ export default function MemberShell({
 
         {mobile ? (
           <button
+            data-button="icon"
+            data-button-shape="square"
             className={`${styles.iconButton} ${styles.drawerClose}`}
             aria-label="Tutup menu"
             onClick={() => setDrawer(false)}
@@ -165,9 +168,9 @@ export default function MemberShell({
               {logoutError}
             </p>
           ) : null}
-          <button onClick={logout} disabled={loggingOut}>
+          <button data-button="ghost" data-button-loading={loggingOut} aria-busy={loggingOut} onClick={logout} disabled={loggingOut}>
             <FiLogOut aria-hidden />
-            {loggingOut ? "Sedang keluar..." : "Keluar"}
+            <ButtonLabel loading={loggingOut} pending="Sedang keluar...">Keluar</ButtonLabel>
           </button>
         </div>
       </>
@@ -204,6 +207,8 @@ export default function MemberShell({
         <div className={styles.workspace}>
           <header className={styles.topbar}>
             <button
+              data-button="icon"
+              data-button-shape="square"
               ref={menuButton}
               className={`${styles.iconButton} ${styles.menuButton}`}
               aria-label="Buka menu anggota"
@@ -233,13 +238,15 @@ export default function MemberShell({
                   );
                 }}
               >
-                <button aria-label="Cari koleksi" type="submit">
+                <button data-button="icon" data-button-size="sm" data-button-shape="square" aria-label="Cari koleksi" type="submit">
                   <FiSearch />
                 </button>
                 <input name="search" aria-label="Cari koleksi" placeholder="Cari koleksi..." />
               </form>
 
               <Link
+                data-button="icon"
+                data-button-shape="pill"
                 href="/dashboard/notifikasi"
                 className={styles.iconButton}
                 aria-label={`Notifikasi${unread !== undefined ? `, ${unread} belum dibaca` : ""}`}

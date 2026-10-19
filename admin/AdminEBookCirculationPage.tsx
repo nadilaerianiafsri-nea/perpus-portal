@@ -143,9 +143,9 @@ export default function AdminEBookCirculationPage() {
       <section className={styles.panel}>
         <div className={styles.toolbar}>
           <div className={styles.tabs} role="tablist" aria-label="Bagian sirkulasi E-Book">
-            <button type="button" role="tab" aria-selected={section === "ACTIVE"} className={section === "ACTIVE" ? styles.activeTab : ""} onClick={() => { setSection("ACTIVE"); setPage(1); }}>Pinjaman Aktif</button>
-            <button type="button" role="tab" aria-selected={section === "QUEUE"} className={section === "QUEUE" ? styles.activeTab : ""} onClick={() => { setSection("QUEUE"); setPage(1); }}>Antrean</button>
-            <button type="button" role="tab" aria-selected={section === "HISTORY"} className={section === "HISTORY" ? styles.activeTab : ""} onClick={() => { setSection("HISTORY"); setPage(1); }}>Riwayat</button>
+            <button data-button="secondary" data-button-size="md" data-button-active={section === "ACTIVE"} type="button" role="tab" aria-selected={section === "ACTIVE"} className={section === "ACTIVE" ? styles.activeTab : ""} onClick={() => { setSection("ACTIVE"); setPage(1); }}>Pinjaman Aktif</button>
+            <button data-button="secondary" data-button-size="md" data-button-active={section === "QUEUE"} type="button" role="tab" aria-selected={section === "QUEUE"} className={section === "QUEUE" ? styles.activeTab : ""} onClick={() => { setSection("QUEUE"); setPage(1); }}>Antrean</button>
+            <button data-button="secondary" data-button-size="md" data-button-active={section === "HISTORY"} type="button" role="tab" aria-selected={section === "HISTORY"} className={section === "HISTORY" ? styles.activeTab : ""} onClick={() => { setSection("HISTORY"); setPage(1); }}>Riwayat</button>
           </div>
           <label className={styles.search}>
             <FiSearch aria-hidden />
@@ -163,7 +163,7 @@ export default function AdminEBookCirculationPage() {
         {error ? (
           <div className={styles.error} role="alert">
             <p>{error}</p>
-            <button type="button" onClick={() => setRevision((value) => value + 1)}>Coba Lagi</button>
+            <button data-button="secondary" data-button-size="md" type="button" onClick={() => setRevision((value) => value + 1)}>Coba Lagi</button>
           </div>
         ) : null}
 
@@ -220,9 +220,9 @@ export default function AdminEBookCirculationPage() {
 
         {!loading && currentMeta.totalPages > 1 ? (
           <nav className={styles.pagination} aria-label="Halaman monitoring E-Book">
-            <button type="button" disabled={page <= 1} onClick={() => setPage((value) => Math.max(1, value - 1))}>Sebelumnya</button>
+            <button data-button="secondary" data-button-size="sm" type="button" disabled={page <= 1} onClick={() => setPage((value) => Math.max(1, value - 1))}>Sebelumnya</button>
             <span>Halaman {currentMeta.page} dari {currentMeta.totalPages}</span>
-            <button type="button" disabled={page >= currentMeta.totalPages} onClick={() => setPage((value) => Math.min(currentMeta.totalPages, value + 1))}>Berikutnya</button>
+            <button data-button="secondary" data-button-size="sm" type="button" disabled={page >= currentMeta.totalPages} onClick={() => setPage((value) => Math.min(currentMeta.totalPages, value + 1))}>Berikutnya</button>
           </nav>
         ) : null}
       </section>

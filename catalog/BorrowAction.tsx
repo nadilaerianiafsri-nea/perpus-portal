@@ -1,5 +1,6 @@
 "use client";
 
+import { ButtonLabel } from '@/components/Button';
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -153,7 +154,7 @@ export default function BorrowAction({
     );
   if (role === null)
     return (
-      <Link className={styles.primaryButton} href={loginHref}>
+      <Link data-button="primary" data-button-size="md" className={styles.primaryButton} href={loginHref}>
         Masuk untuk Ajukan Peminjaman
       </Link>
     );
@@ -169,7 +170,7 @@ export default function BorrowAction({
         <p className={styles.ctaNotice} role="alert">
           Status peminjaman belum dapat dimuat.
         </p>
-        <button
+        <button data-button="primary" data-button-size="md"
           className={styles.detailLink}
           onClick={() => void checkStatus()}
         >
@@ -185,7 +186,7 @@ export default function BorrowAction({
             ? "Reservasi berhasil dibuat. Ambil buku dalam 24 jam."
             : "Reservasi Aktif"}
         </p>
-        <Link className={styles.detailLink} href="/dashboard/reservasi">
+        <Link data-button="secondary" data-button-size="md" className={styles.detailLink} href="/dashboard/reservasi">
           Lihat Reservasi Saya
         </Link>
       </div>
@@ -202,7 +203,7 @@ export default function BorrowAction({
         <p className={styles.ctaNotice}>
           {borrowStatus === "loan" ? "Pinjaman Aktif" : "Judul Sedang Aktif"}
         </p>
-        <Link
+        <Link data-button="secondary" data-button-size="md"
           className={styles.detailLink}
           href={
             borrowStatus === "loan"
@@ -218,7 +219,7 @@ export default function BorrowAction({
     );
   return (
     <>
-      <button
+      <button aria-busy={pending} data-button="primary" data-button-size="md"
         className={styles.primaryButton}
         type="button"
         disabled={!available || stockChanged || pending}
@@ -257,19 +258,19 @@ export default function BorrowAction({
           </p>
         )}
         <div className={styles.actionRow}>
-          <button
+          <button aria-busy={pending} data-button="ghost" data-button-size="md"
             className={styles.detailLink}
             disabled={pending}
             onClick={() => dialog.current?.close()}
           >
             Batal
           </button>
-          <button
+          <button aria-busy={pending} data-button="primary" data-button-size="md"
             className={styles.primaryButton}
             disabled={pending}
             onClick={() => void reserve()}
           >
-            {pending ? "Memproses..." : "Konfirmasi Reservasi"}
+            <ButtonLabel loading={pending} pending="Memproses...">Konfirmasi Reservasi</ButtonLabel>
           </button>
         </div>
       </dialog>

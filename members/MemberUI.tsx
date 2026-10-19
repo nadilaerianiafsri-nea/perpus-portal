@@ -12,10 +12,10 @@ export function LoadingCards() {
   return <div className={styles.loading} role="status" aria-label="Memuat data"><span className={styles.srOnly}>Memuat data...</span>{[1, 2, 3].map(id => <div className={styles.skeleton} key={id} />)}</div>;
 }
 export function ErrorState({ message, retry }: { message: string; retry: () => void }) {
-  return <div className={styles.error} role="alert"><p>{message}</p><button className={styles.button} onClick={retry}><FiRefreshCw /> Coba lagi</button></div>;
+  return <div className={styles.error} role="alert"><p>{message}</p><button data-button="primary" className={styles.button} onClick={retry}><FiRefreshCw /> Coba lagi</button></div>;
 }
 export function EmptyState({ message, href, label = "Cari Koleksi" }: { message: string; href?: string; label?: string }) {
-  return <div className={styles.empty}><FiBookOpen size={32} aria-hidden /><p>{message}</p>{href && <Link className={styles.button} href={href}>{label}</Link>}</div>;
+  return <div className={styles.empty}><FiBookOpen size={32} aria-hidden /><p>{message}</p>{href && <Link data-button="primary" className={styles.button} href={href}>{label}</Link>}</div>;
 }
 export function PageHeading({ title, description, children }: { title: string; description: string; children?: React.ReactNode }) {
   return <div className={styles.pageHeading}><div><h1>{title}</h1><p>{description}</p></div>{children}</div>;

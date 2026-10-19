@@ -158,7 +158,7 @@ export default function AdminEBooksPage() {
             aria-label="Cari E-Book"
           />
         </form>
-        <Link href="/admin/koleksi/e-book/tambah" className={styles.addButton}>
+        <Link data-button="primary" data-button-size="md" href="/admin/koleksi/e-book/tambah" className={styles.addButton}>
           <FiPlus aria-hidden />
           Tambah E-Book
         </Link>
@@ -167,6 +167,9 @@ export default function AdminEBooksPage() {
       <div className={styles.filters} role="group" aria-label="Filter status E-Book">
         {filters.map((filter) => (
           <button
+            data-button="secondary"
+            data-button-size="md"
+            data-button-active={status === filter.value}
             key={filter.value}
             type="button"
             className={status === filter.value ? styles.filterActive : ""}
@@ -183,7 +186,7 @@ export default function AdminEBooksPage() {
       {error ? (
         <div className={styles.errorBox} role="alert">
           <p>{error}</p>
-          <button type="button" onClick={() => setRevision((value) => value + 1)}>
+          <button data-button="secondary" data-button-size="md" type="button" onClick={() => setRevision((value) => value + 1)}>
             Coba Lagi
           </button>
         </div>
@@ -229,13 +232,17 @@ export default function AdminEBooksPage() {
                     </td>
                     <td>
                       <div className={styles.actions}>
-                        <Link href={`/admin/koleksi/e-book/${book.id}`} className={styles.iconAction} aria-label={`Lihat detail ${book.title}`} title="Lihat detail">
+                        <Link data-button="icon" data-button-size="sm" data-button-shape="square" href={`/admin/koleksi/e-book/${book.id}`} className={styles.iconAction} aria-label={`Lihat detail ${book.title}`} title="Lihat detail">
                           <FiEye />
                         </Link>
-                        <Link href={`/admin/koleksi/e-book/${book.id}/edit`} className={styles.iconAction} aria-label={`Edit ${book.title}`} title="Edit E-Book">
+                        <Link data-button="icon" data-button-size="sm" data-button-shape="square" href={`/admin/koleksi/e-book/${book.id}/edit`} className={styles.iconAction} aria-label={`Edit ${book.title}`} title="Edit E-Book">
                           <FiEdit2 />
                         </Link>
                         <button
+                          data-button={book.isActive ? "danger" : "success"}
+                          data-button-size="sm"
+                          data-button-shape="square"
+                          data-button-loading={changingId === book.id}
                           type="button"
                           className={`${styles.iconAction} ${book.isActive ? styles.powerOff : styles.powerOn}`}
                           aria-label={book.isActive ? `Nonaktifkan ${book.title}` : `Aktifkan ${book.title}`}
@@ -260,9 +267,9 @@ export default function AdminEBooksPage() {
 
         {!loading && result.meta.totalPages > 1 ? (
           <nav className={styles.pagination} aria-label="Halaman E-Book">
-            <button type="button" disabled={page <= 1} onClick={() => setPage((value) => Math.max(1, value - 1))}>Sebelumnya</button>
+            <button data-button="secondary" data-button-size="sm" type="button" disabled={page <= 1} onClick={() => setPage((value) => Math.max(1, value - 1))}>Sebelumnya</button>
             <span>Halaman {result.meta.page} dari {result.meta.totalPages}</span>
-            <button type="button" disabled={page >= result.meta.totalPages} onClick={() => setPage((value) => Math.min(result.meta.totalPages, value + 1))}>Berikutnya</button>
+            <button data-button="secondary" data-button-size="sm" type="button" disabled={page >= result.meta.totalPages} onClick={() => setPage((value) => Math.min(result.meta.totalPages, value + 1))}>Berikutnya</button>
           </nav>
         ) : null}
       </section>

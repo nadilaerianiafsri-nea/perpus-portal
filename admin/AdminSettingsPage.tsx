@@ -1,5 +1,6 @@
 "use client";
 
+import { ButtonLabel } from '@/components/Button';
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import {
   adminOperationsApiMessage,
@@ -165,7 +166,7 @@ export default function AdminSettingsPage() {
       {error ? (
         <div className={styles.errorBox} role="alert">
           <span>{error}</span>
-          {!form ? <button type="button" onClick={() => setRevision((value) => value + 1)}>Coba Lagi</button> : null}
+          {!form ? <button data-button="secondary" data-button-size="md" type="button" onClick={() => setRevision((value) => value + 1)}>Coba Lagi</button> : null}
         </div>
       ) : null}
       {success ? <div className={styles.successBox} role="status">{success}</div> : null}
@@ -245,8 +246,8 @@ export default function AdminSettingsPage() {
           </section>
 
           <div className={styles.actions}>
-            <button type="submit" disabled={saving || loading}>
-              {saving ? "Menyimpan..." : "Simpan Pengaturan"}
+            <button data-button="primary" data-button-size="md" data-button-loading={saving || loading} type="submit" disabled={saving || loading}>
+              <ButtonLabel loading={saving} pending="Menyimpan...">Simpan Pengaturan</ButtonLabel>
             </button>
           </div>
         </form>

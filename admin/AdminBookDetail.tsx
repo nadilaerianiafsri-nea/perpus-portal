@@ -85,7 +85,7 @@ export default function AdminBookDetailPage({ id }: { id: string }) {
     return (
       <div className={styles.statePanel} role="alert">
         <p>{error || "Buku tidak ditemukan."}</p>
-        <button type="button" onClick={() => void load()}>
+        <button data-button="secondary" data-button-size="md" type="button" onClick={() => void load()}>
           Coba Lagi
         </button>
       </div>
@@ -107,7 +107,7 @@ export default function AdminBookDetailPage({ id }: { id: string }) {
           </div>
           <h1>Detail Buku</h1>
         </div>
-        <Link href="/admin/koleksi/data-buku" className={styles.backButton}>
+        <Link data-button="secondary" data-button-size="md" href="/admin/koleksi/data-buku" className={styles.backButton}>
           <FiArrowLeft aria-hidden />
           Kembali
         </Link>
@@ -136,6 +136,9 @@ export default function AdminBookDetailPage({ id }: { id: string }) {
         </div>
         <div className={styles.heroActions}>
           <Link
+            data-button="secondary"
+            data-button-size="md"
+            data-button-inverse
             href={`/admin/koleksi/data-buku/${book.id}/edit`}
             className={styles.yellowAction}
           >
@@ -143,6 +146,9 @@ export default function AdminBookDetailPage({ id }: { id: string }) {
             Edit
           </Link>
           <button
+            data-button={book.isActive ? "danger" : "success"}
+            data-button-size="md"
+            data-button-loading={changingStatus}
             type="button"
             className={styles.darkAction}
             onClick={() => void toggleStatus()}

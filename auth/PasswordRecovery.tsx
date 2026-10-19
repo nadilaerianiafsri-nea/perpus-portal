@@ -1,5 +1,6 @@
 "use client";
 import { type FormEvent, useRef, useState } from 'react';
+import { ButtonLabel } from '@/components/Button';
 import Link from 'next/link';
 import AuthShell from './AuthShell';
 import { authRequest } from './authApi';
@@ -33,10 +34,10 @@ export default function PasswordRecovery({ token, reset = false }: { token?: str
         {!done && <><label className={styles.field}><span>Kata Sandi Baru <b>*</b></span><input type="password" autoComplete="new-password" minLength={8} required value={password} disabled={loading || !token} onChange={(e) => setPassword(e.target.value)} /></label>
           <label className={styles.field}><span>Konfirmasi Kata Sandi <b>*</b></span><input type="password" autoComplete="new-password" minLength={8} required value={confirmation} disabled={loading || !token} onChange={(e) => setConfirmation(e.target.value)} /></label></>}
       </> : <label className={styles.field}><span>Email <b>*</b></span><input type="email" autoComplete="email" maxLength={191} required value={email} disabled={loading} onChange={(e) => setEmail(e.target.value)} /></label>}
-      {!done && <button className={styles.primaryButton} disabled={loading || (reset && !token)}>{loading ? reset ? 'Menyimpan...' : 'Mengirim...' : reset ? 'Simpan Kata Sandi' : 'Kirim Link Reset'}</button>}
+      {!done && <button aria-busy={loading} data-button="primary" data-button-size="lg" className={styles.primaryButton} disabled={loading || (reset && !token)}><ButtonLabel loading={loading} pending={reset ? 'Menyimpan...' : 'Mengirim...'}>{reset ? 'Simpan Kata Sandi' : 'Kirim Link Reset'}</ButtonLabel></button>}
       {message && <p className={styles.inlineInfo} role="status">{message}</p>}
-      <Link className={styles.actionLink} href="/login">{done ? 'Masuk' : 'Masuk ke Akun'}</Link>
-      {reset && !done && <Link className={styles.actionLink} href="/forgot-password">Minta link reset baru</Link>}
+      <Link data-button="ghost" data-button-size="md" className={styles.actionLink} href="/login">{done ? 'Masuk' : 'Masuk ke Akun'}</Link>
+      {reset && !done && <Link data-button="ghost" data-button-size="md" className={styles.actionLink} href="/forgot-password">Minta link reset baru</Link>}
     </form>
   </div></AuthShell>;
 }
