@@ -1,5 +1,8 @@
 "use client";
 
+import AdminStatCard, { type AdminStatTone } from "./AdminStatCard";
+import { FiBookOpen as CardBookOpen, FiCheckCircle as CardCheckCircle, FiXCircle as CardXCircle, FiAlertTriangle as CardAlertTriangle, FiStar as CardStar, FiUsers as CardUsers, FiGift as CardGift, FiBox as CardBox } from "react-icons/fi";
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import {
@@ -10,6 +13,13 @@ import {
   type AdminReportResponse,
 } from "./adminOperations";
 import styles from "./AdminReports.module.css";
+
+const reportCardAppearance: { tone: AdminStatTone; icon: typeof CardBookOpen }[] = [
+  { tone: "teal", icon: CardBookOpen }, { tone: "success", icon: CardCheckCircle },
+  { tone: "danger", icon: CardXCircle }, { tone: "danger", icon: CardAlertTriangle },
+  { tone: "primary", icon: CardStar }, { tone: "slate", icon: CardUsers },
+  { tone: "dark", icon: CardGift }, { tone: "coral", icon: CardBox },
+];
 
 function validateDates(from: string, to: string) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(from) || !/^\d{4}-\d{2}-\d{2}$/.test(to)) {
@@ -135,13 +145,11 @@ export default function AdminReportsPage() {
       ) : report ? (
         <>
           <section className={styles.statsGrid} aria-label="Ringkasan laporan">
-            {cards.map(([label, value]) => (
-              <article key={label} className={styles.statCard}>
-                <span>{label}</span>
-                <strong>{value}</strong>
-                <small>Periode terpilih</small>
-              </article>
-            ))}
+            {cards.map(([label, value], index) => {
+              const appearance = reportCardAppearance[index];
+              const Icon = appearance.icon;
+              return <AdminStatCard key={label} label={label} value={value} tone={appearance.tone} icon={<Icon />} detail="Periode terpilih" textValue={index === 4} />;
+            })}
           </section>
 
           <section className={styles.chartCard}>

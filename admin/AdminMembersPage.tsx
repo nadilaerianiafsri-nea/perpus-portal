@@ -1,5 +1,8 @@
 "use client";
 
+import AdminStatCard from "./AdminStatCard";
+import { FiUsers as CardUsers, FiBookOpen as CardBookOpen, FiBriefcase as CardBriefcase } from "react-icons/fi";
+
 import { plainTextMessage } from "../members/inputSecurity";
 
 import Link from "next/link";
@@ -175,25 +178,17 @@ export default function AdminMembersPage() {
         className={styles.stats}
         aria-label="Statistik anggota hasil filter"
       >
-        <article className={`${styles.statCard} ${styles.statNavy}`}>
-          <span>TOTAL ANGGOTA</span>
-          <strong>{result.stats.total}</strong>
-        </article>
+        <AdminStatCard label="TOTAL ANGGOTA" value={result.stats.total} tone="slate" icon={<CardUsers />}
+           />
 
-        <article className={`${styles.statCard} ${styles.statBlue}`}>
-          <span>MASYARAKAT UMUM</span>
-          <strong>{result.stats.umum}</strong>
-        </article>
+        <AdminStatCard label="MASYARAKAT UMUM" value={result.stats.umum} tone="primary" icon={<CardUsers />}
+           />
 
-        <article className={`${styles.statCard} ${styles.statYellow}`}>
-          <span>MAHASISWA</span>
-          <strong>{result.stats.mahasiswa}</strong>
-        </article>
+        <AdminStatCard label="MAHASISWA" value={result.stats.mahasiswa} tone="teal" icon={<CardBookOpen />}
+           />
 
-        <article className={`${styles.statCard} ${styles.statGreen}`}>
-          <span>PEGAWAI INTERNAL</span>
-          <strong>{result.stats.pegawai}</strong>
-        </article>
+        <AdminStatCard label="PEGAWAI INTERNAL" value={result.stats.pegawai} tone="dark" icon={<CardBriefcase />}
+           />
       </section>
 
       <section className={styles.filterCard}>

@@ -1,5 +1,8 @@
 "use client";
 
+import AdminStatCard from "./AdminStatCard";
+import { FiBookOpen as CardBookOpen, FiLayers as CardLayers } from "react-icons/fi";
+
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
@@ -126,15 +129,9 @@ export default function AdminGrantDetail({ id }: Props) {
       </section>
 
       <section className={styles.detailStats}>
-        <article className={styles.detailStat}>
-          <span>JUMLAH JUDUL</span>
-          <strong>{grant.totalTitles}</strong>
-        </article>
+        <AdminStatCard label="JUMLAH JUDUL" value={grant.totalTitles} tone="dark" icon={<CardBookOpen />} />
 
-        <article className={styles.detailStat}>
-          <span>TOTAL BUKU</span>
-          <strong>{grant.totalBooks.toLocaleString("id-ID")}</strong>
-        </article>
+        <AdminStatCard label="TOTAL BUKU" value={grant.totalBooks.toLocaleString("id-ID")} tone="primary" icon={<CardLayers />} />
       </section>
 
       <section className={styles.detailGrid}>

@@ -1,6 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import AdminStatCard from "./AdminStatCard";
+import { FiBookOpen as CardBookOpen, FiMonitor as CardMonitor, FiClock as CardClock, FiAlertTriangle as CardAlertTriangle } from "react-icons/fi";
+
 import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import { plainTextMessage } from "../members/inputSecurity";
 
@@ -157,29 +160,17 @@ export default function AdminLoansPage() {
       </header>
 
       <section className={styles.statsFour} aria-label="Ringkasan peminjaman">
-        <article className={`${styles.statCard} ${styles.statNavy}`}>
-          <span>PINJAMAN BUKU FISIK</span>
-          <strong>{result.stats.physicalActive}</strong>
-          <small>sedang berjalan</small>
-        </article>
+        <AdminStatCard label="PINJAMAN BUKU FISIK" value={result.stats.physicalActive} tone="teal" icon={<CardBookOpen />}
+          detail="sedang berjalan" />
 
-        <article className={`${styles.statCard} ${styles.statYellow}`}>
-          <span>AKSES E-BOOK AKTIF</span>
-          <strong>{result.stats.ebookActive}</strong>
-          <small>sedang berjalan</small>
-        </article>
+        <AdminStatCard label="AKSES E-BOOK AKTIF" value={result.stats.ebookActive} tone="yellow" icon={<CardMonitor />}
+          detail="sedang berjalan" />
 
-        <article className={`${styles.statCard} ${styles.statOrange}`}>
-          <span>JATUH TEMPO ≤ 1 HARI</span>
-          <strong>{result.stats.dueSoon}</strong>
-          <small>perlu perhatian</small>
-        </article>
+        <AdminStatCard label="JATUH TEMPO ≤ 1 HARI" value={result.stats.dueSoon} tone="warning" icon={<CardClock />}
+          detail="perlu perhatian" />
 
-        <article className={`${styles.statCard} ${styles.statRed}`}>
-          <span>TERLAMBAT</span>
-          <strong>{result.stats.overdue}</strong>
-          <small>melewati jatuh tempo</small>
-        </article>
+        <AdminStatCard label="TERLAMBAT" value={result.stats.overdue} tone="danger" icon={<CardAlertTriangle />}
+          detail="melewati jatuh tempo" />
       </section>
 
       <section className={styles.panel}>

@@ -1,7 +1,10 @@
 "use client";
 
+import AdminStatCard from "./AdminStatCard";
+import { FiBookOpen as CardBookOpen, FiUsers as CardUsers, FiClock as CardClock } from "react-icons/fi";
+
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { FiBookOpen, FiClock, FiSearch, FiUsers } from "react-icons/fi";
+import { FiSearch } from "react-icons/fi";
 import styles from "./AdminEBookCirculation.module.css";
 
 type Meta = { page: number; limit: number; total: number; totalPages: number };
@@ -135,9 +138,9 @@ export default function AdminEBookCirculationPage() {
       </header>
 
       <section className={styles.summary} aria-label="Ringkasan sirkulasi E-Book">
-        <article><FiBookOpen aria-hidden /><span>PINJAMAN AKTIF</span><strong>{data.activeLoans.meta.total}</strong></article>
-        <article><FiUsers aria-hidden /><span>ANTREAN AKTIF</span><strong>{data.queues.meta.total}</strong></article>
-        <article><FiClock aria-hidden /><span>RIWAYAT PINJAMAN</span><strong>{data.history.meta.total}</strong></article>
+        <AdminStatCard label="PINJAMAN AKTIF" value={data.activeLoans.meta.total} tone="teal" icon={<CardBookOpen />} />
+        <AdminStatCard label="ANTREAN AKTIF" value={data.queues.meta.total} tone="info" icon={<CardUsers />} />
+        <AdminStatCard label="RIWAYAT PINJAMAN" value={data.history.meta.total} tone="primary" icon={<CardClock />} />
       </section>
 
       <section className={styles.panel}>

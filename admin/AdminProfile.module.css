@@ -30,6 +30,8 @@
 }
 
 .identityCard {
+  background: var(--navy-soft);
+  color: var(--white);
   min-height: 112px;
   display: grid;
   grid-template-columns: 64px minmax(0, 1fr) auto;
@@ -45,7 +47,7 @@
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: var(--navy-soft);
+  background: #ffffff26;
   color: #fff;
   font-size: 20px;
   font-weight: 700;
@@ -63,7 +65,7 @@
 }
 
 .identityText span {
-  color: #565656;
+  color: #ffffffd9;
   font-size: 14px;
   overflow-wrap: anywhere;
 }
@@ -73,8 +75,8 @@
   margin-top: 5px;
   padding: 5px 10px;
   border-radius: 99px;
-  background: #e8f6ff;
-  color: #1570a8;
+  background: #ffffff26;
+  color: var(--white);
   font-size: 12px;
   font-weight: 700;
 }
@@ -82,7 +84,7 @@
 .identityCard > svg {
   width: 24px;
   height: 24px;
-  color: var(--navy-soft);
+  color: var(--white);
 }
 
 .grid {

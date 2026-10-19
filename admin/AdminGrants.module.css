@@ -117,69 +117,8 @@
 .stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.statCard {
-  --card-background: var(--navy);
-  --card-foreground: var(--white);
-  min-height: 90px;
-  padding: 17px 19px 15px;
-  border: 1px solid transparent;
-  border-radius: 16px;
-  background: var(--card-background);
-  color: var(--card-foreground);
-  box-shadow: 0 4px 12px #0006330d;
-  transition:
-    transform 160ms ease,
-    box-shadow 160ms ease;
-}
-
-.statCard:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 20px #00063318;
-}
-
-.statCard span {
-  display: block;
-  margin-bottom: 7px;
-  color: inherit;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-}
-
-.statCard strong {
-  display: block;
-  color: inherit;
-  font-size: 25px;
-  line-height: 1;
-}
-
-.statCard small {
-  display: block;
-  margin-top: 6px;
-  color: inherit;
-  font-size: 8px;
-}
-
-.statNavy {
-  --card-background: var(--navy);
-}
-
-.statOrange {
-  --card-background: #ff9500;
-  --card-foreground: var(--navy);
-}
-
-.statGreen {
-  --card-background: #55be24;
-  --card-foreground: var(--navy);
-}
-
-.statBlue {
-  --card-background: #1fabff;
-  --card-foreground: var(--navy);
+  gap: 16px;
+  grid-auto-rows: 1fr;
 }
 
 .filterCard {
@@ -504,27 +443,8 @@
 .detailStats {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.detailStat {
-  padding: 17px 19px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--white);
-}
-
-.detailStat span {
-  display: block;
-  margin-bottom: 6px;
-  color: #777;
-  font-size: 9px;
-  font-weight: 600;
-}
-
-.detailStat strong {
-  color: var(--navy);
-  font-size: 23px;
+  gap: 16px;
+  grid-auto-rows: 1fr;
 }
 
 .detailGrid {

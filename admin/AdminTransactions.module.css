@@ -33,7 +33,8 @@
 .statsFour,
 .statsThree {
   display: grid;
-  gap: 12px;
+  gap: 16px;
+  grid-auto-rows: 1fr;
 }
 
 .statsFour {
@@ -42,65 +43,6 @@
 
 .statsThree {
   grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.statCard {
-  min-height: 108px;
-  padding: 19px 20px;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px #0006330d;
-  color: var(--white);
-}
-
-.statCard span {
-  display: block;
-  min-height: 28px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  line-height: 1.35;
-}
-
-.statCard strong {
-  display: block;
-  margin-top: 2px;
-  font-size: 29px;
-  line-height: 1;
-}
-
-.statCard small {
-  display: block;
-  margin-top: 7px;
-  font-size: 9px;
-}
-
-.statNavy {
-  background: var(--navy-soft);
-}
-
-.statBlue {
-  background: #1fabff;
-  color: var(--navy);
-}
-
-.statYellow {
-  background: var(--yellow);
-  color: var(--navy);
-}
-
-.statOrange {
-  background: #ff9500;
-  color: var(--navy);
-}
-
-.statRed {
-  background: #ff3b2f;
-  color: var(--navy);
-}
-
-.statGreen {
-  background: #55be24;
-  color: var(--navy);
 }
 
 .panel {
@@ -610,10 +552,6 @@
   .statsFour,
   .statsThree {
     grid-template-columns: 1fr;
-  }
-
-  .statCard {
-    min-height: 92px;
   }
 
   .filterBar,

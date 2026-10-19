@@ -1,7 +1,7 @@
 "use client";
 
 import { ButtonLabel } from '@/components/Button';
-import Link from "next/link";
+import AdminStatCard, { type AdminStatTone } from "./AdminStatCard";
 import type { ComponentType } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -65,7 +65,7 @@ type StatCard = {
   label: string;
   value: string;
   icon: ComponentType<{ size?: number }>;
-  tone: string;
+  tone: AdminStatTone;
   href: string;
 };
 
@@ -312,70 +312,70 @@ export default function AdminDashboard() {
           label: "TOTAL KOLEKSI",
           value: dashboard.stats.totalCollections.toLocaleString("id-ID"),
           icon: FiBookOpen,
-          tone: styles.statDark,
+          tone: "dark",
           href: "/admin/koleksi/data-buku",
         },
         {
           label: "TOTAL STOK BUKU",
           value: dashboard.stats.totalStock.toLocaleString("id-ID"),
           icon: FiLayers,
-          tone: styles.statNavy,
+          tone: "primary",
           href: "/admin/koleksi/data-buku",
         },
         {
           label: "STOK TERSEDIA",
           value: dashboard.stats.availableStock.toLocaleString("id-ID"),
           icon: FiCheckCircle,
-          tone: styles.statGreen,
+          tone: "success",
           href: "/admin/koleksi/data-buku?availability=TERSEDIA",
         },
         {
           label: "MENUNGGU PENGAMBILAN",
           value: dashboard.stats.waitingPickup.toLocaleString("id-ID"),
           icon: FiClock,
-          tone: styles.statBlue,
+          tone: "info",
           href: "/admin/transaksi/reservasi?status=MENUNGGU_PENGAMBILAN",
         },
         {
           label: "PEMINJAMAN AKTIF",
           value: dashboard.stats.activeLoans.toLocaleString("id-ID"),
           icon: FiPackage,
-          tone: styles.statDark,
+          tone: "teal",
           href: "/admin/transaksi/peminjaman?status=ACTIVE",
         },
         {
           label: "JATUH TEMPO HARI INI",
           value: dashboard.stats.dueToday.toLocaleString("id-ID"),
           icon: FiAlertTriangle,
-          tone: styles.statOrange,
+          tone: "warning",
           href: "/admin/transaksi/peminjaman?due=TODAY",
         },
         {
           label: "TERLAMBAT",
           value: dashboard.stats.overdue.toLocaleString("id-ID"),
           icon: FiAlertTriangle,
-          tone: styles.statRed,
+          tone: "danger",
           href: "/admin/transaksi/peminjaman?status=OVERDUE",
         },
         {
           label: "BUKU HILANG (PROSES)",
           value: dashboard.stats.lostInProcess.toLocaleString("id-ID"),
           icon: FiBox,
-          tone: styles.statRed,
+          tone: "coral",
           href: "/admin/transaksi/buku-hilang-penggantian?status=PROCESS",
         },
         {
           label: "TOTAL ANGGOTA",
           value: dashboard.stats.totalMembers.toLocaleString("id-ID"),
           icon: FiUsers,
-          tone: styles.statNavy,
+          tone: "slate",
           href: "/admin/keanggotaan",
         },
         {
           label: "E-BOOK",
           value: dashboard.stats.ebooks.toLocaleString("id-ID"),
           icon: FiMonitor,
-          tone: styles.statYellow,
+          tone: "yellow",
           href: "/admin/koleksi/e-book",
         },
       ]
@@ -544,24 +544,7 @@ export default function AdminDashboard() {
           >
             {statCards.map((card) => {
               const Icon = card.icon;
-
-              return (
-                <Link
-                  key={card.label}
-                  href={card.href}
-                  className={`${styles.statCard} ${card.tone} ${enhancements.clickableStatCard}`}
-                  aria-label={`${card.label}: ${card.value}. Buka halaman terkait.`}
-                >
-                  <span className={styles.statIcon}>
-                    <Icon size={21} aria-hidden="true" />
-                  </span>
-
-                  <div>
-                    <span className={styles.statLabel}>{card.label}</span>
-                    <strong>{card.value}</strong>
-                  </div>
-                </Link>
-              );
+              return <AdminStatCard key={card.label} label={card.label} value={card.value} tone={card.tone} icon={<Icon size={23} />} href={card.href} />;
             })}
           </section>
 

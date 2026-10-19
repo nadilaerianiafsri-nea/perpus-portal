@@ -1,5 +1,8 @@
 "use client";
 
+import AdminStatCard from "./AdminStatCard";
+import { FiGift as CardGift, FiClock as CardClock, FiCheckCircle as CardCheckCircle, FiLayers as CardLayers } from "react-icons/fi";
+
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
@@ -142,39 +145,17 @@ export default function AdminGrantsPage() {
       </header>
 
       <section className={styles.stats} aria-label="Statistik hibah buku">
-        <article className={`${styles.statCard} ${styles.statNavy}`}>
-          <span>TOTAL BUKU HIBAH</span>
+        <AdminStatCard label="TOTAL BUKU HIBAH" value={result.stats.totalBooks.toLocaleString("id-ID")} tone="dark" icon={<CardGift />}
+          detail="berdasarkan filter aktif" />
 
-          <strong>{result.stats.totalBooks.toLocaleString("id-ID")}</strong>
+        <AdminStatCard label="BELUM DIKATALOGKAN" value={result.stats.pendingBooks.toLocaleString("id-ID")} tone="warning" icon={<CardClock />}
+          detail="buku belum selesai katalog" />
 
-          <small>berdasarkan filter aktif</small>
-        </article>
+        <AdminStatCard label="SUDAH DIKATALOGKAN" value={result.stats.cataloguedBooks.toLocaleString("id-ID")} tone="success" icon={<CardCheckCircle />}
+          detail="buku selesai katalog" />
 
-        <article className={`${styles.statCard} ${styles.statOrange}`}>
-          <span>BELUM DIKATALOGKAN</span>
-
-          <strong>{result.stats.pendingBooks.toLocaleString("id-ID")}</strong>
-
-          <small>buku belum selesai katalog</small>
-        </article>
-
-        <article className={`${styles.statCard} ${styles.statGreen}`}>
-          <span>SUDAH DIKATALOGKAN</span>
-
-          <strong>
-            {result.stats.cataloguedBooks.toLocaleString("id-ID")}
-          </strong>
-
-          <small>buku selesai katalog</small>
-        </article>
-
-        <article className={`${styles.statCard} ${styles.statBlue}`}>
-          <span>TOTAL PENERIMAAN</span>
-
-          <strong>{result.stats.totalReceipts.toLocaleString("id-ID")}</strong>
-
-          <small>data penerimaan hibah</small>
-        </article>
+        <AdminStatCard label="TOTAL PENERIMAAN" value={result.stats.totalReceipts.toLocaleString("id-ID")} tone="primary" icon={<CardLayers />}
+          detail="data penerimaan hibah" />
       </section>
 
       <section className={styles.filterCard}>

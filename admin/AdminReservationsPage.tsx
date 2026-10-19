@@ -1,6 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import AdminStatCard from "./AdminStatCard";
+import { FiClock as CardClock, FiAlertTriangle as CardAlertTriangle, FiXCircle as CardXCircle, FiCheckCircle as CardCheckCircle } from "react-icons/fi";
+
 import { ButtonLabel } from '@/components/Button';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { safeCoverUrl } from "../shared/displayUrls.cjs";
@@ -208,29 +211,17 @@ export default function AdminReservationsPage() {
       </header>
 
       <section className={styles.statsFour} aria-label="Ringkasan reservasi">
-        <article className={`${styles.statCard} ${styles.statNavy}`}>
-          <span>MENUNGGU PENGAMBILAN</span>
-          <strong>{result.stats.waiting}</strong>
-          <small>reservasi aktif</small>
-        </article>
+        <AdminStatCard label="MENUNGGU PENGAMBILAN" value={result.stats.waiting} tone="info" icon={<CardClock />}
+          detail="reservasi aktif" />
 
-        <article className={`${styles.statCard} ${styles.statOrange}`}>
-          <span>HAMPIR KEDALUWARSA</span>
-          <strong>{result.stats.almostExpired}</strong>
-          <small>sisa waktu maksimal 2 jam</small>
-        </article>
+        <AdminStatCard label="HAMPIR KEDALUWARSA" value={result.stats.almostExpired} tone="warning" icon={<CardAlertTriangle />}
+          detail="sisa waktu maksimal 2 jam" />
 
-        <article className={`${styles.statCard} ${styles.statRed}`}>
-          <span>KEDALUWARSA</span>
-          <strong>{result.stats.expired}</strong>
-          <small>reservasi tidak diambil</small>
-        </article>
+        <AdminStatCard label="KEDALUWARSA" value={result.stats.expired} tone="danger" icon={<CardXCircle />}
+          detail="reservasi tidak diambil" />
 
-        <article className={`${styles.statCard} ${styles.statGreen}`}>
-          <span>SUDAH DIAMBIL</span>
-          <strong>{result.stats.pickedUp}</strong>
-          <small>reservasi menjadi pinjaman</small>
-        </article>
+        <AdminStatCard label="SUDAH DIAMBIL" value={result.stats.pickedUp} tone="success" icon={<CardCheckCircle />}
+          detail="reservasi menjadi pinjaman" />
       </section>
 
       <section className={styles.panel}>

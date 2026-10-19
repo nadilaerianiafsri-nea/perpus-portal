@@ -1,5 +1,8 @@
 "use client";
 
+import AdminStatCard from "./AdminStatCard";
+import { FiBookOpen as CardBookOpen, FiAlertTriangle as CardAlertTriangle, FiClock as CardClock, FiCheckCircle as CardCheckCircle } from "react-icons/fi";
+
 import Link from "next/link";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { useCallback, useEffect, useState } from "react";
@@ -179,25 +182,13 @@ export default function AdminMemberDetail({ id }: Props) {
       ) : null}
 
       <section className={styles.detailSummary}>
-        <article>
-          <span>PINJAMAN AKTIF</span>
-          <strong>{summary.activeLoans}</strong>
-        </article>
+        <AdminStatCard label="PINJAMAN AKTIF" value={summary.activeLoans} tone="teal" icon={<CardBookOpen />} />
 
-        <article>
-          <span>OVERDUE</span>
-          <strong>{summary.overdue}</strong>
-        </article>
+        <AdminStatCard label="OVERDUE" value={summary.overdue} tone="danger" icon={<CardAlertTriangle />} />
 
-        <article>
-          <span>RESERVASI AKTIF</span>
-          <strong>{summary.activeReservations}</strong>
-        </article>
+        <AdminStatCard label="RESERVASI AKTIF" value={summary.activeReservations} tone="info" icon={<CardClock />} />
 
-        <article>
-          <span>RIWAYAT SELESAI</span>
-          <strong>{summary.completedLoans}</strong>
-        </article>
+        <AdminStatCard label="RIWAYAT SELESAI" value={summary.completedLoans} tone="success" icon={<CardCheckCircle />} />
       </section>
 
       <section className={styles.detailGrid}>

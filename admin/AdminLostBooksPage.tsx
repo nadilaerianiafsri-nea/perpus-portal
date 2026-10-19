@@ -1,6 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import AdminStatCard from "./AdminStatCard";
+import { FiBox as CardBox, FiUsers as CardUsers, FiRefreshCw as CardRefreshCw } from "react-icons/fi";
+
 import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import { plainTextMessage } from "../members/inputSecurity";
 
@@ -142,23 +145,14 @@ export default function AdminLostBooksPage() {
       </header>
 
       <section className={styles.statsThree} aria-label="Ringkasan buku hilang">
-        <article className={`${styles.statCard} ${styles.statRed}`}>
-          <span>TOTAL BUKU HILANG</span>
-          <strong>{result.stats.total}</strong>
-          <small>kasus tercatat</small>
-        </article>
+        <AdminStatCard label="TOTAL BUKU HILANG" value={result.stats.total} tone="coral" icon={<CardBox />}
+          detail="kasus tercatat" />
 
-        <article className={`${styles.statCard} ${styles.statOrange}`}>
-          <span>ANGGOTA TERDAMPAK</span>
-          <strong>{result.stats.affectedMembers}</strong>
-          <small>anggota dengan buku hilang</small>
-        </article>
+        <AdminStatCard label="ANGGOTA TERDAMPAK" value={result.stats.affectedMembers} tone="slate" icon={<CardUsers />}
+          detail="anggota dengan buku hilang" />
 
-        <article className={`${styles.statCard} ${styles.statNavy}`}>
-          <span>PERNAH DIPERPANJANG</span>
-          <strong>{result.stats.extended}</strong>
-          <small>kasus dengan perpanjangan</small>
-        </article>
+        <AdminStatCard label="PERNAH DIPERPANJANG" value={result.stats.extended} tone="primary" icon={<CardRefreshCw />}
+          detail="kasus dengan perpanjangan" />
       </section>
 
       <section className={styles.panel}>

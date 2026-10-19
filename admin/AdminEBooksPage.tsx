@@ -1,6 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import AdminStatCard from "./AdminStatCard";
+import { FiMonitor as CardMonitor, FiCheckCircle as CardCheckCircle, FiArchive as CardArchive } from "react-icons/fi";
+
 import { adminCoverUrl, adminBookTextError } from "./adminBooks";
 import Link from "next/link";
 import ConfirmDialog from "@/components/ConfirmDialog";
@@ -142,18 +145,12 @@ export default function AdminEBooksPage() {
   return (
     <div className={styles.page}>
       <section className={styles.stats} aria-label="Ringkasan E-Book">
-        <article className={`${styles.statCard} ${styles.statNavy}`}>
-          <span>TOTAL E-BOOK</span>
-          <strong>{result.stats.total}</strong>
-        </article>
-        <article className={`${styles.statCard} ${styles.statGreen}`}>
-          <span>AKTIF</span>
-          <strong>{result.stats.active}</strong>
-        </article>
-        <article className={`${styles.statCard} ${styles.statMuted}`}>
-          <span>NONAKTIF</span>
-          <strong>{result.stats.inactive}</strong>
-        </article>
+        <AdminStatCard label="TOTAL E-BOOK" value={result.stats.total} tone="yellow" icon={<CardMonitor />}
+           />
+        <AdminStatCard label="AKTIF" value={result.stats.active} tone="success" icon={<CardCheckCircle />}
+           />
+        <AdminStatCard label="NONAKTIF" value={result.stats.inactive} tone="slate" icon={<CardArchive />}
+           />
       </section>
 
       <section className={styles.toolbar}>

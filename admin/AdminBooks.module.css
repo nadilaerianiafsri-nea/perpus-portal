@@ -28,50 +28,8 @@
 .stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.statCard {
-  --card-background: var(--navy);
-  --card-foreground: var(--white);
-  min-height: 80px;
-  position: relative;
-  padding: 17px 20px 15px;
-  overflow: hidden;
-  border: 1px solid transparent;
-  border-radius: 16px;
-  background: var(--card-background);
-  color: var(--card-foreground);
-  box-shadow: 0 4px 12px #0006330d;
-}
-
-.statCard span {
-  display: block;
-  margin-bottom: 5px;
-  color: inherit;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-}
-
-.statCard strong {
-  display: block;
-  color: inherit;
-  font-size: 23px;
-  line-height: 1;
-}
-
-.statNavy {
-  --card-background: var(--navy);
-}
-
-.statGreen {
-  --card-background: #55be24;
-  --card-foreground: var(--navy);
-}
-
-.statMuted {
-  --card-background: var(--navy-soft);
+  gap: 16px;
+  grid-auto-rows: 1fr;
 }
 
 .toolbar {
@@ -698,12 +656,13 @@
   margin-bottom: 13px;
   padding: 17px;
   border-radius: 11px;
-  background: #f4f4f7;
+  background: var(--admin-success);
+  color: var(--navy);
 }
 
 .stockBox > span {
   display: block;
-  color: #777;
+  color: inherit;
   font-size: 9px;
 }
 
@@ -715,7 +674,7 @@
 }
 
 .stockBox strong small {
-  color: #777;
+  color: inherit;
   font-size: 14px;
   font-weight: 500;
 }
@@ -723,7 +682,7 @@
 .stockBox > small {
   display: block;
   margin-top: 7px;
-  color: #777;
+  color: inherit;
   font-size: 9px;
 }
 
@@ -731,14 +690,14 @@
   height: 6px;
   overflow: hidden;
   border-radius: 99px;
-  background: #dedfe5;
+  background: #0006331a;
 }
 
 .progressTrack span {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: #56ca25;
+  background: var(--navy-soft);
 }
 
 .description {

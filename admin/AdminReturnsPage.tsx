@@ -1,6 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import AdminStatCard from "./AdminStatCard";
+import { FiBookOpen as CardBookOpen, FiClock as CardClock, FiAlertTriangle as CardAlertTriangle, FiCheckCircle as CardCheckCircle } from "react-icons/fi";
+
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import { plainTextMessage } from "../members/inputSecurity";
@@ -176,29 +179,17 @@ export default function AdminReturnsPage() {
       </header>
 
       <section className={styles.statsFour} aria-label="Ringkasan pengembalian">
-        <article className={`${styles.statCard} ${styles.statNavy}`}>
-          <span>PINJAMAN AKTIF</span>
-          <strong>{result.stats.active}</strong>
-          <small>menunggu pengembalian</small>
-        </article>
+        <AdminStatCard label="PINJAMAN AKTIF" value={result.stats.active} tone="teal" icon={<CardBookOpen />}
+          detail="menunggu pengembalian" />
 
-        <article className={`${styles.statCard} ${styles.statOrange}`}>
-          <span>JATUH TEMPO HARI INI</span>
-          <strong>{result.stats.dueToday}</strong>
-          <small>perlu perhatian</small>
-        </article>
+        <AdminStatCard label="JATUH TEMPO HARI INI" value={result.stats.dueToday} tone="warning" icon={<CardClock />}
+          detail="perlu perhatian" />
 
-        <article className={`${styles.statCard} ${styles.statRed}`}>
-          <span>TERLAMBAT</span>
-          <strong>{result.stats.overdue}</strong>
-          <small>melewati jatuh tempo</small>
-        </article>
+        <AdminStatCard label="TERLAMBAT" value={result.stats.overdue} tone="danger" icon={<CardAlertTriangle />}
+          detail="melewati jatuh tempo" />
 
-        <article className={`${styles.statCard} ${styles.statGreen}`}>
-          <span>DIKEMBALIKAN HARI INI</span>
-          <strong>{result.stats.returnedToday}</strong>
-          <small>pengembalian selesai</small>
-        </article>
+        <AdminStatCard label="DIKEMBALIKAN HARI INI" value={result.stats.returnedToday} tone="success" icon={<CardCheckCircle />}
+          detail="pengembalian selesai" />
       </section>
 
       <section className={styles.panel}>
