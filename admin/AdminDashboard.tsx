@@ -6,6 +6,7 @@ import type { ComponentType } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   FiAlertTriangle,
+  FiBarChart2,
   FiBookOpen,
   FiBox,
   FiCheckCircle,
@@ -13,6 +14,7 @@ import {
   FiLayers,
   FiMonitor,
   FiPackage,
+  FiRefreshCw,
   FiSearch,
   FiUsers,
 } from "react-icons/fi";
@@ -20,11 +22,11 @@ import {
 import {
   adminOperationsApiMessage,
   jakartaDateInput,
-  monthsBeforeDateInput,
 } from "./adminOperations";
 import styles from "./Admin.module.css";
 import controls from "./AdminReports.module.css";
 import enhancements from "./AdminEnhancements.module.css";
+import filters from "./AdminDashboardFilters.module.css";
 
 type DashboardTrendRow = {
   key: string;
@@ -69,15 +71,26 @@ type StatCard = {
 
 type MemberCategoryKey = "umum" | "mahasiswa" | "pegawai";
 
-function validateDates(from: string, to: string) {
+type DateRange = { from: string; to: string };
+
+function validateDates(from: string, to: string, today: string) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(from) || !/^\d{4}-\d{2}-\d{2}$/.test(to)) {
     return "Dari Tanggal dan Sampai Tanggal wajib diisi.";
   }
 
   if (from > to) {
-    return "Dari Tanggal tidak boleh melewati Sampai Tanggal.";
+    return "Tanggal mulai tidak boleh melebihi tanggal akhir.";
   }
 
+  const start = inputDate(from);
+  const finish = inputDate(to);
+  if (!start || !finish || start.toISOString().slice(0, 10) !== from || finish.toISOString().slice(0, 10) !== to) {
+    return "Tanggal yang dipilih tidak valid.";
+  }
+  if (from > today || to > today) return "Tanggal tidak boleh melebihi hari ini.";
+  if ((finish.getTime() - start.getTime()) / 86_400_000 + 1 > 366) {
+    return "Rentang tanggal maksimal 366 hari.";
+  }
   return "";
 }
 
@@ -178,39 +191,43 @@ function formatUpdatedAt(value: string) {
 }
 
 export default function AdminDashboard() {
-  const initialTo = useMemo(() => jakartaDateInput(), []);
-  const initialFrom = useMemo(() => monthsBeforeDateInput(5), []);
-
-  const [fromInput, setFromInput] = useState(initialFrom);
-  const [toInput, setToInput] = useState(initialTo);
-  const [range, setRange] = useState({
-    from: initialFrom,
-    to: initialTo,
-  });
+  const today = useMemo(() => jakartaDateInput(), []);
+  const [fromInput, setFromInput] = useState("");
+  const [toInput, setToInput] = useState("");
+  const [range, setRange] = useState<DateRange | null>(null);
   const [dashboard, setDashboard] = useState<AdminDashboardResponse | null>(null);
+  const [chartData, setChartData] = useState<AdminDashboardResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [chartLoading, setChartLoading] = useState(false);
+  const [chartError, setChartError] = useState("");
   const [error, setError] = useState("");
-  const [revision, setRevision] = useState(0);
   const [activeTrend, setActiveTrend] = useState<number | null>(null);
   const [activeMemberCategory, setActiveMemberCategory] =
     useState<MemberCategoryKey | null>(null);
   const requestId = useRef(0);
+  const requestController = useRef<AbortController | null>(null);
 
-  const load = useCallback(async () => {
-    void revision;
-
+  const load = useCallback(async (selectedRange: DateRange | null) => {
     const currentRequest = requestId.current + 1;
     requestId.current = currentRequest;
+    requestController.current?.abort();
+    const controller = new AbortController();
+    requestController.current = controller;
 
     setLoading(true);
+    setChartLoading(Boolean(selectedRange));
     setError("");
+    setChartError("");
 
     try {
-      const query = new URLSearchParams(range);
+      // This existing endpoint requires dates even for its unfiltered live KPIs.
+      // The initial KPI request uses today only; its trend is never presented as an applied filter.
+      const query = new URLSearchParams(selectedRange ?? { from: today, to: today });
       const response = await fetch(
         `/api/members/admin/operations/dashboard?${query}`,
         {
           cache: "no-store",
+          signal: controller.signal,
         },
       );
 
@@ -227,55 +244,66 @@ export default function AdminDashboard() {
 
       if (requestId.current === currentRequest) {
         setDashboard(payload);
+        if (selectedRange) setChartData(payload);
       }
     } catch (reason) {
-      if (requestId.current === currentRequest) {
-        setError(
+      if (requestId.current === currentRequest && !controller.signal.aborted) {
+        const message =
           reason instanceof Error
             ? reason.message
-            : "Dashboard admin belum dapat dimuat.",
-        );
+            : "Dashboard admin belum dapat dimuat.";
+        if (selectedRange) setChartError(message);
+        else setError(message);
       }
     } finally {
       if (requestId.current === currentRequest) {
         setLoading(false);
+        setChartLoading(false);
       }
     }
-  }, [range, revision]);
+  }, [today]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- Keep the existing fetch/loading lifecycle when the selected date range changes.
-    void load();
-
-    const interval = window.setInterval(() => {
-      void load();
-    }, 30_000);
-
-    const refreshOnFocus = () => {
-      void load();
-    };
-
-    window.addEventListener("focus", refreshOnFocus);
-
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Load live KPI data once on mount; period requests are explicit user actions.
+    void load(null);
     return () => {
-      window.clearInterval(interval);
-      window.removeEventListener("focus", refreshOnFocus);
+      requestId.current += 1;
+      requestController.current?.abort();
     };
   }, [load]);
 
+  const dateError = fromInput && toInput ? validateDates(fromInput, toInput, today) : "";
+
   function applyRange() {
-    const message = validateDates(fromInput, toInput);
+    if (!dashboard || loading || validateDates(fromInput, toInput, today)) return;
+    const selectedRange = { from: fromInput, to: toInput };
+    setRange(selectedRange);
+    setChartData(null);
+    setActiveTrend(null);
+    void load(selectedRange);
+  }
 
-    if (message) {
-      setError(message);
-      return;
+  function resetRange() {
+    if (range) {
+      requestId.current += 1;
+      requestController.current?.abort();
+      setLoading(false);
     }
+    setFromInput("");
+    setToInput("");
+    setRange(null);
+    setChartData(null);
+    setChartError("");
+    setChartLoading(false);
+    setActiveTrend(null);
+  }
 
-    setError("");
-    setRange({
-      from: fromInput,
-      to: toInput,
-    });
+  function selectQuickRange(days: number | "month") {
+    const end = new Date(`${today}T00:00:00Z`);
+    if (days === "month") end.setUTCDate(1);
+    else end.setUTCDate(end.getUTCDate() - days + 1);
+    setFromInput(end.toISOString().slice(0, 10));
+    setToInput(today);
   }
 
   const statCards: StatCard[] = dashboard
@@ -355,14 +383,14 @@ export default function AdminDashboard() {
 
   const maxTrend = Math.max(
     1,
-    ...(dashboard?.trend.flatMap((row) => [row.borrowings, row.returns]) ?? [1]),
+    ...(chartData?.trend.flatMap((row) => [row.borrowings, row.returns]) ?? [1]),
   );
 
-  const borrowingPoints = dashboard
-    ? chartPoints(dashboard.trend, "borrowings", maxTrend)
+  const borrowingPoints = chartData
+    ? chartPoints(chartData.trend, "borrowings", maxTrend)
     : "";
-  const returnPoints = dashboard
-    ? chartPoints(dashboard.trend, "returns", maxTrend)
+  const returnPoints = chartData
+    ? chartPoints(chartData.trend, "returns", maxTrend)
     : "";
 
   const axisValues = [
@@ -414,53 +442,82 @@ export default function AdminDashboard() {
 
   return (
     <div className={styles.content}>
-      <section
-        className={controls.filterCard}
+      <form
+        className={filters.filterCard}
         aria-label="Filter periode dashboard admin"
+        noValidate
+        onSubmit={(event) => { event.preventDefault(); applyRange(); }}
       >
-        <label>
+        <div className={filters.filterHeading}>
+          <div>
+            <h2>Filter Periode</h2>
+            <p id="dashboard-period-help">Rentang tanggal hanya berlaku untuk grafik transaksi.</p>
+          </div>
+          <div className={filters.quickRanges} aria-label="Pilihan rentang tanggal">
+            {([{ label: "Hari Ini", value: 1 }, { label: "7 Hari", value: 7 }, { label: "30 Hari", value: 30 }, { label: "Bulan Ini", value: "month" }] as const).map((option) => (
+              <button key={option.label} data-button="ghost" data-button-size="sm" type="button" onClick={() => selectQuickRange(option.value)}>{option.label}</button>
+            ))}
+          </div>
+        </div>
+        <div className={filters.fields}>
+        <label htmlFor="dashboard-date-from">
           <span>Dari Tanggal</span>
+          <span className={filters.dateField} data-empty={!fromInput || undefined}>
           <input
+            id="dashboard-date-from"
             type="date"
+            required
+            max={today}
+            aria-invalid={Boolean(dateError)}
+            aria-describedby={`dashboard-period-help${dateError ? " dashboard-date-error" : ""}`}
             value={fromInput}
             onChange={(event) => setFromInput(event.target.value)}
           />
+          {!fromInput && <span className={filters.datePlaceholder} aria-hidden="true">Pilih tanggal mulai</span>}
+          </span>
         </label>
 
-        <label>
+        <label htmlFor="dashboard-date-to">
           <span>Sampai Tanggal</span>
+          <span className={filters.dateField} data-empty={!toInput || undefined}>
           <input
+            id="dashboard-date-to"
             type="date"
+            required
+            max={today}
+            aria-invalid={Boolean(dateError)}
+            aria-describedby={`dashboard-period-help${dateError ? " dashboard-date-error" : ""}`}
             value={toInput}
             onChange={(event) => setToInput(event.target.value)}
           />
+          {!toInput && <span className={filters.datePlaceholder} aria-hidden="true">Pilih tanggal akhir</span>}
+          </span>
         </label>
 
         <button
           data-button="primary"
           data-button-size="md"
-          data-button-loading={loading && !dashboard}
-          type="button"
-          className={controls.primaryButton}
-          onClick={applyRange}
-          disabled={loading && !dashboard}
+          data-button-loading={chartLoading}
+          type="submit"
+          aria-busy={chartLoading}
+          disabled={!dashboard || loading || !fromInput || !toInput || Boolean(dateError)}
         >
           <FiSearch aria-hidden="true" />
-          Terapkan
+          <ButtonLabel loading={chartLoading} pending="Memuat...">Terapkan</ButtonLabel>
         </button>
 
         <button
-          data-button="secondary"
+          data-button="ghost"
           data-button-size="md"
-          data-button-loading={loading}
           type="button"
-          className={controls.secondaryButton}
-          onClick={() => setRevision((value) => value + 1)}
-          disabled={loading}
+          onClick={resetRange}
+          disabled={!fromInput && !toInput && !range}
         >
-          <ButtonLabel loading={Boolean(loading && dashboard)} pending="Memuat...">Segarkan</ButtonLabel>
+          Reset
         </button>
-      </section>
+        </div>
+        {dateError ? <p id="dashboard-date-error" className={filters.dateError} role="alert">{dateError}</p> : range && (fromInput !== range.from || toInput !== range.to) ? <p className={filters.draftHint}>Perubahan tanggal belum diterapkan.</p> : null}
+      </form>
 
       {error ? (
         <div className={controls.errorBox} role="alert">
@@ -469,7 +526,8 @@ export default function AdminDashboard() {
             data-button="secondary"
             data-button-size="md"
             type="button"
-            onClick={() => setRevision((value) => value + 1)}
+            onClick={() => void load(null)}
+            disabled={loading}
           >
             Coba Lagi
           </button>
@@ -509,13 +567,14 @@ export default function AdminDashboard() {
 
           <section className={styles.analyticsGrid}>
             <article className={styles.chartCard}>
-              <header>
+              <header className={filters.chartHeader}>
+                <div className={filters.chartHeading}>
                 <h2>Transaksi Peminjaman</h2>
-                <p>
-                  {formatRangeLabel(dashboard.range.from, dashboard.range.to)} · Diperbarui{" "}
-                  {formatUpdatedAt(dashboard.generatedAt)}
-                </p>
+                {range && <button data-button="ghost" data-button-size="sm" type="button" onClick={() => { setActiveTrend(null); void load(range); }} disabled={loading} aria-label="Segarkan Data periode aktif"><FiRefreshCw aria-hidden="true" /><span className={filters.refreshLabel}>Segarkan Data</span></button>}
+                </div>
+                {range ? <p className={filters.activePeriod} data-active-period>Periode aktif · {formatRangeLabel(range.from, range.to)}{chartData && <> · Diperbarui {formatUpdatedAt(chartData.generatedAt)}</>}</p> : <p>Pilih periode untuk menampilkan transaksi.</p>}
 
+                {range && chartData && !chartLoading && !chartError && chartData.trend.some((row) => row.borrowings > 0 || row.returns > 0) && (
                 <div
                   className={styles.transactionLegend}
                   aria-label="Legenda transaksi peminjaman"
@@ -529,18 +588,25 @@ export default function AdminDashboard() {
                     Pengembalian
                   </span>
                 </div>
+                )}
               </header>
 
               <div
-                className={styles.lineChartWrap}
+                className={`${styles.lineChartWrap} ${filters.chartBody}`}
                 aria-label="Grafik transaksi peminjaman"
+                aria-busy={chartLoading}
                 onMouseLeave={() => setActiveTrend(null)}
                 style={{ overflowX: "auto" }}
               >
+                {!range ? <div className={filters.chartState} role="status"><FiBarChart2 aria-hidden="true" /><strong>Pilih rentang tanggal untuk melihat transaksi peminjaman.</strong><p>Data peminjaman dan pengembalian akan ditampilkan sesuai periode yang Anda pilih.</p></div>
+                : chartLoading ? <div className={filters.chartState} role="status"><span className={filters.skeleton} aria-hidden="true" /><span className={filters.skeleton} aria-hidden="true" /><strong>Memuat transaksi peminjaman...</strong></div>
+                : chartError ? <div className={filters.chartState} role="alert"><FiAlertTriangle aria-hidden="true" /><strong>{chartError}</strong><button data-button="secondary" data-button-size="sm" type="button" onClick={() => void load(range)}>Coba Lagi</button></div>
+                : !chartData?.trend.some((row) => row.borrowings > 0 || row.returns > 0) ? <div className={filters.chartState} role="status"><FiBarChart2 aria-hidden="true" /><strong>Tidak ada transaksi pada periode ini.</strong><p>Coba pilih rentang tanggal lain.</p></div>
+                : (
                 <div
                   className={enhancements.chartFrame}
                   style={{
-                    minWidth: Math.max(620, dashboard.trend.length * 92),
+                    minWidth: Math.max(620, chartData.trend.length * 92),
                   }}
                 >
                   <svg
@@ -589,15 +655,15 @@ export default function AdminDashboard() {
                       />
                     ) : null}
 
-                    {dashboard.trend.map((row, index) => {
+                    {chartData.trend.map((row, index) => {
                       const borrowing = chartCoordinate(
-                        dashboard.trend,
+                        chartData.trend,
                         index,
                         row.borrowings,
                         maxTrend,
                       );
                       const returned = chartCoordinate(
-                        dashboard.trend,
+                        chartData.trend,
                         index,
                         row.returns,
                         maxTrend,
@@ -632,10 +698,10 @@ export default function AdminDashboard() {
                     })}
                   </svg>
 
-                  {activeTrend !== null && dashboard.trend[activeTrend] ? (() => {
-                    const row = dashboard.trend[activeTrend];
+                  {activeTrend !== null && chartData.trend[activeTrend] ? (() => {
+                    const row = chartData.trend[activeTrend];
                     const point = chartCoordinate(
-                      dashboard.trend,
+                      chartData.trend,
                       activeTrend,
                       Math.max(row.borrowings, row.returns),
                       maxTrend,
@@ -664,15 +730,16 @@ export default function AdminDashboard() {
                     style={{
                       gridTemplateColumns: `repeat(${Math.max(
                         1,
-                        dashboard.trend.length,
+                        chartData.trend.length,
                       )}, minmax(0, 1fr))`,
                     }}
                   >
-                    {dashboard.trend.map((row) => (
+                    {chartData.trend.map((row) => (
                       <span key={row.key}>{row.label}</span>
                     ))}
                   </div>
                 </div>
+                )}
               </div>
             </article>
 
