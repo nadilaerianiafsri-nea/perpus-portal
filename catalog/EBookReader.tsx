@@ -36,7 +36,7 @@ export default function EBookReader({
 
   return (
     <section className={styles.readerStage} aria-label={`Pembaca ${title}`}>
-      <button aria-busy={closing} data-button="icon" data-button-size="sm" data-button-shape="square"
+      <button aria-busy={closing} data-button="ghost" data-button-size="sm" data-button-shape="square"
         type="button"
         className={styles.readerBackButton}
         disabled={!reading || closing}

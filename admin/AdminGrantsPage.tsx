@@ -318,7 +318,7 @@ export default function AdminGrantsPage() {
                         </Link>
 
                         <Link
-                          data-button="secondary"
+                          data-button="warning"
                           data-button-size="sm"
                           href={`/admin/hibah-buku/${grant.id}/edit`}
                           className={styles.actionButton}
@@ -396,7 +396,7 @@ export default function AdminGrantsPage() {
                   </Link>
 
                   <Link
-                    data-button="secondary"
+                    data-button="warning"
                     data-button-size="sm"
                     href={`/admin/hibah-buku/${grant.id}/edit`}
                     className={styles.actionButton}

@@ -387,7 +387,7 @@ export default function AdminEBookForm({
               : `Memperbarui data ${form.code}. Perubahan langsung berlaku setelah disimpan.`}
           </p>
         </div>
-        <Link data-button="secondary" data-button-size="md" href={backHref} className={styles.backButton}>
+        <Link data-button="ghost" data-button-size="md" href={backHref} className={styles.backButton}>
           <FiArrowLeft aria-hidden />
           Kembali
         </Link>

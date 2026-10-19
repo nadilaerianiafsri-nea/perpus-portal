@@ -152,7 +152,7 @@ export default function EBooksPage() {
 
           <div className={styles.viewTabs} role="tablist" aria-label="Tampilan E-Book saya">
             <button
-              data-button="secondary"
+              data-button="ghost"
               type="button"
               role="tab"
               aria-selected={view === "active"}
@@ -162,7 +162,7 @@ export default function EBooksPage() {
               Sedang Dipinjam
             </button>
             <button
-              data-button="secondary"
+              data-button="ghost"
               type="button"
               role="tab"
               aria-selected={view === "queue"}
@@ -172,7 +172,7 @@ export default function EBooksPage() {
               Antrean Saya
             </button>
             <button
-              data-button="secondary"
+              data-button="ghost"
               type="button"
               role="tab"
               aria-selected={view === "history"}
@@ -211,7 +211,7 @@ export default function EBooksPage() {
                               <span className={styles.percentage}>{progress}%</span>
                               <div className={styles.actions}>
                                 <Link data-button="primary" className={styles.read} href={`/e-book/${loan.book.id}/baca`}>Baca E-Book</Link>
-                                <button data-button="secondary" data-button-loading={pendingKey === `${loan.bookId}:return`} aria-busy={pendingKey === `${loan.bookId}:return`} type="button" className={styles.secondary} disabled={Boolean(pendingKey)} onClick={() => void act(loan.bookId, "return", "E-Book berhasil dikembalikan.")}><ButtonLabel loading={pendingKey === `${loan.bookId}:return`} pending="Memproses...">Kembalikan E-Book</ButtonLabel></button>
+                                <button data-button="success" data-button-loading={pendingKey === `${loan.bookId}:return`} aria-busy={pendingKey === `${loan.bookId}:return`} type="button" className={styles.secondary} disabled={Boolean(pendingKey)} onClick={() => void act(loan.bookId, "return", "E-Book berhasil dikembalikan.")}><ButtonLabel loading={pendingKey === `${loan.bookId}:return`} pending="Memproses...">Kembalikan E-Book</ButtonLabel></button>
                               </div>
                             </div>
                           </div>

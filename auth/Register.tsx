@@ -324,7 +324,7 @@ export default function Register() {
           </>
         ) : (
           <>
-            <button aria-busy={loading} data-button="secondary" data-button-size="md"
+            <button aria-busy={loading} data-button="ghost" data-button-size="md"
               className={`${styles.backToMembership} ${enhancements.backToMembership}`}
               type="button"
               disabled={loading || succeeded}

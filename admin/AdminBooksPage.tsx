@@ -385,7 +385,7 @@ export default function AdminBooksPage() {
                           <FiEye />
                         </Link>
                         <Link
-                          data-button="secondary"
+                          data-button="warning"
                           data-button-size="sm"
                           data-button-shape="square"
                           href={`/admin/koleksi/data-buku/${book.id}/edit`}

@@ -32,21 +32,23 @@
 }
 
 .statCard {
+  --card-background: var(--navy);
+  --card-foreground: var(--white);
   min-height: 80px;
   position: relative;
   padding: 17px 20px 15px;
   overflow: hidden;
-  border: 1px solid var(--line);
-  border-left: 4px solid var(--card-accent);
-  border-radius: 13px;
-  background: var(--white);
-  box-shadow: 0 2px 8px #00063306;
+  border: 1px solid transparent;
+  border-radius: 16px;
+  background: var(--card-background);
+  color: var(--card-foreground);
+  box-shadow: 0 4px 12px #0006330d;
 }
 
 .statCard span {
   display: block;
   margin-bottom: 5px;
-  color: #777;
+  color: inherit;
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -54,21 +56,22 @@
 
 .statCard strong {
   display: block;
-  color: var(--navy);
+  color: inherit;
   font-size: 23px;
   line-height: 1;
 }
 
 .statNavy {
-  --card-accent: var(--navy);
+  --card-background: var(--navy);
 }
 
 .statGreen {
-  --card-accent: #56ca25;
+  --card-background: #55be24;
+  --card-foreground: var(--navy);
 }
 
 .statMuted {
-  --card-accent: #777;
+  --card-background: var(--navy-soft);
 }
 
 .toolbar {

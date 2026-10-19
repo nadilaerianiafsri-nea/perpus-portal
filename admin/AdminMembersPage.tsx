@@ -347,7 +347,7 @@ export default function AdminMembersPage() {
                         </Link>
 
                         <Link
-                          data-button="secondary"
+                          data-button="warning"
                           data-button-size="sm"
                           href={`/admin/keanggotaan/${member.id}/edit`}
                           className={styles.editAction}
@@ -460,7 +460,7 @@ export default function AdminMembersPage() {
                   </Link>
 
                   <Link
-                    data-button="secondary"
+                    data-button="warning"
                     data-button-size="sm"
                     href={`/admin/keanggotaan/${member.id}/edit`}
                     className={styles.editAction}

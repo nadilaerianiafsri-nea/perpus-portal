@@ -478,7 +478,7 @@ export default function Catalog({
                   Sebelumnya
                 </button>
                 {pages.map((page) => (
-                  <button data-button="secondary" data-button-size="sm"
+                  <button data-button={page === currentPage ? "primary" : "ghost"} data-button-size="sm"
                     key={page}
                     aria-current={page === currentPage ? "page" : undefined}
                     onClick={() => update({ page: String(page) })}
@@ -509,7 +509,7 @@ export default function Catalog({
               </p>
               <button data-button="ghost" data-button-size="md" onClick={clear}>Bersihkan Filter</button>
               {totalPages > 0 ? (
-                <button data-button="secondary" data-button-size="md" onClick={() => update({ page: "1" })}>
+                <button data-button="ghost" data-button-size="md" onClick={() => update({ page: "1" })}>
                   Kembali ke Halaman Pertama
                 </button>
               ) : null}
@@ -536,7 +536,7 @@ export default function Catalog({
           className={`${styles.filterDialog} ${member ? memberStyles.memberFilterDialog : ""}`}
           aria-label="Filter koleksi"
         >
-          <button data-button="icon" data-button-size="sm" data-button-shape="square"
+          <button data-button="ghost" data-button-size="sm" data-button-shape="square"
             className={styles.closeDialog}
             aria-label="Tutup filter"
             onClick={() => dialog.current?.close()}

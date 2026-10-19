@@ -62,7 +62,7 @@ export default function LandingNavbar({
     </Link>
   ) : (
     <>
-      <Link data-button="secondary" data-button-size="md" data-button-shape="pill" className="login-link" href="/login">
+      <Link data-button="ghost" data-button-size="md" data-button-shape="pill" className="login-link" href="/login">
         Masuk
       </Link>
       <Link data-button="primary" data-button-size="md" data-button-shape="pill" className="member-btn" href="/register">

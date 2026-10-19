@@ -81,7 +81,7 @@ export default function BookDetailLayout({
       </nav>
       <header className={styles.heading}>
         <h1>Detail Buku</h1>
-        <Link data-button="secondary" data-button-size="md" className={styles.backLink} href={basePath}>
+        <Link data-button="ghost" data-button-size="md" className={styles.backLink} href={basePath}>
           <FiArrowLeft aria-hidden />{" "}
           {member ? "Kembali ke Katalog" : "Kembali ke Koleksi"}
         </Link>

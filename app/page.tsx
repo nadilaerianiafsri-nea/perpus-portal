@@ -79,7 +79,7 @@ export default async function Home() {
               </form>
 
               <div className="hero-actions">
-                <a data-button="primary" data-button-size="md" className="navy-btn" href="#koleksi"><FiSearch /> Cari Koleksi</a>
+                <a data-button="accent" data-button-size="md" className="navy-btn" href="#koleksi"><FiSearch /> Cari Koleksi</a>
                 <a data-button="secondary" data-button-size="md" className="soft-link" href="#ebook"><FiBookOpen /> Jelajahi E-Book</a>
               </div>
             </div>
@@ -251,7 +251,7 @@ export default async function Home() {
                 <li><FiCheckCircle /> Tersedia untuk perangkat mobile</li>
               </ul>
               <div className="hero-actions">
-                <a data-button="primary" data-button-size="md" className="navy-btn" href="#"><FiBookOpen /> Jelajahi E-Book</a>
+                <a data-button="secondary" data-button-size="md" className="navy-btn" href="#"><FiBookOpen /> Jelajahi E-Book</a>
                 <a data-button="secondary" data-button-size="md" className="outline-btn" href="#">Lihat Semua</a>
               </div>
             </div>
@@ -314,7 +314,7 @@ export default async function Home() {
               </ul>
               <div className="hero-actions">
                 <a data-button="primary" data-button-size="md" data-button-inverse className="yellow-btn" href="#">Daftar Anggota</a>
-                <a data-button="secondary" data-button-size="md" data-button-inverse className="dark-outline-btn" href="#">Masuk</a>
+                <a data-button="ghost" data-button-size="md" data-button-inverse className="dark-outline-btn" href="#">Masuk</a>
               </div>
             </div>
             <div className="member-art">

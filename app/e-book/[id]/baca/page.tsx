@@ -56,7 +56,7 @@ function ReaderState({
         <div className={styles.readerStateCard}>
           <h1>{title}</h1>
           <p>{message}</p>
-          <Link data-button="secondary" data-button-size="md" className={styles.stateAction} href={href}>
+          <Link data-button="ghost" data-button-size="md" className={styles.stateAction} href={href}>
             Kembali ke Detail E-Book
           </Link>
         </div>

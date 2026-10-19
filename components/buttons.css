@@ -7,9 +7,9 @@
   --button-primary: #2b3056;
   --button-soft: #eef0f7;
   --button-border: #d5d9e7;
-  --button-secondary: #ffd000;
-  --button-secondary-hover: #e6bc00;
-  --button-secondary-pressed: #d1aa00;
+  --button-accent: #ffd000;
+  --button-accent-hover: #e6bc00;
+  --button-accent-pressed: #d1aa00;
   --button-radius: 11px;
   --button-error: #ff3b2f;
   --button-success: #55be24;
@@ -58,13 +58,22 @@
 }
 
 :root body [data-button="secondary"][data-button] {
-  --button-bg: var(--button-secondary);
+  --button-bg: var(--button-soft);
+  --button-fg: var(--button-navy);
+  --button-stroke: var(--button-border);
+  --button-hover-bg: var(--button-primary);
+  --button-hover-fg: #fff;
+  --button-hover-stroke: var(--button-primary);
+  --button-pressed-bg: var(--button-navy);
+}
+:root body [data-button="accent"][data-button] {
+  --button-bg: var(--button-accent);
   --button-fg: var(--button-navy);
   --button-stroke: #0006331f;
-  --button-hover-bg: var(--button-secondary-hover);
+  --button-hover-bg: var(--button-accent-hover);
   --button-hover-fg: var(--button-navy);
   --button-hover-stroke: #00063333;
-  --button-pressed-bg: var(--button-secondary-pressed);
+  --button-pressed-bg: var(--button-accent-pressed);
   font-weight: 600;
 }
 :root body :is([data-button="ghost"], [data-button="icon"])[data-button] {
@@ -74,46 +83,35 @@
   --button-hover-fg: var(--button-navy);
 }
 :root body [data-button="danger"][data-button] {
-  --button-bg: #fff0ef;
-  --button-fg: #a8231b;
-  --button-stroke: #ffd0cc;
-  --button-hover-bg: #ffe1de;
-  --button-hover-fg: #8f1e17;
-  --button-hover-stroke: var(--button-error);
-}
-:root body [data-button="danger-solid"][data-button] {
-  /* Darken the error accent for legible white confirmation text. */
-  --button-bg: #c52b23;
-  --button-fg: #fff;
-  --button-hover-bg: #a8231b;
+  --button-bg: var(--button-error);
+  --button-fg: var(--button-navy);
+  --button-hover-bg: #e6352a;
+  --button-hover-fg: var(--button-navy);
 }
 :root body [data-button="success"][data-button] {
-  --button-bg: #eef9e9;
-  --button-fg: #286713;
-  --button-stroke: #cce7c1;
-  --button-hover-bg: #def1d4;
-  --button-hover-fg: #205610;
-  --button-hover-stroke: var(--button-success);
+  --button-bg: var(--button-success);
+  --button-fg: var(--button-navy);
+  --button-hover-bg: #49a81f;
+  --button-hover-fg: var(--button-navy);
 }
 :root body [data-button="warning"][data-button] {
-  --button-bg: #fff4e5;
-  --button-fg: #855000;
-  --button-stroke: #f2dbb7;
-  --button-hover-bg: #ffe7c3;
-  --button-hover-fg: #6b4000;
-  --button-hover-stroke: var(--button-warning);
+  --button-bg: var(--button-warning);
+  --button-fg: var(--button-navy);
+  --button-hover-bg: #e68600;
+  --button-hover-fg: var(--button-navy);
 }
 
 :root
   body
   [data-button][data-button][data-button-inverse]:not(
-    [data-button="secondary"]
+    [data-button="accent"]
   ):not([data-button-inverse="false"]) {
   --button-stroke: #ffffff38;
 }
 :root
   body
   :is(
+    [data-button="secondary"],
     [data-button="ghost"],
     [data-button="icon"]
   )[data-button][data-button-inverse]:not([data-button-inverse="false"]) {
@@ -122,6 +120,10 @@
   --button-hover-bg: #ffffff24;
   --button-hover-fg: #fff;
   --button-hover-stroke: #ffffff60;
+}
+:root body [data-button="secondary"][data-button][data-button-inverse]:not([data-button-inverse="false"]) {
+  --button-hover-bg: var(--button-primary);
+  --button-pressed-bg: var(--button-navy);
 }
 :root body [data-button][data-button][data-button-size="sm"] {
   --button-height: 36px;
@@ -213,16 +215,10 @@
 :root
   body
   [data-button][data-button]:active:not(:disabled):not([aria-disabled="true"]) {
+  background: var(--button-pressed-bg, var(--button-hover-bg));
+  color: var(--button-hover-fg);
   transform: translateY(1px);
   box-shadow: none;
-}
-:root
-  body
-  [data-button="secondary"][data-button]:active:not(:disabled):not(
-    [aria-disabled="true"]
-  ) {
-  background: var(--button-pressed-bg);
-  color: var(--button-hover-fg);
 }
 :root body [data-button][data-button]:focus-visible {
   outline: 2px solid var(--button-primary);
@@ -231,9 +227,7 @@
 }
 :root
   body
-  [data-button][data-button][data-button-inverse]:not(
-    [data-button="secondary"]
-  ):focus-visible {
+  [data-button][data-button][data-button-inverse]:not([data-button-inverse="false"]):focus-visible {
   outline-color: #ffd000;
   box-shadow: none;
 }
@@ -246,15 +240,6 @@
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
-}
-
-:root
-  body
-  [data-button="secondary"][data-button]:is(:disabled, [aria-disabled="true"]) {
-  background: #fff0a8;
-  color: #626478;
-  border-color: #e1d79c;
-  opacity: 0.55;
 }
 
 /* Both labels contribute to width, so pending text cannot move adjacent actions. */

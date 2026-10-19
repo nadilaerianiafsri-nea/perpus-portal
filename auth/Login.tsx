@@ -108,7 +108,7 @@ export default function Login() {
   return (
     <AuthShell login>
       <div className={styles.loginContent}>
-        <Link data-button="secondary" data-button-size="md" className={styles.loginBack} href="/">
+        <Link data-button="ghost" data-button-size="md" className={styles.loginBack} href="/">
           <FiArrowLeft aria-hidden /> Kembali ke Beranda
         </Link>
         <Link
@@ -193,7 +193,7 @@ export default function Login() {
               <span>Ingat saya</span>
             </label>
 
-            <Link data-button="secondary" data-button-size="md" className={styles.linkButton} href="/forgot-password">
+            <Link data-button="ghost" data-button-size="md" className={styles.linkButton} href="/forgot-password">
               Lupa kata sandi?
             </Link>
           </div>

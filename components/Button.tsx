@@ -4,9 +4,9 @@ import type { ComponentProps, ReactNode } from "react";
 export type ButtonVariant =
   | "primary"
   | "secondary"
+  | "accent"
   | "ghost"
   | "danger"
-  | "danger-solid"
   | "success"
   | "warning"
   | "icon";

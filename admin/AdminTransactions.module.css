@@ -47,8 +47,8 @@
 .statCard {
   min-height: 108px;
   padding: 19px 20px;
-  border-radius: 15px;
-  box-shadow: 0 9px 18px #00063312;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px #0006330d;
   color: var(--white);
 }
 
@@ -72,32 +72,35 @@
   display: block;
   margin-top: 7px;
   font-size: 9px;
-  opacity: 0.8;
 }
 
 .statNavy {
-  background: #343a68;
+  background: var(--navy-soft);
 }
 
 .statBlue {
-  background: #2caef3;
+  background: #1fabff;
+  color: var(--navy);
 }
 
 .statYellow {
   background: var(--yellow);
-  color: var(--white);
+  color: var(--navy);
 }
 
 .statOrange {
-  background: #ff9300;
+  background: #ff9500;
+  color: var(--navy);
 }
 
 .statRed {
-  background: #ff3e39;
+  background: #ff3b2f;
+  color: var(--navy);
 }
 
 .statGreen {
-  background: #56ca25;
+  background: #55be24;
+  color: var(--navy);
 }
 
 .panel {

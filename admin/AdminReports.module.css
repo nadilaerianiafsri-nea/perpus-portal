@@ -2,8 +2,8 @@
   --navy: #000633;
   --navy-soft: #2b3056;
   --yellow: #ffd000;
-  --blue: #2caef3;
-  --green: #56ca25;
+  --blue: #1fabff;
+  --green: #55be24;
   --line: #dedfe5;
   display: grid;
   gap: 18px;
@@ -60,12 +60,17 @@
 .errorBox button { min-height: 34px; padding: 0 12px; border: 1px solid #bc241c; background: #fff; color: #bc241c; }
 .loadingBox { background: #fff; border: 1px solid var(--line); color: #52699e; }
 
-.statsGrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
-.statCard { min-height: 128px; border: 1px solid var(--line); border-radius: 14px; background: #fff; padding: 17px; display: grid; align-content: space-between; gap: 9px; }
-.statCard:hover { border-color: var(--navy-soft); }
-.statCard span { font-size: 12px; font-weight: 700; color: #52699e; text-transform: uppercase; letter-spacing: .03em; }
+.statsGrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 12px; }
+.statCard { min-height: 128px; border: 1px solid transparent; border-radius: 16px; background: var(--navy-soft); color: #fff; padding: 17px; display: grid; align-content: space-between; gap: 9px; box-shadow: 0 4px 12px #0006330d; }
+/* Card order follows the existing report summary: returns/active members,
+   expired reservations/overdue/lost books, popular title, and grants. */
+.statCard:nth-child(2), .statCard:nth-child(6) { background: var(--green); color: var(--navy); }
+.statCard:nth-child(3), .statCard:nth-child(4), .statCard:nth-child(8) { background: #ff3b2f; color: var(--navy); }
+.statCard:nth-child(5) { background: var(--yellow); color: var(--navy); }
+.statCard:nth-child(7) { background: var(--blue); color: var(--navy); }
+.statCard span { font-size: 12px; font-weight: 700; color: inherit; text-transform: uppercase; letter-spacing: .03em; }
 .statCard strong { font-size: 25px; line-height: 1.2; overflow-wrap: anywhere; }
-.statCard small { color: #52699e; font-size: 12px; }
+.statCard small { color: inherit; font-size: 12px; }
 
 .chartCard { border: 1px solid var(--line); border-radius: 14px; background: #fff; padding: 18px; }
 .chartHeading { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 20px; }

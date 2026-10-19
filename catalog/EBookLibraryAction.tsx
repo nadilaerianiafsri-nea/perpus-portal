@@ -214,7 +214,7 @@ export default function EBookLibraryAction({
                 ? "Lanjut Baca"
                 : "Baca E-Book"}
           </Link>
-          <button aria-busy={pending} data-button="warning" data-button-size="md"
+          <button aria-busy={pending} data-button="success" data-button-size="md"
             className={styles.detailLink}
             type="button"
             disabled={pending}

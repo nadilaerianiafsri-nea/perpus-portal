@@ -242,7 +242,7 @@ export default function Grants() {
             <h2>Tidak ada data hibah yang sesuai.</h2>
             {active && <button data-button="ghost" data-button-size="md" onClick={clear}>Bersihkan Filter</button>}
             {totalPages > 0 && (
-              <button data-button="secondary" data-button-size="md" onClick={() => update({ page: "1" })}>
+              <button data-button="ghost" data-button-size="md" onClick={() => update({ page: "1" })}>
                 Kembali ke Halaman Pertama
               </button>
             )}
@@ -258,7 +258,7 @@ export default function Grants() {
             Sebelumnya
           </button>
           {pages.map((value) => (
-            <button data-button="secondary" data-button-size="sm"
+            <button data-button={page === value ? "primary" : "ghost"} data-button-size="sm"
               key={value}
               aria-current={page === value ? "page" : undefined}
               onClick={() => update({ page: String(value) })}

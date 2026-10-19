@@ -355,7 +355,7 @@ export default function AdminShell({ children, user }: AdminShellProps) {
             <FiHome size={18} />
             <span>Lihat Situs Publik</span>
           </Link>
-          <button data-button="danger" data-button-size="md" data-button-loading={loggingOut} type="button" onClick={handleLogout} disabled={loggingOut}>
+          <button data-button="ghost" data-button-size="md" data-button-loading={loggingOut} type="button" onClick={handleLogout} disabled={loggingOut}>
             <FiLogOut size={18} />
             <span>{loggingOut ? "Keluar..." : "Keluar"}</span>
           </button>
