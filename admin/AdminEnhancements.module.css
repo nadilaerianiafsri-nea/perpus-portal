@@ -10,9 +10,8 @@
 .clickableStatCard:hover,
 .clickableStatCard:focus-visible {
   transform: translateY(-2px);
-  border-color: #c9cedb;
-  border-left-color: var(--stat-accent);
-  box-shadow: 0 8px 16px #0006330a;
+  border-color: #00063324;
+  box-shadow: 0 8px 18px #0006331a;
 }
 
 .clickableStatCard:focus-visible {

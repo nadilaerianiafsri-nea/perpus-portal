@@ -284,7 +284,7 @@ export default function AdminDashboard() {
           label: "TOTAL KOLEKSI",
           value: dashboard.stats.totalCollections.toLocaleString("id-ID"),
           icon: FiBookOpen,
-          tone: styles.statNavy,
+          tone: styles.statDark,
           href: "/admin/koleksi/data-buku",
         },
         {
@@ -312,7 +312,7 @@ export default function AdminDashboard() {
           label: "PEMINJAMAN AKTIF",
           value: dashboard.stats.activeLoans.toLocaleString("id-ID"),
           icon: FiPackage,
-          tone: styles.statNavy,
+          tone: styles.statDark,
           href: "/admin/transaksi/peminjaman?status=ACTIVE",
         },
         {
@@ -347,7 +347,7 @@ export default function AdminDashboard() {
           label: "E-BOOK",
           value: dashboard.stats.ebooks.toLocaleString("id-ID"),
           icon: FiMonitor,
-          tone: styles.statBlue,
+          tone: styles.statYellow,
           href: "/admin/koleksi/e-book",
         },
       ]
