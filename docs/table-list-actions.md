@@ -11,9 +11,19 @@ The existing button system supports a scoped `data-row-action` appearance. Compa
 
 These are text buttons, not square icon-only actions. Both retain object-specific accessible names, the existing loading/disabled expressions, native button semantics and the original ConfirmDialog handlers. Existing ButtonLabel reserves pending-label space. Scoped `returnsActionsCell`/`returnsActions` rules in `AdminTransactions.module.css` size the action column to its content and prevent labels from shrinking; the buttons stack below 700px. The existing table scroll container is retained, with no page overflow. Other tables keep icon-only actions.
 
-Both Returns actions deliberately contain no SVG/icon. The Returns-only `returnsTable` class sets body/primary text to 14px, headers to 12px, secondary metadata/status badges to 12px and action text to 14px/600. Body line-height is 1.5; button line-height is 1.3. Rows use 16px cell padding, and the local pagination text is 12px. The table retains Outfit and its existing internal horizontal scrolling instead of shrinking text to fit. CSS variables and selectors are scoped to Returns, leaving all other transaction-table typography unchanged.
+Both Returns actions deliberately contain no SVG/icon. Shared `transactionTable` styles set body/primary text to 14px, headers to 12px and secondary metadata/status badges to 12px on Reservations, Loans and Returns. Returns-only action text remains 14px/600, with line-height 1.3. Body line-height is 1.5; rows use 16px cell padding and the corresponding pagination text is 12px. These tables retain Outfit and existing internal scrolling instead of shrinking text to fit. Other transaction pages remain outside this typography scope.
 
 This exception changed only `admin/AdminReturnsPage.tsx`, its scoped styles in `admin/AdminTransactions.module.css`, and this document. Browser checks at 1440/768/390px passed for full labels, aligned/stacked 40-44px controls, no control/page overflow, Space/Enter, both existing confirmations/endpoints, cancellation without mutation, stable pending dimensions and single submit. A representative other table retained its icon controls at all three widths. TypeScript, Returns-file ESLint, four Button tests, production build and the AST behavior-preservation check passed. Mutation checks used an isolated in-memory API fixture.
+
+## Transaction list ID visibility
+
+The main Reservations, physical Loans, E-Book access and Returns tables no longer render a transaction ID column. Their column counts are respectively 6, 7, 6 and 7, including matching loading/empty-state spans. Every remaining header has `scope="col"` and the first column is Member. Internal object IDs, React keys, action lookup IDs, payload types, routes, backend generators, detail pages and search/filter/pagination callbacks remain unchanged.
+
+The table's obsolete fixed minimum width no longer reserves space for the removed column. Native table sizing distributes space among the remaining columns, with minimum member/book content widths of 160/220px. Reservations/Loans keep icon actions; Returns keeps its text-only decisions.
+
+Browser checks covered all four tables at 1440/768/390px, loading/empty column spans, 14/12px typography, no page overflow, retained API IDs and unchanged search-query forwarding. Pickup and Returns confirmations still submit using the original internal ID. TypeScript, three-page ESLint, 14 relevant Node tests and production build passed.
+
+Existing search limitation: backend `reservationSearch`/`loanSearch` match member details and book/copy metadata; they do not currently implement formatted `RSV-...`/`TRX-...` lookup. That existing behavior was preserved; this UI task does not add backend search support.
 
 ## Reusable system
 

@@ -17,7 +17,6 @@ import {
   memberTypeLabel,
   physicalLoanStatus,
   transactionApiMessage,
-  transactionId,
   type ReturnsResponse,
 } from "./adminTransactions";
 import styles from "./AdminTransactions.module.css";
@@ -261,24 +260,23 @@ export default function AdminReturnsPage() {
         ) : null}
 
         <div className={styles.tableScroller}>
-          <table className={`${styles.table} ${styles.tableWide} ${styles.returnsTable}`}>
+          <table className={`${styles.table} ${styles.tableWide} ${styles.transactionTable} ${styles.returnsTable}`}>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>ANGGOTA</th>
-                <th>BUKU</th>
-                <th>DIPINJAM</th>
-                <th>JATUH TEMPO</th>
-                <th>PERPANJANGAN</th>
-                <th>STATUS</th>
-                <th className={styles.returnsActionsCell}>AKSI</th>
+                <th scope="col">ANGGOTA</th>
+                <th scope="col">BUKU</th>
+                <th scope="col">DIPINJAM</th>
+                <th scope="col">JATUH TEMPO</th>
+                <th scope="col">PERPANJANGAN</th>
+                <th scope="col">STATUS</th>
+                <th scope="col" className={styles.returnsActionsCell}>AKSI</th>
               </tr>
             </thead>
 
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={8} className={styles.stateCell}>
+                  <td colSpan={7} className={styles.stateCell}>
                     Memuat data pengembalian...
                   </td>
                 </tr>
@@ -288,10 +286,6 @@ export default function AdminReturnsPage() {
 
                   return (
                     <tr key={loan.id}>
-                      <td className={styles.transactionCode}>
-                        {transactionId(loan.id)}
-                      </td>
-
                       <td>
                         <div className={styles.memberCell}>
                           <strong>{loan.member.name}</strong>
@@ -388,7 +382,7 @@ export default function AdminReturnsPage() {
                 })
               ) : (
                 <tr>
-                  <td colSpan={8} className={styles.stateCell}>
+                  <td colSpan={7} className={styles.stateCell}>
                     Tidak ada pinjaman yang sesuai dengan pencarian atau filter.
                   </td>
                 </tr>
@@ -398,7 +392,7 @@ export default function AdminReturnsPage() {
         </div>
 
         {!loading && result.meta.totalPages > 1 ? (
-          <nav className={`${styles.pagination} ${styles.returnsPagination}`} aria-label="Halaman pengembalian">
+          <nav className={`${styles.pagination} ${styles.transactionPagination}`} aria-label="Halaman pengembalian">
             <button
               data-button="secondary"
               data-button-size="sm"

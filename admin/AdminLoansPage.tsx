@@ -16,7 +16,6 @@ import {
   memberTypeLabel,
   physicalLoanStatus,
   transactionApiMessage,
-  transactionId,
   whatsappReminderHref,
   type LoansResponse,
 } from "./adminTransactions";
@@ -258,27 +257,26 @@ export default function AdminLoansPage() {
           </div>
         ) : null}
 
-        <p className={styles.sectionCount}>{result.meta.total} transaksi</p>
+        <p className={`${styles.sectionCount} ${styles.transactionCount}`}>{result.meta.total} transaksi</p>
 
         <div className={styles.tableScroller}>
-          <table className={`${styles.table} ${styles.tableWide}`}>
+          <table className={`${styles.table} ${styles.tableWide} ${styles.transactionTable}`}>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>ANGGOTA</th>
-                <th>BUKU</th>
-                <th>DIPINJAM</th>
-                <th>JATUH TEMPO</th>
-                <th>PERPANJANGAN</th>
-                <th>STATUS</th>
-                <th>AKSI</th>
+                <th scope="col">ANGGOTA</th>
+                <th scope="col">BUKU</th>
+                <th scope="col">DIPINJAM</th>
+                <th scope="col">JATUH TEMPO</th>
+                <th scope="col">PERPANJANGAN</th>
+                <th scope="col">STATUS</th>
+                <th scope="col">AKSI</th>
               </tr>
             </thead>
 
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={8} className={styles.stateCell}>
+                  <td colSpan={7} className={styles.stateCell}>
                     Memuat data peminjaman...
                   </td>
                 </tr>
@@ -294,10 +292,6 @@ export default function AdminLoansPage() {
 
                   return (
                     <tr key={loan.id}>
-                      <td className={styles.transactionCode}>
-                        {transactionId(loan.id)}
-                      </td>
-
                       <td>
                         <div className={styles.memberCell}>
                           <strong>{loan.member.name}</strong>
@@ -365,7 +359,7 @@ export default function AdminLoansPage() {
                 })
               ) : (
                 <tr>
-                  <td colSpan={8} className={styles.stateCell}>
+                  <td colSpan={7} className={styles.stateCell}>
                     Tidak ada pinjaman yang sesuai dengan pencarian atau filter.
                   </td>
                 </tr>
@@ -375,7 +369,7 @@ export default function AdminLoansPage() {
         </div>
 
         {!loading && result.meta.totalPages > 1 ? (
-          <nav className={styles.pagination} aria-label="Halaman peminjaman">
+          <nav className={`${styles.pagination} ${styles.transactionPagination}`} aria-label="Halaman peminjaman">
             <button
               data-button="secondary"
               data-button-size="sm"
@@ -411,33 +405,28 @@ export default function AdminLoansPage() {
         </header>
 
         <div className={styles.tableScroller}>
-          <table className={styles.table}>
+          <table className={`${styles.table} ${styles.transactionTable}`}>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>ANGGOTA</th>
-                <th>JUDUL E-BOOK</th>
-                <th>KODE</th>
-                <th>MULAI AKSES</th>
-                <th>BERAKHIR</th>
-                <th>TIPE</th>
+                <th scope="col">ANGGOTA</th>
+                <th scope="col">JUDUL E-BOOK</th>
+                <th scope="col">KODE</th>
+                <th scope="col">MULAI AKSES</th>
+                <th scope="col">BERAKHIR</th>
+                <th scope="col">TIPE</th>
               </tr>
             </thead>
 
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={7} className={styles.stateCell}>
+                  <td colSpan={6} className={styles.stateCell}>
                     Memuat akses E-Book...
                   </td>
                 </tr>
               ) : result.ebooks.length ? (
                 result.ebooks.map((ebook) => (
                   <tr key={ebook.id}>
-                    <td className={styles.transactionCode}>
-                      {transactionId(ebook.id, "EB")}
-                    </td>
-
                     <td>
                       <div className={styles.memberCell}>
                         <strong>{ebook.member.name}</strong>
@@ -447,7 +436,7 @@ export default function AdminLoansPage() {
                       </div>
                     </td>
 
-                    <td>{ebook.book.title}</td>
+                    <td><strong>{ebook.book.title}</strong></td>
                     <td>{ebook.book.code}</td>
 
                     <td>{formatTransactionDate(ebook.addedAt)}</td>
@@ -467,7 +456,7 @@ export default function AdminLoansPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={7} className={styles.stateCell}>
+                  <td colSpan={6} className={styles.stateCell}>
                     Tidak ada akses E-Book aktif.
                   </td>
                 </tr>

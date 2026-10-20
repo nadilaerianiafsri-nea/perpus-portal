@@ -304,50 +304,59 @@
   white-space: nowrap;
 }
 
-/* Readable Returns records and text-only decisions; other tables stay unchanged. */
-.returnsTable {
-  --returns-body-size: 14px;
-  --returns-header-size: 12px;
-  --returns-meta-size: 12px;
-  font-size: var(--returns-body-size);
+/* Shared readable records for Reservations, Loans and Returns only. */
+.table.transactionTable {
+  --transaction-body-size: 14px;
+  --transaction-header-size: 12px;
+  --transaction-meta-size: 12px;
+  min-width: 0;
+  font-size: var(--transaction-body-size);
   line-height: 1.5;
 }
 
-.returnsTable th {
+.transactionTable th {
   height: 48px;
   padding: 12px 16px;
-  font-size: var(--returns-header-size);
+  font-size: var(--transaction-header-size);
   line-height: 1.4;
 }
 
-.returnsTable td {
+.transactionTable td {
   padding: 16px;
 }
 
-.returnsTable .transactionCode,
-.returnsTable .memberCell strong,
-.returnsTable .bookCell strong {
-  font-size: var(--returns-body-size);
+.transactionTable .memberCell strong,
+.transactionTable .bookCell strong {
+  font-size: var(--transaction-body-size);
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
 
-.returnsTable .memberCell small,
-.returnsTable .bookCell small {
+.transactionTable .memberCell small,
+.transactionTable .bookCell small {
   margin-top: 4px;
-  font-size: var(--returns-meta-size);
+  font-size: var(--transaction-meta-size);
   line-height: 1.5;
 }
 
-.returnsTable .pill {
+.transactionTable .pill {
   padding: 6px 8px;
-  font-size: var(--returns-meta-size);
+  font-size: var(--transaction-meta-size);
   line-height: 1.4;
 }
 
-.pagination.returnsPagination {
+.pagination.transactionPagination,
+.sectionCount.transactionCount {
   font-size: 12px;
   line-height: 1.5;
+}
+
+.transactionTable .memberCell {
+  min-width: 160px;
+}
+
+.transactionTable .bookCell {
+  min-width: 220px;
 }
 
 .returnsActionsCell {
@@ -366,7 +375,7 @@
 
 .returnsTable .returnsActionsCell .returnsActions > button[data-row-action][data-button] {
   padding-inline: 16px;
-  font-size: var(--returns-body-size);
+  font-size: var(--transaction-body-size);
   font-weight: 600;
   line-height: 1.3;
 }

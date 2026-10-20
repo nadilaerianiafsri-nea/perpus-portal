@@ -16,7 +16,6 @@ import {
   formatTransactionDateTime,
   memberTypeLabel,
   transactionApiMessage,
-  transactionId,
   type ReservationsResponse,
 } from "./adminTransactions";
 import styles from "./AdminTransactions.module.css";
@@ -294,33 +293,28 @@ export default function AdminReservationsPage() {
         ) : null}
 
         <div className={styles.tableScroller}>
-          <table className={`${styles.table} ${styles.tableWide}`}>
+          <table className={`${styles.table} ${styles.tableWide} ${styles.transactionTable}`}>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>ANGGOTA</th>
-                <th>BUKU</th>
-                <th>DIAJUKAN</th>
-                <th>BATAS PENGAMBILAN</th>
-                <th>STATUS</th>
-                <th>AKSI</th>
+                <th scope="col">ANGGOTA</th>
+                <th scope="col">BUKU</th>
+                <th scope="col">DIAJUKAN</th>
+                <th scope="col">BATAS PENGAMBILAN</th>
+                <th scope="col">STATUS</th>
+                <th scope="col">AKSI</th>
               </tr>
             </thead>
 
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={7} className={styles.stateCell}>
+                  <td colSpan={6} className={styles.stateCell}>
                     Memuat data reservasi...
                   </td>
                 </tr>
               ) : result.data.length ? (
                 result.data.map((reservation) => (
                   <tr key={reservation.id}>
-                    <td className={styles.transactionCode}>
-                      {transactionId(reservation.id, "RSV")}
-                    </td>
-
                     <td>
                       <div className={styles.memberCell}>
                         <strong>{reservation.member.name}</strong>
@@ -391,7 +385,7 @@ export default function AdminReservationsPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={7} className={styles.stateCell}>
+                  <td colSpan={6} className={styles.stateCell}>
                     Tidak ada reservasi yang sesuai dengan pencarian atau
                     filter.
                   </td>
@@ -402,7 +396,7 @@ export default function AdminReservationsPage() {
         </div>
 
         {!loading && result.meta.totalPages > 1 ? (
-          <nav className={styles.pagination} aria-label="Halaman reservasi">
+          <nav className={`${styles.pagination} ${styles.transactionPagination}`} aria-label="Halaman reservasi">
             <button
               data-button="secondary"
               data-button-size="sm"
