@@ -260,7 +260,7 @@ img {
   border-bottom: 0.8px solid #dfdfdf;
 }
 .hero-grid {
-  width: min(100%, 1650px);
+  width: min(var(--shell), calc(100% - 32px));
   min-height: 760px;
   display: grid;
   grid-template-columns: 44% 56%;
@@ -268,7 +268,7 @@ img {
   position: relative;
 }
 .hero-copy {
-  padding: 138px 0 96px max(0px, calc((100vw - 1180px) / 2));
+  padding: 138px 0 96px 0;
   position: relative;
   z-index: 4;
 }
@@ -394,7 +394,7 @@ img {
   min-height: 760px;
   position: relative;
   overflow: hidden;
-  margin-right: calc((100vw - min(100vw, 1650px)) / -2);
+  margin-right: 0;
 }
 .hero-art::before {
   content: "";
