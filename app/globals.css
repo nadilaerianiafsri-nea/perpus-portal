@@ -96,8 +96,8 @@ img {
   line-height: 1.7;
 }
 .centered {
-  max-width: 720px;
-  margin: 0 auto 36px;
+  max-width: 760px;
+  margin: 0 auto 42px;
   text-align: center;
 }
 .row-head {
@@ -269,7 +269,7 @@ img {
   position: relative;
 }
 .hero-copy {
-  padding: 138px 0 96px max(0px, calc((100vw - 1180px) / 2));
+  padding: 92px 0 88px max(0px, calc((100vw - 1180px) / 2));
   position: relative;
   z-index: 4;
 }
@@ -290,7 +290,7 @@ img {
 }
 .hero h1 {
   max-width: 570px;
-  margin: 30px 0 24px;
+  margin: 0 0 24px;
   color: #000633;
   font-size: clamp(60px, 5vw, 84px);
   line-height: 0.98;
@@ -652,7 +652,7 @@ img {
 
 /* DARK SERVICES */
 .service-dark {
-  background: var(--navy);
+  background: var(--stat-primary);
   color: var(--white);
 }
 .section-head.light p {
@@ -661,9 +661,9 @@ img {
 .feature-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 60px;
+  gap: 56px;
   align-items: center;
-  padding: 42px 0;
+  padding: 48px 0;
   border-top: 0.8px solid rgba(255, 255, 255, 0.08);
 }
 .feature-row:first-of-type {
@@ -675,12 +675,13 @@ img {
   letter-spacing: -0.035em;
 }
 .feature-copy p {
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 16px;
   line-height: 1.7;
 }
 .mini-tag {
   color: var(--yellow);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -698,13 +699,17 @@ img {
   gap: 6px;
   border: 0.8px solid rgba(255, 255, 255, 0.18);
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 13px;
 }
 .feature-art {
   min-height: 320px;
   position: relative;
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.04);
+  animation: landingCardEnter 0.5s ease both;
+  transition:
+    transform 0.22s ease,
+    background 0.22s ease;
 }
 .feature-art img {
   object-fit: contain;
@@ -727,6 +732,7 @@ img {
   border-radius: 8px;
   background: var(--white);
   box-shadow: var(--shadow);
+  animation: landingCardEnter 0.45s ease both;
   transition:
     transform 0.2s ease,
     border-color 0.2s ease,
@@ -746,14 +752,14 @@ img {
 .step-grid strong {
   display: block;
   margin-top: 18px;
-  font-size: 13px;
+  font-size: 14px;
 }
 .step-grid small {
   display: block;
   margin-top: 7px;
   color: rgba(0, 6, 51, 0.55);
-  font-size: 11px;
-  line-height: 1.5;
+  font-size: 12px;
+  line-height: 1.55;
 }
 .step-grid article.active {
   background: var(--navy);
@@ -801,7 +807,7 @@ img {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 14px;
+  font-size: 15px;
 }
 .ebook-copy li svg {
   color: var(--green);
@@ -824,6 +830,7 @@ img {
   border-radius: 10px;
   background: var(--white);
   box-shadow: var(--shadow);
+  animation: landingCardEnter 0.45s ease both;
   transition:
     transform 0.2s ease,
     border-color 0.2s ease,
@@ -891,6 +898,7 @@ img {
   border: 0.8px solid var(--line);
   border-radius: 10px;
   background: var(--white);
+  animation: landingCardEnter 0.45s ease both;
   transition:
     transform 0.2s ease,
     border-color 0.2s ease,
@@ -933,14 +941,14 @@ img {
 
 /* MEMBER CTA */
 .member-cta {
-  background: #000633;
+  background: var(--stat-primary);
   color: var(--white);
   border-top: 0.8px solid #ffd000;
 }
 .member-grid {
   display: grid;
   grid-template-columns: 1.2fr 0.8fr;
-  gap: 60px;
+  gap: 52px;
   align-items: center;
 }
 .member-grid p {
@@ -957,6 +965,10 @@ img {
   position: relative;
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.05);
+  animation: landingCardEnter 0.5s ease both;
+  transition:
+    transform 0.22s ease,
+    background 0.22s ease;
 }
 .member-art img {
   object-fit: contain;
@@ -966,6 +978,9 @@ img {
 /* INFO + FOOTER */
 .info-section {
   background: var(--white);
+}
+.info-section .section-head {
+  margin-bottom: 28px;
 }
 .info-grid {
   display: grid;
@@ -982,6 +997,7 @@ img {
   border-radius: 9px;
   background: var(--white);
   box-shadow: var(--shadow);
+  animation: landingCardEnter 0.45s ease both;
   transition:
     transform 0.2s ease,
     border-color 0.2s ease,
@@ -1006,20 +1022,20 @@ img {
   display: block;
 }
 .info-grid span {
-  font-size: 10px;
+  font-size: 11px;
   color: rgba(0, 6, 51, 0.5);
   letter-spacing: 0.08em;
 }
 .info-grid strong {
   margin-top: 4px;
-  font-size: 14px;
+  font-size: 15px;
 }
 .contact-center {
   margin-top: 18px;
   text-align: center;
 }
 .landing-footer {
-  background: var(--navy);
+  background: var(--stat-primary);
   color: var(--white);
   border-top: 0.8px solid var(--yellow);
 }
@@ -1033,12 +1049,12 @@ img {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 15px;
+  font-size: 16px;
 }
 .footer-about p {
   max-width: 340px;
   color: rgba(255, 255, 255, 0.62);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.65;
 }
 .footer-about > a {
@@ -1046,18 +1062,18 @@ img {
   align-items: center;
   gap: 6px;
   color: var(--yellow);
-  font-size: 11px;
+  font-size: 12px;
 }
 .footer-col {
   display: grid;
   align-content: start;
   gap: 10px;
-  font-size: 11px;
+  font-size: 13px;
 }
 .footer-col strong {
   margin-bottom: 4px;
   color: var(--white);
-  font-size: 10px;
+  font-size: 13px;
 }
 .footer-col a,
 .footer-col span {
@@ -1072,8 +1088,8 @@ img {
   justify-content: space-between;
   gap: 20px;
   border-top: 0.8px solid rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.45);
-  font-size: 10px;
+  color: rgba(255, 255, 255, 0.52);
+  font-size: 11px;
 }
 
 
@@ -1109,6 +1125,13 @@ img {
     background: var(--white);
     color: var(--navy);
     transform: scale(1.04);
+  }
+
+  .dark-outline-btn:hover {
+    background: var(--white);
+    border-color: var(--white);
+    color: var(--stat-primary);
+    transform: scale(1.03);
   }
 
   .outline-btn:hover,
@@ -1187,6 +1210,12 @@ img {
     box-shadow: 0 12px 34px rgba(0, 6, 51, 0.08);
     transform: translateY(-4px);
   }
+
+  .feature-art:hover,
+  .member-art:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-4px);
+  }
 }
 
 @media (max-width: 1280px) {
@@ -1211,7 +1240,7 @@ img {
     min-height: 680px;
   }
   .hero-copy {
-    padding-top: 112px;
+    padding-top: 76px;
   }
 }
 
@@ -1419,6 +1448,16 @@ img {
   .quick-grid small {
     font-size: 12px;
   }
+  .footer-about p,
+  .footer-col {
+    font-size: 12px;
+  }
+  .footer-col strong {
+    font-size: 12px;
+  }
+  .footer-bottom {
+    font-size: 10px;
+  }
 
   .site-header {
     padding-top: 7px;
@@ -1442,6 +1481,7 @@ img {
   .navy-btn,
   .outline-btn,
   .yellow-btn,
+  .dark-outline-btn,
   .soft-link,
   .stats-wrap [data-stat-card],
   .quick-grid a,
@@ -1451,7 +1491,9 @@ img {
   .step-grid article,
   .reminder-grid article,
   .donation-list > div,
-  .info-grid article {
+  .info-grid article,
+  .feature-art,
+  .member-art {
     animation: none;
     transition: none;
   }
@@ -1469,7 +1511,10 @@ img {
   .navy-btn:hover,
   .outline-btn:hover,
   .yellow-btn:hover,
-  .soft-link:hover {
+  .dark-outline-btn:hover,
+  .soft-link:hover,
+  .feature-art:hover,
+  .member-art:hover {
     transform: none;
   }
 }

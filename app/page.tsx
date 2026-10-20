@@ -68,7 +68,6 @@ export default async function Home() {
         <section className="hero" id="beranda">
           <div className="landing-shell hero-grid">
             <div className="hero-copy">
-              <span className="micro-badge">PORTAL RESMI {settings.libraryName.toUpperCase()}</span>
               <h1>Temukan<br />Pengetahuan,<br />dalam Satu Akses</h1>
               <p>
                 Jelajahi ribuan koleksi fisik dan e-book, reservasi buku,
