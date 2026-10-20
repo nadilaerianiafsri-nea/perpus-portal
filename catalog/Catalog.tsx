@@ -466,6 +466,7 @@ export default function Catalog({
                     book={book}
                     basePath={detailBasePath}
                     member={member}
+                    rowAction={view === "list"}
                   />
                 ))}
               </div>

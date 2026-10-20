@@ -1,10 +1,9 @@
 "use client";
 
-import { ButtonLabel } from '@/components/Button';
 import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import Image from "next/image";
 import Link from "next/link";
-import { FiCalendar, FiClock, FiMapPin } from "react-icons/fi";
+import { FiCalendar, FiClock, FiMapPin, FiXCircle } from "react-icons/fi";
 import { memberDate } from "./format";
 import { useCountdown } from "./useCountdown";
 import type { Reservation } from "./types";
@@ -44,7 +43,7 @@ export default function ReservationCard({ reservation, onExpire, onCancel, busy 
           <div><FiMapPin aria-hidden /><dt className={styles.srOnly}>Lokasi pengambilan</dt><dd>{reservation.pickupLocation}</dd></div>
           <div className={styles.deadline}><FiCalendar aria-hidden /><dt>Batas:</dt><dd><time dateTime={reservation.expiresAt}>{memberDate(reservation.expiresAt, true)}</time></dd></div>
         </dl>
-        <div className={styles.footer}><small>Eksemplar: {reservation.copy.code}</small>{active && onCancel && <button data-button="danger" data-row-action="danger-soft" data-button-size="sm" data-button-loading={busy} aria-busy={busy} type="button" disabled={busy} onClick={onCancel} aria-label={`Batalkan reservasi ${reservation.book.title}`}><ButtonLabel loading={busy} pending="Membatalkan...">Batalkan Reservasi</ButtonLabel></button>}</div>
+        <div className={styles.footer}><small>Eksemplar: {reservation.copy.code}</small>{active && onCancel && <button data-button="danger" data-row-action="danger-soft" data-button-shape="square" title={`Batalkan reservasi ${reservation.book.title}`} data-button-size="sm" data-button-loading={busy} aria-busy={busy} type="button" disabled={busy} onClick={onCancel} aria-label={`Batalkan reservasi ${reservation.book.title}`}><FiXCircle aria-hidden="true" /></button>}</div>
         {!active && <p className={styles.finishedNote}>{reservation.status === "DIAMBIL" ? "Pengambilan telah dikonfirmasi oleh petugas perpustakaan." : reservation.status === "KEDALUWARSA" ? "Batas pengambilan telah berakhir. Stok buku dilepas kembali." : "Reservasi telah dibatalkan. Stok buku dilepas kembali."}</p>}
       </div>
       {active && <ReservationCountdown deadline={reservation.expiresAt} onExpire={onExpire} />}

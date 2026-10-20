@@ -1,10 +1,9 @@
 "use client";
 
-import { ButtonLabel } from '@/components/Button';
 import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import Image from "next/image";
 import Link from "next/link";
-import { FiAlertTriangle, FiCheck, FiRefreshCw, FiXCircle } from "react-icons/fi";
+import { FiAlertTriangle, FiCheck, FiEye, FiInfo, FiRefreshCw, FiXCircle } from "react-icons/fi";
 import { loanState, memberDate } from "./format";
 import type { Loan } from "./types";
 import styles from "./Loans.module.css";
@@ -36,8 +35,8 @@ export default function LoanCard({ loan, now, busy, extending, onExtend, onRepla
         </dl>
       </div>
       <div className={styles.actions}>
-        {lost ? <button data-button="secondary" data-row-action="neutral" className={styles.replacementButton} disabled={busy} onClick={onReplacement}>Info Penggantian</button> : loan.status === "AKTIF" && <button data-button="primary" data-row-action="primary" data-button-loading={extending} aria-busy={extending} className={styles.extendButton} disabled={busy} onClick={onExtend}><FiRefreshCw aria-hidden /><ButtonLabel loading={extending} pending="Memperpanjang...">Perpanjang 7 Hari</ButtonLabel></button>}
-        <Link data-button="secondary" data-row-action="neutral" className={styles.detailLink} href={`/dashboard/koleksi/${loan.book.id}`}>Lihat Detail</Link>
+        {lost ? <button data-button="secondary" data-row-action="neutral" data-button-shape="square" title={`Info penggantian ${loan.book.title}`} aria-label={`Info penggantian ${loan.book.title}`} className={styles.replacementButton} disabled={busy} onClick={onReplacement}><FiInfo aria-hidden="true" /></button> : loan.status === "AKTIF" && <button data-button="primary" data-row-action="primary" data-button-shape="square" title={`Perpanjang pinjaman ${loan.book.title} 7 hari`} aria-label={`Perpanjang pinjaman ${loan.book.title} 7 hari`} data-button-loading={extending} aria-busy={extending} className={styles.extendButton} disabled={busy} onClick={onExtend}><FiRefreshCw aria-hidden="true" /></button>}
+        <Link data-button="secondary" data-row-action="neutral" data-button-shape="square" title={`Lihat detail ${loan.book.title}`} aria-label={`Lihat detail ${loan.book.title}`} className={styles.detailLink} href={`/dashboard/koleksi/${loan.book.id}`}><FiEye aria-hidden="true" /></Link>
       </div>
     </div>
   </article>;

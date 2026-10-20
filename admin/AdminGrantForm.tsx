@@ -2,6 +2,7 @@
 
 import { ButtonLabel } from '@/components/Button';
 import Link from "next/link";
+import { FiTrash2 } from "react-icons/fi";
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -422,7 +423,7 @@ export default function AdminGrantForm({ mode, id }: Props) {
                   />
                 </label>
 
-                <button data-row-action="danger"
+                <button data-button-shape="square" title="Hapus judul buku" aria-label={`Hapus ${item.title || `judul buku ${index + 1}`}`} data-row-action="danger"
                   data-button="danger"
                   data-button-size="sm"
                   type="button"
@@ -430,7 +431,7 @@ export default function AdminGrantForm({ mode, id }: Props) {
                   disabled={form.items.length <= 1}
                   onClick={() => removeItem(item.key)}
                 >
-                  Hapus
+                  <FiTrash2 aria-hidden="true" />
                 </button>
               </div>
             ))}

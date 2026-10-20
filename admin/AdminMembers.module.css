@@ -249,7 +249,6 @@
 }
 
 .actions {
-  min-width: 210px;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -738,13 +737,10 @@
 
   .mobileActions {
     margin-top: 10px;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
     gap: 6px;
-  }
-
-  .mobileActions > * {
-    width: 100%;
   }
 
   .mobileState {
@@ -792,10 +788,6 @@
 
 @media (max-width: 460px) {
   .mobileInfo {
-    grid-template-columns: 1fr;
-  }
-
-  .mobileActions {
     grid-template-columns: 1fr;
   }
 

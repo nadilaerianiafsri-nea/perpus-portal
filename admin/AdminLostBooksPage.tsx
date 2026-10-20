@@ -10,7 +10,7 @@ import { plainTextMessage } from "../members/inputSecurity";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { FiSearch } from "react-icons/fi";
+import { FiSearch, FiEye } from "react-icons/fi";
 
 import {
   formatTransactionDate,
@@ -302,13 +302,13 @@ export default function AdminLostBooksPage() {
                     </td>
 
                     <td>
-                      <Link data-row-action="neutral"
+                      <Link data-button-shape="square" title="Lihat detail anggota" aria-label={`Lihat detail anggota ${loan.member.name}`} data-row-action="neutral"
                         data-button="secondary"
                         data-button-size="sm"
                         href={`/admin/keanggotaan/${loan.member.id}`}
                         className={styles.linkAction}
                       >
-                        Lihat Anggota
+                        <FiEye aria-hidden="true" />
                       </Link>
                     </td>
                   </tr>

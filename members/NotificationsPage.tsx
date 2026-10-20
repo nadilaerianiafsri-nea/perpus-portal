@@ -4,7 +4,7 @@ import { ButtonLabel } from '@/components/Button';
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
-import { FiArrowRight, FiBell, FiCheck } from "react-icons/fi";
+import { FiBell, FiCheck, FiEye } from "react-icons/fi";
 import { memberRequest, useMemberResource } from "./api";
 import { useMember } from "./MemberContext";
 import { Badge, EmptyState, ErrorState, LoadingCards, PageHeading } from "./MemberUI";
@@ -76,8 +76,8 @@ export default function NotificationsPage() {
           <p>{item.message}</p><time dateTime={item.createdAt}>{memberDate(item.createdAt, true)}</time>
           <div className={styles.notificationActions}>
             <Badge tone={item.readAt ? "neutral" : "blue"}>{item.readAt ? "Sudah Dibaca" : "Belum Dibaca"}</Badge>
-            {!item.readAt && <button data-button="ghost" data-row-action="neutral" data-button-size="sm" data-button-loading={busy === String(item.id)} aria-busy={busy === String(item.id)} className={interaction.actionButton} disabled={busy !== null} onClick={event => { event.stopPropagation(); void markRead(item.id); }}><ButtonLabel loading={busy === String(item.id)} pending="Memperbarui...">Tandai Dibaca</ButtonLabel></button>}
-            {linked && <span data-button="secondary" data-button-size="sm" className={interaction.detail} data-notification-detail aria-hidden>Lihat detail <FiArrowRight /></span>}
+            {!item.readAt && <button data-button="ghost" data-row-action="neutral" data-button-shape="square" title={`Tandai dibaca: ${item.title}`} aria-label={`Tandai dibaca: ${item.title}`} data-button-size="sm" data-button-loading={busy === String(item.id)} aria-busy={busy === String(item.id)} className={interaction.actionButton} disabled={busy !== null} onClick={event => { event.stopPropagation(); void markRead(item.id); }}><FiCheck aria-hidden="true" /></button>}
+            {linked && <span data-button="secondary" data-button-shape="square" data-button-size="sm" className={interaction.detail} data-notification-detail aria-hidden><FiEye aria-hidden="true" /></span>}
           </div>
         </div>
       </article>;

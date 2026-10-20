@@ -15,7 +15,7 @@
 .clickable .cardLink:focus-visible { outline: none; }
 .actionButton { position: relative; z-index: 2; cursor: pointer; }
 .actionButton:disabled { cursor: wait; }
-.detail { display: inline-flex; align-items: center; gap: 5px; margin-left: auto; color: #086caa; white-space: nowrap; }
+.detail { display: inline-flex; align-items: center; margin-left: auto; color: #086caa; }
 .detail svg { flex-shrink: 0; }
 .clickable:has(.cardLink:hover) .detail[data-button="secondary"] {
   background: var(--button-hover-bg);

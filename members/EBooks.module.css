@@ -26,7 +26,7 @@
 .progress::-webkit-progress-value { background: #2B3056; border-radius: 10px; }
 .progress::-moz-progress-bar { background: #2B3056; border-radius: 10px; }
 .percentage { display: block; margin: 5px 0 10px; font-size: 11px; color: #2B3056; font-weight: 700; }
-.actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .read, .secondary, .secondaryLink { display: inline-flex; align-items: center; justify-content: center; min-height: 38px; border-radius: 8px; padding: 8px 11px; font: inherit; font-size: 12px; font-weight: 600; text-align: center; cursor: pointer; }
 .read { border: 1px solid #2B3056; background: #2B3056; color: #fff; }
 .read:hover { background: #000633; border-color: #000633; }
@@ -117,7 +117,7 @@
 @media (max-width: 1200px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .body { gap: 12px; } }
 @media (max-width: 600px) {
  .statsGrid { grid-template-columns: minmax(0, 1fr); } }
-@media (max-width: 600px) { .grid { grid-template-columns: minmax(0, 1fr); } .sectionHeading { align-items: flex-start; } .body { gap: 14px; } .actions { display: grid; grid-template-columns: 1fr; } .read, .secondary, .secondaryLink { width: 100%; min-height: 44px; }
+@media (max-width: 600px) { .grid { grid-template-columns: minmax(0, 1fr); } .sectionHeading { align-items: flex-start; } .body { gap: 14px; } .read, .secondary, .secondaryLink { width: 100%; min-height: 44px; }
   .statsGrid { gap: 8px; }
   .viewTabs { gap: 5px; padding: 4px; overflow-x: auto; }
   .viewTab { min-width: 108px; min-height: 44px; padding-inline: 8px; font-size: 12px; white-space: nowrap; }

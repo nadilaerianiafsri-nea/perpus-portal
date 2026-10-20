@@ -4,14 +4,13 @@
 import AdminStatCard from "./AdminStatCard";
 import { FiClock as CardClock, FiAlertTriangle as CardAlertTriangle, FiXCircle as CardXCircle, FiCheckCircle as CardCheckCircle } from "react-icons/fi";
 
-import { ButtonLabel } from '@/components/Button';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import { plainTextMessage } from "../members/inputSecurity";
 
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { FiSearch } from "react-icons/fi";
+import { FiSearch, FiCheckCircle } from "react-icons/fi";
 
 import {
   formatTransactionDateTime,
@@ -366,7 +365,7 @@ export default function AdminReservationsPage() {
 
                     <td>
                       {reservation.status === "MENUNGGU_PENGAMBILAN" ? (
-                        <button data-row-action="success" aria-busy={processingId === reservation.id}
+                        <button data-button-shape="square" title="Konfirmasi pengambilan" aria-label={`Konfirmasi pengambilan ${reservation.book.title} oleh ${reservation.member.name}`} data-row-action="success" aria-busy={processingId === reservation.id}
                           data-button="primary"
                           data-button-size="sm"
                           data-button-loading={processingId === reservation.id}
@@ -382,7 +381,7 @@ export default function AdminReservationsPage() {
                             });
                           }}
                         >
-                          <ButtonLabel loading={processingId === reservation.id} pending="Memproses...">Konfirmasi Pengambilan</ButtonLabel>
+                          <FiCheckCircle aria-hidden="true" />
                         </button>
                       ) : (
                         "-"

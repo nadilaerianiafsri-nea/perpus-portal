@@ -5,7 +5,7 @@ import { FiGift as CardGift, FiClock as CardClock, FiCheckCircle as CardCheckCir
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { FiSearch } from "react-icons/fi";
+import { FiSearch, FiEye, FiEdit2 } from "react-icons/fi";
 
 import {
   adminGrantApiMessage,
@@ -289,22 +289,22 @@ export default function AdminGrantsPage() {
 
                     <td>
                       <div className={styles.actions}>
-                        <Link data-row-action="neutral"
+                        <Link data-button-shape="square" title="Lihat detail hibah" aria-label={`Lihat detail hibah ${grantCode(grant.id)} dari ${grant.donorName}`} data-row-action="neutral"
                           data-button="secondary"
                           data-button-size="sm"
                           href={`/admin/hibah-buku/${grant.id}`}
                           className={styles.actionButton}
                         >
-                          Detail
+                          <FiEye aria-hidden="true" />
                         </Link>
 
-                        <Link data-row-action="warning"
+                        <Link data-button-shape="square" title="Edit hibah" aria-label={`Edit hibah ${grantCode(grant.id)} dari ${grant.donorName}`} data-row-action="warning"
                           data-button="warning"
                           data-button-size="sm"
                           href={`/admin/hibah-buku/${grant.id}/edit`}
                           className={styles.actionButton}
                         >
-                          Edit
+                          <FiEdit2 aria-hidden="true" />
                         </Link>
                       </div>
                     </td>
@@ -367,22 +367,22 @@ export default function AdminGrantsPage() {
                 </div>
 
                 <div className={styles.mobileActions}>
-                  <Link data-row-action="neutral"
+                  <Link data-button-shape="square" title="Lihat detail hibah" aria-label={`Lihat detail hibah ${grantCode(grant.id)} dari ${grant.donorName}`} data-row-action="neutral"
                     data-button="secondary"
                     data-button-size="sm"
                     href={`/admin/hibah-buku/${grant.id}`}
                     className={styles.actionButton}
                   >
-                    Detail
+                    <FiEye aria-hidden="true" />
                   </Link>
 
-                  <Link data-row-action="warning"
+                  <Link data-button-shape="square" title="Edit hibah" aria-label={`Edit hibah ${grantCode(grant.id)} dari ${grant.donorName}`} data-row-action="warning"
                     data-button="warning"
                     data-button-size="sm"
                     href={`/admin/hibah-buku/${grant.id}/edit`}
                     className={styles.actionButton}
                   >
-                    Edit
+                    <FiEdit2 aria-hidden="true" />
                   </Link>
                 </div>
               </article>

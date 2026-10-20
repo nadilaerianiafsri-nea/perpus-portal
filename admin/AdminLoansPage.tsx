@@ -9,7 +9,7 @@ import { plainTextMessage } from "../members/inputSecurity";
 
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { FiSearch } from "react-icons/fi";
+import { FiSearch, FiMessageCircle } from "react-icons/fi";
 
 import {
   formatTransactionDate,
@@ -346,7 +346,7 @@ export default function AdminLoansPage() {
 
                       <td>
                         {loanStatus !== "AKTIF" && whatsappHref ? (
-                          <a data-row-action="primary"
+                          <a data-button-shape="square" title="Kirim pengingat WhatsApp" aria-label={`Kirim pengingat WhatsApp kepada ${loan.member.name} untuk ${loan.book.title}`} data-row-action="primary"
                             data-button="secondary"
                             data-button-size="sm"
                             href={whatsappHref}
@@ -354,7 +354,7 @@ export default function AdminLoansPage() {
                             rel="noreferrer"
                             className={styles.secondaryAction}
                           >
-                            Kirim WhatsApp
+                            <FiMessageCircle aria-hidden="true" />
                           </a>
                         ) : (
                           "-"

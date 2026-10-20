@@ -385,10 +385,10 @@ export default function AdminBooksPage() {
                           data-button-shape="square"
                           href={`/admin/koleksi/data-buku/${book.id}`}
                           className={styles.iconAction}
-                          aria-label={`Lihat detail ${book.title}`}
-                          title="Lihat detail"
+                          aria-label={`Lihat detail buku ${book.title}`}
+                          title="Lihat detail buku"
                         >
-                          <FiEye />
+                          <FiEye aria-hidden="true" />
                         </Link>
                         <Link data-row-action="warning"
                           data-button="warning"
@@ -396,10 +396,10 @@ export default function AdminBooksPage() {
                           data-button-shape="square"
                           href={`/admin/koleksi/data-buku/${book.id}/edit`}
                           className={styles.iconAction}
-                          aria-label={`Edit ${book.title}`}
+                          aria-label={`Edit buku ${book.title}`}
                           title="Edit buku"
                         >
-                          <FiEdit2 />
+                          <FiEdit2 aria-hidden="true" />
                         </Link>
                         <button data-row-action={book.isActive ? "danger-soft" : "success"} aria-busy={changingId === book.id}
                           data-button={book.isActive ? "danger" : "success"}
@@ -412,16 +412,16 @@ export default function AdminBooksPage() {
                           }`}
                           aria-label={
                             book.isActive
-                              ? `Nonaktifkan ${book.title}`
-                              : `Aktifkan ${book.title}`
+                              ? `Nonaktifkan buku ${book.title}`
+                              : `Aktifkan buku ${book.title}`
                           }
-                          title={book.isActive ? "Nonaktifkan" : "Aktifkan"}
+                          title={book.isActive ? "Nonaktifkan buku" : "Aktifkan buku"}
                           disabled={changingId === book.id}
                           onClick={() =>
                             requestStatus(book.id, book.isActive, book.title)
                           }
                         >
-                          <FiPower />
+                          <FiPower aria-hidden="true" />
                         </button>
                       </div>
                     </td>

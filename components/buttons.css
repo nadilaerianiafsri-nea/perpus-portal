@@ -365,6 +365,8 @@
   --button-pressed-bg: color-mix(in srgb, var(--button-error) 23%, white);
 }
 :root body [data-button][data-button][data-row-action][data-button-shape="square"] {
+  display: inline-flex;
+  flex: 0 0 var(--button-height);
   width: var(--button-height);
   min-width: var(--button-height);
   height: var(--button-height);

@@ -1,7 +1,7 @@
 import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import Image from "next/image";
 import Link from "next/link";
-import { FiBookOpen, FiCheckCircle, FiClock, FiMonitor } from "react-icons/fi";
+import { FiBookOpen, FiCheckCircle, FiClock, FiEye, FiMonitor } from "react-icons/fi";
 import { type Book, availabilityLabels, typeLabels } from "./types";
 import styles from "./Catalog.module.css";
 
@@ -32,11 +32,13 @@ export default function BookCard({
   basePath = "/koleksi",
   member = false,
   compact = false,
+  rowAction = false,
 }: {
   book: Book;
   basePath?: string;
   member?: boolean;
   compact?: boolean;
+  rowAction?: boolean;
 }) {
   const detailHref = `${basePath}/${book.id}`;
   const details = (
@@ -65,8 +67,8 @@ export default function BookCard({
   const actions = (
     <>
       <BookStatus book={book} />
-      <Link data-button="secondary" data-button-size="md" data-row-action="neutral" className={styles.detailLink} href={detailHref}>
-        Lihat Detail
+      <Link data-button="secondary" data-button-size="md" data-row-action="neutral" data-button-shape={rowAction ? "square" : undefined} title={rowAction ? "Lihat detail koleksi" : undefined} aria-label={rowAction ? `Lihat detail ${book.title}` : undefined} className={styles.detailLink} href={detailHref}>
+        {rowAction ? <FiEye aria-hidden="true" /> : "Lihat Detail"}
       </Link>
     </>
   );

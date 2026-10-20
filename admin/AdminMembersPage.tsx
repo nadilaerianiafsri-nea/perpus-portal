@@ -7,9 +7,8 @@ import { plainTextMessage } from "../members/inputSecurity";
 
 import Link from "next/link";
 import ConfirmDialog from "@/components/ConfirmDialog";
-import { ButtonLabel } from "@/components/Button";
 import { useCallback, useEffect, useState } from "react";
-import { FiSearch } from "react-icons/fi";
+import { FiSearch, FiEye, FiEdit2, FiPower } from "react-icons/fi";
 
 import {
   adminMemberApiMessage,
@@ -334,25 +333,25 @@ export default function AdminMembersPage() {
 
                     <td>
                       <div className={styles.actions}>
-                        <Link data-row-action="neutral"
+                        <Link data-button-shape="square" title="Lihat detail anggota" aria-label={`Lihat detail anggota ${member.name}`} data-row-action="neutral"
                           data-button="secondary"
                           data-button-size="sm"
                           href={`/admin/keanggotaan/${member.id}`}
                           className={styles.detailAction}
                         >
-                          Detail
+                          <FiEye aria-hidden="true" />
                         </Link>
 
-                        <Link data-row-action="warning"
+                        <Link data-button-shape="square" title="Edit anggota" aria-label={`Edit anggota ${member.name}`} data-row-action="warning"
                           data-button="warning"
                           data-button-size="sm"
                           href={`/admin/keanggotaan/${member.id}/edit`}
                           className={styles.editAction}
                         >
-                          Edit
+                          <FiEdit2 aria-hidden="true" />
                         </Link>
 
-                        <button data-row-action={member.isActive ? "danger-soft" : "success"} aria-busy={changingId === member.id}
+                        <button data-button-shape="square" title={member.isActive ? "Nonaktifkan anggota" : "Aktifkan anggota"} aria-label={member.isActive ? `Nonaktifkan anggota ${member.name}` : `Aktifkan anggota ${member.name}`} data-row-action={member.isActive ? "danger-soft" : "success"} aria-busy={changingId === member.id}
                           data-button={member.isActive ? "danger" : "success"}
                           data-button-size="sm"
                           data-button-loading={changingId === member.id}
@@ -371,9 +370,7 @@ export default function AdminMembersPage() {
                             )
                           }
                         >
-                          <ButtonLabel loading={changingId === member.id} pending="Memproses...">
-                            {member.isActive ? "Nonaktifkan" : "Aktifkan"}
-                          </ButtonLabel>
+                          <FiPower aria-hidden="true" />
                         </button>
                       </div>
                     </td>
@@ -445,25 +442,25 @@ export default function AdminMembersPage() {
                 </dl>
 
                 <div className={styles.mobileActions}>
-                  <Link data-row-action="neutral"
+                  <Link data-button-shape="square" title="Lihat detail anggota" aria-label={`Lihat detail anggota ${member.name}`} data-row-action="neutral"
                     data-button="secondary"
                     data-button-size="sm"
                     href={`/admin/keanggotaan/${member.id}`}
                     className={styles.detailAction}
                   >
-                    Detail
+                    <FiEye aria-hidden="true" />
                   </Link>
 
-                  <Link data-row-action="warning"
+                  <Link data-button-shape="square" title="Edit anggota" aria-label={`Edit anggota ${member.name}`} data-row-action="warning"
                     data-button="warning"
                     data-button-size="sm"
                     href={`/admin/keanggotaan/${member.id}/edit`}
                     className={styles.editAction}
                   >
-                    Edit
+                    <FiEdit2 aria-hidden="true" />
                   </Link>
 
-                  <button data-row-action={member.isActive ? "danger-soft" : "success"} aria-busy={changingId === member.id}
+                  <button data-button-shape="square" title={member.isActive ? "Nonaktifkan anggota" : "Aktifkan anggota"} aria-label={member.isActive ? `Nonaktifkan anggota ${member.name}` : `Aktifkan anggota ${member.name}`} data-row-action={member.isActive ? "danger-soft" : "success"} aria-busy={changingId === member.id}
                     data-button={member.isActive ? "danger" : "success"}
                     data-button-size="sm"
                     data-button-loading={changingId === member.id}
@@ -478,9 +475,7 @@ export default function AdminMembersPage() {
                       requestStatus(member.id, member.isActive, member.name)
                     }
                   >
-                    <ButtonLabel loading={changingId === member.id} pending="Memproses...">
-                      {member.isActive ? "Nonaktifkan" : "Aktifkan"}
-                    </ButtonLabel>
+                    <FiPower aria-hidden="true" />
                   </button>
                 </div>
               </article>

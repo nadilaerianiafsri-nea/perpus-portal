@@ -9,7 +9,7 @@ import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import { plainTextMessage } from "../members/inputSecurity";
 
 import { useCallback, useEffect, useState } from "react";
-import { FiSearch } from "react-icons/fi";
+import { FiSearch, FiCornerDownLeft, FiAlertTriangle } from "react-icons/fi";
 
 import {
   formatTransactionDate,
@@ -341,7 +341,7 @@ export default function AdminReturnsPage() {
 
                       <td>
                         <div className={styles.actionGroup}>
-                          <button data-row-action="success" aria-busy={processingId === loan.id}
+                          <button data-button-shape="square" title="Konfirmasi pengembalian" aria-label={`Konfirmasi pengembalian ${loan.book.title} oleh ${loan.member.name}`} data-row-action="success" aria-busy={processingId === loan.id}
                             data-button="success"
                             data-button-size="sm"
                             data-button-loading={processingId === loan.id}
@@ -358,10 +358,10 @@ export default function AdminReturnsPage() {
                               });
                             }}
                           >
-                            Kembalikan
+                            <FiCornerDownLeft aria-hidden="true" />
                           </button>
 
-                          <button data-row-action="danger-soft" aria-busy={processingId === loan.id}
+                          <button data-button-shape="square" title="Tandai buku hilang" aria-label={`Tandai ${loan.book.title} oleh ${loan.member.name} sebagai hilang`} data-row-action="danger-soft" aria-busy={processingId === loan.id}
                             data-button="danger"
                             data-button-size="sm"
                             data-button-loading={processingId === loan.id}
@@ -378,7 +378,7 @@ export default function AdminReturnsPage() {
                               });
                             }}
                           >
-                            Buku Hilang
+                            <FiAlertTriangle aria-hidden="true" />
                           </button>
                         </div>
                       </td>

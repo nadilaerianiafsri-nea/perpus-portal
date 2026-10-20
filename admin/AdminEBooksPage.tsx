@@ -238,11 +238,11 @@ export default function AdminEBooksPage() {
                     </td>
                     <td>
                       <div className={styles.actions}>
-                        <Link data-row-action="neutral" data-button="secondary" data-button-size="sm" data-button-shape="square" href={`/admin/koleksi/e-book/${book.id}`} className={styles.iconAction} aria-label={`Lihat detail ${book.title}`} title="Lihat detail">
-                          <FiEye />
+                        <Link data-row-action="neutral" data-button="secondary" data-button-size="sm" data-button-shape="square" href={`/admin/koleksi/e-book/${book.id}`} className={styles.iconAction} aria-label={`Lihat detail E-Book ${book.title}`} title="Lihat detail E-Book">
+                          <FiEye aria-hidden="true" />
                         </Link>
-                        <Link data-row-action="warning" data-button="warning" data-button-size="sm" data-button-shape="square" href={`/admin/koleksi/e-book/${book.id}/edit`} className={styles.iconAction} aria-label={`Edit ${book.title}`} title="Edit E-Book">
-                          <FiEdit2 />
+                        <Link data-row-action="warning" data-button="warning" data-button-size="sm" data-button-shape="square" href={`/admin/koleksi/e-book/${book.id}/edit`} className={styles.iconAction} aria-label={`Edit E-Book ${book.title}`} title="Edit E-Book">
+                          <FiEdit2 aria-hidden="true" />
                         </Link>
                         <button data-row-action={book.isActive ? "danger-soft" : "success"} aria-busy={changingId === book.id}
                           data-button={book.isActive ? "danger" : "success"}
@@ -251,12 +251,12 @@ export default function AdminEBooksPage() {
                           data-button-loading={changingId === book.id}
                           type="button"
                           className={`${styles.iconAction} ${book.isActive ? styles.powerOff : styles.powerOn}`}
-                          aria-label={book.isActive ? `Nonaktifkan ${book.title}` : `Aktifkan ${book.title}`}
-                          title={book.isActive ? "Nonaktifkan" : "Aktifkan"}
+                          aria-label={book.isActive ? `Nonaktifkan E-Book ${book.title}` : `Aktifkan E-Book ${book.title}`}
+                          title={book.isActive ? "Nonaktifkan E-Book" : "Aktifkan E-Book"}
                           disabled={changingId === book.id}
                           onClick={() => requestStatus(book.id, book.isActive, book.title)}
                         >
-                          <FiPower />
+                          <FiPower aria-hidden="true" />
                         </button>
                       </div>
                     </td>

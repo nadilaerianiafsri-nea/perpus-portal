@@ -17,7 +17,6 @@
 .deadline svg,.deadline dt,.deadline dd { color: #955700; font-weight: 600; }
 .footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding-top: 10px; }
 .footer small { color: #6b6b75; font-size: 11px; overflow-wrap: anywhere; }
-.footer button { border: 0; padding: 1px 0; background: transparent; color: #2b3056; font-size: 11px; text-decoration: underline; text-underline-offset: 3px; }
 .countdown { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; min-height: 140px; padding: 14px 12px; border-radius: 14px; background: #1aa7f8; color: #00344f; box-shadow: 0 2px 2px #00063313; text-align: center; }
 .countdown > span,.countdown small { font-size: 11px; line-height: 1.4; }
 .digits { display: flex; align-items: center; justify-content: center; gap: 7px; font-variant-numeric: tabular-nums; }
