@@ -598,6 +598,77 @@
   font-weight: 600;
 }
 
+/* Detail-only rhythm: keep the shared list/form layouts and card design intact. */
+.detailPage {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+}
+
+.detailPage .detailHeading {
+  margin-bottom: 0;
+  gap: 20px;
+}
+
+.detailPage .localBreadcrumb {
+  margin-bottom: 12px;
+  gap: 8px;
+}
+
+.detailPage .detailHeading p {
+  margin-top: 8px;
+}
+
+.detailPage .hero,
+.detailPage .panel {
+  min-width: 0;
+  padding: 24px;
+}
+
+.detailPage .detailStats {
+  gap: 20px;
+}
+
+.detailPage .detailGrid {
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 20px;
+}
+
+.detailPage .panel h2 {
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+}
+
+.detailPage .infoList > div {
+  padding-block: 16px;
+}
+
+.detailPage .infoList > div:first-child {
+  padding-top: 0;
+}
+
+.detailPage .infoList > div:last-child {
+  padding-bottom: 0;
+}
+
+.detailPage .infoList dt {
+  margin-bottom: 8px;
+}
+
+.detailPage .catalogFlow {
+  gap: 12px;
+}
+
+.detailPage .catalogStep {
+  gap: 12px;
+  padding: 12px;
+}
+
+.detailPage .tableScroller {
+  display: block;
+  min-width: 0;
+}
+
 .formPage {
   display: grid;
   gap: 15px;
@@ -754,12 +825,26 @@
     grid-template-columns: minmax(0, 1fr) repeat(2, 170px);
   }
 
-  .detailGrid {
+  .detailPage .detailGrid {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 800px) {
+  .detailPage {
+    gap: 20px;
+  }
+
+  .detailPage .hero,
+  .detailPage .panel {
+    padding: 20px;
+  }
+
+  .detailPage .detailHeading,
+  .detailPage .detailStats {
+    gap: 16px;
+  }
+
   .pageHeading,
   .detailHeading {
     flex-direction: column;
@@ -796,6 +881,23 @@
 }
 
 @media (max-width: 650px) {
+  .detailPage {
+    gap: 16px;
+  }
+
+  .detailPage .hero,
+  .detailPage .panel {
+    padding: 16px;
+  }
+
+  .detailPage .detailGrid {
+    gap: 16px;
+  }
+
+  .detailPage .panel h2 {
+    margin-bottom: 16px;
+  }
+
   .pageHeading h1,
   .detailHeading h1 {
     font-size: 22px;

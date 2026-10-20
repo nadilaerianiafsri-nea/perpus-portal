@@ -57,6 +57,7 @@ export default function AdminGrantDetail({ id }: Props) {
   }, [id]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Preserve the existing detail fetch lifecycle during this layout-only change.
     void load();
   }, [load]);
 
