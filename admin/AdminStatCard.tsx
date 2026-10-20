@@ -1,8 +1,7 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
-import styles from "./AdminStatCard.module.css";
+import StatCard, { type StatTone } from "@/components/StatCard";
 
-export type AdminStatTone = "dark" | "primary" | "slate" | "teal" | "info" | "success" | "danger" | "coral" | "warning" | "yellow";
+export type AdminStatTone = StatTone;
 
 type AdminStatCardProps = {
   label: string;
@@ -16,16 +15,5 @@ type AdminStatCardProps = {
 
 /** Shared presentation only: pages retain their values, links, and calculations. */
 export default function AdminStatCard({ label, value, icon, tone, detail, href, textValue }: AdminStatCardProps) {
-  const content = <>
-    <span className={styles.icon} aria-hidden="true">{icon}</span>
-    <div className={styles.body}>
-      <span className={styles.label}>{label}</span>
-      <strong className={`${styles.value} ${textValue ? styles.textValue : ""}`}>{value}</strong>
-      {detail && <small className={styles.detail}>{detail}</small>}
-    </div>
-  </>;
-  const className = `${styles.card} ${styles[tone]} ${href ? styles.clickable : ""}`;
-  return href
-    ? <Link href={href} className={className} data-admin-stat data-stat-tone={tone} aria-label={`${label}: ${value}. Buka halaman terkait.`}>{content}</Link>
-    : <article className={className} data-admin-stat data-stat-tone={tone}>{content}</article>;
+  return <StatCard label={label} value={value} icon={icon} tone={tone} detail={detail} href={href} textValue={textValue} data-admin-stat aria-label={href ? `${label}: ${value}. Buka halaman terkait.` : undefined} />;
 }

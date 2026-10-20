@@ -654,23 +654,7 @@
 
 .stockBox {
   margin-bottom: 13px;
-  padding: 17px;
-  border-radius: 11px;
-  background: var(--admin-success);
-  color: var(--navy);
-}
-
-.stockBox > span {
-  display: block;
-  color: inherit;
-  font-size: 9px;
-}
-
-.stockBox > strong {
-  display: block;
-  margin: 5px 0 11px;
-  color: var(--navy);
-  font-size: 24px;
+  height: auto;
 }
 
 .stockBox strong small {
@@ -679,25 +663,19 @@
   font-weight: 500;
 }
 
-.stockBox > small {
-  display: block;
-  margin-top: 7px;
-  color: inherit;
-  font-size: 9px;
-}
-
 .progressTrack {
+  margin-top: 10px;
   height: 6px;
   overflow: hidden;
   border-radius: 99px;
-  background: #0006331a;
+  background: #ffffff26;
 }
 
 .progressTrack span {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--navy-soft);
+  background: #ffffffd1;
 }
 
 .description {
@@ -989,6 +967,13 @@
   border: 1px solid #ececef;
   border-radius: 13px;
   background: var(--white);
+}
+
+@media (max-width: 1180px) {
+
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 1050px) {

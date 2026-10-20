@@ -4,6 +4,7 @@
 import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import Link from "next/link";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import StatCard from "@/components/StatCard";
 import { useCallback, useEffect, useState } from "react";
 import { FiArrowLeft, FiCheckCircle, FiEdit2, FiPower } from "react-icons/fi";
 import {
@@ -178,16 +179,11 @@ export default function AdminBookDetailPage({ id }: { id: string }) {
 
         <section className={styles.detailPanel}>
           <h3>Stok & Lokasi</h3>
-          <div className={styles.stockBox}>
-            <span>STOK TERSEDIA</span>
-            <strong>{book.availableCopies} <small>/ {book.totalCopies}</small></strong>
+          <StatCard className={styles.stockBox} label="STOK TERSEDIA" value={<>{book.availableCopies} <small>/ {book.totalCopies}</small></>} tone="success" icon={<FiCheckCircle />} detail={`${book.totalCopies - book.availableCopies} sedang direservasi, dipinjam, atau tidak tersedia`}>
             <div className={styles.progressTrack} aria-hidden="true">
               <span style={{ width: `${stockPercent}%` }} />
             </div>
-            <small>
-              {book.totalCopies - book.availableCopies} sedang direservasi, dipinjam, atau tidak tersedia
-            </small>
-          </div>
+          </StatCard>
           <dl className={styles.infoList}>
             <div><dt>LOKASI</dt><dd>{book.location || "—"}</dd></div>
             <div><dt>RAK</dt><dd>{book.shelf || "—"}</dd></div>

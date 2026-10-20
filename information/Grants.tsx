@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { FiGift, FiInfo } from "react-icons/fi";
 import SearchField from "@/components/SearchField";
+import StatCard, { type StatTone } from "@/components/StatCard";
 import GrantBadge from "./GrantBadge";
 import { type GrantsResponse, grantStatusLabels } from "./grantTypes";
 import common from "@/catalog/Catalog.module.css";
@@ -69,9 +70,9 @@ export default function Grants() {
     params.has(name),
   );
   const stats = [
-    { label: "Total Judul Hibah", value: summary?.totalTitles, icon: FiGift },
-    { label: "Total Buku", value: summary?.totalBooks, icon: FiInfo },
-    { label: "Sudah Dikatalogkan", value: summary?.catalogued, icon: FiInfo },
+    { label: "Total Judul Hibah", value: summary?.totalTitles, icon: FiGift, tone: "dark" },
+    { label: "Total Buku", value: summary?.totalBooks, icon: FiInfo, tone: "primary" },
+    { label: "Sudah Dikatalogkan", value: summary?.catalogued, icon: FiInfo, tone: "success" },
   ];
   const page = response?.meta.page ?? 1;
   const totalPages = response?.meta.totalPages ?? 0;
@@ -90,14 +91,9 @@ export default function Grants() {
         </span>
       </div>
       <section className={styles.stats} aria-label="Ringkasan seluruh hibah">
-        {stats.map(({ label, value, icon: Icon }) => (
-          <article className={styles.stat} key={label}>
-            <span className={styles.icon}>
-              <Icon aria-hidden="true" />
-            </span>
-            <div>
-              <strong>
-                {value !== undefined ? (
+        {stats.map(({ label, value, icon: Icon, tone }) => (
+          <StatCard key={label} label={label} tone={tone as StatTone} icon={<Icon />} value={
+                value !== undefined ? (
                   value.toLocaleString("id-ID")
                 ) : loading ? (
                   <span
@@ -106,11 +102,8 @@ export default function Grants() {
                   />
                 ) : (
                   "—"
-                )}
-              </strong>
-              <p>{label}</p>
-            </div>
-          </article>
+                )
+          } />
         ))}
       </section>
       <section

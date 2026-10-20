@@ -9,11 +9,13 @@ import {
   FiList,
   FiMail,
   FiMapPin,
+  FiMonitor,
   FiPhone,
   FiSearch,
 } from "react-icons/fi";
 import LandingNavbar from "../components/LandingNavbar";
 import LandingFooter from "../components/LandingFooter";
+import StatCard from "@/components/StatCard";
 import {
   formatPublicPhone,
   getLibrarySettings,
@@ -98,9 +100,9 @@ export default async function Home() {
 
         <section className="stats-wrap">
           <div className="landing-shell stats-card">
-            <div><strong>5.000+</strong><span>Judul Koleksi</span></div>
-            <div><strong>800+</strong><span>E-Book Digital</span></div>
-            <div><strong>24 Jam</strong><span>Portal Akses Aktif</span></div>
+            <StatCard label="Judul Koleksi" value="5.000+" tone="dark" icon={<FiBookOpen />} />
+            <StatCard label="E-Book Digital" value="800+" tone="yellow" icon={<FiMonitor />} />
+            <StatCard label="Portal Akses Aktif" value="24 Jam" tone="info" icon={<FiClock />} />
           </div>
         </section>
 

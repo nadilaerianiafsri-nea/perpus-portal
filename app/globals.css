@@ -13,6 +13,17 @@
   --line: #dfdfdf;
   --shadow: 0px 1px 2px -1px #0000001a, 0px 1px 3px 0px #0000001a;
   --shell: 1180px;
+  /* Statistic fills are derived from the brand palette, with white text contrast. */
+  --stat-dark: var(--navy);
+  --stat-primary: #2b3056;
+  --stat-slate: #4b5e8c;
+  --stat-teal: #13689c;
+  --stat-info: color-mix(in srgb, #1fabff 55%, var(--navy));
+  --stat-success: color-mix(in srgb, #55be24 55%, var(--navy));
+  --stat-danger: color-mix(in srgb, #ff3b2f 67%, var(--navy));
+  --stat-coral: color-mix(in srgb, #ff5c52 61%, var(--navy));
+  --stat-warning: color-mix(in srgb, #ff9500 55%, var(--navy));
+  --stat-yellow: color-mix(in srgb, #ffd000 45%, var(--navy));
 }
 
 * {
@@ -421,27 +432,8 @@ img {
 }
 .stats-card {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  background: var(--white);
-  border-radius: 16px;
-  box-shadow: var(--shadow);
-  overflow: hidden;
-}
-.stats-card div {
-  padding: 20px;
-  text-align: center;
-  border-right: 0.8px solid var(--line);
-}
-.stats-card div:last-child {
-  border-right: 0;
-}
-.stats-card strong {
-  display: block;
-  font-size: 25px;
-}
-.stats-card span {
-  color: rgba(0, 6, 51, 0.6);
-  font-size: 11px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
 }
 .quick-section {
   padding: 12px 0 38px;
@@ -1119,13 +1111,6 @@ img {
   }
   .stats-card {
     grid-template-columns: 1fr;
-  }
-  .stats-card div {
-    border-right: 0;
-    border-bottom: 0.8px solid var(--line);
-  }
-  .stats-card div:last-child {
-    border-bottom: 0;
   }
   .quick-grid {
     grid-template-columns: repeat(2, 1fr);

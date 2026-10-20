@@ -53,39 +53,6 @@
   gap: 14px;
 }
 
-.statCard {
-  display: grid;
-  gap: 8px;
-  min-width: 0;
-  border: 1px solid #e7e7ed;
-  border-radius: 16px;
-  padding: 16px 18px;
-  background: #fff;
-  box-shadow: 0 2px 8px #0006330d;
-  animation: ebookCardIn 220ms ease both;
-  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease, box-shadow 160ms ease;
-}
-
-.statCard:hover {
-  border-color: #dfdfe6;
-  border-radius: 18px;
-  background: #f5f6fa;
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 5px 14px #00063315;
-}
-
-.statCard span {
-  color: #6c6c6c;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.statCard strong {
-  color: #000633;
-  font-size: 28px;
-  line-height: 1;
-}
-
 .viewTabs {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -148,11 +115,10 @@
 }
 
 @media (max-width: 1200px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .body { gap: 12px; } }
+@media (max-width: 600px) {
+ .statsGrid { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 600px) { .grid { grid-template-columns: minmax(0, 1fr); } .sectionHeading { align-items: flex-start; } .body { gap: 14px; } .actions { display: grid; grid-template-columns: 1fr; } .read, .secondary, .secondaryLink { width: 100%; min-height: 44px; }
   .statsGrid { gap: 8px; }
-  .statCard { padding: 13px 10px; border-radius: 13px; text-align: center; }
-  .statCard span { font-size: 11px; }
-  .statCard strong { font-size: 23px; }
   .viewTabs { gap: 5px; padding: 4px; overflow-x: auto; }
   .viewTab { min-width: 108px; min-height: 44px; padding-inline: 8px; font-size: 12px; white-space: nowrap; }
 }
@@ -160,7 +126,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .card,
-  .statCard,
   .viewTab,
   .viewPanel {
     animation: none;
@@ -168,7 +133,6 @@
   }
 
   .card:hover,
-  .statCard:hover,
   .viewTab:hover {
     transform: none;
   }

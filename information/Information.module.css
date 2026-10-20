@@ -207,37 +207,6 @@
   margin-bottom: 18px;
 }
 
-.stat {
-  border: 1px solid #e7e7e9;
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  min-height: 122px;
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-}
-
-.grantMain .stat {
-  border-radius: 14px;
-  box-shadow:
-    0px 1px 2px -1px #0000001a,
-    0px 1px 3px 0px #0000001a;
-  animation: grantCardEnter 0.38s ease both;
-  transition:
-    transform 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.grantMain .stat:nth-child(2) {
-  animation-delay: 0.05s;
-}
-
-.grantMain .stat:nth-child(3) {
-  animation-delay: 0.1s;
-}
-
 @keyframes grantCardEnter {
   from {
     opacity: 0;
@@ -260,36 +229,6 @@
   color: #000633;
   font-size: 21px;
   flex-shrink: 0;
-}
-
-.stat:first-child .icon {
-  background: #fffae6;
-  color: #a47b00;
-}
-
-.stat:last-child .icon {
-  background: #eef9e9;
-  color: #3b8519;
-}
-
-.stat strong {
-  display: block;
-  font-size: 34px;
-  line-height: 1.15;
-  margin: 3px 0 5px;
-}
-
-.stat p {
-  margin: 0;
-  color: #666;
-  font-size: 14px;
-}
-
-.stat small {
-  color: #777;
-  display: block;
-  margin-top: 4px;
-  font-size: 12px;
 }
 
 .feature {
@@ -493,11 +432,6 @@
 }
 
 @media (hover: hover) {
-  .grantMain .stat:hover {
-    border-color: #dfdfdf;
-    box-shadow: 0 12px 34px rgba(0, 6, 51, 0.08);
-    transform: translateY(-4px);
-  }
 
   .grantMain .table tbody tr:hover {
     background: #fffae6;
@@ -555,10 +489,6 @@
 
   .grantMain .stats {
     gap: 12px;
-  }
-
-  .stat {
-    min-height: 108px;
   }
 
   .feature {
@@ -723,14 +653,12 @@
 @media (prefers-reduced-motion: reduce) {
   .skeleton,
   .skeletonRow,
-  .grantMain .stat,
   .grantMain .grantCard,
   .faq > :first-child,
   .faqResults {
     animation: none;
   }
 
-  .grantMain .stat,
   .grantMain .table tbody tr,
   .grantMain .grantCard {
     transition: none;

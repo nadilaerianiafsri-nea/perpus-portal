@@ -5,7 +5,8 @@ import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FiBookOpen, FiClock, FiList, FiMonitor } from "react-icons/fi";
+import { FiBookOpen, FiCheckCircle, FiClock, FiList, FiMonitor } from "react-icons/fi";
+import StatCard from "@/components/StatCard";
 import { memberRequest, useMemberResource } from "./api";
 import { normalizeMemberEBooksPayload } from "./ebookPayload";
 import { ErrorState, LoadingCards, PageHeading } from "./MemberUI";
@@ -136,18 +137,9 @@ export default function EBooksPage() {
       ) : (
         <>
           <section className={styles.statsGrid} aria-label="Statistik E-Book saya">
-            <article className={styles.statCard}>
-              <span>Sedang Dipinjam</span>
-              <strong>{activeLoans.length}</strong>
-            </article>
-            <article className={styles.statCard}>
-              <span>Antrean Saya</span>
-              <strong>{queues.length}</strong>
-            </article>
-            <article className={styles.statCard}>
-              <span>Pernah Dibaca</span>
-              <strong>{visibleHistory.length}</strong>
-            </article>
+            <StatCard label="Sedang Dipinjam" value={activeLoans.length} tone="yellow" icon={<FiMonitor />} />
+            <StatCard label="Antrean Saya" value={queues.length} tone="info" icon={<FiClock />} />
+            <StatCard label="Pernah Dibaca" value={visibleHistory.length} tone="success" icon={<FiCheckCircle />} />
           </section>
 
           <div className={styles.viewTabs} role="tablist" aria-label="Tampilan E-Book saya">

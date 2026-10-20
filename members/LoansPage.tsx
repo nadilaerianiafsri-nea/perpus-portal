@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { FiBookOpen } from "react-icons/fi";
+import { FiAlertTriangle, FiBookOpen, FiCheckCircle } from "react-icons/fi";
+import StatCard from "@/components/StatCard";
 import { memberRequest, useMemberResource } from "./api";
 import { useMember } from "./MemberContext";
 import { ErrorState, LoadingCards, PageHeading } from "./MemberUI";
@@ -128,18 +129,9 @@ export default function LoansPage() {
       />
 
       <section className={styles.statsGrid} aria-label="Statistik pinjaman saya">
-        <article className={styles.statCard}>
-          <span>Sedang Dipinjam</span>
-          <strong>{resource.loading ? "–" : loans.length}</strong>
-        </article>
-        <article className={styles.statCard}>
-          <span>Jatuh Tempo</span>
-          <strong>{resource.loading || now === null ? "–" : overdueCount}</strong>
-        </article>
-        <article className={styles.statCard}>
-          <span>Sudah Dibaca</span>
-          <strong>{historyResource.loading ? "–" : readBookCount}</strong>
-        </article>
+        <StatCard label="Sedang Dipinjam" value={resource.loading ? "–" : loans.length} tone="primary" icon={<FiBookOpen />} />
+        <StatCard label="Jatuh Tempo" value={resource.loading || now === null ? "–" : overdueCount} tone="danger" icon={<FiAlertTriangle />} />
+        <StatCard label="Sudah Dibaca" value={historyResource.loading ? "–" : readBookCount} tone="success" icon={<FiCheckCircle />} />
       </section>
 
       <div className={styles.viewTabs} role="tablist" aria-label="Tampilan pinjaman">
