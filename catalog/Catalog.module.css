@@ -5,11 +5,6 @@
   font-family: inherit;
 }
 
-.shell :global(.site-header) {
-  background: #f5f5f5;
-  padding-bottom: 20px;
-}
-
 .shell :global(.footer-top) {
   padding-block: 56px;
 }
