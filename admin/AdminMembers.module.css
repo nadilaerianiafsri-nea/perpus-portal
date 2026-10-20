@@ -252,7 +252,7 @@
   min-width: 210px;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
 }
 
 .detailAction,

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
 import "@/components/buttons.css";
+import RowActionTooltip from "@/components/RowActionTooltip";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -22,7 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id">
-      <body className={outfit.className}>{children}</body>
+      <body className={outfit.className}>{children}<RowActionTooltip /></body>
     </html>
   );
 }

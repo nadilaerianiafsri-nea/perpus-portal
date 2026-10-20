@@ -7,6 +7,7 @@ import { plainTextMessage } from "../members/inputSecurity";
 
 import Link from "next/link";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import { ButtonLabel } from "@/components/Button";
 import { useCallback, useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 
@@ -333,7 +334,7 @@ export default function AdminMembersPage() {
 
                     <td>
                       <div className={styles.actions}>
-                        <Link
+                        <Link data-row-action="neutral"
                           data-button="secondary"
                           data-button-size="sm"
                           href={`/admin/keanggotaan/${member.id}`}
@@ -342,7 +343,7 @@ export default function AdminMembersPage() {
                           Detail
                         </Link>
 
-                        <Link
+                        <Link data-row-action="warning"
                           data-button="warning"
                           data-button-size="sm"
                           href={`/admin/keanggotaan/${member.id}/edit`}
@@ -351,7 +352,7 @@ export default function AdminMembersPage() {
                           Edit
                         </Link>
 
-                        <button
+                        <button data-row-action={member.isActive ? "danger-soft" : "success"} aria-busy={changingId === member.id}
                           data-button={member.isActive ? "danger" : "success"}
                           data-button-size="sm"
                           data-button-loading={changingId === member.id}
@@ -370,11 +371,9 @@ export default function AdminMembersPage() {
                             )
                           }
                         >
-                          {changingId === member.id
-                            ? "Memproses..."
-                            : member.isActive
-                              ? "Nonaktifkan"
-                              : "Aktifkan"}
+                          <ButtonLabel loading={changingId === member.id} pending="Memproses...">
+                            {member.isActive ? "Nonaktifkan" : "Aktifkan"}
+                          </ButtonLabel>
                         </button>
                       </div>
                     </td>
@@ -446,7 +445,7 @@ export default function AdminMembersPage() {
                 </dl>
 
                 <div className={styles.mobileActions}>
-                  <Link
+                  <Link data-row-action="neutral"
                     data-button="secondary"
                     data-button-size="sm"
                     href={`/admin/keanggotaan/${member.id}`}
@@ -455,7 +454,7 @@ export default function AdminMembersPage() {
                     Detail
                   </Link>
 
-                  <Link
+                  <Link data-row-action="warning"
                     data-button="warning"
                     data-button-size="sm"
                     href={`/admin/keanggotaan/${member.id}/edit`}
@@ -464,7 +463,7 @@ export default function AdminMembersPage() {
                     Edit
                   </Link>
 
-                  <button
+                  <button data-row-action={member.isActive ? "danger-soft" : "success"} aria-busy={changingId === member.id}
                     data-button={member.isActive ? "danger" : "success"}
                     data-button-size="sm"
                     data-button-loading={changingId === member.id}
@@ -479,11 +478,9 @@ export default function AdminMembersPage() {
                       requestStatus(member.id, member.isActive, member.name)
                     }
                   >
-                    {changingId === member.id
-                      ? "Memproses..."
-                      : member.isActive
-                        ? "Nonaktifkan"
-                        : "Aktifkan"}
+                    <ButtonLabel loading={changingId === member.id} pending="Memproses...">
+                      {member.isActive ? "Nonaktifkan" : "Aktifkan"}
+                    </ButtonLabel>
                   </button>
                 </div>
               </article>

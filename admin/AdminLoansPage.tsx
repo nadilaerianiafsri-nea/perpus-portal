@@ -346,7 +346,7 @@ export default function AdminLoansPage() {
 
                       <td>
                         {loanStatus !== "AKTIF" && whatsappHref ? (
-                          <a
+                          <a data-row-action="primary"
                             data-button="secondary"
                             data-button-size="sm"
                             href={whatsappHref}

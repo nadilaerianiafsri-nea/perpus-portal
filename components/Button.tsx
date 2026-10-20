@@ -11,11 +11,14 @@ export type ButtonVariant =
   | "warning"
   | "icon";
 
+export type RowActionVariant = "neutral" | "primary" | "info" | "warning" | "success" | "danger-soft" | "danger";
+
 type ButtonAppearance = {
   variant?: ButtonVariant;
   size?: "sm" | "md" | "lg";
   fullWidth?: boolean;
   icon?: ReactNode;
+  rowAction?: RowActionVariant;
 };
 
 type ButtonProps = ComponentProps<"button"> &
@@ -30,6 +33,7 @@ export function Button({
   size = "md",
   fullWidth = false,
   icon,
+  rowAction,
   loading = false,
   loadingLabel = "Memproses...",
   children,
@@ -42,6 +46,7 @@ export function Button({
       {...props}
       type={type}
       data-button={variant}
+      data-row-action={rowAction}
       data-button-size={size}
       data-button-full-width={fullWidth || undefined}
       data-button-loading={loading || undefined}
@@ -87,6 +92,7 @@ export function ButtonLink({
   size = "md",
   fullWidth = false,
   icon,
+  rowAction,
   children,
   ...props
 }: ComponentProps<typeof Link> & ButtonAppearance) {
@@ -94,6 +100,7 @@ export function ButtonLink({
     <Link
       {...props}
       data-button={variant}
+      data-row-action={rowAction}
       data-button-size={size}
       data-button-full-width={fullWidth || undefined}
     >

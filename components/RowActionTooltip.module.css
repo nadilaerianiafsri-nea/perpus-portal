@@ -1,0 +1,1 @@
+.tooltip { position: fixed; z-index: 1500; width: max-content; max-width: min(300px, calc(100vw - 16px)); padding: 8px 11px; border-radius: 8px; background: var(--button-navy); color: white; box-shadow: 0 3px 10px #00063324; font-family: var(--font-outfit), "Outfit", sans-serif; font-size: 12px; font-weight: 400; line-height: 1.45; overflow-wrap: break-word; }

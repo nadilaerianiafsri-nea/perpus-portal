@@ -289,7 +289,7 @@ export default function AdminGrantsPage() {
 
                     <td>
                       <div className={styles.actions}>
-                        <Link
+                        <Link data-row-action="neutral"
                           data-button="secondary"
                           data-button-size="sm"
                           href={`/admin/hibah-buku/${grant.id}`}
@@ -298,7 +298,7 @@ export default function AdminGrantsPage() {
                           Detail
                         </Link>
 
-                        <Link
+                        <Link data-row-action="warning"
                           data-button="warning"
                           data-button-size="sm"
                           href={`/admin/hibah-buku/${grant.id}/edit`}
@@ -367,7 +367,7 @@ export default function AdminGrantsPage() {
                 </div>
 
                 <div className={styles.mobileActions}>
-                  <Link
+                  <Link data-row-action="neutral"
                     data-button="secondary"
                     data-button-size="sm"
                     href={`/admin/hibah-buku/${grant.id}`}
@@ -376,7 +376,7 @@ export default function AdminGrantsPage() {
                     Detail
                   </Link>
 
-                  <Link
+                  <Link data-row-action="warning"
                     data-button="warning"
                     data-button-size="sm"
                     href={`/admin/hibah-buku/${grant.id}/edit`}

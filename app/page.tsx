@@ -30,28 +30,23 @@ import {
   renderPublicText,
 } from "@/information/publicContent";
 import { serviceInfo } from "@/shared/serviceInfo.cjs";
-
 function formatCount(value: number | null) {
   return value === null ? "—" : value.toLocaleString("id-ID");
 }
-
 export default async function Home() {
   const [settings, content, homeData] = await Promise.all([
     getLibrarySettings(),
     getPublicContent(),
     getHomeData(),
   ]);
-
   const steps = content.guide.steps.map((step, index) => ({
     no: String(index + 1).padStart(2, "0"),
     title: renderPublicText(step.title.replace(/^\d+\.\s*/, ""), settings),
     description: renderPublicText(step.description, settings),
   }));
-
   return (
     <>
       <LandingNavbar />
-
       <main>
         <section className="hero" id="beranda">
           <div className="landing-shell hero-grid">
@@ -60,7 +55,6 @@ export default async function Home() {
                 {renderPublicText(content.home.heroTitle, settings)}
               </h1>
               <p>{renderPublicText(content.home.heroDescription, settings)}</p>
-
               <form className="hero-search" action="/koleksi" method="get">
                 <input
                   name="search"
@@ -78,7 +72,6 @@ export default async function Home() {
                   <FiSearch />
                 </button>
               </form>
-
               <div className="hero-actions">
                 <Link
                   data-button="accent"
@@ -98,7 +91,6 @@ export default async function Home() {
                 </Link>
               </div>
             </div>
-
             <div className="hero-art">
               <Image
                 src="/images/ASSET PERPUS/BG LANDING PAGE.png"
@@ -110,7 +102,6 @@ export default async function Home() {
             </div>
           </div>
         </section>
-
         <section className="stats-wrap" aria-label="Ringkasan perpustakaan">
           <div className="landing-shell stats-card">
             <StatCard
@@ -133,7 +124,6 @@ export default async function Home() {
             />
           </div>
         </section>
-
         <section className="quick-section">
           <div className="landing-shell quick-grid">
             <Link href="/koleksi">
@@ -154,7 +144,6 @@ export default async function Home() {
             </Link>
           </div>
         </section>
-
         <section className="collection section-pad compact-section" id="koleksi">
           <div className="landing-shell">
             <div className="section-head row-head">
@@ -167,7 +156,6 @@ export default async function Home() {
                 Lihat semua koleksi <FiArrowRight />
               </Link>
             </div>
-
             {homeData.latestBooks.length ? (
               <div className="book-grid">
                 {homeData.latestBooks.map((book, index) => (
@@ -200,6 +188,7 @@ export default async function Home() {
                       <Link
                         data-button="secondary"
                         data-button-size="sm"
+                        data-row-action="neutral"
                         href={`/koleksi/${book.id}`}
                       >
                         Lihat Detail
@@ -215,7 +204,6 @@ export default async function Home() {
             )}
           </div>
         </section>
-
         <section className="subject-section section-pad compact-section">
           <div className="landing-shell subject-grid">
             <div>
@@ -247,7 +235,6 @@ export default async function Home() {
             </div>
           </div>
         </section>
-
         <section className="service-dark section-pad compact-dark-section" id="layanan">
           <div className="landing-shell">
             <div className="section-head centered light">
@@ -255,7 +242,6 @@ export default async function Home() {
               <h2>{content.home.servicesTitle}</h2>
               <p>{content.home.servicesDescription}</p>
             </div>
-
             <div className="feature-row landing-motion-card">
               <div className="feature-copy">
                 <span className="mini-tag">Layanan 01</span>
@@ -277,7 +263,6 @@ export default async function Home() {
                 <Image src="/images/ASSET PERPUS/Hero pegang buku.png" alt="Cari koleksi dan reservasi" fill sizes="460px" />
               </div>
             </div>
-
             <div className="feature-row reverse landing-motion-card">
               <div className="feature-art">
                 <Image src="/images/ASSET PERPUS/Hero peminjaman.png" alt="Perpanjangan peminjaman" fill sizes="460px" />
@@ -302,7 +287,6 @@ export default async function Home() {
             </div>
           </div>
         </section>
-
         <section className="borrow-flow section-pad compact-section">
           <div className="landing-shell">
             <div className="section-head centered">
@@ -326,7 +310,6 @@ export default async function Home() {
             </div>
           </div>
         </section>
-
         <section className="ebook-section section-pad compact-section" id="ebook">
           <div className="landing-shell ebook-grid">
             <div className="ebook-art landing-motion-card">
@@ -352,7 +335,6 @@ export default async function Home() {
             </div>
           </div>
         </section>
-
         <section className="reminder-section section-pad compact-section">
           <div className="landing-shell">
             <div className="section-head centered">
@@ -386,7 +368,6 @@ export default async function Home() {
             </div>
           </div>
         </section>
-
         <section className="donation-section section-pad compact-section">
           <div className="landing-shell donation-grid">
             <div>
@@ -418,7 +399,6 @@ export default async function Home() {
             </div>
           </div>
         </section>
-
         <section className="member-cta section-pad compact-dark-section">
           <div className="landing-shell member-grid">
             <div>
@@ -445,7 +425,6 @@ export default async function Home() {
             </div>
           </div>
         </section>
-
         <section className="info-section section-pad compact-section">
           <div className="landing-shell">
             <div className="section-head"><h2>{content.home.informationTitle}</h2></div>
@@ -462,7 +441,6 @@ export default async function Home() {
           </div>
         </section>
       </main>
-
       <LandingFooter />
     </>
   );

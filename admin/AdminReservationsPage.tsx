@@ -366,7 +366,7 @@ export default function AdminReservationsPage() {
 
                     <td>
                       {reservation.status === "MENUNGGU_PENGAMBILAN" ? (
-                        <button
+                        <button data-row-action="success" aria-busy={processingId === reservation.id}
                           data-button="primary"
                           data-button-size="sm"
                           data-button-loading={processingId === reservation.id}

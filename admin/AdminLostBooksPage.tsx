@@ -302,7 +302,7 @@ export default function AdminLostBooksPage() {
                     </td>
 
                     <td>
-                      <Link
+                      <Link data-row-action="neutral"
                         data-button="secondary"
                         data-button-size="sm"
                         href={`/admin/keanggotaan/${loan.member.id}`}

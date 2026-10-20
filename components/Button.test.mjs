@@ -68,3 +68,31 @@ test("buttons default to non-submit while navigation remains a real link", () =>
   assert.match(link, /data-button="secondary"/);
   assert.doesNotMatch(link, /role="button"/);
 });
+
+test("row action appearance opts in without changing navigation or mutation semantics", () => {
+  const { Button, ButtonLink } = loadButton();
+  const row = renderToStaticMarkup(React.createElement(ButtonLink, {
+    href: "/admin/koleksi/data-buku/7/edit", variant: "warning", rowAction: "warning",
+    "aria-label": "Edit buku", title: "Edit buku", "data-button-shape": "square",
+  }, React.createElement("svg")));
+  assert.match(row, /href="\/admin\/koleksi\/data-buku\/7\/edit"/);
+  assert.match(row, /data-row-action="warning"/);
+  assert.match(row, /aria-label="Edit buku"/);
+  assert.match(row, /title="Edit buku"/);
+  assert.doesNotMatch(row, /rowAction=|role="button"/);
+  const page = renderToStaticMarkup(React.createElement(Button, { variant: "warning" }, "Konfirmasi"));
+  assert.doesNotMatch(page, /data-row-action/);
+});
+
+test("busy row actions preserve native disabled semantics and both stable labels", () => {
+  const { Button } = loadButton();
+  const html = renderToStaticMarkup(React.createElement(Button, {
+    variant: "danger", rowAction: "danger-soft", loading: true, loadingLabel: "Memproses...",
+  }, "Nonaktifkan"));
+  assert.match(html, /data-row-action="danger-soft"/);
+  assert.match(html, /data-button-loading="true"/);
+  assert.match(html, /disabled=""/);
+  assert.match(html, /aria-busy="true"/);
+  assert.match(html, /Nonaktifkan/);
+  assert.match(html, /Memproses/);
+});

@@ -76,7 +76,7 @@ export default function NotificationsPage() {
           <p>{item.message}</p><time dateTime={item.createdAt}>{memberDate(item.createdAt, true)}</time>
           <div className={styles.notificationActions}>
             <Badge tone={item.readAt ? "neutral" : "blue"}>{item.readAt ? "Sudah Dibaca" : "Belum Dibaca"}</Badge>
-            {!item.readAt && <button data-button="ghost" data-button-size="sm" data-button-loading={busy === String(item.id)} aria-busy={busy === String(item.id)} className={interaction.actionButton} disabled={busy !== null} onClick={event => { event.stopPropagation(); void markRead(item.id); }}><ButtonLabel loading={busy === String(item.id)} pending="Memperbarui...">Tandai Dibaca</ButtonLabel></button>}
+            {!item.readAt && <button data-button="ghost" data-row-action="neutral" data-button-size="sm" data-button-loading={busy === String(item.id)} aria-busy={busy === String(item.id)} className={interaction.actionButton} disabled={busy !== null} onClick={event => { event.stopPropagation(); void markRead(item.id); }}><ButtonLabel loading={busy === String(item.id)} pending="Memperbarui...">Tandai Dibaca</ButtonLabel></button>}
             {linked && <span data-button="secondary" data-button-size="sm" className={interaction.detail} data-notification-detail aria-hidden>Lihat detail <FiArrowRight /></span>}
           </div>
         </div>

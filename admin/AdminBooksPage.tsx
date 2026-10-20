@@ -379,7 +379,7 @@ export default function AdminBooksPage() {
                     </td>
                     <td>
                       <div className={styles.actions}>
-                        <Link
+                        <Link data-row-action="neutral"
                           data-button="secondary"
                           data-button-size="sm"
                           data-button-shape="square"
@@ -390,7 +390,7 @@ export default function AdminBooksPage() {
                         >
                           <FiEye />
                         </Link>
-                        <Link
+                        <Link data-row-action="warning"
                           data-button="warning"
                           data-button-size="sm"
                           data-button-shape="square"
@@ -401,7 +401,7 @@ export default function AdminBooksPage() {
                         >
                           <FiEdit2 />
                         </Link>
-                        <button
+                        <button data-row-action={book.isActive ? "danger-soft" : "success"} aria-busy={changingId === book.id}
                           data-button={book.isActive ? "danger" : "success"}
                           data-button-size="sm"
                           data-button-shape="square"

@@ -36,8 +36,8 @@ export default function LoanCard({ loan, now, busy, extending, onExtend, onRepla
         </dl>
       </div>
       <div className={styles.actions}>
-        {lost ? <button data-button="secondary" className={styles.replacementButton} disabled={busy} onClick={onReplacement}>Info Penggantian</button> : loan.status === "AKTIF" && <button data-button="primary" data-button-loading={extending} aria-busy={extending} className={styles.extendButton} disabled={busy} onClick={onExtend}><FiRefreshCw aria-hidden /><ButtonLabel loading={extending} pending="Memperpanjang...">Perpanjang 7 Hari</ButtonLabel></button>}
-        <Link data-button="secondary" className={styles.detailLink} href={`/dashboard/koleksi/${loan.book.id}`}>Lihat Detail</Link>
+        {lost ? <button data-button="secondary" data-row-action="neutral" className={styles.replacementButton} disabled={busy} onClick={onReplacement}>Info Penggantian</button> : loan.status === "AKTIF" && <button data-button="primary" data-row-action="primary" data-button-loading={extending} aria-busy={extending} className={styles.extendButton} disabled={busy} onClick={onExtend}><FiRefreshCw aria-hidden /><ButtonLabel loading={extending} pending="Memperpanjang...">Perpanjang 7 Hari</ButtonLabel></button>}
+        <Link data-button="secondary" data-row-action="neutral" className={styles.detailLink} href={`/dashboard/koleksi/${loan.book.id}`}>Lihat Detail</Link>
       </div>
     </div>
   </article>;

@@ -422,7 +422,7 @@ export default function AdminGrantForm({ mode, id }: Props) {
                   />
                 </label>
 
-                <button
+                <button data-row-action="danger"
                   data-button="danger"
                   data-button-size="sm"
                   type="button"

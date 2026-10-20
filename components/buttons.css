@@ -276,3 +276,129 @@
     transform: none;
   }
 }
+
+/* Opt-in table/list actions. Page CTAs, navigation and confirmations keep the
+   existing button hierarchy above. Every tone is derived from the brand palette. */
+:root {
+  --action-neutral-bg: color-mix(in srgb, var(--button-primary) 7%, white);
+  --action-neutral-fg: var(--button-primary);
+  --action-warning-bg: color-mix(in srgb, var(--button-warning) 8%, white);
+  --action-warning-fg: var(--stat-warning, #8c5517);
+  --action-success-bg: color-mix(in srgb, var(--button-success) 9%, white);
+  --action-success-fg: var(--stat-success, #2f6b2b);
+  --action-info-bg: color-mix(in srgb, #1fabff 7%, white);
+  --action-info-fg: #13689c;
+  --action-danger-soft-bg: color-mix(in srgb, var(--button-error) 6%, white);
+  --action-danger-bg: color-mix(in srgb, var(--button-error) 11%, white);
+  --action-danger-fg: var(--stat-danger, #ab2a30);
+}
+:root body [data-button][data-button][data-row-action] {
+  --button-height: 40px;
+  --button-bg: var(--action-neutral-bg);
+  --button-fg: var(--action-neutral-fg);
+  --button-stroke: color-mix(in srgb, var(--button-primary) 14%, white);
+  --button-hover-bg: color-mix(in srgb, var(--button-primary) 12%, white);
+  --button-hover-fg: var(--action-neutral-fg);
+  --button-hover-stroke: color-mix(in srgb, var(--button-primary) 25%, white);
+  --button-pressed-bg: color-mix(in srgb, var(--button-primary) 17%, white);
+  --row-focus: var(--button-primary);
+  min-height: var(--button-height);
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.35;
+  text-decoration: none;
+}
+:root body [data-button][data-button][data-row-action="primary"] {
+  --button-bg: var(--button-navy);
+  --button-fg: white;
+  --button-stroke: transparent;
+  --button-hover-bg: var(--button-primary);
+  --button-hover-fg: white;
+  --button-hover-stroke: var(--button-primary);
+  --button-pressed-bg: var(--button-navy);
+}
+:root body [data-button][data-button][data-row-action="warning"] {
+  --button-bg: var(--action-warning-bg);
+  --button-fg: var(--action-warning-fg);
+  --button-stroke: color-mix(in srgb, var(--button-warning) 22%, white);
+  --button-hover-bg: color-mix(in srgb, var(--button-warning) 14%, white);
+  --button-hover-fg: var(--action-warning-fg);
+  --button-hover-stroke: color-mix(in srgb, var(--button-warning) 36%, white);
+  --button-pressed-bg: color-mix(in srgb, var(--button-warning) 19%, white);
+  --row-focus: var(--action-warning-fg);
+}
+:root body [data-button][data-button][data-row-action="success"] {
+  --button-bg: var(--action-success-bg);
+  --button-fg: var(--action-success-fg);
+  --button-stroke: color-mix(in srgb, var(--button-success) 22%, white);
+  --button-hover-bg: color-mix(in srgb, var(--button-success) 16%, white);
+  --button-hover-fg: var(--action-success-fg);
+  --button-hover-stroke: color-mix(in srgb, var(--button-success) 36%, white);
+  --button-pressed-bg: color-mix(in srgb, var(--button-success) 21%, white);
+  --row-focus: var(--action-success-fg);
+}
+:root body [data-button][data-button][data-row-action="info"] {
+  --button-bg: var(--action-info-bg);
+  --button-fg: var(--action-info-fg);
+  --button-stroke: color-mix(in srgb, #1fabff 20%, white);
+  --button-hover-bg: color-mix(in srgb, #1fabff 13%, white);
+  --button-hover-fg: var(--action-info-fg);
+  --button-hover-stroke: color-mix(in srgb, #1fabff 34%, white);
+  --button-pressed-bg: color-mix(in srgb, #1fabff 18%, white);
+  --row-focus: var(--action-info-fg);
+}
+:root body [data-button][data-button]:is([data-row-action="danger-soft"], [data-row-action="danger"]) {
+  --button-bg: var(--action-danger-soft-bg);
+  --button-fg: var(--action-danger-fg);
+  --button-stroke: color-mix(in srgb, var(--button-error) 17%, white);
+  --button-hover-bg: color-mix(in srgb, var(--button-error) 11%, white);
+  --button-hover-fg: var(--action-danger-fg);
+  --button-hover-stroke: color-mix(in srgb, var(--button-error) 32%, white);
+  --button-pressed-bg: color-mix(in srgb, var(--button-error) 16%, white);
+  --row-focus: var(--action-danger-fg);
+}
+:root body [data-button][data-button][data-row-action="danger"] {
+  --button-bg: var(--action-danger-bg);
+  --button-stroke: color-mix(in srgb, var(--button-error) 32%, white);
+  --button-hover-bg: color-mix(in srgb, var(--button-error) 18%, white);
+  --button-pressed-bg: color-mix(in srgb, var(--button-error) 23%, white);
+}
+:root body [data-button][data-button][data-row-action][data-button-shape="square"] {
+  width: var(--button-height);
+  min-width: var(--button-height);
+  height: var(--button-height);
+  padding: 0;
+}
+:root body [data-button][data-button][data-row-action] > svg {
+  width: 18px;
+  height: 18px;
+}
+:root body [data-button][data-button][data-row-action]:focus-visible {
+  outline-color: var(--row-focus);
+}
+:root body [data-button][data-button][data-row-action]:hover {
+  text-decoration: none;
+}
+:root body [data-button][data-button][data-row-action][data-button-loading="true"][data-button-shape="square"] > svg {
+  visibility: hidden;
+}
+:root body [data-button][data-button][data-row-action][data-button-loading="true"][data-button-shape="square"]::before {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: calc(50% - 8px);
+  left: calc(50% - 8px);
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: row-action-spin .75s linear infinite;
+}
+@keyframes row-action-spin { to { transform: rotate(360deg); } }
+@media (max-width: 600px) {
+  :root body [data-button][data-button][data-row-action] { --button-height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root body [data-button][data-button][data-row-action][data-button-loading="true"][data-button-shape="square"]::before { animation: none; }
+}

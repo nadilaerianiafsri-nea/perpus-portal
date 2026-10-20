@@ -65,7 +65,7 @@ export default function BookCard({
   const actions = (
     <>
       <BookStatus book={book} />
-      <Link data-button="secondary" data-button-size="md" className={styles.detailLink} href={detailHref}>
+      <Link data-button="secondary" data-button-size="md" data-row-action="neutral" className={styles.detailLink} href={detailHref}>
         Lihat Detail
       </Link>
     </>

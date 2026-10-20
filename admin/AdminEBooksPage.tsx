@@ -238,13 +238,13 @@ export default function AdminEBooksPage() {
                     </td>
                     <td>
                       <div className={styles.actions}>
-                        <Link data-button="secondary" data-button-size="sm" data-button-shape="square" href={`/admin/koleksi/e-book/${book.id}`} className={styles.iconAction} aria-label={`Lihat detail ${book.title}`} title="Lihat detail">
+                        <Link data-row-action="neutral" data-button="secondary" data-button-size="sm" data-button-shape="square" href={`/admin/koleksi/e-book/${book.id}`} className={styles.iconAction} aria-label={`Lihat detail ${book.title}`} title="Lihat detail">
                           <FiEye />
                         </Link>
-                        <Link data-button="warning" data-button-size="sm" data-button-shape="square" href={`/admin/koleksi/e-book/${book.id}/edit`} className={styles.iconAction} aria-label={`Edit ${book.title}`} title="Edit E-Book">
+                        <Link data-row-action="warning" data-button="warning" data-button-size="sm" data-button-shape="square" href={`/admin/koleksi/e-book/${book.id}/edit`} className={styles.iconAction} aria-label={`Edit ${book.title}`} title="Edit E-Book">
                           <FiEdit2 />
                         </Link>
-                        <button
+                        <button data-row-action={book.isActive ? "danger-soft" : "success"} aria-busy={changingId === book.id}
                           data-button={book.isActive ? "danger" : "success"}
                           data-button-size="sm"
                           data-button-shape="square"

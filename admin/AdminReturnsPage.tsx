@@ -341,7 +341,7 @@ export default function AdminReturnsPage() {
 
                       <td>
                         <div className={styles.actionGroup}>
-                          <button
+                          <button data-row-action="success" aria-busy={processingId === loan.id}
                             data-button="success"
                             data-button-size="sm"
                             data-button-loading={processingId === loan.id}
@@ -361,7 +361,7 @@ export default function AdminReturnsPage() {
                             Kembalikan
                           </button>
 
-                          <button
+                          <button data-row-action="danger-soft" aria-busy={processingId === loan.id}
                             data-button="danger"
                             data-button-size="sm"
                             data-button-loading={processingId === loan.id}
