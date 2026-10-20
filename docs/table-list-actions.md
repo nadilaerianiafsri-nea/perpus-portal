@@ -6,10 +6,12 @@ The existing button system supports a scoped `data-row-action` appearance. Compa
 
 `Admin > Transaksi > Pengembalian` retains two clearly labelled decisions:
 
-- **Konfirmasi Pengembalian** with FiCornerDownLeft and soft success styling.
-- **Buku Hilang** with FiAlertTriangle and soft danger styling.
+- **Konfirmasi Pengembalian** with text only and soft success styling.
+- **Buku Hilang** with text only and soft danger styling.
 
 These are text buttons, not square icon-only actions. Both retain object-specific accessible names, the existing loading/disabled expressions, native button semantics and the original ConfirmDialog handlers. Existing ButtonLabel reserves pending-label space. Scoped `returnsActionsCell`/`returnsActions` rules in `AdminTransactions.module.css` size the action column to its content and prevent labels from shrinking; the buttons stack below 700px. The existing table scroll container is retained, with no page overflow. Other tables keep icon-only actions.
+
+Both Returns actions deliberately contain no SVG/icon. The Returns-only `returnsTable` class sets body/primary text to 14px, headers to 12px, secondary metadata/status badges to 12px and action text to 14px/600. Body line-height is 1.5; button line-height is 1.3. Rows use 16px cell padding, and the local pagination text is 12px. The table retains Outfit and its existing internal horizontal scrolling instead of shrinking text to fit. CSS variables and selectors are scoped to Returns, leaving all other transaction-table typography unchanged.
 
 This exception changed only `admin/AdminReturnsPage.tsx`, its scoped styles in `admin/AdminTransactions.module.css`, and this document. Browser checks at 1440/768/390px passed for full labels, aligned/stacked 40-44px controls, no control/page overflow, Space/Enter, both existing confirmations/endpoints, cancellation without mutation, stable pending dimensions and single submit. A representative other table retained its icon controls at all three widths. TypeScript, Returns-file ESLint, four Button tests, production build and the AST behavior-preservation check passed. Mutation checks used an isolated in-memory API fixture.
 
@@ -58,13 +60,13 @@ This revision adjusts compact action layouts in `admin/AdminMembers.module.css`,
 | Activate/deactivate | FiPower |
 | Remove unsaved grant item | FiTrash2 |
 | Confirm pickup | FiCheckCircle |
-| Return | FiCornerDownLeft |
+| Return | FiCornerDownLeft for member E-Books; Admin Returns is text-only |
 | Extend loan | FiRefreshCw |
 | Cancel reservation/queue | FiXCircle |
 | Read/borrow E-Book | FiBookOpen |
 | Mark notification read | FiCheck |
 | Replacement information | FiInfo |
-| Mark book lost | FiAlertTriangle |
+| Mark book lost | Text-only in Admin Returns |
 | Existing WhatsApp reminder | FiMessageCircle |
 
 All actual compact controls have hidden decorative SVGs and explicit accessible names. No new reject, verify or download action was invented where the current application has none.

@@ -10,7 +10,7 @@ import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import { plainTextMessage } from "../members/inputSecurity";
 
 import { useCallback, useEffect, useState } from "react";
-import { FiSearch, FiCornerDownLeft, FiAlertTriangle } from "react-icons/fi";
+import { FiSearch } from "react-icons/fi";
 
 import {
   formatTransactionDate,
@@ -261,7 +261,7 @@ export default function AdminReturnsPage() {
         ) : null}
 
         <div className={styles.tableScroller}>
-          <table className={`${styles.table} ${styles.tableWide}`}>
+          <table className={`${styles.table} ${styles.tableWide} ${styles.returnsTable}`}>
             <thead>
               <tr>
                 <th>ID</th>
@@ -359,7 +359,6 @@ export default function AdminReturnsPage() {
                               });
                             }}
                           >
-                            <FiCornerDownLeft aria-hidden="true" />
                             <ButtonLabel loading={processingId === loan.id} pending="Memproses...">Konfirmasi Pengembalian</ButtonLabel>
                           </button>
 
@@ -380,7 +379,6 @@ export default function AdminReturnsPage() {
                               });
                             }}
                           >
-                            <FiAlertTriangle aria-hidden="true" />
                             <ButtonLabel loading={processingId === loan.id} pending="Memproses...">Buku Hilang</ButtonLabel>
                           </button>
                         </div>
@@ -400,7 +398,7 @@ export default function AdminReturnsPage() {
         </div>
 
         {!loading && result.meta.totalPages > 1 ? (
-          <nav className={styles.pagination} aria-label="Halaman pengembalian">
+          <nav className={`${styles.pagination} ${styles.returnsPagination}`} aria-label="Halaman pengembalian">
             <button
               data-button="secondary"
               data-button-size="sm"
