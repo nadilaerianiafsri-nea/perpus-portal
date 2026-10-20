@@ -5,6 +5,7 @@ import AdminStatCard from "./AdminStatCard";
 import { FiBookOpen as CardBookOpen, FiClock as CardClock, FiAlertTriangle as CardAlertTriangle, FiCheckCircle as CardCheckCircle } from "react-icons/fi";
 
 import ConfirmDialog from "@/components/ConfirmDialog";
+import { ButtonLabel } from "@/components/Button";
 import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import { plainTextMessage } from "../members/inputSecurity";
 
@@ -270,7 +271,7 @@ export default function AdminReturnsPage() {
                 <th>JATUH TEMPO</th>
                 <th>PERPANJANGAN</th>
                 <th>STATUS</th>
-                <th>AKSI</th>
+                <th className={styles.returnsActionsCell}>AKSI</th>
               </tr>
             </thead>
 
@@ -339,9 +340,9 @@ export default function AdminReturnsPage() {
                         </span>
                       </td>
 
-                      <td>
-                        <div className={styles.actionGroup}>
-                          <button data-button-shape="square" title="Konfirmasi pengembalian" aria-label={`Konfirmasi pengembalian ${loan.book.title} oleh ${loan.member.name}`} data-row-action="success" aria-busy={processingId === loan.id}
+                      <td className={styles.returnsActionsCell}>
+                        <div className={`${styles.actionGroup} ${styles.returnsActions}`}>
+                          <button aria-label={`Konfirmasi pengembalian ${loan.book.title} oleh ${loan.member.name}`} data-row-action="success" aria-busy={processingId === loan.id}
                             data-button="success"
                             data-button-size="sm"
                             data-button-loading={processingId === loan.id}
@@ -359,9 +360,10 @@ export default function AdminReturnsPage() {
                             }}
                           >
                             <FiCornerDownLeft aria-hidden="true" />
+                            <ButtonLabel loading={processingId === loan.id} pending="Memproses...">Konfirmasi Pengembalian</ButtonLabel>
                           </button>
 
-                          <button data-button-shape="square" title="Tandai buku hilang" aria-label={`Tandai ${loan.book.title} oleh ${loan.member.name} sebagai hilang`} data-row-action="danger-soft" aria-busy={processingId === loan.id}
+                          <button aria-label={`Tandai ${loan.book.title} oleh ${loan.member.name} sebagai hilang`} data-row-action="danger-soft" aria-busy={processingId === loan.id}
                             data-button="danger"
                             data-button-size="sm"
                             data-button-loading={processingId === loan.id}
@@ -379,6 +381,7 @@ export default function AdminReturnsPage() {
                             }}
                           >
                             <FiAlertTriangle aria-hidden="true" />
+                            <ButtonLabel loading={processingId === loan.id} pending="Memproses...">Buku Hilang</ButtonLabel>
                           </button>
                         </div>
                       </td>

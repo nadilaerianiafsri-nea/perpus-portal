@@ -1,6 +1,17 @@
 # Table and list action buttons
 
-The existing button system supports a scoped `data-row-action` appearance. Compact table/list record actions now use icons only, with `data-button-shape="square"`, a tooltip title and an object-specific `aria-label`. Navigation, page CTAs, statistics, filters and final confirmation buttons retain their existing styles. Ordinary book grid cards retain their textual detail CTA.
+The existing button system supports a scoped `data-row-action` appearance. Compact table/list record actions use icons only, with `data-button-shape="square"`, a tooltip title and an object-specific `aria-label`, except for the explicit Admin Returns exception below. Navigation, page CTAs, statistics, filters and final confirmation buttons retain their existing styles. Ordinary book grid cards retain their textual detail CTA.
+
+## Mandatory exception: Admin Returns
+
+`Admin > Transaksi > Pengembalian` retains two clearly labelled decisions:
+
+- **Konfirmasi Pengembalian** with FiCornerDownLeft and soft success styling.
+- **Buku Hilang** with FiAlertTriangle and soft danger styling.
+
+These are text buttons, not square icon-only actions. Both retain object-specific accessible names, the existing loading/disabled expressions, native button semantics and the original ConfirmDialog handlers. Existing ButtonLabel reserves pending-label space. Scoped `returnsActionsCell`/`returnsActions` rules in `AdminTransactions.module.css` size the action column to its content and prevent labels from shrinking; the buttons stack below 700px. The existing table scroll container is retained, with no page overflow. Other tables keep icon-only actions.
+
+This exception changed only `admin/AdminReturnsPage.tsx`, its scoped styles in `admin/AdminTransactions.module.css`, and this document. Browser checks at 1440/768/390px passed for full labels, aligned/stacked 40-44px controls, no control/page overflow, Space/Enter, both existing confirmations/endpoints, cancellation without mutation, stable pending dimensions and single submit. A representative other table retained its icon controls at all three widths. TypeScript, Returns-file ESLint, four Button tests, production build and the AST behavior-preservation check passed. Mutation checks used an isolated in-memory API fixture.
 
 ## Reusable system
 
@@ -23,7 +34,7 @@ Colors derive from the existing website palette, using white mixes for soft back
 
 ## Applied inventory
 
-34 compact action templates use icons: 22 admin, 11 member and one public catalog list action. Mapped records can render these templates multiple times. This revision changes 15 TSX files, seven CSS files and this audit document.
+32 compact action templates use icons: 20 admin, 11 member and one public catalog list action. The two Admin Returns decisions use text under the mandatory exception. Mapped records can render these templates multiple times.
 
 | Area | Files | Actions |
 | --- | --- | --- |
@@ -33,7 +44,7 @@ Colors derive from the existing website palette, using white mixes for soft back
 | Admin | `admin/AdminBooksPage.tsx`, `admin/AdminEBooksPage.tsx` | View, edit, activate/deactivate icon actions |
 | Admin | `admin/AdminMembersPage.tsx` | Eye, Edit2, Power in desktop and mobile records; fixed square dimensions remain stable while the icon becomes a spinner |
 | Admin | `admin/AdminGrantsPage.tsx`, `admin/AdminGrantForm.tsx` | View/edit records, remove unsaved item |
-| Admin | `admin/AdminReservationsPage.tsx`, `admin/AdminReturnsPage.tsx` | Confirm pickup, return, mark lost |
+| Admin | `admin/AdminReservationsPage.tsx`, `admin/AdminReturnsPage.tsx` | Pickup uses an icon; return and mark-lost decisions retain text under the mandatory exception |
 | Admin | `admin/AdminLoansPage.tsx`, `admin/AdminLostBooksPage.tsx` | Existing WhatsApp reminder and member detail |
 
 This revision adjusts compact action layouts in `admin/AdminMembers.module.css`, `admin/AdminGrants.module.css`, `members/Loans.module.css`, `members/Reservations.module.css`, `members/EBooks.module.css` and `members/Notifications.module.css`. The Members action-group minimum width and mobile full-width action grids were removed. Loan/E-Book actions wrap with 8px gaps; admin groups use 6-7px gaps.
@@ -70,7 +81,7 @@ All actual compact controls have hidden decorative SVGs and explicit accessible 
 
 Browser verification uses the production build with an isolated in-memory API fixture, not database mutations or external messages. It covers public, member and admin record actions at 1440/768/390px, including the existing horizontally scrollable table on mobile. Checks cover color contrast, dimensions, no new page overflow, hover/focus tooltips, native keyboard/link routing, stable loading dimensions, disabled/double-click protection, confirmation cancellation/submission and notification read-button propagation.
 
-Final results:
+Original icon-only rollout results (the Returns exception has separate verification above):
 
 - 69 page/viewport checks passed: 23 public/member/admin views at all three widths, including icon-only content, browser accessibility-tree names, 40/44px dimensions and keyboard-focus tooltip clipping checks.
 - 21 interaction checks passed, plus Space/Enter, focus restoration and stable member-status loading dimensions at each of 1440/768/390px.

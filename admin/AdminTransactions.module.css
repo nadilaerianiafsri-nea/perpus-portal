@@ -304,6 +304,21 @@
   white-space: nowrap;
 }
 
+/* Return decisions retain explicit labels; other transaction actions stay square. */
+.returnsActionsCell {
+  width: 1%;
+}
+
+.returnsActions {
+  width: max-content;
+  gap: 8px;
+}
+
+.returnsActions > button {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
 .primaryAction,
 .secondaryAction,
 .dangerAction,
@@ -545,6 +560,15 @@
 }
 
 @media (max-width: 700px) {
+  .returnsActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .returnsActions > button {
+    width: 100%;
+  }
+
   .pageHeading h1 {
     font-size: 22px;
   }
