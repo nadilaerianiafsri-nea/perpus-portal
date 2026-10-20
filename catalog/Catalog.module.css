@@ -54,7 +54,7 @@
 }
 
 .main {
-  width: min(1378px, calc(100% - 64px));
+  width: min(1180px, calc(100% - 32px));
   margin: 16px auto 0;
   padding-bottom: 36px;
 }
