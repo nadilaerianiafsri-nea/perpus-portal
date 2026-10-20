@@ -1518,3 +1518,231 @@ img {
     transform: none;
   }
 }
+
+/* PUBLIC LANDING REFINEMENT: compact rhythm + live-content states */
+.hero-title-cms {
+  white-space: pre-line;
+}
+.hero-copy {
+  padding-top: 58px;
+  padding-bottom: 64px;
+}
+.quick-section {
+  padding-bottom: 22px;
+}
+.compact-section {
+  padding-top: 52px;
+  padding-bottom: 52px;
+}
+.compact-dark-section {
+  padding-top: 58px;
+  padding-bottom: 58px;
+}
+.compact-section .centered,
+.compact-dark-section .centered {
+  margin-bottom: 30px;
+}
+.compact-section .row-head {
+  margin-bottom: 24px;
+}
+.compact-dark-section .feature-row {
+  padding: 32px 0;
+}
+.feature-text-link {
+  margin-top: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--yellow);
+  font-size: 14px;
+  font-weight: 750;
+  cursor: pointer;
+}
+.section-action-center {
+  margin-top: 22px;
+  display: flex;
+  justify-content: center;
+}
+.landing-empty-state,
+.landing-inline-state {
+  border: 0.8px solid var(--line);
+  border-radius: 12px;
+  background: var(--white);
+  color: rgba(0, 6, 51, 0.62);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.landing-empty-state {
+  padding: 24px;
+  text-align: center;
+}
+.landing-inline-state {
+  margin-top: 20px;
+  padding: 13px 15px;
+}
+.landing-motion-card {
+  animation: landingCardEnter 0.48s ease both;
+  transition:
+    transform 0.22s ease,
+    border-color 0.22s ease,
+    background 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+@media (hover: hover) {
+  .feature-text-link:hover {
+    text-decoration: underline;
+  }
+
+  .landing-motion-card:hover {
+    transform: translateY(-4px);
+  }
+
+  .book-image:hover img {
+    transform: scale(1.035);
+  }
+}
+
+@media (max-width: 1280px) {
+  .hero-copy {
+    padding-top: 48px;
+    padding-bottom: 56px;
+  }
+}
+
+@media (max-width: 1080px) {
+  .hero-copy {
+    padding-top: 38px;
+    padding-bottom: 18px;
+  }
+  .compact-section,
+  .compact-dark-section {
+    padding-top: 48px;
+    padding-bottom: 48px;
+  }
+}
+
+@media (max-width: 820px) {
+  .quick-section {
+    padding-bottom: 18px;
+  }
+  .compact-section,
+  .compact-dark-section {
+    padding-top: 44px;
+    padding-bottom: 44px;
+  }
+  .compact-dark-section .feature-row {
+    padding: 26px 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .hero-copy {
+    padding-top: 28px;
+  }
+  .compact-section,
+  .compact-dark-section {
+    padding-top: 38px;
+    padding-bottom: 38px;
+  }
+  .compact-section .centered,
+  .compact-dark-section .centered {
+    margin-bottom: 24px;
+  }
+  .feature-text-link,
+  .landing-empty-state,
+  .landing-inline-state {
+    font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-motion-card {
+    animation: none;
+    transition: none;
+  }
+  .landing-motion-card:hover,
+  .book-image:hover img {
+    transform: none;
+  }
+}
+
+/* Shared visual refinement for public navbar pages */
+.public-info-refresh {
+  padding-top: 4px;
+}
+.public-info-refresh > header {
+  margin-bottom: 24px;
+  padding: 24px 26px;
+  border: 0.8px solid var(--line);
+  border-radius: 16px;
+  background: var(--white);
+  box-shadow: var(--shadow);
+}
+.public-info-refresh > header h1 {
+  margin-top: 0;
+  color: var(--navy);
+  font-size: clamp(34px, 3.4vw, 46px);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+.public-info-refresh > header p {
+  max-width: 780px;
+  color: rgba(0, 6, 51, 0.64);
+  font-size: 16px;
+  line-height: 1.65;
+}
+.public-info-refresh > section > article,
+.public-info-refresh > div > section,
+.public-info-refresh details,
+.public-info-refresh > aside {
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+@media (hover: hover) {
+  .public-info-refresh > section > article:hover,
+  .public-info-refresh > div > section:hover,
+  .public-info-refresh details:hover,
+  .public-info-refresh > aside:hover {
+    border-color: var(--yellow);
+    box-shadow: 0 12px 34px rgba(0, 6, 51, 0.08);
+    transform: translateY(-3px);
+  }
+
+  .public-info-refresh a:hover {
+    cursor: pointer;
+  }
+}
+
+@media (max-width: 560px) {
+  .public-info-refresh > header {
+    margin-bottom: 18px;
+    padding: 20px;
+    border-radius: 14px;
+  }
+  .public-info-refresh > header h1 {
+    font-size: 31px;
+  }
+  .public-info-refresh > header p {
+    font-size: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-info-refresh > section > article,
+  .public-info-refresh > div > section,
+  .public-info-refresh details,
+  .public-info-refresh > aside {
+    transition: none;
+  }
+  .public-info-refresh > section > article:hover,
+  .public-info-refresh > div > section:hover,
+  .public-info-refresh details:hover,
+  .public-info-refresh > aside:hover {
+    transform: none;
+  }
+}

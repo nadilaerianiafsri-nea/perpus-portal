@@ -1,8 +1,11 @@
 import { FiInfo } from "react-icons/fi";
 import CatalogShell from "@/catalog/CatalogShell";
 import PageBreadcrumb from "@/components/PageBreadcrumb";
-import { buildGuideSteps } from "@/information/serviceContent";
 import { getLibrarySettings } from "@/information/librarySettings";
+import {
+  getPublicContent,
+  renderPublicText,
+} from "@/information/publicContent";
 import common from "@/catalog/Catalog.module.css";
 import styles from "@/information/Information.module.css";
 
@@ -13,38 +16,35 @@ export const metadata = {
 };
 
 export default async function Page() {
-  const settings = await getLibrarySettings();
-  const guideSteps = buildGuideSteps(settings);
+  const [settings, content] = await Promise.all([
+    getLibrarySettings(),
+    getPublicContent(),
+  ]);
 
   return (
     <CatalogShell active="panduan">
-      <main className={`${common.main} ${styles.main} ${styles.helpMain}`}>
+      <main className={`${common.main} ${styles.main} ${styles.helpMain} public-info-refresh`}>
         <PageBreadcrumb label="Panduan" />
 
         <header className={styles.heading}>
-          <h1>Panduan Peminjaman</h1>
-          <p>Alur layanan dari pendaftaran hingga pengembalian.</p>
+          <h1>{content.guide.title}</h1>
+          <p>{renderPublicText(content.guide.intro, settings)}</p>
         </header>
 
         <section className={styles.steps} aria-label="Langkah peminjaman buku">
-          {guideSteps.map(({ title, description }) => (
-            <article className={styles.step} key={title}>
-              <h2>{title}</h2>
-              <p>{description}</p>
+          {content.guide.steps.map(({ title, description }, index) => (
+            <article className={styles.step} key={`${title}-${index}`}>
+              <h2>{renderPublicText(title, settings)}</h2>
+              <p>{renderPublicText(description, settings)}</p>
             </article>
           ))}
         </section>
 
         <aside className={`${styles.alert} ${styles.reminder}`}>
           <FiInfo aria-hidden="true" />
-
           <div>
-            <h2>Pengingat layanan</h2>
-            <p>
-              Pengingat jatuh tempo dikirim otomatis melalui Email dan WhatsApp
-              pada H-1, hari jatuh tempo, H+1, lalu setiap 2 hari selama
-              terlambat.
-            </p>
+            <h2>{content.guide.reminderTitle}</h2>
+            <p>{renderPublicText(content.guide.reminderText, settings)}</p>
           </div>
         </aside>
       </main>

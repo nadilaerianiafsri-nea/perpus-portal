@@ -3,6 +3,10 @@ import PageBreadcrumb from "@/components/PageBreadcrumb";
 import ServiceDetails from "@/components/ServiceDetails";
 import ContactForm from "@/information/ContactForm";
 import { getLibrarySettings } from "@/information/librarySettings";
+import {
+  getPublicContent,
+  renderPublicText,
+} from "@/information/publicContent";
 import { serviceInfo } from "@/shared/serviceInfo.cjs";
 import common from "@/catalog/Catalog.module.css";
 import info from "@/information/Information.module.css";
@@ -15,16 +19,19 @@ export const metadata = {
 };
 
 export default async function Page() {
-  const settings = await getLibrarySettings();
+  const [settings, content] = await Promise.all([
+    getLibrarySettings(),
+    getPublicContent(),
+  ]);
 
   return (
     <CatalogShell active="kontak">
-      <main className={`${common.main} ${info.main} ${info.helpMain}`}>
+      <main className={`${common.main} ${info.main} ${info.helpMain} public-info-refresh`}>
         <PageBreadcrumb label="Kontak" />
 
         <header className={info.heading}>
-          <h1>Hubungi Kami</h1>
-          <p>Informasi layanan dan formulir pesan.</p>
+          <h1>{content.contact.title}</h1>
+          <p>{renderPublicText(content.contact.intro, settings)}</p>
         </header>
 
         <div className={styles.grid}>
@@ -38,7 +45,7 @@ export default async function Page() {
             <figure className={styles.map}>
               <iframe
                 src={serviceInfo.mapEmbedUrl}
-                title="Peta lokasi Perpustakaan Kemenkum Riau"
+                title={`Peta lokasi ${settings.libraryName}`}
                 loading="lazy"
                 referrerPolicy="no-referrer"
               />
