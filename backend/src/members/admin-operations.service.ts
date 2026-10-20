@@ -1,11 +1,13 @@
 import { Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import { serviceInfo } from '../../../shared/serviceInfo.cjs';
+import { buildTransactionTrend } from '../../../shared/chartTime.cjs';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   type LibrarySettings,
   parseLibrarySettingsInput,
   parseNotificationQuery,
   parseReportRange,
+  parseChartGranularity,
 } from './admin-operations.validation';
 
 const DEFAULT_SETTINGS: LibrarySettings = Object.freeze({
@@ -97,37 +99,6 @@ function whatsappStatus(value: string): AdminNotificationRow['status'] {
     default:
       return 'MANUAL';
   }
-}
-
-function monthKeyFromDate(value: Date) {
-  const shifted = new Date(value.getTime() + JAKARTA_OFFSET_MS);
-  return `${shifted.getUTCFullYear()}-${String(shifted.getUTCMonth() + 1).padStart(2, '0')}`;
-}
-
-function monthKeys(from: string, to: string) {
-  const [fromYear, fromMonth] = from.split('-').map(Number);
-  const [toYear, toMonth] = to.split('-').map(Number);
-  const rows: string[] = [];
-  let year = fromYear;
-  let month = fromMonth;
-  while (year < toYear || (year === toYear && month <= toMonth)) {
-    rows.push(`${year}-${String(month).padStart(2, '0')}`);
-    month += 1;
-    if (month === 13) {
-      month = 1;
-      year += 1;
-    }
-  }
-  return rows;
-}
-
-function monthLabel(key: string) {
-  const [year, month] = key.split('-').map(Number);
-  return new Intl.DateTimeFormat('id-ID', {
-    month: 'short',
-    year: 'numeric',
-    timeZone: 'UTC',
-  }).format(new Date(Date.UTC(year, month - 1, 1)));
 }
 
 function jakartaDayRange(now: Date) {
@@ -231,8 +202,9 @@ export class AdminOperationsService {
     }
   }
 
-  async dashboard(query: { from?: unknown; to?: unknown }) {
+  async dashboard(query: { from?: unknown; to?: unknown; granularity?: unknown }) {
     const range = parseReportRange(query.from, query.to);
+    const granularity = parseChartGranularity(query.granularity, range);
     const during = { gte: range.start, lt: range.endExclusive };
     const now = new Date();
     const today = jakartaDayRange(now);
@@ -363,30 +335,8 @@ export class AdminOperationsService {
       }),
     ]);
 
-    const buckets = new Map(
-      monthKeys(range.from, range.to).map((key) => [
-        key,
-        {
-          key,
-          label: monthLabel(key),
-          borrowings: 0,
-          returns: 0,
-        },
-      ]),
-    );
-
-    borrowed.forEach((loan) => {
-      const bucket = buckets.get(monthKeyFromDate(loan.borrowedAt));
-      if (bucket) bucket.borrowings += 1;
-    });
-
-    returned.forEach((loan) => {
-      if (!loan.returnedAt) return;
-      const bucket = buckets.get(monthKeyFromDate(loan.returnedAt));
-      if (bucket) bucket.returns += 1;
-    });
-
     return {
+      granularity,
       generatedAt: now.toISOString(),
       range: {
         from: range.from,
@@ -409,7 +359,7 @@ export class AdminOperationsService {
         mahasiswa,
         pegawai,
       },
-      trend: [...buckets.values()],
+      trend: buildTransactionTrend(range, granularity, borrowed.map((loan) => loan.borrowedAt), returned.map((loan) => loan.returnedAt)),
     };
   }
 
@@ -624,8 +574,9 @@ export class AdminOperationsService {
     return { readAt: read.readAt };
   }
 
-  async reports(query: { from?: unknown; to?: unknown }) {
+  async reports(query: { from?: unknown; to?: unknown; granularity?: unknown }) {
     const range = parseReportRange(query.from, query.to);
+    const granularity = parseChartGranularity(query.granularity, range);
     const during = { gte: range.start, lt: range.endExclusive };
 
     const [
@@ -711,23 +662,8 @@ export class AdminOperationsService {
       /^loan:\d+:lost$/.test(notice.eventKey),
     ).length;
 
-    const buckets = new Map(
-      monthKeys(range.from, range.to).map((key) => [
-        key,
-        { key, label: monthLabel(key), borrowings: 0, returns: 0 },
-      ]),
-    );
-    borrowed.forEach((loan) => {
-      const bucket = buckets.get(monthKeyFromDate(loan.borrowedAt));
-      if (bucket) bucket.borrowings += 1;
-    });
-    returned.forEach((loan) => {
-      if (!loan.returnedAt) return;
-      const bucket = buckets.get(monthKeyFromDate(loan.returnedAt));
-      if (bucket) bucket.returns += 1;
-    });
-
     return {
+      granularity,
       range: { from: range.from, to: range.to },
       stats: {
         borrowings: borrowed.length,
@@ -740,7 +676,7 @@ export class AdminOperationsService {
         grantsReceived,
         lostBooks,
       },
-      trend: [...buckets.values()],
+      trend: buildTransactionTrend(range, granularity, borrowed.map((loan) => loan.borrowedAt), returned.map((loan) => loan.returnedAt)),
     };
   }
 }

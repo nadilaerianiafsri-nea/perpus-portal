@@ -1,3 +1,7 @@
+import { jakartaDateInput } from "../shared/period";
+import type { ChartGranularity, TransactionTrendRow } from "../shared/chartTime.cjs";
+export { jakartaDateInput } from "../shared/period";
+
 export type LibrarySettings = {
   libraryName: string;
   address: string;
@@ -52,12 +56,7 @@ export type AdminNotificationsResponse = {
   meta: PageMeta;
 };
 
-export type ReportTrendRow = {
-  key: string;
-  label: string;
-  borrowings: number;
-  returns: number;
-};
+export type ReportTrendRow = TransactionTrendRow;
 
 export type AdminReportResponse = {
   range: {
@@ -76,6 +75,7 @@ export type AdminReportResponse = {
     lostBooks: number;
   };
   trend: ReportTrendRow[];
+  granularity: ChartGranularity;
 };
 
 export async function adminOperationsApiMessage(
@@ -154,17 +154,6 @@ export function reportCsv(report: AdminReportResponse) {
     ...report.trend.map((row) => [row.label, row.borrowings, row.returns]),
   ];
   return `\uFEFF${rows.map((row) => row.map(csvCell).join(",")).join("\r\n")}`;
-}
-
-export function jakartaDateInput(date = new Date()) {
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    timeZone: "Asia/Jakarta",
-  }).formatToParts(date);
-  const get = (type: string) => parts.find((part) => part.type === type)?.value ?? "";
-  return `${get("year")}-${get("month")}-${get("day")}`;
 }
 
 export function monthsBeforeDateInput(months: number, date = new Date()) {

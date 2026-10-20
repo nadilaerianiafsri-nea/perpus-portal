@@ -1,9 +1,12 @@
 "use client";
 
-import { ButtonLabel } from '@/components/Button';
+import TransactionTrendChart from "./TransactionTrendChart";
+import { getChartGranularity, type ChartGranularity, type TransactionTrendRow } from "@/shared/chartTime.cjs";
+import PeriodSelector from "@/components/PeriodSelector";
+import { createPeriod, formatPeriodRange, jakartaDateInput, type PeriodValue } from "@/shared/period";
 import AdminStatCard, { type AdminStatTone } from "./AdminStatCard";
 import type { ComponentType } from "react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   FiAlertTriangle,
   FiBarChart2,
@@ -15,25 +18,18 @@ import {
   FiMonitor,
   FiPackage,
   FiRefreshCw,
-  FiSearch,
   FiUsers,
 } from "react-icons/fi";
 
 import {
   adminOperationsApiMessage,
-  jakartaDateInput,
 } from "./adminOperations";
 import styles from "./Admin.module.css";
 import controls from "./AdminReports.module.css";
 import enhancements from "./AdminEnhancements.module.css";
 import filters from "./AdminDashboardFilters.module.css";
 
-type DashboardTrendRow = {
-  key: string;
-  label: string;
-  borrowings: number;
-  returns: number;
-};
+type DashboardTrendRow = TransactionTrendRow;
 
 type AdminDashboardResponse = {
   generatedAt: string;
@@ -58,6 +54,7 @@ type AdminDashboardResponse = {
     mahasiswa: number;
     pegawai: number;
   };
+  granularity: ChartGranularity;
   trend: DashboardTrendRow[];
 };
 
@@ -71,109 +68,7 @@ type StatCard = {
 
 type MemberCategoryKey = "umum" | "mahasiswa" | "pegawai";
 
-type DateRange = { from: string; to: string };
-
-function validateDates(from: string, to: string, today: string) {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(from) || !/^\d{4}-\d{2}-\d{2}$/.test(to)) {
-    return "Dari Tanggal dan Sampai Tanggal wajib diisi.";
-  }
-
-  if (from > to) {
-    return "Tanggal mulai tidak boleh melebihi tanggal akhir.";
-  }
-
-  const start = inputDate(from);
-  const finish = inputDate(to);
-  if (!start || !finish || start.toISOString().slice(0, 10) !== from || finish.toISOString().slice(0, 10) !== to) {
-    return "Tanggal yang dipilih tidak valid.";
-  }
-  if (from > today || to > today) return "Tanggal tidak boleh melebihi hari ini.";
-  if ((finish.getTime() - start.getTime()) / 86_400_000 + 1 > 366) {
-    return "Rentang tanggal maksimal 366 hari.";
-  }
-  return "";
-}
-
-function chartPoints(
-  rows: DashboardTrendRow[],
-  key: "borrowings" | "returns",
-  maximum: number,
-) {
-  if (!rows.length) {
-    return "";
-  }
-
-  const startX = 48;
-  const endX = 835;
-  const topY = 32;
-  const bottomY = 280;
-  const width = endX - startX;
-  const height = bottomY - topY;
-
-  return rows
-    .map((row, index) => {
-      const x =
-        rows.length === 1
-          ? startX + width / 2
-          : startX + (index / (rows.length - 1)) * width;
-      const y = bottomY - (row[key] / maximum) * height;
-
-      return `${x.toFixed(1)},${y.toFixed(1)}`;
-    })
-    .join(" ");
-}
-
-function chartCoordinate(
-  rows: DashboardTrendRow[],
-  index: number,
-  value: number,
-  maximum: number,
-) {
-  const startX = 48;
-  const endX = 835;
-  const topY = 32;
-  const bottomY = 280;
-  const width = endX - startX;
-  const height = bottomY - topY;
-  const x =
-    rows.length <= 1
-      ? startX + width / 2
-      : startX + (index / (rows.length - 1)) * width;
-  const y = bottomY - (value / maximum) * height;
-  return { x, y };
-}
-
-function inputDate(value: string) {
-  const date = new Date(`${value}T00:00:00Z`);
-  return Number.isFinite(date.getTime()) ? date : null;
-}
-
-function formatRangeLabel(from: string, to: string) {
-  const fromDate = inputDate(from);
-  const toDate = inputDate(to);
-
-  if (!fromDate || !toDate) return `${from}–${to}`;
-
-  const startYear = fromDate.getUTCFullYear();
-  const endYear = toDate.getUTCFullYear();
-  const dayMonth = new Intl.DateTimeFormat("id-ID", {
-    day: "numeric",
-    month: "short",
-    timeZone: "UTC",
-  });
-  const dayMonthYear = new Intl.DateTimeFormat("id-ID", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    timeZone: "UTC",
-  });
-
-  if (startYear === endYear) {
-    return `${dayMonth.format(fromDate)}–${dayMonthYear.format(toDate)}`;
-  }
-
-  return `${dayMonthYear.format(fromDate)}–${dayMonthYear.format(toDate)}`;
-}
+type DateRange = PeriodValue;
 
 function formatUpdatedAt(value: string) {
   const date = new Date(value);
@@ -191,38 +86,33 @@ function formatUpdatedAt(value: string) {
 }
 
 export default function AdminDashboard() {
-  const today = useMemo(() => jakartaDateInput(), []);
-  const [fromInput, setFromInput] = useState("");
-  const [toInput, setToInput] = useState("");
-  const [range, setRange] = useState<DateRange | null>(null);
+  const [initialPeriod] = useState(() => createPeriod("this-month"));
+  const [range, setRange] = useState(initialPeriod);
   const [dashboard, setDashboard] = useState<AdminDashboardResponse | null>(null);
   const [chartData, setChartData] = useState<AdminDashboardResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [chartLoading, setChartLoading] = useState(false);
   const [chartError, setChartError] = useState("");
   const [error, setError] = useState("");
-  const [activeTrend, setActiveTrend] = useState<number | null>(null);
   const [activeMemberCategory, setActiveMemberCategory] =
     useState<MemberCategoryKey | null>(null);
   const requestId = useRef(0);
   const requestController = useRef<AbortController | null>(null);
 
-  const load = useCallback(async (selectedRange: DateRange | null) => {
+  const load = useCallback(async (selectedRange: DateRange, chartOnly = false) => {
     const currentRequest = requestId.current + 1;
     requestId.current = currentRequest;
     requestController.current?.abort();
     const controller = new AbortController();
     requestController.current = controller;
 
-    setLoading(true);
-    setChartLoading(Boolean(selectedRange));
-    setError("");
+    if (!chartOnly) { setLoading(true); setError(""); }
+    setChartLoading(true);
     setChartError("");
 
     try {
-      // This existing endpoint requires dates even for its unfiltered live KPIs.
-      // The initial KPI request uses today only; its trend is never presented as an applied filter.
-      const query = new URLSearchParams(selectedRange ?? { from: today, to: today });
+      // Live KPIs are independent of the existing endpoint's trend period.
+      const query = new URLSearchParams({ from: selectedRange.from, to: selectedRange.to, granularity: getChartGranularity(selectedRange, selectedRange.preset) });
       const response = await fetch(
         `/api/members/admin/operations/dashboard?${query}`,
         {
@@ -243,8 +133,8 @@ export default function AdminDashboard() {
       const payload = (await response.json()) as AdminDashboardResponse;
 
       if (requestId.current === currentRequest) {
-        setDashboard(payload);
-        if (selectedRange) setChartData(payload);
+        if (!chartOnly) setDashboard(payload);
+        setChartData(payload);
       }
     } catch (reason) {
       if (requestId.current === currentRequest && !controller.signal.aborted) {
@@ -252,7 +142,7 @@ export default function AdminDashboard() {
           reason instanceof Error
             ? reason.message
             : "Dashboard admin belum dapat dimuat.";
-        if (selectedRange) setChartError(message);
+        if (chartOnly) setChartError(message);
         else setError(message);
       }
     } finally {
@@ -261,49 +151,20 @@ export default function AdminDashboard() {
         setChartLoading(false);
       }
     }
-  }, [today]);
+  }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- Load live KPI data once on mount; period requests are explicit user actions.
-    void load(null);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Load the existing dashboard endpoint with this month's initial trend.
+    void load(initialPeriod);
     return () => {
       requestId.current += 1;
       requestController.current?.abort();
     };
-  }, [load]);
+  }, [initialPeriod, load]);
 
-  const dateError = fromInput && toInput ? validateDates(fromInput, toInput, today) : "";
-
-  function applyRange() {
-    if (!dashboard || loading || validateDates(fromInput, toInput, today)) return;
-    const selectedRange = { from: fromInput, to: toInput };
-    setRange(selectedRange);
-    setChartData(null);
-    setActiveTrend(null);
-    void load(selectedRange);
-  }
-
-  function resetRange() {
-    if (range) {
-      requestId.current += 1;
-      requestController.current?.abort();
-      setLoading(false);
-    }
-    setFromInput("");
-    setToInput("");
-    setRange(null);
-    setChartData(null);
-    setChartError("");
-    setChartLoading(false);
-    setActiveTrend(null);
-  }
-
-  function selectQuickRange(days: number | "month") {
-    const end = new Date(`${today}T00:00:00Z`);
-    if (days === "month") end.setUTCDate(1);
-    else end.setUTCDate(end.getUTCDate() - days + 1);
-    setFromInput(end.toISOString().slice(0, 10));
-    setToInput(today);
+  function applyPeriod(next: PeriodValue) {
+    setRange(next);
+    void load(next, true);
   }
 
   const statCards: StatCard[] = dashboard
@@ -381,26 +242,6 @@ export default function AdminDashboard() {
       ]
     : [];
 
-  const maxTrend = Math.max(
-    1,
-    ...(chartData?.trend.flatMap((row) => [row.borrowings, row.returns]) ?? [1]),
-  );
-
-  const borrowingPoints = chartData
-    ? chartPoints(chartData.trend, "borrowings", maxTrend)
-    : "";
-  const returnPoints = chartData
-    ? chartPoints(chartData.trend, "returns", maxTrend)
-    : "";
-
-  const axisValues = [
-    maxTrend,
-    maxTrend * 0.75,
-    maxTrend * 0.5,
-    maxTrend * 0.25,
-    0,
-  ].map((value) => Math.round(value));
-
   const memberTotal = dashboard
     ? dashboard.memberCategories.umum +
       dashboard.memberCategories.mahasiswa +
@@ -442,83 +283,6 @@ export default function AdminDashboard() {
 
   return (
     <div className={styles.content}>
-      <form
-        className={filters.filterCard}
-        aria-label="Filter periode dashboard admin"
-        noValidate
-        onSubmit={(event) => { event.preventDefault(); applyRange(); }}
-      >
-        <div className={filters.filterHeading}>
-          <div>
-            <h2>Filter Periode</h2>
-            <p id="dashboard-period-help">Rentang tanggal hanya berlaku untuk grafik transaksi.</p>
-          </div>
-          <div className={filters.quickRanges} aria-label="Pilihan rentang tanggal">
-            {([{ label: "Hari Ini", value: 1 }, { label: "7 Hari", value: 7 }, { label: "30 Hari", value: 30 }, { label: "Bulan Ini", value: "month" }] as const).map((option) => (
-              <button key={option.label} data-button="ghost" data-button-size="sm" type="button" onClick={() => selectQuickRange(option.value)}>{option.label}</button>
-            ))}
-          </div>
-        </div>
-        <div className={filters.fields}>
-        <label htmlFor="dashboard-date-from">
-          <span>Dari Tanggal</span>
-          <span className={filters.dateField} data-empty={!fromInput || undefined}>
-          <input
-            id="dashboard-date-from"
-            type="date"
-            required
-            max={today}
-            aria-invalid={Boolean(dateError)}
-            aria-describedby={`dashboard-period-help${dateError ? " dashboard-date-error" : ""}`}
-            value={fromInput}
-            onChange={(event) => setFromInput(event.target.value)}
-          />
-          {!fromInput && <span className={filters.datePlaceholder} aria-hidden="true">Pilih tanggal mulai</span>}
-          </span>
-        </label>
-
-        <label htmlFor="dashboard-date-to">
-          <span>Sampai Tanggal</span>
-          <span className={filters.dateField} data-empty={!toInput || undefined}>
-          <input
-            id="dashboard-date-to"
-            type="date"
-            required
-            max={today}
-            aria-invalid={Boolean(dateError)}
-            aria-describedby={`dashboard-period-help${dateError ? " dashboard-date-error" : ""}`}
-            value={toInput}
-            onChange={(event) => setToInput(event.target.value)}
-          />
-          {!toInput && <span className={filters.datePlaceholder} aria-hidden="true">Pilih tanggal akhir</span>}
-          </span>
-        </label>
-
-        <button
-          data-button="primary"
-          data-button-size="md"
-          data-button-loading={chartLoading}
-          type="submit"
-          aria-busy={chartLoading}
-          disabled={!dashboard || loading || !fromInput || !toInput || Boolean(dateError)}
-        >
-          <FiSearch aria-hidden="true" />
-          <ButtonLabel loading={chartLoading} pending="Memuat...">Terapkan</ButtonLabel>
-        </button>
-
-        <button
-          data-button="ghost"
-          data-button-size="md"
-          type="button"
-          onClick={resetRange}
-          disabled={!fromInput && !toInput && !range}
-        >
-          Reset
-        </button>
-        </div>
-        {dateError ? <p id="dashboard-date-error" className={filters.dateError} role="alert">{dateError}</p> : range && (fromInput !== range.from || toInput !== range.to) ? <p className={filters.draftHint}>Perubahan tanggal belum diterapkan.</p> : null}
-      </form>
-
       {error ? (
         <div className={controls.errorBox} role="alert">
           <span>{error}</span>
@@ -526,7 +290,7 @@ export default function AdminDashboard() {
             data-button="secondary"
             data-button-size="md"
             type="button"
-            onClick={() => void load(null)}
+            onClick={() => void load(range)}
             disabled={loading}
           >
             Coba Lagi
@@ -552,12 +316,15 @@ export default function AdminDashboard() {
             <article className={styles.chartCard}>
               <header className={filters.chartHeader}>
                 <div className={filters.chartHeading}>
-                <h2>Transaksi Peminjaman</h2>
-                {range && <button data-button="ghost" data-button-size="sm" type="button" onClick={() => { setActiveTrend(null); void load(range); }} disabled={loading} aria-label="Segarkan Data periode aktif"><FiRefreshCw aria-hidden="true" /><span className={filters.refreshLabel}>Segarkan Data</span></button>}
+                  <h2>Transaksi Peminjaman</h2>
+                  <div className={filters.chartControls}>
+                    <PeriodSelector value={range} onChange={applyPeriod} loading={chartLoading} maxDate={jakartaDateInput()} label="Periode transaksi peminjaman" />
+                    <button data-button="icon" data-button-size="md" type="button" onClick={() => { void load(range, true); }} disabled={chartLoading} aria-label="Segarkan transaksi" title="Segarkan"><FiRefreshCw aria-hidden="true" /></button>
+                  </div>
                 </div>
-                {range ? <p className={filters.activePeriod} data-active-period>Periode aktif · {formatRangeLabel(range.from, range.to)}{chartData && <> · Diperbarui {formatUpdatedAt(chartData.generatedAt)}</>}</p> : <p>Pilih periode untuk menampilkan transaksi.</p>}
+                <p className={filters.activePeriod} data-active-period>Periode aktif: {formatPeriodRange(range)}{chartData && !chartLoading && !chartError && <> · Diperbarui {formatUpdatedAt(chartData.generatedAt)}</>}</p>
 
-                {range && chartData && !chartLoading && !chartError && chartData.trend.some((row) => row.borrowings > 0 || row.returns > 0) && (
+                {chartData && !chartLoading && !chartError && chartData.trend.some((row) => row.borrowings > 0 || row.returns > 0) && (
                 <div
                   className={styles.transactionLegend}
                   aria-label="Legenda transaksi peminjaman"
@@ -578,150 +345,12 @@ export default function AdminDashboard() {
                 className={`${styles.lineChartWrap} ${filters.chartBody}`}
                 aria-label="Grafik transaksi peminjaman"
                 aria-busy={chartLoading}
-                onMouseLeave={() => setActiveTrend(null)}
-                style={{ overflowX: "auto" }}
               >
-                {!range ? <div className={filters.chartState} role="status"><FiBarChart2 aria-hidden="true" /><strong>Pilih rentang tanggal untuk melihat transaksi peminjaman.</strong><p>Data peminjaman dan pengembalian akan ditampilkan sesuai periode yang Anda pilih.</p></div>
-                : chartLoading ? <div className={filters.chartState} role="status"><span className={filters.skeleton} aria-hidden="true" /><span className={filters.skeleton} aria-hidden="true" /><strong>Memuat transaksi peminjaman...</strong></div>
-                : chartError ? <div className={filters.chartState} role="alert"><FiAlertTriangle aria-hidden="true" /><strong>{chartError}</strong><button data-button="secondary" data-button-size="sm" type="button" onClick={() => void load(range)}>Coba Lagi</button></div>
-                : !chartData?.trend.some((row) => row.borrowings > 0 || row.returns > 0) ? <div className={filters.chartState} role="status"><FiBarChart2 aria-hidden="true" /><strong>Tidak ada transaksi pada periode ini.</strong><p>Coba pilih rentang tanggal lain.</p></div>
+                {chartLoading ? <div className={filters.chartState} role="status"><span className={filters.skeleton} aria-hidden="true" /><span className={filters.skeleton} aria-hidden="true" /><strong>Memuat transaksi peminjaman...</strong></div>
+                : chartError ? <div className={filters.chartState} role="alert"><FiAlertTriangle aria-hidden="true" /><strong>{chartError}</strong><button data-button="secondary" data-button-size="sm" type="button" onClick={() => void load(range, true)}>Coba Lagi</button></div>
+                : !chartData?.trend.some((row) => row.borrowings > 0 || row.returns > 0) ? <div className={filters.chartState} role="status"><FiBarChart2 aria-hidden="true" /><strong>Tidak ada transaksi pada periode ini.</strong><p>Coba pilih periode lain.</p></div>
                 : (
-                <div
-                  className={enhancements.chartFrame}
-                  style={{
-                    minWidth: Math.max(620, chartData.trend.length * 92),
-                  }}
-                >
-                  <svg
-                    className={styles.lineChart}
-                    viewBox="0 0 860 300"
-                    role="img"
-                    aria-label="Grafik peminjaman dan pengembalian berdasarkan periode terpilih"
-                  >
-                    <g className={styles.chartGrid}>
-                      <line x1="48" y1="32" x2="835" y2="32" />
-                      <line x1="48" y1="94" x2="835" y2="94" />
-                      <line x1="48" y1="156" x2="835" y2="156" />
-                      <line x1="48" y1="218" x2="835" y2="218" />
-                      <line x1="48" y1="280" x2="835" y2="280" />
-                    </g>
-
-                    <g className={styles.chartAxis}>
-                      <text x="8" y="36">
-                        {axisValues[0]}
-                      </text>
-                      <text x="8" y="98">
-                        {axisValues[1]}
-                      </text>
-                      <text x="8" y="160">
-                        {axisValues[2]}
-                      </text>
-                      <text x="8" y="222">
-                        {axisValues[3]}
-                      </text>
-                      <text x="28" y="284">
-                        0
-                      </text>
-                    </g>
-
-                    {borrowingPoints ? (
-                      <polyline
-                        className={styles.borrowingLine}
-                        points={borrowingPoints}
-                      />
-                    ) : null}
-
-                    {returnPoints ? (
-                      <polyline
-                        className={styles.returnLine}
-                        points={returnPoints}
-                      />
-                    ) : null}
-
-                    {chartData.trend.map((row, index) => {
-                      const borrowing = chartCoordinate(
-                        chartData.trend,
-                        index,
-                        row.borrowings,
-                        maxTrend,
-                      );
-                      const returned = chartCoordinate(
-                        chartData.trend,
-                        index,
-                        row.returns,
-                        maxTrend,
-                      );
-
-                      return (
-                        <g key={`points-${row.key}`}>
-                          <circle
-                            className={`${enhancements.chartPoint} ${enhancements.borrowingPoint}`}
-                            cx={borrowing.x}
-                            cy={borrowing.y}
-                            r="4"
-                            tabIndex={0}
-                            aria-label={`${row.label}: ${row.borrowings} peminjaman, ${row.returns} pengembalian`}
-                            onMouseEnter={() => setActiveTrend(index)}
-                            onFocus={() => setActiveTrend(index)}
-                            onClick={() => setActiveTrend(index)}
-                          />
-                          <circle
-                            className={`${enhancements.chartPoint} ${enhancements.returnPoint}`}
-                            cx={returned.x}
-                            cy={returned.y}
-                            r="4"
-                            tabIndex={0}
-                            aria-label={`${row.label}: ${row.borrowings} peminjaman, ${row.returns} pengembalian`}
-                            onMouseEnter={() => setActiveTrend(index)}
-                            onFocus={() => setActiveTrend(index)}
-                            onClick={() => setActiveTrend(index)}
-                          />
-                        </g>
-                      );
-                    })}
-                  </svg>
-
-                  {activeTrend !== null && chartData.trend[activeTrend] ? (() => {
-                    const row = chartData.trend[activeTrend];
-                    const point = chartCoordinate(
-                      chartData.trend,
-                      activeTrend,
-                      Math.max(row.borrowings, row.returns),
-                      maxTrend,
-                    );
-                    return (
-                      <div
-                        className={`${enhancements.chartTooltip} ${
-                          point.y < 82 ? enhancements.chartTooltipBelow : ""
-                        }`}
-                        role="status"
-                        style={{
-                          left: `clamp(96px, ${(point.x / 860) * 100}%, calc(100% - 96px))`,
-                          top: `${(point.y / 300) * 100}%`,
-                        }}
-                      >
-                        <strong>{row.label}</strong>
-                        <span>Peminjaman: {row.borrowings}</span>
-                        <span>Pengembalian: {row.returns}</span>
-                      </div>
-                    );
-                  })() : null}
-
-                  <div
-                    className={styles.monthLabels}
-                    aria-hidden="true"
-                    style={{
-                      gridTemplateColumns: `repeat(${Math.max(
-                        1,
-                        chartData.trend.length,
-                      )}, minmax(0, 1fr))`,
-                    }}
-                  >
-                    {chartData.trend.map((row) => (
-                      <span key={row.key}>{row.label}</span>
-                    ))}
-                  </div>
-                </div>
+                <TransactionTrendChart rows={chartData.trend} granularity={chartData.granularity} />
                 )}
               </div>
             </article>

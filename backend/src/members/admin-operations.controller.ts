@@ -22,8 +22,8 @@ export class AdminOperationsController {
   constructor(private readonly operations: AdminOperationsService) {}
 
   @Get('dashboard')
-  dashboard(@Query('from') from?: string, @Query('to') to?: string) {
-    return this.operations.dashboard({ from, to });
+  dashboard(@Query('from') from?: string, @Query('to') to?: string, @Query('granularity') granularity?: string) {
+    return this.operations.dashboard({ from, to, granularity });
   }
 
   @Get('notifications/unread-count')
@@ -58,8 +58,8 @@ export class AdminOperationsController {
   }
 
   @Get('reports')
-  reports(@Query('from') from?: string, @Query('to') to?: string) {
-    return this.operations.reports({ from, to });
+  reports(@Query('from') from?: string, @Query('to') to?: string, @Query('granularity') granularity?: string) {
+    return this.operations.reports({ from, to, granularity });
   }
 
   @Get('settings')

@@ -370,8 +370,7 @@
 .content {
   --dashboard-primary: var(--navy-soft);
   --dashboard-success: var(--admin-success);
-  /* Existing success shade keeps thin chart strokes visible on white. */
-  --dashboard-return: color-mix(in srgb, var(--admin-success) 70%, #000);
+  --dashboard-return: var(--admin-success);
   --dashboard-info: var(--admin-info);
   --dashboard-warning: var(--admin-warning);
   --dashboard-error: var(--admin-danger);

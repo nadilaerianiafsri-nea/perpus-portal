@@ -67,28 +67,30 @@ describe('admin operations validation', () => {
 
 describe('AdminOperationsService', () => {
   function serviceWith(overrides: Record<string, unknown> = {}) {
+    // Each query projects different fields; keep the fixture return type open.
+    const emptyRows = async (): Promise<unknown[]> => [];
     const prisma = {
-      $queryRaw: jest.fn(async () => []),
+      $queryRaw: jest.fn(emptyRows),
       $executeRaw: jest.fn(async () => 1),
       notification: {
-        findMany: jest.fn(async () => []),
-        findFirst: jest.fn(async () => null),
+        findMany: jest.fn(emptyRows),
+        findFirst: jest.fn(async (): Promise<Record<string, unknown> | null> => null),
         count: jest.fn(async () => 0),
       },
       adminNotificationRead: {
-        findMany: jest.fn(async () => []),
+        findMany: jest.fn(emptyRows),
         upsert: jest.fn(async () => ({ readAt: new Date('2026-10-14T01:00:00.000Z') })),
       },
       loan: {
-        findMany: jest.fn(async () => []),
+        findMany: jest.fn(emptyRows),
         count: jest.fn(async () => 0),
       },
       reservation: {
-        findMany: jest.fn(async () => []),
+        findMany: jest.fn(emptyRows),
         count: jest.fn(async () => 0),
       },
-      userEBook: { findMany: jest.fn(async () => []) },
-      bookGrant: { findMany: jest.fn(async () => []) },
+      userEBook: { findMany: jest.fn(emptyRows) },
+      bookGrant: { findMany: jest.fn(emptyRows) },
       book: { count: jest.fn(async () => 0) },
       bookCopy: { count: jest.fn(async () => 0) },
       user: { count: jest.fn(async () => 0) },
@@ -392,5 +394,56 @@ describe('AdminOperationsService', () => {
       lostBooks: 1,
     });
     expect(report.trend.map((row) => row.key)).toEqual(['2026-04', '2026-05', '2026-06']);
+  });
+
+  it.each(['dashboard', 'reports'] as const)('%s defaults this month to continuous daily WIB buckets', async (endpoint) => {
+    const { service, prisma } = serviceWith();
+    prisma.loan.findMany
+      .mockResolvedValueOnce([
+        { id: 1, userId: 2, borrowedAt: new Date('2026-09-30T17:30:00Z'), bookId: 9, book: { title: 'Buku' } },
+        { id: 2, userId: 2, borrowedAt: new Date('2026-10-19T17:30:00Z'), bookId: 9, book: { title: 'Buku' } },
+      ])
+      .mockResolvedValueOnce([{ id: 1, userId: 2, returnedAt: new Date('2026-10-02T01:00:00Z') }]);
+    const result = await service[endpoint]({ from: '2026-10-01', to: '2026-10-20' });
+    expect(result).toMatchObject({ granularity: 'day' });
+    expect(result.trend).toHaveLength(20);
+    expect(result.trend[0]).toMatchObject({ key: '2026-10-01', label: '1 Okt', tooltipLabel: '1 Okt 2026', borrowings: 1, returns: 0 });
+    expect(result.trend[1]).toMatchObject({ key: '2026-10-02', borrowings: 0, returns: 1 });
+    expect(result.trend[2]).toMatchObject({ key: '2026-10-03', borrowings: 0, returns: 0 });
+    expect(result.trend[19]).toMatchObject({ key: '2026-10-20', borrowings: 1, returns: 0 });
+    expect(prisma.loan.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: { borrowedAt: { gte: new Date('2026-09-30T17:00:00Z'), lt: new Date('2026-10-20T17:00:00Z') } } }));
+  });
+
+  it.each(['dashboard', 'reports'] as const)('%s supports explicit hourly today buckets and weekly daily defaults', async (endpoint) => {
+    const { service } = serviceWith();
+    const today = await service[endpoint]({ from: '2026-10-20', to: '2026-10-20', granularity: 'hour' });
+    expect(today).toMatchObject({ granularity: 'hour' });
+    expect(today.trend).toHaveLength(24);
+    expect(today.trend[0]).toMatchObject({ key: '2026-10-20T00', borrowings: 0, returns: 0 });
+    expect(today.trend[23].key).toBe('2026-10-20T23');
+    const week = await service[endpoint]({ from: '2026-10-19', to: '2026-10-20' });
+    expect(week).toMatchObject({ granularity: 'day' });
+    expect(week.trend).toHaveLength(2);
+  });
+
+  it.each(['dashboard', 'reports'] as const)('%s keeps year ranges monthly with 12 buckets', async (endpoint) => {
+    const { service } = serviceWith();
+    const result = await service[endpoint]({ from: '2026-01-01', to: '2026-12-31' });
+    expect(result).toMatchObject({ granularity: 'month' });
+    expect(result.trend).toHaveLength(12);
+    expect(result.trend[0].key).toBe('2026-01');
+    expect(result.trend[11].key).toBe('2026-12');
+  });
+
+  it.each(['dashboard', 'reports'] as const)('%s rejects invalid or overly dense granularity before querying', async (endpoint) => {
+    const { service, prisma } = serviceWith();
+    for (const granularity of ['invalid', ['hour'], {}, '', null]) {
+      await expect(service[endpoint]({ from: '2026-10-20', to: '2026-10-20', granularity })).rejects.toBeInstanceOf(BadRequestException);
+    }
+    await expect(service[endpoint]({ from: '2026-10-01', to: '2026-10-20', granularity: 'hour' })).rejects.toBeInstanceOf(BadRequestException);
+    await expect(service[endpoint]({ from: '2026-01-01', to: '2026-12-31', granularity: 'day' })).rejects.toBeInstanceOf(BadRequestException);
+    await expect(service[endpoint]({ from: '2025-01-01', to: '2026-12-31', granularity: 'year' })).rejects.toBeInstanceOf(BadRequestException);
+    expect(prisma.loan.findMany).not.toHaveBeenCalled();
+    expect(prisma.book.count).not.toHaveBeenCalled();
   });
 });

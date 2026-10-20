@@ -1,4 +1,5 @@
 import { BadRequestException } from '@nestjs/common';
+import { getChartGranularity, type ChartGranularity } from '../../../shared/chartTime.cjs';
 
 export type LibrarySettings = {
   libraryName: string;
@@ -179,6 +180,20 @@ export function parseReportRange(from: unknown, to: unknown) {
     endExclusive,
     days,
   };
+}
+
+export function parseChartGranularity(value: unknown, range: ReturnType<typeof parseReportRange>): ChartGranularity {
+  if (value === undefined) return getChartGranularity(range);
+  if (typeof value !== 'string' || !['hour', 'day', 'month', 'year'].includes(value)) {
+    throw new BadRequestException('Granularitas grafik tidak valid.');
+  }
+  if (value === 'hour' && range.days !== 1) {
+    throw new BadRequestException('Grafik per jam hanya tersedia untuk satu hari.');
+  }
+  if (value === 'day' && range.days > 62) {
+    throw new BadRequestException('Grafik per hari maksimal 62 hari.');
+  }
+  return value as ChartGranularity;
 }
 
 export function parseNotificationQuery(query: {
