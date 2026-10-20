@@ -1,6 +1,8 @@
 "use client";
 
 import TransactionTrendChart from "./TransactionTrendChart";
+import AdminDashboardInsights from "./AdminDashboardInsights";
+import type { DashboardInsightsData } from "./dashboardInsights";
 import { getChartGranularity, type ChartGranularity, type TransactionTrendRow } from "@/shared/chartTime.cjs";
 import PeriodSelector from "@/components/PeriodSelector";
 import { createPeriod, formatPeriodRange, jakartaDateInput, type PeriodValue } from "@/shared/period";
@@ -31,7 +33,7 @@ import filters from "./AdminDashboardFilters.module.css";
 
 type DashboardTrendRow = TransactionTrendRow;
 
-type AdminDashboardResponse = {
+type AdminDashboardResponse = DashboardInsightsData & {
   generatedAt: string;
   range: {
     from: string;
@@ -445,6 +447,7 @@ export default function AdminDashboard() {
           </section>
         </>
       ) : null}
+      <AdminDashboardInsights key={dashboard?.generatedAt ?? "initial-insights"} data={dashboard} loading={loading} failed={Boolean(error)} period={initialPeriod} />
     </div>
   );
 }

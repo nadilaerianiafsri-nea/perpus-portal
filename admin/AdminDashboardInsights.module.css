@@ -1,0 +1,49 @@
+.grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); align-items: stretch; gap: 24px; margin-top: 24px; }
+.panel { min-width: 0; min-height: 300px; border: 1px solid var(--line); border-radius: 16px; background: var(--white); box-shadow: 0 2px 8px #00063308; overflow: hidden; }
+.header { padding: 20px 20px 17px; border-bottom: 1px solid #00063312; }
+.header h2 { margin: 0; color: var(--navy); font-size: 20px; line-height: 1.35; letter-spacing: -.02em; }
+.header p { margin: 6px 0 0; color: var(--admin-slate); font-size: 12px; line-height: 1.5; }
+.collectionList, .actionList { display: grid; margin: 0; padding: 16px; list-style: none; }
+.collectionList { gap: 8px; }
+.collection { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(50px, 1fr) auto; align-items: center; gap: 12px; min-height: 48px; padding: 10px 8px; border-radius: 9px; cursor: pointer; transition: background 160ms ease; }
+.collectionTitle { overflow: hidden; color: var(--navy); font-size: 13px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.barTrack { display: block; height: 10px; overflow: hidden; border-radius: 4px; background: #2b305610; }
+.bar { display: block; height: 100%; border-radius: inherit; background: var(--navy-soft); transition: background 160ms ease; }
+.collection .count { color: var(--navy-soft); font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.count span { font-size: 11px; font-weight: 400; }
+.collection:hover { background: #2b30560a; }
+.collection:hover .bar { background: var(--navy); }
+.collection:focus-visible, .action:focus-visible { outline: 3px solid var(--admin-teal); outline-offset: 2px; }
+.actionList { gap: 10px; }
+.action { --action-base: var(--admin-info); --action-ink: var(--stat-info); display: flex; align-items: center; gap: 12px; min-height: 68px; padding: 13px; border: 1px solid color-mix(in srgb, var(--action-base) 23%, white); border-radius: 11px; background: color-mix(in srgb, var(--action-base) 5%, white); color: var(--navy); cursor: pointer; transition: background 160ms ease, border-color 160ms ease; }
+.action:hover { background: color-mix(in srgb, var(--action-base) 10%, white); border-color: color-mix(in srgb, var(--action-base) 40%, white); }
+.warning { --action-base: var(--admin-warning); --action-ink: var(--stat-warning); }
+.danger { --action-base: var(--admin-danger); --action-ink: var(--stat-danger); }
+.coral { --action-base: var(--admin-coral); --action-ink: var(--stat-coral); }
+.info { --action-base: var(--admin-info); --action-ink: var(--stat-info); }
+.icon { flex: 0 0 34px; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 9px; background: color-mix(in srgb, var(--action-base) 14%, white); color: var(--action-ink); }
+.icon svg { width: 17px; height: 17px; }
+.actionCopy { flex: 1; min-width: 0; font-size: 13px; line-height: 1.5; overflow-wrap: break-word; }
+.actionCopy strong { font-weight: 700; font-variant-numeric: tabular-nums; }
+.actionCopy small { display: block; margin-top: 2px; color: var(--admin-slate); font-size: 11px; line-height: 1.5; }
+.chevron { flex: 0 0 16px; color: var(--action-ink); }
+.feedback { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; min-height: 208px; padding: 24px; color: var(--admin-slate); text-align: center; font-size: 13px; line-height: 1.6; }
+.feedback > svg { width: 24px; height: 24px; }
+.feedback strong { color: var(--navy-soft); font-size: 14px; font-weight: 600; }
+.feedback p { margin: 0; }
+.feedback .positive { color: var(--stat-success); }
+.skeleton { width: 100%; height: 34px; border-radius: 8px; background: #0006330a; animation: pulse 1.4s ease-in-out infinite alternate; }
+.srOnly { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+@keyframes pulse { to { opacity: .4; } }
+@media (max-width: 1100px) { .grid { grid-template-columns: minmax(0, 1fr); gap: 18px; } }
+@media (max-width: 600px) {
+  .grid { margin-top: 18px; }
+  .header { padding: 18px 16px 15px; }
+  .header h2 { font-size: 18px; }
+  .collectionList, .actionList { padding: 12px; }
+  .collection { gap: 8px; padding-inline: 4px; }
+  .collectionTitle { font-size: 12px; }
+  .action { gap: 10px; padding: 12px; }
+  .actionCopy { font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } .action, .collection, .bar { transition: none; } }

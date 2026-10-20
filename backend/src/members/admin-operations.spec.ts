@@ -84,6 +84,7 @@ describe('AdminOperationsService', () => {
       loan: {
         findMany: jest.fn(emptyRows),
         count: jest.fn(async () => 0),
+        groupBy: jest.fn(emptyRows),
       },
       reservation: {
         findMany: jest.fn(emptyRows),
@@ -91,7 +92,7 @@ describe('AdminOperationsService', () => {
       },
       userEBook: { findMany: jest.fn(emptyRows) },
       bookGrant: { findMany: jest.fn(emptyRows) },
-      book: { count: jest.fn(async () => 0) },
+      book: { count: jest.fn(async () => 0), findMany: jest.fn(emptyRows) },
       bookCopy: { count: jest.fn(async () => 0) },
       user: { count: jest.fn(async () => 0) },
       ...overrides,
@@ -278,6 +279,129 @@ describe('AdminOperationsService', () => {
     await expect(service.markNotificationRead(77, 999)).rejects.toBeInstanceOf(
       NotFoundException,
     );
+  });
+
+  it('returns the database top five real physical collections in ranked order with one title query', async () => {
+    const { service, prisma } = serviceWith();
+    const ranks = [
+      { bookId: 6, _count: { id: 24 } },
+      { bookId: 2, _count: { id: 17 } },
+      { bookId: 9, _count: { id: 17 } },
+      { bookId: 4, _count: { id: 8 } },
+      { bookId: 1, _count: { id: 3 } },
+    ];
+    prisma.loan.groupBy.mockResolvedValueOnce(ranks);
+    // Title lookup order need not match ranking order.
+    prisma.book.findMany.mockResolvedValueOnce([
+      { id: 1, title: 'Judul Satu' }, { id: 9, title: 'Judul Sembilan' },
+      { id: 6, title: 'Judul Enam' }, { id: 4, title: 'Judul Empat' },
+      { id: 2, title: 'Judul Dua' },
+    ]);
+
+    const dashboard = await service.dashboard({ from: '2026-10-01', to: '2026-10-20' });
+
+    expect(prisma.loan.groupBy).toHaveBeenCalledWith({
+      by: ['bookId'],
+      where: {
+        book: { is: { type: 'FISIK', isDemo: false } },
+        reservation: { is: { status: 'DIAMBIL' } },
+      },
+      _count: { id: true },
+      orderBy: [{ _count: { id: 'desc' } }, { bookId: 'asc' }],
+      take: 5,
+    });
+    expect(prisma.book.findMany).toHaveBeenCalledTimes(1);
+    expect(prisma.book.findMany).toHaveBeenCalledWith({
+      where: { id: { in: [6, 2, 9, 4, 1] } }, select: { id: true, title: true },
+    });
+    expect(dashboard.topBorrowedCollections).toEqual([
+      { id: 6, title: 'Judul Enam', borrowCount: 24 },
+      { id: 2, title: 'Judul Dua', borrowCount: 17 },
+      { id: 9, title: 'Judul Sembilan', borrowCount: 17 },
+      { id: 4, title: 'Judul Empat', borrowCount: 8 },
+      { id: 1, title: 'Judul Satu', borrowCount: 3 },
+    ]);
+  });
+
+  it('returns empty supplementary data without a title query when there is no loan history', async () => {
+    const { service, prisma } = serviceWith();
+    const dashboard = await service.dashboard({ from: '2026-10-01', to: '2026-10-20' });
+    expect(dashboard.topBorrowedCollections).toEqual([]);
+    expect(prisma.book.findMany).not.toHaveBeenCalled();
+    expect(dashboard.actionRequired).toEqual({
+      expiringReservations: 0, overdueLoans: 0,
+      pendingLostBookReplacements: 0, failedNotifications: 0,
+    });
+  });
+
+  it('uses the existing two-hour window, scoped nonreturned overdue/lost loans, and reliable email failures', async () => {
+    const { service, prisma } = serviceWith();
+    prisma.reservation.count.mockResolvedValueOnce(10).mockResolvedValueOnce(3);
+    prisma.loan.count.mockResolvedValueOnce(20).mockResolvedValueOnce(4)
+      .mockResolvedValueOnce(12).mockResolvedValueOnce(9)
+      .mockResolvedValueOnce(7).mockResolvedValueOnce(2);
+    prisma.notification.count.mockResolvedValueOnce(5);
+    const before = Date.now();
+    const dashboard = await service.dashboard({ from: '2020-01-01', to: '2020-01-02' });
+    const after = Date.now();
+    expect(dashboard.actionRequired).toEqual({
+      expiringReservations: 3, overdueLoans: 7,
+      pendingLostBookReplacements: 2, failedNotifications: 5,
+    });
+    const expiryQuery = (prisma.reservation.count.mock.calls as unknown[][])[1][0] as {
+      where: { status: string; user: { is: { role: string } }; expiresAt: { gt: Date; lte: Date } };
+    };
+    expect(expiryQuery.where.status).toBe('MENUNGGU_PENGAMBILAN');
+    expect(expiryQuery.where.user).toEqual({ is: { role: 'PENGUNJUNG' } });
+    expect(expiryQuery.where.expiresAt.gt.getTime()).toBeGreaterThanOrEqual(before);
+    expect(expiryQuery.where.expiresAt.gt.getTime()).toBeLessThanOrEqual(after);
+    expect(expiryQuery.where.expiresAt.lte.getTime() - expiryQuery.where.expiresAt.gt.getTime())
+      .toBe(2 * 60 * 60 * 1000);
+    expect(prisma.loan.count).toHaveBeenNthCalledWith(5, {
+      where: {
+        status: 'AKTIF', returnedAt: null, dueAt: { lt: expiryQuery.where.expiresAt.gt },
+        book: { is: { type: 'FISIK' } }, user: { is: { role: 'PENGUNJUNG' } },
+      },
+    });
+    expect(prisma.loan.count).toHaveBeenNthCalledWith(6, {
+      where: {
+        status: 'HILANG', returnedAt: null,
+        book: { is: { type: 'FISIK' } }, user: { is: { role: 'PENGUNJUNG' } },
+      },
+    });
+    expect(dashboard.stats.overdue).toBe(12);
+    expect(dashboard.stats.lostInProcess).toBe(9);
+    expect(prisma.notification.count).toHaveBeenCalledWith({ where: { emailDelivery: 'FAILED' } });
+  });
+
+  it.each(['aggregation', 'titles'] as const)('keeps the dashboard and action section usable when top collection %s fails', async (failure) => {
+    const { service, prisma } = serviceWith();
+    if (failure === 'aggregation') prisma.loan.groupBy.mockRejectedValueOnce(new Error('database unavailable'));
+    else {
+      prisma.loan.groupBy.mockResolvedValueOnce([{ bookId: 1, _count: { id: 2 } }]);
+      prisma.book.findMany.mockRejectedValueOnce(new Error('database unavailable'));
+    }
+    const dashboard = await service.dashboard({ from: '2026-10-01', to: '2026-10-20' });
+    expect(dashboard.topBorrowedCollections).toBeNull();
+    expect(dashboard.actionRequired).not.toBeNull();
+    expect(dashboard.stats.totalCollections).toBe(0);
+    expect(dashboard.trend.length).toBeGreaterThan(0);
+  });
+
+  it.each(['reservation', 'notification', 'overdue', 'lost'] as const)('keeps the dashboard and top collections usable when action %s count fails', async (failure) => {
+    const { service, prisma } = serviceWith();
+    if (failure === 'reservation') {
+      prisma.reservation.count.mockResolvedValueOnce(0).mockRejectedValueOnce(new Error('database unavailable'));
+    } else if (failure === 'notification') prisma.notification.count.mockRejectedValueOnce(new Error('database unavailable'));
+    else {
+      for (let i = 0; i < (failure === 'lost' ? 5 : 4); i++) prisma.loan.count.mockResolvedValueOnce(0);
+      prisma.loan.count.mockRejectedValueOnce(new Error('database unavailable'));
+    }
+    const dashboard = await service.dashboard({ from: '2026-10-01', to: '2026-10-20' });
+    expect(dashboard.actionRequired).toBeNull();
+    expect(dashboard.topBorrowedCollections).toEqual([]);
+    expect(dashboard.stats.totalCollections).toBe(0);
+    expect(dashboard.trend.length).toBeGreaterThan(0);
   });
 
   it('builds realtime dashboard totals and filtered month trend from database activity', async () => {

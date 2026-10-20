@@ -335,6 +335,12 @@ export class AdminOperationsService {
       }),
     ]);
 
+    // Supplementary panels fail independently of each other and the existing KPIs/charts.
+    const [topBorrowedCollections, actionRequired] = await Promise.all([
+      this.topBorrowedCollections().catch(() => null),
+      this.actionRequired(now).catch(() => null),
+    ]);
+
     return {
       granularity,
       generatedAt: now.toISOString(),
@@ -360,6 +366,68 @@ export class AdminOperationsService {
         pegawai,
       },
       trend: buildTransactionTrend(range, granularity, borrowed.map((loan) => loan.borrowedAt), returned.map((loan) => loan.returnedAt)),
+      topBorrowedCollections,
+      actionRequired,
+    };
+  }
+
+  private async topBorrowedCollections() {
+    // Loan rows represent actual pickups. A cancelled/unconverted reservation is not a borrowing.
+    // Keep this all-time ranking independent of the existing transaction chart's date selector.
+    const ranked = await this.prisma.loan.groupBy({
+      by: ['bookId'],
+      where: {
+        book: { is: { type: 'FISIK', isDemo: false } },
+        reservation: { is: { status: 'DIAMBIL' } },
+      },
+      _count: { id: true },
+      orderBy: [{ _count: { id: 'desc' } }, { bookId: 'asc' }],
+      take: 5,
+    });
+    if (!ranked.length) return [];
+
+    const books = await this.prisma.book.findMany({
+      where: { id: { in: ranked.map((row) => row.bookId) } },
+      select: { id: true, title: true },
+    });
+    const titles = new Map(books.map((book) => [book.id, book.title]));
+    return ranked.flatMap((row) => {
+      const title = titles.get(row.bookId);
+      return title === undefined ? [] : [{ id: row.bookId, title, borrowCount: row._count.id }];
+    });
+  }
+
+  private async actionRequired(now: Date) {
+    const [expiringReservations, overdueLoans, pendingLostBookReplacements, failedNotifications] = await Promise.all([
+      this.prisma.reservation.count({
+        where: {
+          status: 'MENUNGGU_PENGAMBILAN',
+          user: { is: { role: 'PENGUNJUNG' } },
+          // Same live (now, now + 2 hours] window as AdminTransactionsService.reservations.
+          expiresAt: { gt: now, lte: new Date(now.getTime() + 2 * 60 * 60 * 1000) },
+        },
+      }),
+      this.prisma.loan.count({
+        where: {
+          status: 'AKTIF', returnedAt: null, dueAt: { lt: now },
+          book: { is: { type: 'FISIK' } }, user: { is: { role: 'PENGUNJUNG' } },
+        },
+      }),
+      this.prisma.loan.count({
+        where: {
+          status: 'HILANG', returnedAt: null,
+          book: { is: { type: 'FISIK' } }, user: { is: { role: 'PENGUNJUNG' } },
+        },
+      }),
+      // Email has persisted delivery failures. WhatsApp is manual, without a failure-producing flow.
+      this.prisma.notification.count({ where: { emailDelivery: 'FAILED' } }),
+    ]);
+    return {
+      expiringReservations,
+      overdueLoans,
+      // HILANG is the existing unresolved lost workflow; no separate verification status exists.
+      pendingLostBookReplacements,
+      failedNotifications,
     };
   }
 
