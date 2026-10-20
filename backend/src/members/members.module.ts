@@ -18,6 +18,11 @@ import {
   MembersController,
 } from './members.controller';
 import { MembersService } from './members.service';
+import {
+  AdminPublicContentController,
+  PublicContentController,
+} from './public-content.controller';
+import { PublicContentService } from './public-content.service';
 
 @Module({
   imports: [AuthModule],
@@ -28,6 +33,8 @@ import { MembersService } from './members.service';
     AdminTransactionsController,
     AdminOperationsController,
     PublicLibrarySettingsController,
+    PublicContentController,
+    AdminPublicContentController,
   ],
   providers: [
     MembersService,
@@ -35,6 +42,7 @@ import { MembersService } from './members.service';
     AdminMembersService,
     AdminTransactionsService,
     AdminOperationsService,
+    PublicContentService,
     MemberRoleGuard,
     ActiveBookGuard,
   ],
@@ -42,6 +50,7 @@ import { MembersService } from './members.service';
     MembersService,
     EBookCirculationService,
     AdminOperationsService,
+    PublicContentService,
     MemberRoleGuard,
   ],
 })

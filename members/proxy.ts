@@ -8,12 +8,12 @@ import { NextResponse } from 'next/server';
 import { API_URL } from '@/catalog/serverApi';
 
 const allowed: Record<string, RegExp> = {
-  GET: /^(?:me\/(dashboard|profile|reservations|loans(?:\/history)?|notifications|ebooks(?:\/\d+\/(?:status|file\.pdf))?|books\/\d+\/borrowing-status|catalog(?:\/filters|\/\d+)?)|admin\/members(?:\/\d+)?|admin\/transactions\/(reservations|loans|returns|lost-books)|admin\/operations\/(dashboard|notifications(?:\/unread-count)?|reports|settings))$/,
+  GET: /^(?:me\/(dashboard|profile|reservations|loans(?:\/history)?|notifications|ebooks(?:\/\d+\/(?:status|file\.pdf))?|books\/\d+\/borrowing-status|catalog(?:\/filters|\/\d+)?)|admin\/members(?:\/\d+)?|admin\/transactions\/(reservations|loans|returns|lost-books)|admin\/operations\/(dashboard|notifications(?:\/unread-count)?|reports|settings)|admin\/public-content|public\/(?:content|summary))$/,
 
   POST: /^(?:me\/(reservations|loans\/\d+\/extend|ebooks(?:\/\d+\/(?:borrow|return|queue(?:\/cancel)?|open))?)|admin\/(?:reservations\/\d+\/pickup|loans\/\d+\/(?:return|lost)))$/,
 
   PATCH:
-    /^(?:me\/(profile|reservations\/\d+\/cancel|notifications\/(read-all|\d+\/read)|ebooks\/\d+\/progress)|admin\/members\/\d+(?:\/status)?|admin\/operations\/(settings|notifications\/\d+\/read))$/,
+    /^(?:me\/(profile|reservations\/\d+\/cancel|notifications\/(read-all|\d+\/read)|ebooks\/\d+\/progress)|admin\/members\/\d+(?:\/status)?|admin\/operations\/(settings|notifications\/\d+\/read)|admin\/public-content)$/,
 };
 
 export async function memberProxy(request: Request, path: string) {
@@ -44,12 +44,13 @@ export async function memberProxy(request: Request, path: string) {
 
   try {
     assertSameOrigin(request);
+    const maxBodyLength = path === 'admin/public-content' ? 65536 : 16384;
     const body =
       request.method !== 'GET'
-        ? await readLimitedText(request, 16384)
+        ? await readLimitedText(request, maxBodyLength)
         : undefined;
 
-    if (body && body.length > 16384) {
+    if (body && body.length > maxBodyLength) {
       return NextResponse.json(
         { message: 'Data permintaan terlalu panjang.' },
         { status: 400, headers },

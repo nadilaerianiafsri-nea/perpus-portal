@@ -1,8 +1,11 @@
 import CatalogShell from "@/catalog/CatalogShell";
 import PageBreadcrumb from "@/components/PageBreadcrumb";
 import FAQ from "@/information/FAQ";
-import { buildFaqItems } from "@/information/serviceContent";
 import { getLibrarySettings } from "@/information/librarySettings";
+import {
+  getPublicContent,
+  renderPublicText,
+} from "@/information/publicContent";
 import common from "@/catalog/Catalog.module.css";
 import styles from "@/information/Information.module.css";
 
@@ -13,17 +16,24 @@ export const metadata = {
 };
 
 export default async function Page() {
-  const settings = await getLibrarySettings();
-  const faqItems = buildFaqItems(settings);
+  const [settings, content] = await Promise.all([
+    getLibrarySettings(),
+    getPublicContent(),
+  ]);
+  const faqItems = content.faq.items.map((item) => ({
+    id: item.id,
+    question: renderPublicText(item.question, settings),
+    answer: renderPublicText(item.answer, settings),
+  }));
 
   return (
     <CatalogShell active="faq">
-      <main className={`${common.main} ${styles.main} ${styles.helpMain}`}>
+      <main className={`${common.main} ${styles.main} ${styles.helpMain} public-info-refresh`}>
         <PageBreadcrumb label="FAQ" />
 
         <header className={styles.heading}>
-          <h1>Pertanyaan yang Sering Diajukan</h1>
-          <p>Jawaban ringkas seputar layanan perpustakaan.</p>
+          <h1>{content.faq.title}</h1>
+          <p>{renderPublicText(content.faq.intro, settings)}</p>
         </header>
 
         <FAQ items={faqItems} />
