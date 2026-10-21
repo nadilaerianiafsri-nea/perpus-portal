@@ -21,7 +21,6 @@ import styles from "./HomeLandingRevision.module.css";
 import StatCard from "@/components/StatCard";
 import { availabilityLabels } from "@/catalog/types";
 import { safeCoverUrl } from "@/shared/displayUrls.cjs";
-import { grantStatusLabels } from "@/information/grantTypes";
 import { getHomeData } from "@/information/homeData";
 import {
   formatPublicPhone,
@@ -85,7 +84,7 @@ export default async function Home() {
               </form>
               <div className="hero-actions">
                 <Link
-                  data-button="accent"
+                  data-button="primary"
                   data-button-size="md"
                   className="navy-btn"
                   href="/koleksi"
@@ -187,6 +186,15 @@ export default async function Home() {
                         fill
                         sizes="(max-width: 560px) 100vw, (max-width: 1080px) 50vw, 220px"
                       />
+                      <span
+                        className={`${styles.latestBookType} ${
+                          book.type === "EBOOK"
+                            ? styles.latestBookTypeEbook
+                            : styles.latestBookTypePhysical
+                        }`}
+                      >
+                        {book.type === "EBOOK" ? "E-Book" : "Fisik"}
+                      </span>
                     </div>
                     <div className={styles.latestBookInfo}>
                       <span className={styles.latestBookSubject}>
@@ -194,13 +202,13 @@ export default async function Home() {
                       </span>
                       <h3>{book.title}</h3>
                       <p>{book.author}</p>
-                      <span className={styles.latestBookAvailability}>
-                        {book.availability
-                          ? availabilityLabels[book.availability]
-                          : book.type === "EBOOK"
-                            ? "E-Book"
+                      {book.type === "FISIK" ? (
+                        <span className={styles.latestBookAvailability}>
+                          {book.availability
+                            ? availabilityLabels[book.availability]
                             : "Ketersediaan diperbarui"}
-                      </span>
+                        </span>
+                      ) : null}
                     </div>
                   </Link>
                 ))}
@@ -221,10 +229,13 @@ export default async function Home() {
                       <div className={styles.collectionContinueMediaOverlay} />
                     </div>
                   ) : null}
+                  <FiArrowRight
+                    className={styles.collectionContinueArrow}
+                    aria-hidden="true"
+                  />
                   <div className={styles.collectionContinueBody}>
                     <span>KOLEKSI PUBLIK</span>
                     <strong>Lihat semua koleksi</strong>
-                    <FiArrowRight />
                   </div>
                 </Link>
               </div>
@@ -359,7 +370,7 @@ export default async function Home() {
                 <li><FiCheckCircle /> Tersedia untuk perangkat mobile</li>
               </ul>
               <div className="hero-actions">
-                <Link data-button="secondary" data-button-size="md" className="navy-btn" href="/e-book">
+                <Link data-button="primary" data-button-size="md" className="navy-btn" href="/e-book">
                   <FiBookOpen /> Jelajahi E-Book
                 </Link>
                 <Link data-button="secondary" data-button-size="md" className="outline-btn" href="/e-book">
@@ -383,7 +394,7 @@ export default async function Home() {
                   <span>Perpanjangan</span>
                   <h3>Perpanjang Pinjaman +{settings.extensionDurationDays} Hari</h3>
                   <p>Ajukan perpanjangan langsung dari akun tanpa harus datang.</p>
-                  <Link data-button="secondary" data-button-size="sm" href="/dashboard/pinjaman">
+                  <Link data-button="primary" data-button-size="sm" href="/dashboard/pinjaman">
                     Kelola Pinjaman <FiArrowRight />
                   </Link>
                 </div>
@@ -394,42 +405,11 @@ export default async function Home() {
                   <span>Reminder Otomatis</span>
                   <h3>Reminder via Email</h3>
                   <p>Notifikasi membantu Anda memantau masa pinjaman dan jatuh tempo.</p>
-                  <Link data-button="secondary" data-button-size="sm" href="/panduan">
+                  <Link data-button="accent" data-button-size="sm" href="/panduan">
                     Lihat Panduan <FiArrowRight />
                   </Link>
                 </div>
               </article>
-            </div>
-          </div>
-        </section>
-
-        <section className={`donation-section section-pad compact-section ${styles.donationBlend} ${styles.revealSection}`}>
-          <div className="landing-shell donation-grid">
-            <div>
-              <h2>{content.home.grantsTitle}</h2>
-              <p>{content.home.grantsDescription}</p>
-              {homeData.latestGrants.length ? (
-                <div className="donation-list">
-                  {homeData.latestGrants.map((grant) => (
-                    <div key={grant.id}>
-                      <FiBookOpen />
-                      <span>
-                        <strong>{grant.title}</strong>
-                        <small>{grant.donorName} · {grant.quantity.toLocaleString("id-ID")} eks.</small>
-                      </span>
-                      <b>{grantStatusLabels[grant.status]}</b>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="landing-inline-state">Data hibah terbaru belum dapat dimuat.</div>
-              )}
-              <Link data-button="secondary" data-button-size="md" className="outline-btn" href="/hibah-buku">
-                Lihat Informasi Hibah <FiArrowRight />
-              </Link>
-            </div>
-            <div className="donation-art landing-motion-card">
-              <Image src="/images/ASSET PERPUS/asset buku kaca pembesar.png" alt="Informasi hibah buku" fill sizes="330px" />
             </div>
           </div>
         </section>
@@ -469,7 +449,7 @@ export default async function Home() {
               <article><FiPhone /><div><span>KONTAK</span><strong><a href={`tel:${settings.phoneE164}`}>{formatPublicPhone(settings.phoneE164)}</a></strong><a href={`mailto:${serviceInfo.email}`}>{serviceInfo.email}</a></div></article>
             </div>
             <div className="contact-center">
-              <Link data-button="secondary" data-button-size="md" className="outline-btn" href="/kontak">
+              <Link data-button="primary" data-button-size="md" className="outline-btn" href="/kontak">
                 <FiMail /> Hubungi Kami
               </Link>
             </div>

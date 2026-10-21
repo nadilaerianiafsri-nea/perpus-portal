@@ -19,11 +19,8 @@ const FIT_SNAP_TOLERANCE = 0.025;
 const TRACKPAD_THRESHOLD = 90;
 
 type PdfPageProxy = Awaited<ReturnType<PDFDocumentProxy["getPage"]>>;
-
 type PdfRenderTask = ReturnType<PdfPageProxy["render"]>;
-
 type TurnDirection = "next" | "previous";
-
 type ReaderMode = "fit" | "overview" | "zoomed";
 
 function clampZoom(value: number) {
@@ -68,7 +65,6 @@ function getTouchDistance(touches: TouchList) {
   }
 
   const first = touches[0];
-
   const second = touches[1];
 
   return Math.hypot(
@@ -96,19 +92,12 @@ function getOverviewPages(current: number, total: number) {
   const count = Math.min(total, OVERVIEW_RADIUS * 2 + 1);
 
   let start = Math.max(1, current - OVERVIEW_RADIUS);
-
   let end = Math.min(total, start + count - 1);
 
   start = Math.max(1, end - count + 1);
-
   end = Math.min(total, start + count - 1);
 
-  return Array.from(
-    {
-      length: end - start + 1,
-    },
-    (_, index) => start + index,
-  );
+  return Array.from({ length: end - start + 1 }, (_, index) => start + index);
 }
 
 export default function PdfReader({
@@ -123,53 +112,31 @@ export default function PdfReader({
   onPosition: (position: { progress: number; lastPosition: number }) => void;
 }) {
   const [document, setDocument] = useState<PDFDocumentProxy | null>(null);
-
   const [page, setPage] = useState(1);
-
   const [width, setWidth] = useState(600);
-
   const [height, setHeight] = useState(800);
-
   const [fitZoom, setFitZoom] = useState(INITIAL_ZOOM);
-
   const [zoom, setZoom] = useState(INITIAL_ZOOM);
-
   const [fitMode, setFitMode] = useState(true);
-
   const [turnDirection, setTurnDirection] = useState<TurnDirection | null>(
     null,
   );
-
   const [controlsVisible, setControlsVisible] = useState(true);
-
   const [error, setError] = useState("");
-
   const [rendering, setRendering] = useState(true);
-
   const [text, setText] = useState("");
 
   const container = useRef<HTMLDivElement>(null);
-
   const previousCanvas = useRef<HTMLCanvasElement>(null);
-
   const canvas = useRef<HTMLCanvasElement>(null);
-
   const nextCanvas = useRef<HTMLCanvasElement>(null);
-
   const overviewCanvases = useRef(new Map<number, HTMLCanvasElement>());
-
   const controlsTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
   const zoomRef = useRef(INITIAL_ZOOM);
-
   const fitZoomRef = useRef(INITIAL_ZOOM);
-
   const pinchStartDistance = useRef<number | null>(null);
-
   const pinchStartZoom = useRef(INITIAL_ZOOM);
-
   const trackpadDelta = useRef(0);
-
   const trackpadLocked = useRef(false);
 
   const touchGesture = useRef({
@@ -183,14 +150,11 @@ export default function PdfReader({
 
   const pointerGesture = useRef({
     active: false,
-
     mode: "turn" as "turn" | "pan",
-
     startX: 0,
     startY: 0,
     lastX: 0,
     lastY: 0,
-
     startScrollLeft: 0,
     startScrollTop: 0,
   });
@@ -224,7 +188,6 @@ export default function PdfReader({
     }
 
     clearTimeout(controlsTimer.current);
-
     controlsTimer.current = null;
   }, []);
 
@@ -238,7 +201,6 @@ export default function PdfReader({
 
   const showControls = useCallback(() => {
     setControlsVisible(true);
-
     scheduleControlsHide();
   }, [scheduleControlsHide]);
 
@@ -255,14 +217,11 @@ export default function PdfReader({
       }
 
       setTurnDirection(direction ?? (current > page ? "next" : "previous"));
-
       setPage(current);
-
       showControls();
 
       onPosition({
         progress: (current / document.numPages) * 100,
-
         lastPosition:
           document.numPages === 1 ? 1 : (current - 1) / (document.numPages - 1),
       });
@@ -276,11 +235,9 @@ export default function PdfReader({
 
       if (Math.abs(next - fitZoom) <= FIT_SNAP_TOLERANCE) {
         setFitMode(true);
-
         setZoom(fitZoom);
       } else {
         setFitMode(false);
-
         setZoom(next);
       }
 
@@ -291,20 +248,17 @@ export default function PdfReader({
 
   const zoomOut = useCallback(() => {
     const current = fitMode ? fitZoom : zoom;
-
     applyManualZoom(current - ZOOM_STEP);
   }, [applyManualZoom, fitMode, fitZoom, zoom]);
 
   const zoomIn = useCallback(() => {
     const current = fitMode ? fitZoom : zoom;
-
     applyManualZoom(current + ZOOM_STEP);
   }, [applyManualZoom, fitMode, fitZoom, zoom]);
 
   const selectOverviewPage = useCallback(
     (target: number) => {
       setFitMode(true);
-
       setZoom(fitZoom);
 
       if (target !== page) {
@@ -325,7 +279,6 @@ export default function PdfReader({
 
     const updateFromEntry = (entry: ResizeObserverEntry) => {
       setWidth(Math.max(100, Math.floor(entry.contentRect.width)));
-
       setHeight(Math.max(320, window.innerHeight));
     };
 
@@ -349,7 +302,6 @@ export default function PdfReader({
 
     return () => {
       observer.disconnect();
-
       window.removeEventListener("resize", handleWindowResize);
     };
   }, []);
@@ -375,23 +327,23 @@ export default function PdfReader({
   }, [readerMode, page]);
 
   useEffect(() => {
-    const root = container.current;
+    const surface = canvas.current;
 
-    if (!root) {
+    if (!surface || readerMode === "overview") {
       return;
     }
+
+    const pageSurface: HTMLCanvasElement = surface;
 
     function finishPinch() {
       if (
         Math.abs(zoomRef.current - fitZoomRef.current) <= FIT_SNAP_TOLERANCE
       ) {
         setFitMode(true);
-
         setZoom(fitZoomRef.current);
       }
 
       pinchStartDistance.current = null;
-
       touchGesture.current.pinching = false;
     }
 
@@ -406,13 +358,9 @@ export default function PdfReader({
         }
 
         pinchStartDistance.current = distance;
-
         pinchStartZoom.current = fitMode ? fitZoomRef.current : zoomRef.current;
-
         touchGesture.current.pinching = true;
-
         showControls();
-
         return;
       }
 
@@ -424,13 +372,9 @@ export default function PdfReader({
 
       touchGesture.current = {
         startX: touch.clientX,
-
         startY: touch.clientY,
-
         lastX: touch.clientX,
-
         lastY: touch.clientY,
-
         moved: false,
         pinching: false,
       };
@@ -447,13 +391,10 @@ export default function PdfReader({
         event.preventDefault();
 
         const ratio = currentDistance / pinchStartDistance.current;
-
         const nextZoom = clampZoom(pinchStartZoom.current * ratio);
 
         setFitMode(false);
-
         setZoom(nextZoom);
-
         return;
       }
 
@@ -462,13 +403,10 @@ export default function PdfReader({
       }
 
       const touch = event.touches[0];
-
       const deltaX = touch.clientX - touchGesture.current.startX;
-
       const deltaY = touch.clientY - touchGesture.current.startY;
 
       touchGesture.current.lastX = touch.clientX;
-
       touchGesture.current.lastY = touch.clientY;
 
       if (
@@ -494,7 +432,6 @@ export default function PdfReader({
       }
 
       const deltaX = touchGesture.current.lastX - touchGesture.current.startX;
-
       const deltaY = touchGesture.current.lastY - touchGesture.current.startY;
 
       if (readerMode === "fit") {
@@ -502,13 +439,11 @@ export default function PdfReader({
 
         if (direction === "next") {
           move(page + 1, "next");
-
           return;
         }
 
         if (direction === "previous") {
           move(page - 1, "previous");
-
           return;
         }
       }
@@ -539,11 +474,9 @@ export default function PdfReader({
         event.preventDefault();
 
         const current = fitMode ? fitZoomRef.current : zoomRef.current;
-
         const factor = Math.exp(-event.deltaY * 0.002);
 
         applyManualZoom(current * factor);
-
         return;
       }
 
@@ -552,7 +485,6 @@ export default function PdfReader({
         Math.abs(event.deltaX) > Math.abs(event.deltaY) * 1.15
       ) {
         event.preventDefault();
-
         trackpadDelta.current += event.deltaX;
 
         if (
@@ -563,7 +495,6 @@ export default function PdfReader({
             trackpadDelta.current > 0 ? "next" : "previous";
 
           trackpadLocked.current = true;
-
           trackpadDelta.current = 0;
 
           move(page + (direction === "next" ? 1 : -1), direction);
@@ -575,12 +506,18 @@ export default function PdfReader({
       }
     }
 
-    function handlePointerDown(event: PointerEvent) {
-      if (event.pointerType !== "mouse" || event.button !== 0) {
-        return;
-      }
+    function stopPointerTracking() {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", finishPointer);
+      window.removeEventListener("pointercancel", finishPointer);
+    }
 
-      if (readerMode === "overview") {
+    function handlePointerDown(event: PointerEvent) {
+      if (
+        event.pointerType !== "mouse" ||
+        event.button !== 0 ||
+        pointerGesture.current.active
+      ) {
         return;
       }
 
@@ -594,40 +531,29 @@ export default function PdfReader({
 
       pointerGesture.current = {
         active: true,
-
         mode: readerMode === "zoomed" ? "pan" : "turn",
-
         startX: event.clientX,
-
         startY: event.clientY,
-
         lastX: event.clientX,
-
         lastY: event.clientY,
-
         startScrollLeft: viewer.scrollLeft,
-
         startScrollTop: viewer.scrollTop,
       };
 
-      viewer.setPointerCapture(event.pointerId);
+      window.addEventListener("pointermove", handlePointerMove);
+      window.addEventListener("pointerup", finishPointer);
+      window.addEventListener("pointercancel", finishPointer);
     }
 
     function handlePointerMove(event: PointerEvent) {
       if (!pointerGesture.current.active) {
-        if (event.pointerType === "mouse") {
-          showControls();
-        }
-
         return;
       }
 
       const deltaX = event.clientX - pointerGesture.current.startX;
-
       const deltaY = event.clientY - pointerGesture.current.startY;
 
       pointerGesture.current.lastX = event.clientX;
-
       pointerGesture.current.lastY = event.clientY;
 
       if (pointerGesture.current.mode === "pan") {
@@ -641,9 +567,7 @@ export default function PdfReader({
 
         viewer.scrollTo({
           left: pointerGesture.current.startScrollLeft - deltaX,
-
           top: pointerGesture.current.startScrollTop - deltaY,
-
           behavior: "auto",
         });
       }
@@ -651,30 +575,18 @@ export default function PdfReader({
 
     function finishPointer(event: PointerEvent) {
       if (!pointerGesture.current.active) {
-        return;
-      }
-
-      const viewer = container.current;
-
-      if (!viewer) {
-        pointerGesture.current.active = false;
-
+        stopPointerTracking();
         return;
       }
 
       const deltaX =
         pointerGesture.current.lastX - pointerGesture.current.startX;
-
       const deltaY =
         pointerGesture.current.lastY - pointerGesture.current.startY;
-
       const mode = pointerGesture.current.mode;
 
       pointerGesture.current.active = false;
-
-      if (viewer.hasPointerCapture(event.pointerId)) {
-        viewer.releasePointerCapture(event.pointerId);
-      }
+      stopPointerTracking();
 
       if (mode !== "turn") {
         return;
@@ -689,48 +601,29 @@ export default function PdfReader({
       }
     }
 
-    root.addEventListener("touchstart", handleTouchStart, {
+    pageSurface.addEventListener("touchstart", handleTouchStart, {
       passive: true,
     });
-
-    root.addEventListener("touchmove", handleTouchMove, {
+    pageSurface.addEventListener("touchmove", handleTouchMove, {
       passive: false,
     });
-
-    root.addEventListener("touchend", handleTouchEnd);
-
-    root.addEventListener("touchcancel", handleTouchCancel);
-
-    root.addEventListener("wheel", handleWheel, {
+    pageSurface.addEventListener("touchend", handleTouchEnd);
+    pageSurface.addEventListener("touchcancel", handleTouchCancel);
+    pageSurface.addEventListener("wheel", handleWheel, {
       passive: false,
     });
-
-    root.addEventListener("pointerdown", handlePointerDown);
-
-    root.addEventListener("pointermove", handlePointerMove);
-
-    root.addEventListener("pointerup", finishPointer);
-
-    root.addEventListener("pointercancel", finishPointer);
+    pageSurface.addEventListener("pointerdown", handlePointerDown);
 
     return () => {
-      root.removeEventListener("touchstart", handleTouchStart);
+      pointerGesture.current.active = false;
+      stopPointerTracking();
 
-      root.removeEventListener("touchmove", handleTouchMove);
-
-      root.removeEventListener("touchend", handleTouchEnd);
-
-      root.removeEventListener("touchcancel", handleTouchCancel);
-
-      root.removeEventListener("wheel", handleWheel);
-
-      root.removeEventListener("pointerdown", handlePointerDown);
-
-      root.removeEventListener("pointermove", handlePointerMove);
-
-      root.removeEventListener("pointerup", finishPointer);
-
-      root.removeEventListener("pointercancel", finishPointer);
+      pageSurface.removeEventListener("touchstart", handleTouchStart);
+      pageSurface.removeEventListener("touchmove", handleTouchMove);
+      pageSurface.removeEventListener("touchend", handleTouchEnd);
+      pageSurface.removeEventListener("touchcancel", handleTouchCancel);
+      pageSurface.removeEventListener("wheel", handleWheel);
+      pageSurface.removeEventListener("pointerdown", handlePointerDown);
     };
   }, [
     applyManualZoom,
@@ -759,9 +652,7 @@ export default function PdfReader({
         setError("");
         setRendering(true);
         setFitMode(true);
-
         setFitZoom(INITIAL_ZOOM);
-
         setZoom(INITIAL_ZOOM);
 
         pdf.GlobalWorkerOptions.workerSrc = new URL(
@@ -771,7 +662,6 @@ export default function PdfReader({
 
         loading = pdf.getDocument({
           url: source,
-
           wasmUrl: "/pdfjs/wasm/",
         });
 
@@ -783,14 +673,12 @@ export default function PdfReader({
         }
 
         const safePosition = Math.max(0, Math.min(1, initialPosition));
-
         const initialPage =
           loaded.numPages === 1
             ? 1
             : Math.round(safePosition * (loaded.numPages - 1)) + 1;
 
         setPage(Math.max(1, Math.min(loaded.numPages, initialPage)));
-
         setDocument(loaded);
       })
       .catch(() => {
@@ -799,13 +687,11 @@ export default function PdfReader({
         }
 
         setRendering(false);
-
         setError("Berkas PDF belum dapat dimuat. Silakan muat ulang pembaca.");
       });
 
     return () => {
       active = false;
-
       void loading?.destroy();
     };
   }, [source, initialPosition]);
@@ -820,7 +706,6 @@ export default function PdfReader({
     }
 
     let active = true;
-
     let renderTask: PdfRenderTask | undefined;
 
     void document
@@ -831,21 +716,13 @@ export default function PdfReader({
         }
 
         setRendering(true);
-
         setError("");
 
         const ratio = Math.min(window.devicePixelRatio || 1, 2);
-
-        const baseViewport = pdfPage.getViewport({
-          scale: 1,
-        });
-
+        const baseViewport = pdfPage.getViewport({ scale: 1 });
         const horizontalPadding = width <= 600 ? 20 : 48;
-
         const verticalReserve = width <= 600 ? 142 : 150;
-
         const availableHeight = Math.max(220, height - verticalReserve);
-
         const availableWidth =
           width >= PREVIEW_BREAKPOINT
             ? Math.min(700, Math.max(300, width * 0.4))
@@ -853,11 +730,8 @@ export default function PdfReader({
 
         const calculatedFitZoom = computeFitZoom({
           pageWidth: baseViewport.width,
-
           pageHeight: baseViewport.height,
-
           availableWidth,
-
           availableHeight,
         });
 
@@ -876,16 +750,12 @@ export default function PdfReader({
         });
 
         canvas.current.width = Math.max(1, Math.floor(viewport.width));
-
         canvas.current.height = Math.max(1, Math.floor(viewport.height));
-
         canvas.current.style.width = `${viewport.width / ratio}px`;
-
         canvas.current.style.height = `${viewport.height / ratio}px`;
 
         renderTask = pdfPage.render({
           canvas: canvas.current,
-
           viewport,
         });
 
@@ -939,7 +809,6 @@ export default function PdfReader({
         }
 
         setRendering(false);
-
         setError(
           "Halaman PDF belum dapat ditampilkan. Silakan muat ulang pembaca.",
         );
@@ -947,7 +816,6 @@ export default function PdfReader({
 
     return () => {
       active = false;
-
       renderTask?.cancel();
     };
   }, [document, fitMode, height, onPosition, page, readerMode, width, zoom]);
@@ -958,9 +826,7 @@ export default function PdfReader({
     }
 
     const pdfDocument = document;
-
     let active = true;
-
     const renderTasks: PdfRenderTask[] = [];
 
     async function renderPreview(
@@ -974,36 +840,26 @@ export default function PdfReader({
       }
 
       const ratio = Math.min(window.devicePixelRatio || 1, 1.5);
-
-      const baseViewport = pdfPage.getViewport({
-        scale: 1,
-      });
-
+      const baseViewport = pdfPage.getViewport({ scale: 1 });
       const previewWidth = Math.min(
         260,
         Math.max(160, Math.floor(width * 0.16)),
       );
-
       const viewport = pdfPage.getViewport({
         scale: (previewWidth / baseViewport.width) * ratio,
       });
 
       targetCanvas.width = Math.max(1, Math.floor(viewport.width));
-
       targetCanvas.height = Math.max(1, Math.floor(viewport.height));
-
       targetCanvas.style.width = "100%";
-
       targetCanvas.style.height = "auto";
 
       const task = pdfPage.render({
         canvas: targetCanvas,
-
         viewport,
       });
 
       renderTasks.push(task);
-
       await task.promise;
     }
 
@@ -1021,7 +877,6 @@ export default function PdfReader({
 
     return () => {
       active = false;
-
       renderTasks.forEach((task) => task.cancel());
     };
   }, [document, page, showSidePreviews, width]);
@@ -1032,9 +887,7 @@ export default function PdfReader({
     }
 
     const pdfDocument = document;
-
     let active = true;
-
     const renderTasks: PdfRenderTask[] = [];
 
     async function renderOverviewPage(pageNumber: number) {
@@ -1051,33 +904,23 @@ export default function PdfReader({
       }
 
       const ratio = Math.min(window.devicePixelRatio || 1, 1.25);
-
-      const baseViewport = pdfPage.getViewport({
-        scale: 1,
-      });
-
+      const baseViewport = pdfPage.getViewport({ scale: 1 });
       const previewWidth = width <= 600 ? 132 : width <= 900 ? 156 : 180;
-
       const viewport = pdfPage.getViewport({
         scale: (previewWidth / baseViewport.width) * ratio,
       });
 
       targetCanvas.width = Math.max(1, Math.floor(viewport.width));
-
       targetCanvas.height = Math.max(1, Math.floor(viewport.height));
-
       targetCanvas.style.width = `${viewport.width / ratio}px`;
-
       targetCanvas.style.height = `${viewport.height / ratio}px`;
 
       const task = pdfPage.render({
         canvas: targetCanvas,
-
         viewport,
       });
 
       renderTasks.push(task);
-
       await task.promise;
     }
 
@@ -1087,7 +930,6 @@ export default function PdfReader({
 
     return () => {
       active = false;
-
       renderTasks.forEach((task) => task.cancel());
     };
   }, [document, overviewPages, readerMode, width]);
@@ -1114,11 +956,8 @@ export default function PdfReader({
 
   const viewerClassName = [
     styles.pdfViewer,
-
     readerMode === "fit" ? styles.pdfViewerFit : "",
-
     readerMode === "zoomed" ? styles.pdfViewerZoomed : "",
-
     readerMode === "overview" ? styles.pdfViewerOverview : "",
   ]
     .filter(Boolean)
@@ -1156,7 +995,7 @@ export default function PdfReader({
                   onClick={() => selectOverviewPage(pageNumber)}
                 >
                   <canvas
-                    ref={(node) => {
+                    ref={(node: HTMLCanvasElement | null) => {
                       if (node) {
                         overviewCanvases.current.set(pageNumber, node);
                       } else {
@@ -1231,15 +1070,17 @@ export default function PdfReader({
                 : styles.pageControlsHidden
             }`}
             aria-label="Navigasi halaman dan zoom"
+            onPointerDown={(event) => {
+              pointerGesture.current.active = false;
+              event.stopPropagation();
+            }}
             onMouseEnter={() => {
               clearControlsTimer();
-
               setControlsVisible(true);
             }}
             onMouseLeave={scheduleControlsHide}
             onFocusCapture={() => {
               clearControlsTimer();
-
               setControlsVisible(true);
             }}
             onBlurCapture={scheduleControlsHide}

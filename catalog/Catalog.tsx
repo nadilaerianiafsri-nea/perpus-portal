@@ -200,14 +200,6 @@ export default function Catalog({
 
   const content = (
     <>
-      {!member ? (
-        <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-          <Link href="/">Beranda</Link>
-          <span>/</span>
-          <span>{ebook ? "E-Book" : "Koleksi"}</span>
-        </nav>
-      ) : null}
-
       <h1>{ebook ? "Katalog E-Book" : "Katalog Koleksi"}</h1>
       {member ? (
         <p className={styles.memberSubtitle}>
@@ -531,7 +523,7 @@ export default function Catalog({
       ) : (
         <dialog
           ref={dialog}
-          className={`${styles.filterDialog} ${member ? memberStyles.memberFilterDialog : ""}`}
+          className={`${styles.filterDialog} ${!ebook ? styles.publicCollectionFilterDialog : ""} ${member ? memberStyles.memberFilterDialog : ""}`}
           aria-label="Filter koleksi"
         >
           <button data-button="ghost" data-button-size="sm" data-button-shape="square"
@@ -557,6 +549,6 @@ export default function Catalog({
   return member ? (
     <div className={`${styles.main} ${styles.memberCatalog}`}>{content}</div>
   ) : (
-    <main className={styles.main}>{content}</main>
+    <main className={`${styles.main} ${!ebook ? styles.publicCollectionCatalog : ""}`}>{content}</main>
   );
 }

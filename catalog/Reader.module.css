@@ -153,14 +153,10 @@
 
 .pdfViewerFit {
   overflow: hidden;
-  touch-action: pan-y;
-  cursor: grab;
 }
 
 .pdfViewerZoomed {
   overflow: auto;
-  touch-action: pan-x pan-y;
-  cursor: grab;
 }
 
 .pdfViewerOverview {
@@ -169,8 +165,18 @@
   touch-action: pan-x;
 }
 
-.pdfViewerZoomed:active,
-.pdfViewerFit:active {
+.pdfViewerFit .pdfPage canvas {
+  touch-action: pan-y;
+  cursor: grab;
+}
+
+.pdfViewerZoomed .pdfPage canvas {
+  touch-action: pan-x pan-y;
+  cursor: grab;
+}
+
+.pdfViewerFit .pdfPage canvas:active,
+.pdfViewerZoomed .pdfPage canvas:active {
   cursor: grabbing;
 }
 
@@ -365,7 +371,7 @@
   position: fixed;
   left: 50%;
   bottom: 20px;
-  z-index: 35;
+  z-index: 50;
   display: flex;
   align-items: center;
   gap: 8px;
