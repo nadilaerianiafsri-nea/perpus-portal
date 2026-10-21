@@ -212,8 +212,8 @@ export default function AdminReturnsPage() {
               placeholder="Cari anggota, judul, kode buku, atau transaksi..."
               aria-label="Cari pengembalian"
             />
-          {searchError && <small id="search-input-error" role="alert">{searchError}</small>}
           </label>
+          {searchError && <small className={styles.searchError} id="search-input-error" role="alert">{searchError}</small>}
 
           <label className={styles.selectField}>
             <span>Status</span>

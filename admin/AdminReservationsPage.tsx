@@ -243,8 +243,8 @@ export default function AdminReservationsPage() {
               placeholder="Cari anggota, buku, kode buku, atau WhatsApp..."
               aria-label="Cari reservasi"
             />
-          {searchError && <small id="search-input-error" role="alert">{searchError}</small>}
           </label>
+          {searchError && <small className={styles.searchError} id="search-input-error" role="alert">{searchError}</small>}
 
           <label className={styles.selectField}>
             <span>Status</span>

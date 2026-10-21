@@ -177,8 +177,8 @@ export default function AdminLostBooksPage() {
               placeholder="Cari anggota, buku, kode buku, atau transaksi..."
               aria-label="Cari buku hilang"
             />
-          {searchError && <small id="search-input-error" role="alert">{searchError}</small>}
           </label>
+          {searchError && <small className={styles.searchError} id="search-input-error" role="alert">{searchError}</small>}
 
           <label className={styles.selectField}>
             <span>Status</span>

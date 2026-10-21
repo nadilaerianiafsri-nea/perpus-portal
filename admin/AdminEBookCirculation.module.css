@@ -7,9 +7,7 @@
 .tabs { display: flex; flex-wrap: wrap; gap: 8px; }
 .tabs button { min-height: 40px; padding: 8px 14px; border: 1px solid #c2c2c2; border-radius: 8px; background: #fff; color: #2B3056; font: inherit; font-size: var(--text-button); font-weight: 600; cursor: pointer; }
 .tabs button:hover, .tabs .activeTab { border-color: #2B3056; background: #2B3056; color: #fff; }
-.search { display: flex; align-items: center; gap: 8px; width: min(420px, 100%); min-height: 42px; padding: 0 12px; border: 1px solid #c2c2c2; border-radius: 8px; background: #fff; color: #6c6c6c; }
-.search:focus-within { border-color: #2B3056; box-shadow: 0 0 0 2px #2b30561f; }
-.search input { width: 100%; border: 0; outline: 0; background: transparent; color: #161616; font: inherit; font-size: var(--text-input); }
+.search { composes: searchBox from "./AdminTransactions.module.css"; width: min(420px, 100%); }
 .error { margin: 16px; padding: 14px 16px; border: 1px solid #ff8d86; border-radius: 10px; background: #ffebea; color: #9c241d; }
 .error p { margin: 0 0 10px; }
 .error button { min-height: 36px; padding: 7px 12px; border: 0; border-radius: 7px; background: #2B3056; color: #fff; cursor: pointer; }

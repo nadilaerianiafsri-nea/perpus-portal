@@ -192,8 +192,8 @@ export default function AdminLoansPage() {
               placeholder="Cari anggota, judul, kode buku, atau nomor transaksi..."
               aria-label="Cari peminjaman"
             />
-          {searchError && <small id="search-input-error" role="alert">{searchError}</small>}
           </label>
+          {searchError && <small className={styles.searchError} id="search-input-error" role="alert">{searchError}</small>}
 
           <label className={styles.selectField}>
             <span>Status</span>

@@ -1,11 +1,15 @@
+:root {
+  --select-control-height: 48px;
+  --select-control-radius: 14px;
+}
 body [data-app-select] {
   position: relative; display: grid; gap: 6px; min-width: 0;
   color: var(--navy, #000633); font-family: var(--font-outfit), Outfit, sans-serif;
 }
 body [data-app-select] [data-select-label] { color: #4b5e8c; font-size: 12px; font-weight: 500; line-height: 1.5; }
 body [data-app-select] [data-select-trigger] {
-  display: flex; align-items: center; gap: 10px; width: 100%; min-width: 0; min-height: 48px;
-  margin: 0; padding: 11px 14px; border: 1px solid var(--line, #dcdfea); border-radius: 14px;
+  display: flex; align-items: center; gap: 10px; width: 100%; min-width: 0; min-height: var(--select-control-height);
+  margin: 0; padding: 11px 14px; border: 1px solid var(--line, #dcdfea); border-radius: var(--select-control-radius);
   background: #fff; color: #000633; box-shadow: none; text-align: left;
   font-family: inherit; font-size: 14px; font-weight: 500; line-height: 1.5; cursor: pointer;
   transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
