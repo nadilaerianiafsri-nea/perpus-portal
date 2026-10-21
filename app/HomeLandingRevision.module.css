@@ -13,6 +13,7 @@
   position: relative;
   z-index: 5;
   padding-top: 128px;
+  padding-bottom: 132px;
   animation: heroCopyEnter 0.72s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
@@ -790,12 +791,12 @@
   position: relative;
   z-index: 2;
   min-height: 0;
-  padding: 18px 20px 20px;
+  padding: 13px 16px 14px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: center;
-  gap: 7px;
+  justify-content: flex-start;
+  gap: 5px;
   background: linear-gradient(
     155deg,
     var(--white) 0%,
@@ -811,10 +812,10 @@
 }
 
 .collectionContinueBody strong {
-  max-width: 172px;
+  max-width: 150px;
   color: var(--navy);
-  font-size: 22px;
-  line-height: 1.16;
+  font-size: 18px;
+  line-height: 1.12;
 }
 
 .collectionContinueArrow {
@@ -1230,7 +1231,10 @@
 }
 
 /* IntersectionObserver-managed reveal. Section backgrounds never animate. */
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 :global(
   [data-landing-reveal-root][data-reveal-ready="true"] .landing-reveal-item
 ) {
@@ -1606,6 +1610,7 @@
 @media (max-width: 560px) {
   .heroBlend :global(.hero-copy) {
     padding-top: 108px;
+    padding-bottom: 72px;
   }
 
   .revealSection {
@@ -1774,7 +1779,7 @@
 
   .collectionContinueBody strong {
     max-width: none;
-    font-size: 16px;
+    font-size: 14px;
     line-height: 1.12;
   }
 
