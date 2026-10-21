@@ -104,7 +104,7 @@ export default function AdminBookDetailPage({ id }: { id: string }) {
           </div>
           <h1>Detail Buku</h1>
         </div>
-        <Link data-button="ghost" data-button-size="md" href="/admin/koleksi/data-buku" className={styles.backButton}>
+        <Link data-button="back" data-button-size="md" href="/admin/koleksi/data-buku" className={styles.backButton}>
           <FiArrowLeft aria-hidden />
           Kembali
         </Link>

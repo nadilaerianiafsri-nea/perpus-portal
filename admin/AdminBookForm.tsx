@@ -284,7 +284,7 @@ export default function AdminBookForm({
               : `Memperbarui data ${form.code}. Perubahan langsung berlaku di katalog setelah disimpan.`}
           </p>
         </div>
-        <Link data-button="ghost" data-button-size="md" href={backHref} className={styles.backButton}>
+        <Link data-button="back" data-button-size="md" href={backHref} className={styles.backButton}>
           <FiArrowLeft aria-hidden />
           Kembali
         </Link>

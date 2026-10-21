@@ -5,6 +5,7 @@ export type ButtonVariant =
   | "primary"
   | "secondary"
   | "accent"
+  | "back"
   | "ghost"
   | "danger"
   | "success"

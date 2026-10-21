@@ -54,7 +54,7 @@ export default function EBookDetailLayout({
           <span>/</span>
           <span aria-current="page">Detail</span>
         </nav>
-        <Link data-button="ghost" data-button-size="md" href={listHref} className={styles.backLink}>
+        <Link data-button={member ? "back" : "ghost"} data-button-size="md" href={listHref} className={styles.backLink}>
           <FiArrowLeft aria-hidden />{" "}
           {member ? "Kembali ke Katalog" : "Kembali ke Koleksi"}
         </Link>

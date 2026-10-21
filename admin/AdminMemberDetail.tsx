@@ -120,7 +120,7 @@ export default function AdminMemberDetail({ id }: Props) {
     return (
       <div className={styles.statePanel}>
         <p>{error || "Anggota tidak ditemukan."}</p>
-        <Link data-button="ghost" data-button-size="md" href="/admin/keanggotaan">Kembali ke Keanggotaan</Link>
+        <Link data-button="back" data-button-size="md" href="/admin/keanggotaan">Kembali ke Keanggotaan</Link>
       </div>
     );
   }

@@ -31,7 +31,7 @@ export default async function BookDetail({
         <Link data-button="primary" data-button-size="md" className={styles.primaryLink} href={`${basePath}/${id}`}>
           Coba Lagi
         </Link>
-        <Link data-button="ghost" data-button-size="md" className={styles.secondaryLink} href={basePath}>
+        <Link data-button={member ? "back" : "ghost"} data-button-size="md" className={styles.secondaryLink} href={basePath}>
           {member ? "Kembali ke Katalog" : "Kembali ke Koleksi"}
         </Link>
       </section>

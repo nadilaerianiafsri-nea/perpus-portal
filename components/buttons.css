@@ -277,6 +277,23 @@
   }
 }
 
+/* Back navigation opts in independently of cancel and other secondary actions. */
+:root body [data-button="back"][data-button] {
+  --button-bg: var(--button-navy);
+  --button-fg: #fff;
+  --button-stroke: var(--button-navy);
+  --button-hover-bg: var(--button-accent);
+  --button-hover-fg: var(--button-navy);
+  --button-hover-stroke: var(--button-accent);
+  --button-pressed-bg: var(--button-accent);
+  --button-height: 44px;
+  padding: 10px 20px;
+  gap: 8px;
+  font-family: var(--font-outfit), "Outfit", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+}
+
 /* Opt-in table/list actions. Page CTAs, navigation and confirmations keep the
    existing button hierarchy above. Every tone is derived from the brand palette. */
 :root {

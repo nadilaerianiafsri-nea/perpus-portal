@@ -6,7 +6,7 @@ export default function NotFound() {
     <section className={`${styles.page} ${styles.memberPage} ${styles.error}`}>
       <h1>Koleksi tidak ditemukan.</h1>
       <p>Koleksi mungkin sudah tidak tersedia.</p>
-      <Link data-button="secondary" className={styles.primaryLink} href="/dashboard/koleksi">
+      <Link data-button="back" className={styles.primaryLink} href="/dashboard/koleksi">
         Kembali ke Katalog
       </Link>
     </section>

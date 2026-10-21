@@ -276,7 +276,7 @@ export default function AdminGrantForm({ mode, id }: Props) {
           <p>Satu penerimaan dapat berisi satu atau beberapa judul buku.</p>
         </div>
 
-        <Link data-button="ghost" data-button-size="md" href={cancelHref} className={styles.secondaryButton}>
+        <Link data-button="back" data-button-size="md" href={cancelHref} className={styles.secondaryButton}>
           Kembali
         </Link>
       </header>

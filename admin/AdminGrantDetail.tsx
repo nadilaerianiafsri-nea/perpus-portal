@@ -71,7 +71,7 @@ export default function AdminGrantDetail({ id }: Props) {
         <div>
           <p>{error || "Data hibah tidak ditemukan."}</p>
 
-          <Link data-button="ghost" data-button-size="md" href="/admin/hibah-buku">Kembali ke Hibah Buku</Link>
+          <Link data-button="back" data-button-size="md" href="/admin/hibah-buku">Kembali ke Hibah Buku</Link>
         </div>
       </div>
     );
@@ -96,7 +96,7 @@ export default function AdminGrantDetail({ id }: Props) {
         </div>
 
         <div className={styles.detailActions}>
-          <Link data-button="ghost" data-button-size="md" href="/admin/hibah-buku" className={styles.secondaryButton}>
+          <Link data-button="back" data-button-size="md" href="/admin/hibah-buku" className={styles.secondaryButton}>
             Kembali
           </Link>
 
