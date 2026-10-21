@@ -1,131 +1,263 @@
+/* Beranda-only refinement. Brand colors stay anchored to the existing global palette. */
 .heroBlend {
   border-bottom: 0;
-  background: linear-gradient(
-    to bottom,
-    var(--white) 0%,
-    var(--white) calc(100% - 44px),
-    var(--cream) 100%
+  background:
+    radial-gradient(
+      circle at 18% 16%,
+      color-mix(in srgb, var(--yellow-soft) 58%, transparent) 0%,
+      transparent 42%
+    ),
+    linear-gradient(
+      135deg,
+      var(--white) 0%,
+      color-mix(in srgb, var(--cream) 62%, var(--white)) 52%,
+      color-mix(in srgb, var(--sky) 38%, var(--white)) 100%
+    );
+}
+
+.heroBlend :global(.hero-grid) {
+  overflow: visible;
+}
+
+.heroBlend :global(.hero-copy) {
+  animation: heroCopyEnter 0.72s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.heroVisual {
+  margin-left: -96px;
+  animation: heroVisualEnter 0.82s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.heroVisual img {
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--navy) 36%, transparent) 9%,
+    var(--navy) 24%,
+    var(--navy) 100%
   );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--navy) 36%, transparent) 9%,
+    var(--navy) 24%,
+    var(--navy) 100%
+  );
+}
+
+.heroVisual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--white) 88%, transparent) 0%,
+    color-mix(in srgb, var(--cream) 32%, transparent) 18%,
+    transparent 38%
+  );
+}
+
+.heroBlend :global(.hero-search) {
+  border-radius: 14px;
+  box-shadow:
+    var(--shadow),
+    0 16px 40px color-mix(in srgb, var(--navy) 8%, transparent);
+}
+
+.heroBlend :global(.navy-btn),
+.heroBlend :global(.soft-link),
+.heroBlend :global(.hero-search button) {
+  border-radius: 12px;
+}
+
+.statsBand {
+  position: relative;
+  z-index: 12;
+  margin-top: -72px;
+  padding: 0 0 18px;
+  background: linear-gradient(
+    180deg,
+    transparent 0 72px,
+    var(--cream) 72px 100%
+  );
+}
+
+.statsGrid {
+  gap: 18px;
+}
+
+.statsBand :global([data-stat-card]) {
+  min-height: 142px;
+  border: 1px solid color-mix(in srgb, var(--white) 28%, transparent);
+  border-radius: 18px;
+  box-shadow:
+    var(--shadow),
+    0 18px 46px color-mix(in srgb, var(--navy) 12%, transparent);
+  transition:
+    transform 0.24s ease,
+    filter 0.24s ease,
+    box-shadow 0.24s ease;
+}
+
+.quickBand {
+  padding: 4px 0 44px;
+  background: var(--cream);
+}
+
+.quickBand :global(.quick-grid) {
+  gap: 14px;
+}
+
+.quickBand :global(.quick-grid a) {
+  min-height: 94px;
+  border-radius: 16px;
+  box-shadow:
+    var(--shadow),
+    0 12px 28px color-mix(in srgb, var(--navy) 5%, transparent);
+}
+
+.quickBand :global(.quick-grid a > span) {
+  border-radius: 12px;
 }
 
 .collectionBlend {
   border-top: 0;
   background: linear-gradient(
-    to bottom,
+    180deg,
     var(--cream) 0%,
-    var(--cream) calc(100% - 44px),
+    color-mix(in srgb, var(--cream) 56%, var(--white)) 52%,
     var(--white) 100%
   );
 }
 
-.subjectBlend {
-  background: linear-gradient(
-    to bottom,
-    var(--white) 0%,
-    var(--white) calc(100% - 44px),
-    var(--stat-primary) 100%
-  );
-}
-
-.serviceBlend {
-  background: linear-gradient(
-    to bottom,
-    var(--stat-primary) 0%,
-    var(--stat-primary) calc(100% - 44px),
-    var(--white) 100%
-  );
-}
-
-.borrowBlend {
-  background: linear-gradient(
-    to bottom,
-    var(--white) 0%,
-    var(--white) calc(100% - 44px),
-    var(--sky) 100%
-  );
-}
-
-.ebookBlend {
-  background: linear-gradient(
-    to bottom,
-    var(--sky) 0%,
-    var(--sky) calc(100% - 44px),
-    var(--white) 100%
-  );
-}
-
-.reminderBlend {
-  background: linear-gradient(
-    to bottom,
-    var(--white) 0%,
-    var(--white) calc(100% - 44px),
-    var(--cream) 100%
-  );
-}
-
-.donationBlend {
-  background: linear-gradient(
-    to bottom,
-    var(--cream) 0%,
-    var(--cream) calc(100% - 44px),
-    var(--stat-primary) 100%
-  );
-}
-
-.memberBlend {
-  border-top: 0;
-  background: linear-gradient(
-    to bottom,
-    var(--stat-primary) 0%,
-    var(--stat-primary) calc(100% - 44px),
-    var(--white) 100%
-  );
+.collectionBlend :global(.section-head) {
+  max-width: 720px;
+  margin-bottom: 28px;
 }
 
 .latestCollectionGrid {
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 18px;
   margin-top: 28px;
+  align-items: stretch;
 }
 
 .latestBookCard {
-  aspect-ratio: 3 / 4;
   min-width: 0;
-  animation: collectionCardEnter 0.45s ease both;
+  min-height: 424px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 18px;
+  background: var(--white);
+  color: var(--navy);
+  cursor: pointer;
+  box-shadow:
+    var(--shadow),
+    0 12px 34px color-mix(in srgb, var(--navy) 5%, transparent);
+  transition:
+    transform 0.24s ease,
+    border-color 0.24s ease,
+    background 0.24s ease,
+    box-shadow 0.24s ease;
 }
 
 .latestBookCover {
   width: 100%;
-  height: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
   min-height: 0;
   display: block;
+  flex: 0 0 auto;
 }
 
 .latestBookCover img {
   object-fit: cover;
+  transition: transform 0.32s ease;
+}
+
+.latestBookInfo {
+  min-height: 144px;
+  padding: 14px 15px 16px;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  background: var(--white);
+}
+
+.latestBookSubject {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--orange);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.latestBookInfo h3 {
+  width: 100%;
+  margin: 7px 0 5px;
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--navy);
+  font-size: 15px;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.latestBookInfo p {
+  width: 100%;
+  margin: 0;
+  overflow: hidden;
+  color: var(--stat-slate);
+  font-size: 12px;
+  line-height: 1.45;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.latestBookAvailability {
+  margin-top: auto;
+  padding: 5px 9px;
+  border: 0.8px solid color-mix(in srgb, var(--green) 34%, var(--line));
+  border-radius: 999px;
+  background: var(--green-soft);
+  color: var(--green);
+  font-size: 10px;
+  font-weight: 750;
+  line-height: 1.2;
 }
 
 .collectionContinueCard {
-  aspect-ratio: 3 / 4;
   min-width: 0;
+  min-height: 424px;
   padding: 22px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-end;
   gap: 8px;
-  border: 0.8px solid var(--line);
-  border-radius: 10px;
-  background: var(--white);
+  border: 0.8px solid color-mix(in srgb, var(--yellow) 45%, var(--line));
+  border-radius: 18px;
+  background: linear-gradient(160deg, var(--yellow-soft), var(--white));
   color: var(--navy);
-  box-shadow: var(--shadow);
+  box-shadow:
+    var(--shadow),
+    0 12px 34px color-mix(in srgb, var(--navy) 5%, transparent);
   cursor: pointer;
-  animation: collectionCardEnter 0.45s ease both;
   transition:
-    transform 0.22s ease,
-    border-color 0.22s ease,
-    background 0.22s ease,
-    box-shadow 0.22s ease;
+    transform 0.24s ease,
+    border-color 0.24s ease,
+    background 0.24s ease,
+    box-shadow 0.24s ease;
 }
 
 .collectionContinueCard span {
@@ -136,9 +268,9 @@
 }
 
 .collectionContinueCard strong {
-  max-width: 150px;
-  font-size: 20px;
-  line-height: 1.2;
+  max-width: 160px;
+  font-size: 21px;
+  line-height: 1.18;
 }
 
 .collectionContinueCard svg {
@@ -147,16 +279,163 @@
   transition: transform 0.22s ease;
 }
 
-.latestBookCover:focus-visible,
+.latestBookCard:focus-visible,
 .collectionContinueCard:focus-visible {
   outline: 2px solid var(--navy);
   outline-offset: 3px;
 }
 
-@keyframes collectionCardEnter {
+.subjectBlend {
+  background:
+    radial-gradient(
+      circle at 88% 20%,
+      color-mix(in srgb, var(--sky) 68%, transparent) 0%,
+      transparent 48%
+    ),
+    var(--white);
+}
+
+.subjectBlend :global(.subject-art) {
+  border-color: color-mix(in srgb, var(--yellow) 62%, var(--line));
+  border-radius: 24px;
+  box-shadow: 0 20px 46px color-mix(in srgb, var(--navy) 7%, transparent);
+}
+
+.subjectBlend :global(.subject-list a) {
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+
+.serviceBlend {
+  background: linear-gradient(
+    135deg,
+    var(--stat-primary) 0%,
+    color-mix(in srgb, var(--stat-primary) 76%, var(--navy)) 58%,
+    var(--navy) 100%
+  );
+}
+
+.serviceBlend :global(.feature-row) {
+  margin-top: 16px;
+  padding: 34px;
+  border: 0.8px solid color-mix(in srgb, var(--white) 13%, transparent);
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--white) 4%, transparent);
+  transition:
+    transform 0.24s ease,
+    border-color 0.24s ease,
+    background 0.24s ease;
+}
+
+.serviceBlend :global(.feature-row:first-of-type) {
+  border-top: 0.8px solid color-mix(in srgb, var(--white) 13%, transparent);
+}
+
+.serviceBlend :global(.feature-art) {
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--white) 7%, transparent);
+}
+
+.serviceBlend :global(.pill-row span) {
+  background: color-mix(in srgb, var(--white) 5%, transparent);
+}
+
+.borrowBlend {
+  background: linear-gradient(
+    180deg,
+    var(--white) 0%,
+    color-mix(in srgb, var(--sky) 28%, var(--white)) 100%
+  );
+}
+
+.borrowBlend :global(.step-grid) {
+  gap: 10px;
+}
+
+.borrowBlend :global(.step-grid article) {
+  border-radius: 16px;
+}
+
+.ebookBlend {
+  background: linear-gradient(
+    135deg,
+    var(--sky) 0%,
+    color-mix(in srgb, var(--sky) 48%, var(--white)) 58%,
+    var(--white) 100%
+  );
+}
+
+.ebookBlend :global(.ebook-art) {
+  border-radius: 26px;
+  box-shadow: 0 22px 48px color-mix(in srgb, var(--navy) 8%, transparent);
+}
+
+.reminderBlend {
+  background: linear-gradient(
+    180deg,
+    var(--white) 0%,
+    color-mix(in srgb, var(--green-soft) 45%, var(--white)) 100%
+  );
+}
+
+.reminderBlend :global(.reminder-grid article) {
+  border-radius: 18px;
+}
+
+.donationBlend {
+  background: linear-gradient(
+    180deg,
+    var(--cream) 0%,
+    color-mix(in srgb, var(--yellow-soft) 65%, var(--cream)) 100%
+  );
+}
+
+.donationBlend :global(.donation-list > div) {
+  border-radius: 14px;
+}
+
+.donationBlend :global(.donation-art) {
+  border-radius: 24px;
+  box-shadow: 0 20px 44px color-mix(in srgb, var(--navy) 7%, transparent);
+}
+
+.memberBlend {
+  border-top: 0;
+  background: linear-gradient(
+    135deg,
+    var(--stat-primary) 0%,
+    color-mix(in srgb, var(--stat-primary) 64%, var(--navy)) 56%,
+    var(--navy) 100%
+  );
+}
+
+.memberBlend :global(.member-art) {
+  border: 0.8px solid color-mix(in srgb, var(--white) 12%, transparent);
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--white) 6%, transparent);
+}
+
+.infoBlend {
+  background: var(--white);
+}
+
+.infoBlend :global(.info-grid article) {
+  border-radius: 16px;
+}
+
+/* Text actions keep the interaction language requested for Beranda. */
+.serviceBlend :global(.feature-text-link:hover),
+.reminderBlend :global(.reminder-grid a:hover),
+.infoBlend :global(.info-grid a:hover),
+.infoBlend :global(.contact-center a:hover) {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@keyframes heroCopyEnter {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(18px);
   }
   to {
     opacity: 1;
@@ -164,22 +443,111 @@
   }
 }
 
+@keyframes heroVisualEnter {
+  from {
+    opacity: 0;
+    transform: translateX(22px) scale(1.015);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes sectionReveal {
+  from {
+    opacity: 0;
+    transform: translateY(36px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cardReveal {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 @media (hover: hover) {
-  .latestBookCard:hover {
+  .heroBlend :global(.hero-search button:hover),
+  .heroBlend :global(.navy-btn:hover) {
+    background: var(--yellow);
+    color: var(--navy);
+    transform: scale(1.04);
+  }
+
+  .heroBlend :global(.soft-link:hover) {
+    border-color: var(--stat-teal);
+    background: var(--sky);
+    color: var(--navy);
+    transform: scale(1.03);
+  }
+
+  .statsBand :global([data-stat-card]:hover) {
+    filter: saturate(1.08) brightness(1.04);
+    transform: translateY(-7px) scale(1.015);
+    box-shadow:
+      var(--shadow),
+      0 24px 52px color-mix(in srgb, var(--navy) 16%, transparent);
+  }
+
+  .quickBand :global(.quick-grid a:hover) {
+    transform: translateY(-5px) scale(1.015);
+  }
+
+  .quickBand :global(.quick-grid a:nth-child(1):hover) {
+    border-color: var(--stat-teal);
+    background: var(--sky);
+  }
+
+  .quickBand :global(.quick-grid a:nth-child(2):hover) {
+    border-color: var(--stat-coral);
+    background: var(--red-soft);
+  }
+
+  .quickBand :global(.quick-grid a:nth-child(3):hover) {
+    border-color: var(--green);
+    background: var(--green-soft);
+  }
+
+  .quickBand :global(.quick-grid a:nth-child(4):hover) {
     border-color: var(--yellow);
-    box-shadow: var(--shadow);
-    transform: translateY(-6px);
+    background: var(--yellow-soft);
+  }
+
+  .latestBookCard:hover {
+    border-color: var(--orange);
+    background: var(--yellow-soft);
+    box-shadow:
+      var(--shadow),
+      0 22px 46px color-mix(in srgb, var(--orange) 12%, transparent);
+    transform: translateY(-7px) scale(1.012);
   }
 
   .latestBookCard:hover .latestBookCover img {
-    transform: scale(1.035);
+    transform: scale(1.045);
+  }
+
+  .latestBookCard:hover .latestBookInfo h3 {
+    color: var(--orange);
+    text-decoration: underline;
   }
 
   .collectionContinueCard:hover {
-    border-color: var(--yellow);
-    background: var(--yellow-soft);
-    box-shadow: var(--shadow);
-    transform: translateY(-6px) scale(1.02);
+    border-color: var(--orange);
+    background: linear-gradient(160deg, var(--yellow-soft), var(--cream));
+    box-shadow:
+      var(--shadow),
+      0 22px 46px color-mix(in srgb, var(--orange) 12%, transparent);
+    transform: translateY(-7px) scale(1.018);
   }
 
   .collectionContinueCard:hover strong {
@@ -187,11 +555,171 @@
   }
 
   .collectionContinueCard:hover svg {
+    transform: translateX(5px);
+  }
+
+  .subjectBlend :global(.subject-list a:hover) {
+    border-color: var(--stat-teal);
+    border-radius: 16px;
+    background: var(--sky);
+    color: var(--navy);
     transform: translateX(4px);
+  }
+
+  .serviceBlend :global(.feature-row:hover) {
+    border-color: color-mix(in srgb, var(--yellow) 48%, transparent);
+    background: color-mix(in srgb, var(--white) 7%, transparent);
+    transform: translateY(-4px);
+  }
+
+  .serviceBlend :global(.pill-row span:hover) {
+    border-color: var(--yellow);
+    background: color-mix(in srgb, var(--yellow) 12%, transparent);
+  }
+
+  .borrowBlend :global(.step-grid article:not(.active):hover) {
+    border-color: var(--orange);
+    background: var(--cream);
+    transform: translateY(-5px);
+  }
+
+  .borrowBlend :global(.step-grid article.active:hover) {
+    border-color: var(--yellow);
+    background: var(--navy);
+    transform: translateY(-5px) scale(1.015);
+  }
+
+  .ebookBlend :global(.ebook-art:hover) {
+    border-color: var(--stat-teal);
+    transform: translateY(-5px);
+  }
+
+  .ebookBlend :global(.navy-btn:hover) {
+    background: var(--stat-teal);
+    color: var(--white);
+    transform: scale(1.04);
+  }
+
+  .reminderBlend :global(.reminder-grid article:nth-child(1):hover) {
+    border-color: var(--green);
+    background: var(--green-soft);
+    transform: translateY(-5px);
+  }
+
+  .reminderBlend :global(.reminder-grid article:nth-child(2):hover) {
+    border-color: var(--yellow);
+    background: var(--yellow-soft);
+    transform: translateY(-5px);
+  }
+
+  .donationBlend :global(.donation-list > div:hover) {
+    border-color: var(--orange);
+    border-radius: 16px;
+    background: var(--yellow-soft);
+    transform: translateX(4px);
+  }
+
+  .memberBlend :global(.yellow-btn:hover) {
+    background: var(--white);
+    color: var(--navy);
+    transform: scale(1.04);
+  }
+
+  .memberBlend :global(.dark-outline-btn:hover) {
+    border-color: var(--yellow);
+    background: color-mix(in srgb, var(--yellow) 14%, transparent);
+    color: var(--white);
+    transform: scale(1.03);
+  }
+
+  .infoBlend :global(.info-grid article:hover) {
+    transform: translateY(-5px);
+  }
+
+  .infoBlend :global(.info-grid article:nth-child(1):hover) {
+    border-color: var(--stat-teal);
+    background: var(--sky);
+  }
+
+  .infoBlend :global(.info-grid article:nth-child(2):hover) {
+    border-color: var(--stat-coral);
+    background: var(--red-soft);
+  }
+
+  .infoBlend :global(.info-grid article:nth-child(3):hover) {
+    border-color: var(--green);
+    background: var(--green-soft);
+  }
+}
+
+/* Modern browsers get true reveal-on-scroll without an extra JS/client file. */
+@supports (animation-timeline: view()) {
+  .revealSection {
+    animation-name: sectionReveal;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-timeline: view();
+    animation-range: entry 8% cover 28%;
+  }
+
+  .revealSection :global(.quick-grid a),
+  .revealSection :global(.book-card),
+  .revealSection :global(.subject-list a),
+  .revealSection :global(.feature-row),
+  .revealSection :global(.step-grid article),
+  .revealSection :global(.ebook-art),
+  .revealSection :global(.reminder-grid article),
+  .revealSection :global(.donation-list > div),
+  .revealSection :global(.donation-art),
+  .revealSection :global(.member-art),
+  .revealSection :global(.info-grid article) {
+    animation-name: cardReveal;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-timeline: view();
+    animation-range: entry 4% cover 18%;
   }
 }
 
 @media (max-width: 1080px) {
+  .heroVisual {
+    margin-left: 0;
+  }
+
+  .heroVisual img {
+    -webkit-mask-image: linear-gradient(
+      180deg,
+      transparent 0%,
+      var(--navy) 14%,
+      var(--navy) 100%
+    );
+    mask-image: linear-gradient(
+      180deg,
+      transparent 0%,
+      var(--navy) 14%,
+      var(--navy) 100%
+    );
+  }
+
+  .heroVisual::after {
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--white) 78%, transparent) 0%,
+      transparent 24%
+    );
+  }
+
+  .statsBand {
+    margin-top: -44px;
+    background: linear-gradient(
+      180deg,
+      transparent 0 44px,
+      var(--cream) 44px 100%
+    );
+  }
+
   .latestCollectionGrid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 14px;
@@ -200,30 +728,85 @@
   .latestBookCard:nth-child(4) {
     display: none;
   }
+
+  .latestBookInfo {
+    min-height: 138px;
+  }
+
+  .collectionContinueCard {
+    min-height: 410px;
+  }
 }
 
 @media (max-width: 820px) {
+  .statsBand {
+    margin-top: -28px;
+    padding-bottom: 14px;
+    background: linear-gradient(
+      180deg,
+      transparent 0 28px,
+      var(--cream) 28px 100%
+    );
+  }
+
   .latestCollectionGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .serviceBlend :global(.feature-row) {
+    padding: 26px;
   }
 }
 
 @media (max-width: 560px) {
-  .heroBlend,
-  .collectionBlend,
-  .subjectBlend,
-  .serviceBlend,
-  .borrowBlend,
-  .ebookBlend,
-  .reminderBlend,
-  .donationBlend,
-  .memberBlend {
-    background-size: 100% 100%;
+  .heroBlend {
+    background: linear-gradient(
+      180deg,
+      var(--white) 0%,
+      color-mix(in srgb, var(--cream) 58%, var(--white)) 100%
+    );
+  }
+
+  .heroVisual {
+    border-radius: 20px;
+  }
+
+  .heroVisual img {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .heroVisual::after {
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--white) 32%, transparent) 0%,
+      transparent 30%
+    );
+  }
+
+  .statsBand {
+    margin-top: 0;
+    padding-top: 14px;
+    background: var(--cream);
+  }
+
+  .statsGrid {
+    gap: 12px;
+  }
+
+  .statsBand :global([data-stat-card]) {
+    min-height: 116px;
+    border-radius: 16px;
+  }
+
+  .quickBand :global(.quick-grid a) {
+    min-height: 86px;
+    border-radius: 14px;
   }
 
   .latestCollectionGrid {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 14px;
     margin-top: 22px;
   }
 
@@ -234,16 +817,56 @@
   .latestBookCard,
   .collectionContinueCard {
     width: min(100%, 360px);
+    min-height: 0;
     margin-inline: auto;
   }
 
+  .latestBookInfo {
+    min-height: 132px;
+  }
+
   .collectionContinueCard {
-    min-height: 180px;
-    aspect-ratio: auto;
+    min-height: 190px;
+  }
+
+  .subjectBlend :global(.subject-list a) {
+    border-radius: 12px;
+  }
+
+  .serviceBlend :global(.feature-row) {
+    margin-top: 12px;
+    padding: 20px;
+    border-radius: 18px;
+  }
+
+  .borrowBlend :global(.step-grid article),
+  .reminderBlend :global(.reminder-grid article),
+  .infoBlend :global(.info-grid article) {
+    border-radius: 14px;
+  }
+
+  @supports (animation-timeline: view()) {
+    .revealSection {
+      animation-range: entry 4% cover 20%;
+    }
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .heroBlend :global(.hero-copy),
+  .heroVisual,
+  .revealSection,
+  .revealSection :global(.quick-grid a),
+  .revealSection :global(.book-card),
+  .revealSection :global(.subject-list a),
+  .revealSection :global(.feature-row),
+  .revealSection :global(.step-grid article),
+  .revealSection :global(.ebook-art),
+  .revealSection :global(.reminder-grid article),
+  .revealSection :global(.donation-list > div),
+  .revealSection :global(.donation-art),
+  .revealSection :global(.member-art),
+  .revealSection :global(.info-grid article),
   .latestBookCard,
   .latestBookCover img,
   .collectionContinueCard,
@@ -252,10 +875,21 @@
     transition: none;
   }
 
+  .statsBand :global([data-stat-card]:hover),
+  .quickBand :global(.quick-grid a:hover),
   .latestBookCard:hover,
   .latestBookCard:hover .latestBookCover img,
   .collectionContinueCard:hover,
-  .collectionContinueCard:hover svg {
+  .collectionContinueCard:hover svg,
+  .subjectBlend :global(.subject-list a:hover),
+  .serviceBlend :global(.feature-row:hover),
+  .borrowBlend :global(.step-grid article:hover),
+  .ebookBlend :global(.ebook-art:hover),
+  .reminderBlend :global(.reminder-grid article:hover),
+  .donationBlend :global(.donation-list > div:hover),
+  .memberBlend :global(.yellow-btn:hover),
+  .memberBlend :global(.dark-outline-btn:hover),
+  .infoBlend :global(.info-grid article:hover) {
     transform: none;
   }
 }

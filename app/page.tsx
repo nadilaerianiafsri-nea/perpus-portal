@@ -18,6 +18,7 @@ import LandingNavbar from "../components/LandingNavbar";
 import LandingFooter from "../components/LandingFooter";
 import styles from "./HomeLandingRevision.module.css";
 import StatCard from "@/components/StatCard";
+import { availabilityLabels } from "@/catalog/types";
 import { safeCoverUrl } from "@/shared/displayUrls.cjs";
 import { grantStatusLabels } from "@/information/grantTypes";
 import { getHomeData } from "@/information/homeData";
@@ -91,7 +92,7 @@ export default async function Home() {
                 </Link>
               </div>
             </div>
-            <div className="hero-art">
+            <div className={`hero-art ${styles.heroVisual}`}>
               <Image
                 src="/images/ASSET PERPUS/BG LANDING PAGE.png"
                 alt={`Ilustrasi ${settings.libraryName}`}
@@ -102,8 +103,8 @@ export default async function Home() {
             </div>
           </div>
         </section>
-        <section className="stats-wrap" aria-label="Ringkasan perpustakaan">
-          <div className="landing-shell stats-card">
+        <section className={`stats-wrap ${styles.statsBand} ${styles.revealSection}`} aria-label="Ringkasan perpustakaan">
+          <div className={`landing-shell stats-card ${styles.statsGrid}`}>
             <StatCard
               label="Judul Koleksi Fisik"
               value={formatCount(homeData.stats.physicalTitles)}
@@ -124,7 +125,7 @@ export default async function Home() {
             />
           </div>
         </section>
-        <section className="quick-section">
+        <section className={`quick-section ${styles.quickBand} ${styles.revealSection}`}>
           <div className="landing-shell quick-grid">
             <Link href="/koleksi">
               <span><FiSearch /></span>
@@ -144,7 +145,7 @@ export default async function Home() {
             </Link>
           </div>
         </section>
-        <section className={`collection section-pad compact-section ${styles.collectionBlend}`} id="koleksi">
+        <section className={`collection section-pad compact-section ${styles.collectionBlend} ${styles.revealSection}`} id="koleksi">
           <div className="landing-shell">
             <div className="section-head">
               <span className="section-kicker">KOLEKSI</span>
@@ -154,20 +155,35 @@ export default async function Home() {
             {homeData.latestBooks.length ? (
               <div className={`book-grid ${styles.latestCollectionGrid}`}>
                 {homeData.latestBooks.slice(0, 4).map((book) => (
-                  <article className={`book-card ${styles.latestBookCard}`} key={book.id}>
-                    <Link
-                      className={`book-image ${styles.latestBookCover}`}
-                      href={`/koleksi/${book.id}`}
-                      aria-label={`Lihat detail ${book.title}`}
-                    >
+                  <Link
+                    className={`book-card ${styles.latestBookCard}`}
+                    href={`/koleksi/${book.id}`}
+                    aria-label={`Lihat detail ${book.title}`}
+                    key={book.id}
+                  >
+                    <div className={`book-image ${styles.latestBookCover}`}>
                       <Image
                         src={safeCoverUrl(book.coverUrl)}
                         alt={`Sampul ${book.title}`}
                         fill
                         sizes="(max-width: 560px) 100vw, (max-width: 1080px) 50vw, 220px"
                       />
-                    </Link>
-                  </article>
+                    </div>
+                    <div className={styles.latestBookInfo}>
+                      <span className={styles.latestBookSubject}>
+                        {book.subject || "Koleksi"}
+                      </span>
+                      <h3>{book.title}</h3>
+                      <p>{book.author}</p>
+                      <span className={styles.latestBookAvailability}>
+                        {book.availability
+                          ? availabilityLabels[book.availability]
+                          : book.type === "EBOOK"
+                            ? "E-Book"
+                            : "Ketersediaan diperbarui"}
+                      </span>
+                    </div>
+                  </Link>
                 ))}
                 <Link
                   className={styles.collectionContinueCard}
@@ -186,7 +202,7 @@ export default async function Home() {
             )}
           </div>
         </section>
-        <section className={`subject-section section-pad compact-section ${styles.subjectBlend}`}>
+        <section className={`subject-section section-pad compact-section ${styles.subjectBlend} ${styles.revealSection}`}>
           <div className="landing-shell subject-grid">
             <div>
               <span className="section-kicker">KATEGORI KOLEKSI</span>
@@ -217,7 +233,7 @@ export default async function Home() {
             </div>
           </div>
         </section>
-        <section className={`service-dark section-pad compact-dark-section ${styles.serviceBlend}`} id="layanan">
+        <section className={`service-dark section-pad compact-dark-section ${styles.serviceBlend} ${styles.revealSection}`} id="layanan">
           <div className="landing-shell">
             <div className="section-head centered light">
               <span className="section-kicker yellow">LAYANAN KAMI</span>
@@ -269,7 +285,7 @@ export default async function Home() {
             </div>
           </div>
         </section>
-        <section className={`borrow-flow section-pad compact-section ${styles.borrowBlend}`}>
+        <section className={`borrow-flow section-pad compact-section ${styles.borrowBlend} ${styles.revealSection}`}>
           <div className="landing-shell">
             <div className="section-head centered">
               <span className="section-kicker">PANDUAN LAYANAN</span>
@@ -292,7 +308,7 @@ export default async function Home() {
             </div>
           </div>
         </section>
-        <section className={`ebook-section section-pad compact-section ${styles.ebookBlend}`} id="ebook">
+        <section className={`ebook-section section-pad compact-section ${styles.ebookBlend} ${styles.revealSection}`} id="ebook">
           <div className="landing-shell ebook-grid">
             <div className="ebook-art landing-motion-card">
               <Image src="/images/ASSET PERPUS/Hero pegang buku.png" alt="Baca E-Book Perpustakaan" fill sizes="480px" />
@@ -317,7 +333,7 @@ export default async function Home() {
             </div>
           </div>
         </section>
-        <section className={`reminder-section section-pad compact-section ${styles.reminderBlend}`}>
+        <section className={`reminder-section section-pad compact-section ${styles.reminderBlend} ${styles.revealSection}`}>
           <div className="landing-shell">
             <div className="section-head centered">
               <span className="section-kicker">PENGINGAT PEMINJAMAN</span>
@@ -350,7 +366,7 @@ export default async function Home() {
             </div>
           </div>
         </section>
-        <section className={`donation-section section-pad compact-section ${styles.donationBlend}`}>
+        <section className={`donation-section section-pad compact-section ${styles.donationBlend} ${styles.revealSection}`}>
           <div className="landing-shell donation-grid">
             <div>
               <span className="section-kicker">TRANSPARANSI & HIBAH</span>
@@ -381,7 +397,7 @@ export default async function Home() {
             </div>
           </div>
         </section>
-        <section className={`member-cta section-pad compact-dark-section ${styles.memberBlend}`}>
+        <section className={`member-cta section-pad compact-dark-section ${styles.memberBlend} ${styles.revealSection}`}>
           <div className="landing-shell member-grid">
             <div>
               <span className="section-kicker yellow">KEANGGOTAAN PERPUSTAKAAN</span>
@@ -407,7 +423,7 @@ export default async function Home() {
             </div>
           </div>
         </section>
-        <section className="info-section section-pad compact-section">
+        <section className={`info-section section-pad compact-section ${styles.infoBlend} ${styles.revealSection}`}>
           <div className="landing-shell">
             <div className="section-head"><h2>{content.home.informationTitle}</h2></div>
             <div className="info-grid">
