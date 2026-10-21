@@ -72,7 +72,10 @@ export default function LandingNavbar({
   );
 
   return (
-    <header className="site-header">
+    <header
+      className="site-header"
+      style={{ position: "fixed", inset: "0 0 auto 0", width: "100%" }}
+    >
       <div className="landing-shell top-nav">
         <Link className="wordmark" href="/" aria-label="Beranda Perpustakaan">
           <span className="wordmark-box">P</span>
