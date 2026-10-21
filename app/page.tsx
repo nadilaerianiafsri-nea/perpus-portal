@@ -16,6 +16,7 @@ import {
 } from "react-icons/fi";
 import LandingNavbar from "../components/LandingNavbar";
 import LandingFooter from "../components/LandingFooter";
+import LandingRevealObserver from "@/components/LandingRevealObserver";
 import styles from "./HomeLandingRevision.module.css";
 import StatCard from "@/components/StatCard";
 import { availabilityLabels } from "@/catalog/types";
@@ -31,24 +32,29 @@ import {
   renderPublicText,
 } from "@/information/publicContent";
 import { serviceInfo } from "@/shared/serviceInfo.cjs";
+
 function formatCount(value: number | null) {
   return value === null ? "—" : value.toLocaleString("id-ID");
 }
+
 export default async function Home() {
   const [settings, content, homeData] = await Promise.all([
     getLibrarySettings(),
     getPublicContent(),
     getHomeData(),
   ]);
+
   const steps = content.guide.steps.map((step, index) => ({
     no: String(index + 1).padStart(2, "0"),
     title: renderPublicText(step.title.replace(/^\d+\.\s*/, ""), settings),
     description: renderPublicText(step.description, settings),
   }));
+
   return (
     <>
       <LandingNavbar />
-      <main>
+      <LandingRevealObserver />
+      <main data-landing-reveal-root>
         <section className={`hero ${styles.heroBlend}`} id="beranda">
           <div className="landing-shell hero-grid">
             <div className="hero-copy">
@@ -103,7 +109,11 @@ export default async function Home() {
             </div>
           </div>
         </section>
-        <section className={`stats-wrap ${styles.statsBand} ${styles.revealSection}`} aria-label="Ringkasan perpustakaan">
+
+        <section
+          className={`stats-wrap ${styles.statsBand} ${styles.revealSection}`}
+          aria-label="Ringkasan perpustakaan"
+        >
           <div className={`landing-shell stats-card ${styles.statsGrid}`}>
             <StatCard
               label="Judul Koleksi Fisik"
@@ -125,6 +135,7 @@ export default async function Home() {
             />
           </div>
         </section>
+
         <section className={`quick-section ${styles.quickBand} ${styles.revealSection}`}>
           <div className="landing-shell quick-grid">
             <Link href="/koleksi">
@@ -145,7 +156,11 @@ export default async function Home() {
             </Link>
           </div>
         </section>
-        <section className={`collection section-pad compact-section ${styles.collectionBlend} ${styles.revealSection}`} id="koleksi">
+
+        <section
+          className={`collection section-pad compact-section ${styles.collectionBlend} ${styles.revealSection}`}
+          id="koleksi"
+        >
           <div className="landing-shell">
             <div className="section-head">
               <span className="section-kicker">KOLEKSI</span>
@@ -202,6 +217,7 @@ export default async function Home() {
             )}
           </div>
         </section>
+
         <section className={`subject-section section-pad compact-section ${styles.subjectBlend} ${styles.revealSection}`}>
           <div className="landing-shell subject-grid">
             <div>
@@ -233,7 +249,11 @@ export default async function Home() {
             </div>
           </div>
         </section>
-        <section className={`service-dark section-pad compact-dark-section ${styles.serviceBlend} ${styles.revealSection}`} id="layanan">
+
+        <section
+          className={`service-dark section-pad compact-dark-section ${styles.serviceBlend} ${styles.revealSection}`}
+          id="layanan"
+        >
           <div className="landing-shell">
             <div className="section-head centered light">
               <span className="section-kicker yellow">LAYANAN KAMI</span>
@@ -285,6 +305,7 @@ export default async function Home() {
             </div>
           </div>
         </section>
+
         <section className={`borrow-flow section-pad compact-section ${styles.borrowBlend} ${styles.revealSection}`}>
           <div className="landing-shell">
             <div className="section-head centered">
@@ -308,6 +329,7 @@ export default async function Home() {
             </div>
           </div>
         </section>
+
         <section className={`ebook-section section-pad compact-section ${styles.ebookBlend} ${styles.revealSection}`} id="ebook">
           <div className="landing-shell ebook-grid">
             <div className="ebook-art landing-motion-card">
@@ -333,6 +355,7 @@ export default async function Home() {
             </div>
           </div>
         </section>
+
         <section className={`reminder-section section-pad compact-section ${styles.reminderBlend} ${styles.revealSection}`}>
           <div className="landing-shell">
             <div className="section-head centered">
@@ -366,6 +389,7 @@ export default async function Home() {
             </div>
           </div>
         </section>
+
         <section className={`donation-section section-pad compact-section ${styles.donationBlend} ${styles.revealSection}`}>
           <div className="landing-shell donation-grid">
             <div>
@@ -397,6 +421,7 @@ export default async function Home() {
             </div>
           </div>
         </section>
+
         <section className={`member-cta section-pad compact-dark-section ${styles.memberBlend} ${styles.revealSection}`}>
           <div className="landing-shell member-grid">
             <div>
@@ -423,6 +448,7 @@ export default async function Home() {
             </div>
           </div>
         </section>
+
         <section className={`info-section section-pad compact-section ${styles.infoBlend} ${styles.revealSection}`}>
           <div className="landing-shell">
             <div className="section-head"><h2>{content.home.informationTitle}</h2></div>

@@ -146,6 +146,20 @@
   padding: 64px 24px 104px;
   overflow: auto;
   background: #f5f5f6;
+  touch-action: pan-x pan-y;
+}
+
+.pdfSpread {
+  width: max-content;
+  min-width: 100%;
+  display: grid;
+  grid-template-columns:
+    clamp(160px, 16vw, 260px)
+    max-content
+    clamp(160px, 16vw, 260px);
+  align-items: start;
+  justify-content: center;
+  gap: 28px;
 }
 
 .pdfPage {
@@ -158,12 +172,54 @@
 
 .pdfViewer canvas {
   display: block;
-  max-width: 100%;
+  max-width: none;
+  flex: 0 0 auto;
   height: auto;
   margin: 0 auto;
   border-radius: 4px;
   background: #fff;
   box-shadow: 0 14px 35px #00063325;
+}
+
+.pdfPreview,
+.pdfPreviewSlot {
+  width: clamp(160px, 16vw, 260px);
+}
+
+.pdfPreview {
+  align-self: start;
+  opacity: 0.32;
+  transform: scale(0.94);
+  transform-origin: top center;
+  pointer-events: none;
+  animation: readerPreviewIn 180ms ease-out both;
+}
+
+.pdfPreview canvas {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+  box-shadow: 0 10px 24px #00063325;
+}
+
+.pdfPreviewPrevious {
+  justify-self: end;
+}
+
+.pdfPreviewNext {
+  justify-self: start;
+}
+
+@keyframes readerPreviewIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.92);
+  }
+
+  to {
+    opacity: 0.32;
+    transform: translateY(0) scale(0.94);
+  }
 }
 
 .pageLoading {
@@ -196,6 +252,7 @@
   height: 42px;
   display: grid;
   place-items: center;
+  flex: 0 0 auto;
   padding: 0;
   border: 1px solid transparent;
   border-radius: 50%;
@@ -216,6 +273,21 @@
 
 .pageIndicator {
   min-width: 68px;
+  color: #000633;
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.zoomControl {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.zoomIndicator {
+  min-width: 52px;
   color: #000633;
   font-size: 13px;
   font-weight: 700;
@@ -317,6 +389,19 @@
   white-space: nowrap;
 }
 
+@media (max-width: 899px) {
+  .pdfSpread {
+    display: block;
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .pdfPreview,
+  .pdfPreviewSlot {
+    display: none;
+  }
+}
+
 @media (max-width: 600px) {
   .readerBackButton {
     width: 40px;
@@ -334,6 +419,7 @@
   }
 
   .pdfViewer canvas {
+    max-width: none;
     border-radius: 3px;
     box-shadow: 0 8px 20px #00063325;
   }
@@ -351,6 +437,15 @@
 
   .pageIndicator {
     min-width: 56px;
+    font-size: 12px;
+  }
+
+  .zoomControl {
+    font-size: 19px;
+  }
+
+  .zoomIndicator {
+    min-width: 46px;
     font-size: 12px;
   }
 
@@ -398,6 +493,10 @@
   .secondary,
   .stateAction {
     transition: none;
+  }
+
+  .pdfPreview {
+    animation: none;
   }
 
   .readerBackButton:hover:not(:disabled),
