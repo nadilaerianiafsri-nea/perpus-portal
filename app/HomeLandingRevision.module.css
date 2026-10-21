@@ -1,0 +1,261 @@
+.heroBlend {
+  border-bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    var(--white) 0%,
+    var(--white) calc(100% - 44px),
+    var(--cream) 100%
+  );
+}
+
+.collectionBlend {
+  border-top: 0;
+  background: linear-gradient(
+    to bottom,
+    var(--cream) 0%,
+    var(--cream) calc(100% - 44px),
+    var(--white) 100%
+  );
+}
+
+.subjectBlend {
+  background: linear-gradient(
+    to bottom,
+    var(--white) 0%,
+    var(--white) calc(100% - 44px),
+    var(--stat-primary) 100%
+  );
+}
+
+.serviceBlend {
+  background: linear-gradient(
+    to bottom,
+    var(--stat-primary) 0%,
+    var(--stat-primary) calc(100% - 44px),
+    var(--white) 100%
+  );
+}
+
+.borrowBlend {
+  background: linear-gradient(
+    to bottom,
+    var(--white) 0%,
+    var(--white) calc(100% - 44px),
+    var(--sky) 100%
+  );
+}
+
+.ebookBlend {
+  background: linear-gradient(
+    to bottom,
+    var(--sky) 0%,
+    var(--sky) calc(100% - 44px),
+    var(--white) 100%
+  );
+}
+
+.reminderBlend {
+  background: linear-gradient(
+    to bottom,
+    var(--white) 0%,
+    var(--white) calc(100% - 44px),
+    var(--cream) 100%
+  );
+}
+
+.donationBlend {
+  background: linear-gradient(
+    to bottom,
+    var(--cream) 0%,
+    var(--cream) calc(100% - 44px),
+    var(--stat-primary) 100%
+  );
+}
+
+.memberBlend {
+  border-top: 0;
+  background: linear-gradient(
+    to bottom,
+    var(--stat-primary) 0%,
+    var(--stat-primary) calc(100% - 44px),
+    var(--white) 100%
+  );
+}
+
+.latestCollectionGrid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 28px;
+}
+
+.latestBookCard {
+  aspect-ratio: 3 / 4;
+  min-width: 0;
+  animation: collectionCardEnter 0.45s ease both;
+}
+
+.latestBookCover {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: block;
+}
+
+.latestBookCover img {
+  object-fit: cover;
+}
+
+.collectionContinueCard {
+  aspect-ratio: 3 / 4;
+  min-width: 0;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 8px;
+  border: 0.8px solid var(--line);
+  border-radius: 10px;
+  background: var(--white);
+  color: var(--navy);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  animation: collectionCardEnter 0.45s ease both;
+  transition:
+    transform 0.22s ease,
+    border-color 0.22s ease,
+    background 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.collectionContinueCard span {
+  color: var(--orange);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.collectionContinueCard strong {
+  max-width: 150px;
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.collectionContinueCard svg {
+  margin-top: 4px;
+  font-size: 20px;
+  transition: transform 0.22s ease;
+}
+
+.latestBookCover:focus-visible,
+.collectionContinueCard:focus-visible {
+  outline: 2px solid var(--navy);
+  outline-offset: 3px;
+}
+
+@keyframes collectionCardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (hover: hover) {
+  .latestBookCard:hover {
+    border-color: var(--yellow);
+    box-shadow: var(--shadow);
+    transform: translateY(-6px);
+  }
+
+  .latestBookCard:hover .latestBookCover img {
+    transform: scale(1.035);
+  }
+
+  .collectionContinueCard:hover {
+    border-color: var(--yellow);
+    background: var(--yellow-soft);
+    box-shadow: var(--shadow);
+    transform: translateY(-6px) scale(1.02);
+  }
+
+  .collectionContinueCard:hover strong {
+    text-decoration: underline;
+  }
+
+  .collectionContinueCard:hover svg {
+    transform: translateX(4px);
+  }
+}
+
+@media (max-width: 1080px) {
+  .latestCollectionGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .latestBookCard:nth-child(4) {
+    display: none;
+  }
+}
+
+@media (max-width: 820px) {
+  .latestCollectionGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .heroBlend,
+  .collectionBlend,
+  .subjectBlend,
+  .serviceBlend,
+  .borrowBlend,
+  .ebookBlend,
+  .reminderBlend,
+  .donationBlend,
+  .memberBlend {
+    background-size: 100% 100%;
+  }
+
+  .latestCollectionGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 22px;
+  }
+
+  .latestBookCard:nth-child(3) {
+    display: none;
+  }
+
+  .latestBookCard,
+  .collectionContinueCard {
+    width: min(100%, 360px);
+    margin-inline: auto;
+  }
+
+  .collectionContinueCard {
+    min-height: 180px;
+    aspect-ratio: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .latestBookCard,
+  .latestBookCover img,
+  .collectionContinueCard,
+  .collectionContinueCard svg {
+    animation: none;
+    transition: none;
+  }
+
+  .latestBookCard:hover,
+  .latestBookCard:hover .latestBookCover img,
+  .collectionContinueCard:hover,
+  .collectionContinueCard:hover svg {
+    transform: none;
+  }
+}
