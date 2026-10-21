@@ -62,7 +62,8 @@
   outline: 0;
   background: transparent;
   color: var(--navy);
-  font-size: 13px;
+  font-size: var(--text-input);
+  line-height: var(--leading-body);
 }
 
 .searchBox input::placeholder {
@@ -326,7 +327,7 @@
   gap: 5px;
   padding: 5px 9px;
   border-radius: 99px;
-  font-size: 10px;
+  font-size: var(--text-badge);
   font-weight: 600;
   white-space: nowrap;
 }
@@ -439,8 +440,9 @@
   gap: 10px;
   padding: 10px 14px;
   border-top: 1px solid #ececef;
-  color: #777;
-  font-size: 11px;
+  color: var(--text-secondary-color);
+  font-size: var(--text-xs);
+  line-height: var(--leading-body);
 }
 
 .pagination button {
@@ -480,24 +482,29 @@
 .formHeading h1 {
   margin: 9px 0 0;
   color: var(--navy);
-  font-size: 26px;
-  line-height: 1.15;
+  font-size: var(--text-page);
+  line-height: var(--leading-title);
+  font-weight: 700;
+  overflow-wrap: anywhere;
 }
 
 .formHeading p {
   max-width: 720px;
   margin: 7px 0 0;
-  color: #777;
-  font-size: 12px;
-  line-height: 1.5;
+  color: var(--text-secondary-color);
+  font-size: var(--text-secondary);
+  line-height: var(--leading-body);
 }
 
 .localBreadcrumb {
   display: flex;
   align-items: center;
   gap: 7px;
-  color: #777;
-  font-size: 10px;
+  color: var(--text-secondary-color);
+  font-size: var(--text-breadcrumb);
+  font-weight: 500;
+  line-height: var(--leading-helper);
+  flex-wrap: wrap;
 }
 
 .localBreadcrumb a {
@@ -506,8 +513,8 @@
 }
 
 .localBreadcrumb strong {
-  color: #777;
-  font-weight: 500;
+  color: var(--text-secondary-color);
+  font-weight: 600;
 }
 
 .detailHero {
@@ -548,6 +555,8 @@
 .heroInfo {
   position: relative;
   z-index: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .heroBadges {
@@ -563,14 +572,16 @@
 
 .heroInfo h2 {
   margin: 14px 0 7px;
-  font-size: 24px;
-  line-height: 1.25;
+  font-size: var(--text-detail-title);
+  line-height: var(--leading-title);
+  font-weight: 700;
 }
 
 .heroInfo p {
   margin: 0;
   color: #dedfe5;
-  font-size: 12px;
+  font-size: var(--text-md);
+  line-height: var(--leading-body);
 }
 
 .codeBadge {
@@ -580,7 +591,7 @@
   border-radius: 5px;
   background: var(--yellow);
   color: var(--navy);
-  font-size: 10px;
+  font-size: var(--text-badge);
 }
 
 .heroActions {
@@ -631,7 +642,9 @@
   padding-bottom: 9px;
   position: relative;
   color: var(--navy);
-  font-size: 14px;
+  font-size: var(--text-section);
+  font-weight: 600;
+  line-height: var(--leading-section);
 }
 
 .detailPanel h3::after,
@@ -661,16 +674,19 @@
 
 .infoList dt {
   margin-bottom: 4px;
-  color: #777;
-  font-size: 9px;
+  color: var(--text-secondary-color);
+  font-size: var(--text-detail-label);
+  font-weight: 500;
+  line-height: var(--leading-helper);
 }
 
 .infoList dd {
   margin: 0;
   color: var(--navy);
-  font-size: 12px;
-  line-height: 1.45;
+  font-size: var(--text-detail-value);
+  line-height: var(--leading-body);
   overflow-wrap: anywhere;
+  font-weight: 500;
 }
 
 .digitalLink {
@@ -712,15 +728,16 @@
 .description {
   margin: 0;
   color: #565656;
-  font-size: 12px;
-  line-height: 1.75;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
   white-space: pre-wrap;
 }
 
 .emptyText {
   margin: 0;
-  color: #777;
-  font-size: 12px;
+  color: var(--text-secondary-color);
+  font-size: var(--text-secondary);
+  line-height: var(--leading-body);
 }
 
 .transactionList {
@@ -741,14 +758,16 @@
 .transactionRow strong {
   display: block;
   color: var(--navy);
-  font-size: 12px;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
 }
 
 .transactionRow small {
   display: block;
   margin-top: 4px;
-  color: #777;
-  font-size: 10px;
+  color: var(--text-secondary-color);
+  font-size: var(--text-xs);
+  line-height: var(--leading-body);
 }
 
 .formLayout {
@@ -784,7 +803,9 @@
 .sectionIntro h2 {
   margin: 0 0 6px;
   color: var(--navy);
-  font-size: 15px;
+  font-size: var(--text-section);
+  font-weight: 600;
+  line-height: var(--leading-section);
 }
 
 .sectionIntro h2::before {
@@ -800,9 +821,9 @@
 .sectionIntro p {
   max-width: 720px;
   margin: 0;
-  color: #777;
-  font-size: 10px;
-  line-height: 1.5;
+  color: var(--text-secondary-color);
+  font-size: var(--text-secondary);
+  line-height: var(--leading-body);
 }
 
 .fieldsGrid {
@@ -815,17 +836,21 @@
 .descriptionField {
   display: grid;
   gap: 6px;
+  min-width: 0;
 }
 
 .fieldsGrid label > span:first-child,
 .descriptionField > span {
   color: var(--navy);
-  font-size: 10px;
+  font-size: var(--text-form-label);
   font-weight: 500;
+  line-height: var(--leading-helper);
 }
 
 .fieldsGrid .selectLabel > span:first-child {
-  font-size: 12px;
+  font-size: var(--text-form-label);
+  font-weight: 500;
+  line-height: var(--leading-helper);
 }
 
 .fieldsGrid b,
@@ -844,7 +869,8 @@
   outline: 0;
   background: var(--white);
   color: var(--navy);
-  font-size: 11px;
+  font-size: var(--text-input);
+  line-height: var(--leading-body);
 }
 
 .fieldsGrid input:focus,
@@ -864,9 +890,9 @@
 }
 
 .fieldsGrid small {
-  color: #777;
-  font-size: 8px;
-  line-height: 1.45;
+  color: var(--text-secondary-color);
+  font-size: var(--text-helper);
+  line-height: var(--leading-helper);
 }
 
 .spanTwo {
@@ -888,7 +914,9 @@
 }
 
 .coverCard h2 {
-  font-size: 12px;
+  font-size: var(--text-section);
+  font-weight: 600;
+  line-height: var(--leading-section);
 }
 
 .coverCard img {
@@ -904,7 +932,7 @@
 .coverButton {
   width: 100%;
   min-height: 38px;
-  font-size: 10px;
+  font-size: var(--text-button);
 }
 
 .coverFileInput {
@@ -915,9 +943,9 @@
 .coverFileName {
   display: block;
   margin-top: 8px;
-  color: #777;
-  font-size: 8px;
-  line-height: 1.45;
+  color: var(--text-secondary-color);
+  font-size: var(--text-helper);
+  line-height: var(--leading-helper);
   text-align: center;
   overflow-wrap: anywhere;
 }
@@ -938,15 +966,17 @@
 .toggleRow strong {
   display: block;
   color: var(--navy);
-  font-size: 11px;
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: var(--leading-body);
 }
 
 .toggleRow small {
   display: block;
   margin-top: 5px;
-  color: #777;
-  font-size: 8px;
-  line-height: 1.45;
+  color: var(--text-secondary-color);
+  font-size: var(--text-helper);
+  line-height: var(--leading-helper);
 }
 
 .toggleRow input {
@@ -1097,7 +1127,7 @@
   }
 
   .heroInfo h2 {
-    font-size: 20px;
+    font-size: var(--text-detail-title);
   }
 
   .heroActions {

@@ -45,7 +45,7 @@
   align-items: center;
   flex: 0 0 auto;
   color: #333333;
-  font-size: 14px;
+  font-size: var(--text-input);
   font-weight: 500;
   user-select: none;
 }
@@ -67,7 +67,7 @@
 @media (max-width: 520px) {
   .prefix {
     padding-left: 12px;
-    font-size: 13px;
+    font-size: var(--text-input);
   }
 
   .prefixedInput input {

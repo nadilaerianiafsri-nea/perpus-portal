@@ -9,7 +9,7 @@
   color: var(--navy);
 }
 
-.pageHeading h1 { margin: 0; font-size: 26px; line-height: 1.2; }
+.pageHeading h1 { margin: 0; font-size: var(--text-page); line-height: var(--leading-title);  font-weight: 700; }
 .pageHeading p { margin: 6px 0 0; color: #52699e; font-size: 14px; }
 
 .infoBox, .failedBox, .errorBox {
@@ -52,7 +52,7 @@
   padding: 0 12px;
   background: #fff;
 }
-.searchBox input { width: 100%; border: 0; outline: 0; padding: 11px 0; font: inherit; color: var(--navy); background: transparent; }
+.searchBox input { width: 100%; border: 0; outline: 0; padding: 11px 0; font: inherit; color: var(--navy); background: transparent;  font-size: var(--text-input); }
 .searchBox:hover, .searchBox:focus-within { border-color: var(--navy-soft); }
 .tabs { display: flex; gap: 8px; flex-wrap: wrap; }
 .tabs button {
@@ -165,7 +165,7 @@
 
 @media (max-width: 460px) {
   .page { gap: 14px; }
-  .pageHeading h1 { font-size: 23px; }
+  .pageHeading h1 { font-size: var(--text-page);  font-weight: 700;  line-height: var(--leading-title); }
   .mobileCard dl { grid-template-columns: 1fr; }
   .footerActions { justify-content: space-between; }
 }

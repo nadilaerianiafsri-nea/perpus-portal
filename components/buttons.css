@@ -41,8 +41,8 @@
   color: var(--button-fg);
   box-shadow: none;
   font-family: inherit;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: var(--text-button);
+  font-weight: 600;
   line-height: 1.35;
   text-align: center;
   text-decoration: none;
@@ -128,7 +128,7 @@
 :root body [data-button][data-button][data-button-size="sm"] {
   --button-height: 36px;
   padding: 7px 12px;
-  font-size: 13px;
+  font-size: var(--text-button);
 }
 :root body [data-button][data-button][data-button-size="lg"] {
   --button-height: 50px;
@@ -271,7 +271,11 @@
 @media (prefers-reduced-motion: reduce) {
   :root body [data-button][data-button] {
     transition: none;
-  }
+
+  font-size: var(--text-button);
+
+  font-weight: 600;
+}
   :root body [data-button][data-button]:active {
     transform: none;
   }
@@ -290,7 +294,7 @@
   padding: 10px 20px;
   gap: 8px;
   font-family: var(--font-outfit), "Outfit", sans-serif;
-  font-size: 14px;
+  font-size: var(--text-button);
   font-weight: 600;
 }
 
@@ -322,7 +326,7 @@
   min-height: var(--button-height);
   padding: 8px 12px;
   border-radius: 10px;
-  font-size: 13px;
+  font-size: var(--text-button);
   line-height: 1.35;
   text-decoration: none;
 }
@@ -416,7 +420,7 @@
 }
 @keyframes row-action-spin { to { transform: rotate(360deg); } }
 @media (max-width: 600px) {
-  :root body [data-button][data-button][data-row-action] { --button-height: 44px; }
+  :root body [data-button][data-button][data-row-action] { --button-height: 44px;  font-size: var(--text-button); }
 }
 @media (prefers-reduced-motion: reduce) {
   :root body [data-button][data-button][data-row-action][data-button-loading="true"][data-button-shape="square"]::before { animation: none; }

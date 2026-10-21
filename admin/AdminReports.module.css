@@ -11,7 +11,7 @@
   font-family: var(--font-outfit), Outfit, sans-serif;
 }
 .pageHeading { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-.pageHeading h1 { margin: 0; font-size: 26px; }
+.pageHeading h1 { margin: 0; font-size: var(--text-page);  font-weight: 700;  line-height: var(--leading-title); }
 .pageHeading p { margin: 6px 0 0; color: #52699e; font-size: 14px; }
 
 .toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
@@ -63,8 +63,8 @@
 .barArea { display: flex; align-items: end; justify-content: center; gap: 8px; min-height: 245px; }
 .bar { width: min(28px, 36%); min-height: 6px; border-radius: 7px 7px 0 0; position: relative; transition: filter .15s ease; }
 .bar:hover { filter: brightness(.9); }
-.bar span { position: absolute; top: -19px; left: 50%; transform: translateX(-50%); font-size: 11px; color: var(--navy-soft); }
-.monthGroup small { color: #52699e; font-size: 11px; white-space: nowrap; }
+.bar span { position: absolute; top: -19px; left: 50%; transform: translateX(-50%); font-size: var(--text-helper); color: var(--navy-soft); }
+.monthGroup small { color: #52699e; font-size: var(--text-helper); white-space: nowrap; }
 
 .secondaryButton:focus-visible, .errorBox button:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
 
@@ -73,7 +73,7 @@
 }
 @media (max-width: 620px) {
   .page { gap: 14px; }
-  .pageHeading h1 { font-size: 23px; }
+  .pageHeading h1 { font-size: var(--text-page);  font-weight: 700;  line-height: var(--leading-title); }
   .pageHeading { align-items: stretch; }
   .toolbar { width: 100%; align-items: center; }
   .reportContent { gap: 14px; }

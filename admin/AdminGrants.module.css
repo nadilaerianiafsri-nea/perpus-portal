@@ -31,17 +31,19 @@
 .detailHeading h1 {
   margin: 0;
   color: var(--navy);
-  font-size: 26px;
-  line-height: 1.15;
+  font-size: var(--text-page);
+  line-height: var(--leading-title);
+  font-weight: 700;
+  overflow-wrap: anywhere;
 }
 
 .pageHeading p,
 .detailHeading p {
   max-width: 720px;
   margin: 6px 0 0;
-  color: #777;
-  font-size: 12px;
-  line-height: 1.55;
+  color: var(--text-secondary-color);
+  font-size: var(--text-secondary);
+  line-height: var(--leading-body);
 }
 
 .addButton,
@@ -159,7 +161,8 @@
   outline: 0;
   background: transparent;
   color: var(--navy);
-  font-size: 11px;
+  font-size: var(--text-input);
+  line-height: var(--leading-body);
 }
 
 .searchBox input::placeholder {
@@ -294,7 +297,7 @@
   justify-content: center;
   padding: 5px 9px;
   border-radius: 99px;
-  font-size: 8px;
+  font-size: var(--text-badge);
   font-weight: 600;
   white-space: nowrap;
 }
@@ -343,7 +346,8 @@
   border-radius: 10px;
   background: #ffebea;
   color: #bc241c;
-  font-size: 11px;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
 }
 
 .errorBox p {
@@ -366,8 +370,9 @@
   justify-content: flex-end;
   gap: 10px;
   border-top: 1px solid #ececef;
-  color: #777;
-  font-size: 9px;
+  color: var(--text-secondary-color);
+  font-size: var(--text-xs);
+  line-height: var(--leading-body);
 }
 
 .pagination button {
@@ -403,8 +408,10 @@
   align-items: center;
   gap: 7px;
   flex-wrap: wrap;
-  color: #777;
-  font-size: 9px;
+  color: var(--text-secondary-color);
+  font-size: var(--text-breadcrumb);
+  font-weight: 500;
+  line-height: var(--leading-helper);
 }
 
 .localBreadcrumb a {
@@ -413,8 +420,8 @@
 }
 
 .localBreadcrumb strong {
-  color: #777;
-  font-weight: 500;
+  color: var(--text-secondary-color);
+  font-weight: 600;
 }
 
 .detailActions {
@@ -438,20 +445,24 @@
   display: block;
   margin-bottom: 8px;
   color: #dedfe5;
-  font-size: 9px;
+  font-size: var(--text-xs);
+  line-height: var(--leading-helper);
 }
 
 .hero h2 {
   margin: 0;
   color: var(--white);
-  font-size: 21px;
-  line-height: 1.25;
+  font-size: var(--text-detail-title);
+  line-height: var(--leading-title);
+  font-weight: 700;
+  overflow-wrap: anywhere;
 }
 
 .hero p {
   margin: 7px 0 0;
   color: #dedfe5;
-  font-size: 10px;
+  font-size: var(--text-md);
+  line-height: var(--leading-body);
 }
 
 .detailStats {
@@ -477,7 +488,9 @@
   padding-bottom: 9px;
   position: relative;
   color: var(--navy);
-  font-size: 14px;
+  font-size: var(--text-section);
+  font-weight: 600;
+  line-height: var(--leading-section);
 }
 
 .panel h2::after,
@@ -506,16 +519,19 @@
 
 .infoList dt {
   margin-bottom: 4px;
-  color: #777;
-  font-size: 8px;
+  color: var(--text-secondary-color);
+  font-size: var(--text-detail-label);
+  font-weight: 500;
+  line-height: var(--leading-helper);
 }
 
 .infoList dd {
   margin: 0;
   color: var(--navy);
-  font-size: 11px;
-  line-height: 1.5;
+  font-size: var(--text-detail-value);
+  line-height: var(--leading-body);
   overflow-wrap: anywhere;
+  font-weight: 500;
 }
 
 .catalogFlow {
@@ -542,21 +558,24 @@
   border-radius: 50%;
   background: #f4f4f7;
   color: #777;
-  font-size: 9px;
+  font-size: var(--text-helper);
   font-weight: 700;
 }
 
 .catalogStep strong {
   display: block;
   color: var(--navy);
-  font-size: 10px;
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: var(--leading-body);
 }
 
 .catalogStep small {
   display: block;
   margin-top: 3px;
-  color: #777;
-  font-size: 8px;
+  color: var(--text-secondary-color);
+  font-size: var(--text-helper);
+  line-height: var(--leading-helper);
 }
 
 .catalogStepDone > span {
@@ -577,8 +596,8 @@
 .note {
   margin: 0;
   color: #565656;
-  font-size: 11px;
-  line-height: 1.7;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
   white-space: pre-wrap;
 }
 
@@ -694,9 +713,9 @@
 
 .formIntro {
   margin: -8px 0 16px;
-  color: #777;
-  font-size: 9px;
-  line-height: 1.5;
+  color: var(--text-secondary-color);
+  font-size: var(--text-secondary);
+  line-height: var(--leading-body);
 }
 
 .formGrid {
@@ -710,6 +729,7 @@
   display: grid;
   align-content: start;
   gap: 6px;
+  min-width: 0;
 }
 
 .fullField {
@@ -719,12 +739,15 @@
 .field > span:first-child,
 .fullField > span:first-child {
   color: var(--navy);
-  font-size: 9px;
+  font-size: var(--text-form-label);
   font-weight: 500;
+  line-height: var(--leading-helper);
 }
 
 .field.selectLabel > span:first-child {
-  font-size: 12px;
+  font-size: var(--text-form-label);
+  font-weight: 500;
+  line-height: var(--leading-helper);
 }
 
 .field b,
@@ -742,7 +765,8 @@
   outline: 0;
   background: var(--white);
   color: var(--navy);
-  font-size: 10px;
+  font-size: var(--text-input);
+  line-height: var(--leading-body);
 }
 
 .field input:focus,
@@ -758,8 +782,9 @@
 
 .field small,
 .fullField small {
-  color: #777;
-  font-size: 8px;
+  color: var(--text-secondary-color);
+  font-size: var(--text-helper);
+  line-height: var(--leading-helper);
 }
 
 .itemsEditor {
@@ -784,9 +809,10 @@
 }
 
 .itemField span {
-  color: #777;
-  font-size: 8px;
+  color: var(--text-secondary-color);
+  font-size: var(--text-form-label);
   font-weight: 500;
+  line-height: var(--leading-helper);
 }
 
 .itemField input {
@@ -798,7 +824,8 @@
   outline: 0;
   background: var(--white);
   color: var(--navy);
-  font-size: 10px;
+  font-size: var(--text-input);
+  line-height: var(--leading-body);
 }
 
 .addItemButton {
@@ -809,7 +836,7 @@
   border-radius: 8px;
   background: var(--white);
   color: var(--navy);
-  font-size: 10px;
+  font-size: var(--text-button);
   font-weight: 600;
   cursor: pointer;
   transition:
@@ -916,7 +943,7 @@
 
   .pageHeading h1,
   .detailHeading h1 {
-    font-size: 22px;
+    font-size: var(--text-page);
   }
 
   .stats {

@@ -308,7 +308,7 @@
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 15px;
+  font-size: var(--text-base);
 }
 
 .table thead {
@@ -356,8 +356,8 @@
 .table td:first-child small {
   display: block;
   margin-top: 5px;
-  color: #888;
-  font-size: 11px;
+  color: var(--text-secondary-color);
+  font-size: var(--text-helper);
   font-weight: 400;
 }
 
@@ -373,7 +373,7 @@
   gap: 5px;
   border-radius: 16px;
   padding: 4px 10px;
-  font-size: 12px;
+  font-size: var(--text-badge);
   line-height: 1.25;
   white-space: nowrap;
 }
@@ -458,7 +458,7 @@
   }
 
   .table {
-    font-size: 13px;
+    font-size: var(--text-base);
   }
 
   .table :is(th, td) {
@@ -466,7 +466,7 @@
   }
 
   .badge {
-    font-size: 10px;
+    font-size: var(--text-badge);
     white-space: normal;
   }
 }
@@ -549,24 +549,26 @@
   }
 
   .grantCard dt {
-    color: #777;
-    font-size: 12px;
+    color: var(--text-secondary-color);
+    font-size: var(--text-helper);
+    font-weight: 500;
   }
 
   .grantCard dd {
     margin: 0;
     color: #555;
-    font-size: 13px;
+    font-size: var(--text-base);
     overflow-wrap: anywhere;
+    line-height: var(--leading-body);
   }
 
   .grantCard small {
-    color: #888;
-    font-size: 11px;
+    color: var(--text-secondary-color);
+    font-size: var(--text-helper);
   }
 
   .badge {
-    font-size: 12px;
+    font-size: var(--text-badge);
   }
 }
 

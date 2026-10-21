@@ -27,7 +27,7 @@
   min-width: 0;
 }
 
-.adminPage :is(button, input) {
+.adminPage :where(button, input) {
   font: inherit;
 }
 
@@ -91,8 +91,8 @@
 .brandText small {
   display: block;
   margin-top: 3px;
-  color: #747474;
-  font-size: 11px;
+  color: var(--text-secondary-color);
+  font-size: var(--text-helper);
   font-weight: 500;
 }
 
@@ -262,8 +262,12 @@
   align-items: center;
   gap: 7px;
   flex-wrap: wrap;
-  color: #777;
-  font-size: 12px;
+  color: var(--text-secondary-color);
+  font-size: var(--text-breadcrumb);
+
+  font-weight: 500;
+
+  line-height: var(--leading-body);
 }
 
 .breadcrumb a {
@@ -323,7 +327,7 @@
   outline: 0;
   background: transparent;
   color: var(--navy);
-  font-size: 13px;
+  font-size: var(--text-input);
 }
 
 .searchBox input::placeholder {
@@ -446,7 +450,9 @@
 .memberCard p {
   margin: 6px 0 0;
   color: var(--dashboard-muted);
-  font-size: 12px;
+  font-size: var(--text-secondary);
+
+  line-height: var(--leading-body);
 }
 
 .lineChartWrap {
@@ -683,8 +689,14 @@
   }
 
   .breadcrumb {
-    font-size: 11px;
-  }
+    font-size: var(--text-breadcrumb);
+
+  font-weight: 500;
+
+  color: var(--text-secondary-color);
+
+  line-height: var(--leading-body);
+}
 
   .searchBox {
     display: none;

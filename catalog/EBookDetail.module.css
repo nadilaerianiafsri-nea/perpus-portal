@@ -62,10 +62,10 @@
   object-fit: contain;
 }
 .coverCaption {
-  color: #717685;
-  font-size: 10px;
+  color: var(--text-secondary-color);
+  font-size: var(--text-helper);
   font-weight: 500;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.08em;
 }
 .heroContent {
   align-self: center;
@@ -85,9 +85,9 @@
 .page .title {
   margin: 14px 0 10px;
   color: #000633;
-  font-size: clamp(28px, 2.6vw, 36px);
+  font-size: var(--text-detail-title);
   font-weight: 700;
-  line-height: 1.2;
+  line-height: var(--leading-title);
   letter-spacing: -0.035em;
   overflow-wrap: anywhere;
 }
@@ -110,7 +110,7 @@
   align-items: center;
   gap: 12px;
   color: #565d70;
-  font-size: 13px;
+  font-size: var(--text-secondary);
   overflow-wrap: anywhere;
 }
 .quickMetadata li + li::before {
@@ -128,8 +128,8 @@
   overflow: hidden;
   margin: 18px 0 0;
   color: #636977;
-  font-size: 14px;
-  line-height: 1.8;
+  font-size: var(--text-body);
+  line-height: 1.6;
   overflow-wrap: anywhere;
 }
 .page .readActions {
@@ -145,9 +145,9 @@
   align-items: flex-start;
   gap: 7px;
   margin: 12px 0 0;
-  color: #747b88;
-  font-size: 12px;
-  line-height: 1.6;
+  color: var(--text-secondary-color);
+  font-size: var(--text-helper);
+  line-height: var(--leading-helper);
 }
 .accessHint svg {
   flex-shrink: 0;
@@ -167,8 +167,8 @@
 .page .description {
   margin: 0;
   color: #596171;
-  font-size: 14px;
-  line-height: 1.85;
+  font-size: var(--text-body);
+  line-height: 1.6;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
@@ -190,34 +190,35 @@
 }
 .page .metadata dt,
 .page .accessFields dt {
-  color: #747b88;
-  font-size: 11px;
-  letter-spacing: 0.06em;
+  color: var(--text-secondary-color);
+  font-size: var(--text-detail-label);
+  letter-spacing: 0.04em;
 }
 .page .metadata dd,
 .page .accessFields dd {
   color: #232c49;
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: var(--text-detail-value);
+  line-height: var(--leading-body);
+  font-weight: 500;
 }
 .accessFields {
   margin: 0;
   display: grid;
-  gap: 12px;
+  gap: 16px;
 }
 .accessFields > div {
   display: grid;
-  grid-template-columns: 90px minmax(0, 1fr);
-  gap: 16px;
+  grid-template-columns: minmax(0, 110px) minmax(0, 1fr);
+  gap: 12px;
   align-items: baseline;
 }
 .page .licenseNote {
   border-top: 1px solid #eceef2;
   padding-top: 14px;
   margin: 16px 0 0;
-  color: #6c7380;
-  font-size: 12px;
-  line-height: 1.7;
+  color: var(--text-secondary-color);
+  font-size: var(--text-helper);
+  line-height: var(--leading-body);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
@@ -306,7 +307,8 @@
     width: 176px;
   }
   .page .title {
-    font-size: 28px;
+    font-size: var(--text-detail-title);
+    line-height: var(--leading-title);
   }
   .heroContent {
     padding: 0;

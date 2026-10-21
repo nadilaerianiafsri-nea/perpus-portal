@@ -42,7 +42,7 @@
   box-shadow: 0 8px 18px #00063325;
   pointer-events: none;
   transform: translate(-50%, calc(-100% - 12px));
-  font-size: 12px;
+  font-size: var(--text-helper);
   line-height: 1.35;
 }
 
@@ -148,14 +148,14 @@
   box-shadow: 0 8px 18px #00063325;
   pointer-events: none;
   transform: translateX(-50%);
-  font-size: 11px;
+  font-size: var(--text-helper);
   line-height: 1.35;
   text-align: center;
 }
 
 .memberChartTooltip strong {
   color: var(--white);
-  font-size: 11px;
+  font-size: var(--text-helper);
 }
 
 /* ================================
@@ -171,8 +171,8 @@
   border-radius: 99px;
   background: var(--yellow);
   color: var(--navy);
-  font-size: 10px;
-  font-weight: 800;
+  font-size: var(--text-badge);
+  font-weight: 600;
   line-height: 1;
 }
 
@@ -275,7 +275,7 @@
 
   .chartTooltip {
     padding: 8px 10px;
-    font-size: 11px;
+    font-size: var(--text-helper);
   }
 
   .memberDonutWrap {
@@ -291,13 +291,17 @@
   .memberChartTooltip {
     width: 136px;
     padding: 8px 9px;
-    font-size: 10px;
+    font-size: var(--text-helper);
   }
 
   .notificationBadge {
     min-width: 17px;
     height: 17px;
-  }
+
+  font-size: var(--text-badge);
+
+  font-weight: 600;
+}
 }
 
 /* ================================

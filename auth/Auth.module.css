@@ -58,7 +58,7 @@
 
 .brandCopy small {
   color: #AEB3D1;
-  font-size: 13px;
+  font-size: var(--text-secondary);
 }
 
 .heroCopy {
@@ -161,7 +161,7 @@
 }
 
 .field input::placeholder {
-  color: #A2A2A8;
+  color: var(--text-secondary-color);
 }
 
 .field input:focus {
@@ -244,9 +244,10 @@
 
 .inlineInfo {
   margin: -4px 0 0;
-  color: #8A8A91;
+  color: var(--text-secondary-color);
   text-align: center;
-  font-size: 12px;
+  font-size: var(--text-helper);
+  line-height: var(--leading-helper);
 }
 
 .switchText {
@@ -422,16 +423,16 @@
   box-shadow: none;
 }
 .registrationCard .field { min-width: 0; gap: 7px; }
-.registrationCard .field > label { color: #333; font-size: 14px; font-weight: 400; }
+.registrationCard .field > label { color: #333; font-size: 14px; font-weight: 500; }
 .registrationCard .field b { color: #FF3B2F; font-weight: 400; }
 .registrationCard .field input { height: 44px; padding-left: 14px; border-color: #E1E1E1; border-radius: 8px; }
 .registrationCard .field input[aria-invalid="true"] { border-color: #FF3B2F; }
-.fieldHelper { color: #777; font-size: 12px; line-height: 1.5; }
+.fieldHelper { color: var(--text-secondary-color); font-size: var(--text-helper); line-height: var(--leading-helper); }
 .fieldError { display: block; color: #B42318; font-size: 12px; line-height: 1.5; }
 .passwordColumns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .consent { display: flex; align-items: flex-start; gap: 10px; color: #444; font-size: 13px; line-height: 1.5; }
 .consent input { width: 18px; height: 18px; flex-shrink: 0; margin: 1px 0 0; accent-color: var(--navyButton); }
-.activationNote { margin: -4px 0 0; color: #777; text-align: center; font-size: 12px; line-height: 1.6; }
+.activationNote { margin: -4px 0 0; color: var(--text-secondary-color); text-align: center; font-size: var(--text-helper); line-height: 1.6; }
 .registrationNotice { margin: 0; padding: 12px; background: #FFFAE6; color: var(--navy); font-size: 13px; line-height: 1.6; }
 
 @media (max-width: 1180px) and (min-width: 821px) {
@@ -525,7 +526,7 @@
   }
 
   .brandCopy small {
-    font-size: 11px;
+    font-size: var(--text-helper);
   }
 
   .heroCopy {
@@ -654,7 +655,7 @@
 .loginPage :is(a, button, input):focus-visible { outline: 2px solid #6875ad; outline-offset: 3px; }
 .loginPage .field input:focus-visible { outline: 2px solid #697393; outline-offset: 2px; }
 .captchaArea { min-height: 78px; max-width: 100%; overflow-x: auto; }
-.captchaNotice { margin: 0; padding: 8px 10px; border: 1px solid #00063308; border-radius: 9px; background: #f0f1f366; color: #646a7b; font-size: 11px; line-height: 1.5; }
+.captchaNotice { margin: 0; padding: 8px 10px; border: 1px solid #00063308; border-radius: 9px; background: #f0f1f366; color: #646a7b; font-size: var(--text-helper); line-height: var(--leading-helper); }
 .loginError { margin: 0; padding: 10px 12px; border: 1px solid #f0d3d0; border-radius: 8px; background: #fff5f4; color: #a9231b; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
 .captchaArea .loginError { margin-top: 10px; }
 

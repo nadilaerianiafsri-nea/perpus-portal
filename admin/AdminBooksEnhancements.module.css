@@ -33,14 +33,15 @@
 
 .filterField > span:first-child,
 .stockGroup > span {
-  color: #565656;
-  font-size: 10px;
+  color: var(--text-secondary-color);
+  font-size: var(--text-form-label);
   font-weight: 600;
   letter-spacing: 0.03em;
+  line-height: var(--leading-helper);
 }
 
 .filterField > span:first-child {
-  font-size: 12px;
+  font-size: var(--text-xs);
 }
 
 .stockRange input {
@@ -53,12 +54,13 @@
   background: var(--white);
   color: var(--navy);
   font: inherit;
-  font-size: 12px;
+  font-size: var(--text-input);
   transition:
     border-color 150ms ease,
     background 150ms ease,
     transform 150ms ease,
     box-shadow 150ms ease;
+  line-height: var(--leading-body);
 }
 
 .stockRange input:hover {
@@ -81,7 +83,7 @@
 
 .rangeSeparator {
   color: #777777;
-  font-size: 12px;
+  font-size: var(--text-helper);
 }
 
 .applyButton {

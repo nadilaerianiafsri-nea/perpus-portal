@@ -1,0 +1,32 @@
+/* Shared semantic scale. Apply in existing components; never enlarge body globally. */
+:root {
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-md: 15px;
+  --text-subsection: 16px;
+  --text-section: 18px;
+  --text-page: 32px;
+  --text-detail-title: 28px;
+  --text-form-label: var(--text-sm);
+  --text-input: var(--text-base);
+  --text-detail-label: var(--text-sm);
+  --text-detail-value: var(--text-md);
+  --text-secondary: var(--text-sm);
+  --text-helper: var(--text-xs);
+  --text-body: var(--text-md);
+  --text-badge: var(--text-xs);
+  --text-button: var(--text-base);
+  --text-breadcrumb: var(--text-xs);
+  --text-secondary-color: #4b5e8c;
+  --leading-title: 1.2;
+  --leading-section: 1.3;
+  --leading-body: 1.5;
+  --leading-helper: 1.45;
+}
+@media (max-width: 1024px) {
+  :root { --text-page: 28px; }
+}
+@media (max-width: 600px) {
+  :root { --text-page: 26px; --text-detail-title: 24px; }
+}

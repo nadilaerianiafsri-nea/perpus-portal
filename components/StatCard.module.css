@@ -21,7 +21,7 @@
 .card .icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; background: #ffffff26; color: inherit; }
 .icon svg { width: 18px; height: 18px; }
 .body { min-width: 0; }
-.card .label { display: block; min-height: 2.8em; color: inherit; font-size: 11px; font-weight: 600; line-height: 1.4; letter-spacing: .045em; text-transform: uppercase; overflow-wrap: break-word; }
+.card .label { display: block; min-height: 2.8em; color: inherit; font-size: var(--text-badge); font-weight: 600; line-height: 1.4; letter-spacing: .045em; text-transform: uppercase; overflow-wrap: break-word; }
 .card .value { display: block; margin: 3px 0 0; color: inherit; font-size: 30px; font-weight: 700; line-height: 1.1; letter-spacing: -.025em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .card .textValue { font-size: 18px; line-height: 1.35; letter-spacing: 0; }
 .card .detail { display: block; margin-top: 6px; color: #ffffffd1; font-size: 12px; line-height: 1.45; overflow-wrap: break-word; }
@@ -41,7 +41,7 @@
 .compact { grid-template-columns: 30px minmax(0, 1fr); min-height: 76px; gap: 10px; padding: 12px; border-radius: 12px; }
 .compact .icon { width: 30px; height: 30px; border-radius: 8px; }
 .compact .icon svg { width: 16px; height: 16px; }
-.compact .label { min-height: 0; font-size: 11px; }
+.compact .label { min-height: 0; font-size: var(--text-badge); }
 .compact .value { font-size: 24px; }
 @media (max-width: 600px) {
   .card:not(.compact) { padding: 16px; }

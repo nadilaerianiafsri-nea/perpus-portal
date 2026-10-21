@@ -1,15 +1,15 @@
 .page { display: grid; gap: 22px; color: #000633; }
-.heading h1 { margin: 0 0 8px; font-size: clamp(28px, 3vw, 38px); line-height: 1.2; }
+.heading h1 { margin: 0 0 8px; font-size: var(--text-page); line-height: var(--leading-title);  font-weight: 700;  overflow-wrap: anywhere; }
 .heading p { margin: 0; max-width: 800px; color: #5d5d5d; font-size: 14px; line-height: 1.65; }
 .summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; grid-auto-rows: 1fr; }
 .panel { overflow: hidden; background: #fff; border: 1px solid #dfdfdf; border-radius: 16px; }
 .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px; border-bottom: 1px solid #ebebeb; }
 .tabs { display: flex; flex-wrap: wrap; gap: 8px; }
-.tabs button { min-height: 40px; padding: 8px 14px; border: 1px solid #c2c2c2; border-radius: 8px; background: #fff; color: #2B3056; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.tabs button { min-height: 40px; padding: 8px 14px; border: 1px solid #c2c2c2; border-radius: 8px; background: #fff; color: #2B3056; font: inherit; font-size: var(--text-button); font-weight: 600; cursor: pointer; }
 .tabs button:hover, .tabs .activeTab { border-color: #2B3056; background: #2B3056; color: #fff; }
 .search { display: flex; align-items: center; gap: 8px; width: min(420px, 100%); min-height: 42px; padding: 0 12px; border: 1px solid #c2c2c2; border-radius: 8px; background: #fff; color: #6c6c6c; }
 .search:focus-within { border-color: #2B3056; box-shadow: 0 0 0 2px #2b30561f; }
-.search input { width: 100%; border: 0; outline: 0; background: transparent; color: #161616; font: inherit; font-size: 13px; }
+.search input { width: 100%; border: 0; outline: 0; background: transparent; color: #161616; font: inherit; font-size: var(--text-input); }
 .error { margin: 16px; padding: 14px 16px; border: 1px solid #ff8d86; border-radius: 10px; background: #ffebea; color: #9c241d; }
 .error p { margin: 0 0 10px; }
 .error button { min-height: 36px; padding: 7px 12px; border: 0; border-radius: 7px; background: #2B3056; color: #fff; cursor: pointer; }
@@ -33,10 +33,10 @@
 .pagination button { min-height: 38px; padding: 7px 12px; border: 1px solid #c2c2c2; border-radius: 8px; background: #fff; color: #2B3056; cursor: pointer; }
 .pagination button:disabled { opacity: .45; cursor: not-allowed; }
 .pagination span { font-size: 12px; color: #6c6c6c; }
-.note { margin: -4px 0 0; padding: 14px 16px; border-left: 4px solid #FFD000; background: #fffae6; color: #515151; font-size: 13px; line-height: 1.6; }
+.note { margin: -4px 0 0; padding: 14px 16px; border-left: 4px solid #FFD000; background: #fffae6; color: #515151; font-size: var(--text-base); line-height: 1.6; }
 @media (max-width: 900px) { .summary { grid-template-columns: 1fr; }.toolbar { align-items: stretch; flex-direction: column; }.search { width: 100%; } }
-@media (max-width: 600px) { .page { gap: 16px; }.toolbar { padding: 12px; }.tabs { display: grid; grid-template-columns: 1fr; }.tabs button { min-height: 44px; }.pagination { justify-content: space-between; flex-wrap: wrap; }.pagination button { min-height: 44px; }.note { font-size: 12px; } }
-@media (max-width: 360px) { .heading h1 { font-size: 26px; }.table th, .table td { padding-inline: 12px; } }
+@media (max-width: 600px) { .page { gap: 16px; }.toolbar { padding: 12px; }.tabs { display: grid; grid-template-columns: 1fr; }.tabs button { min-height: 44px;  font-size: var(--text-button); }.pagination { justify-content: space-between; flex-wrap: wrap; }.pagination button { min-height: 44px; }.note { font-size: var(--text-base); } }
+@media (max-width: 360px) { .heading h1 { font-size: var(--text-page);  font-weight: 700;  line-height: var(--leading-title);  overflow-wrap: anywhere; }.table th, .table td { padding-inline: 12px; } }
 
 .table[data-record-list] th:nth-child(1) { width: 24%; }
 .table[data-record-list] th:nth-child(2) { width: 28%; }

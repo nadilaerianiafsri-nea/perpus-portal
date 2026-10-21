@@ -19,11 +19,16 @@
   align-items: center;
   gap: 8px;
   margin-bottom: 18px;
-  color: #777a87;
-  font-size: 12px;
+  color: var(--text-secondary-color);
+  font-size: var(--text-breadcrumb);
+  font-weight: 500;
+  line-height: var(--leading-helper);
 }
 .breadcrumb a {
   color: #816700;
+}
+.breadcrumb > :last-child {
+  font-weight: 600;
 }
 .heading {
   display: flex;
@@ -35,9 +40,9 @@
 .page .heading h1 {
   margin: 0;
   color: #000633;
-  font-size: clamp(26px, 2.5vw, 32px);
+  font-size: var(--text-page);
   font-weight: 700;
-  line-height: 1.25;
+  line-height: var(--leading-title);
   letter-spacing: -0.035em;
 }
 .heading h1::after {
@@ -89,9 +94,9 @@
   margin: 0 0 20px;
   padding-bottom: 10px;
   color: #000633;
-  font-size: 17px;
+  font-size: var(--text-section);
   font-weight: 600;
-  line-height: 1.4;
+  line-height: var(--leading-section);
 }
 .sectionTitle::after {
   content: "";
@@ -143,19 +148,20 @@
 }
 .page dt {
   margin: 0 0 6px;
-  color: #757986;
-  font-size: 10px;
+  color: var(--text-secondary-color);
+  font-size: var(--text-detail-label);
   font-weight: 500;
-  line-height: 1.4;
-  letter-spacing: 0.09em;
+  line-height: var(--leading-helper);
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 .page dd {
   margin: 0;
   color: #353847;
-  font-size: 13px;
-  line-height: 1.6;
+  font-size: var(--text-detail-value);
+  line-height: var(--leading-body);
   overflow-wrap: anywhere;
+  font-weight: 500;
 }
 .summaryFields h3 {
   margin: 0;
@@ -270,15 +276,15 @@
 }
 .page .note {
   margin: 12px 0 0;
-  color: #777b87;
-  font-size: 11px;
-  line-height: 1.65;
+  color: var(--text-secondary-color);
+  font-size: var(--text-helper);
+  line-height: var(--leading-helper);
 }
 .page .description {
   margin: 0 0 18px;
   color: #555966;
-  font-size: 13px;
-  line-height: 1.85;
+  font-size: var(--text-body);
+  line-height: 1.6;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
@@ -291,14 +297,14 @@
   background: #e6e6eb;
 }
 .codeCallout span {
-  color: #6a6e7b;
-  font-size: 10px;
+  color: var(--text-secondary-color);
+  font-size: var(--text-detail-label);
   font-weight: 500;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 .codeCallout strong {
-  font-size: 14px;
+  font-size: var(--text-detail-value);
   font-weight: 600;
   overflow-wrap: anywhere;
 }
@@ -330,7 +336,8 @@
 }
 .loanRules dd {
   grid-column: 2;
-  font-size: 12px;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
 }
 .related {
   margin-top: 30px;
@@ -354,7 +361,8 @@
   border-radius: 10px;
   background: #fff;
   color: #666a78;
-  font-size: 13px;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
 }
 .relatedEmpty p {
   margin: 0 0 10px;

@@ -68,7 +68,7 @@ img {
   display: inline-block;
   margin-bottom: 9px;
   color: var(--orange);
-  font-size: 12px;
+  font-size: var(--text-xs);
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -517,9 +517,9 @@ img {
 .quick-grid small {
   display: block;
   margin-top: 3px;
-  color: rgba(0, 6, 51, 0.55);
-  font-size: 13px;
-  line-height: 1.45;
+  color: var(--text-secondary-color);
+  font-size: var(--text-secondary);
+  line-height: var(--leading-body);
 }
 
 /* COLLECTION */
@@ -569,8 +569,8 @@ img {
 }
 .book-body > small {
   color: var(--orange);
-  font-weight: 800;
-  font-size: 11px;
+  font-weight: 600;
+  font-size: var(--text-helper);
   text-transform: uppercase;
 }
 .book-body h3 {
@@ -746,8 +746,8 @@ img {
   place-items: center;
   border-radius: 50%;
   background: var(--gray);
-  font-size: 10px;
-  font-weight: 800;
+  font-size: var(--text-xs);
+  font-weight: 600;
 }
 .step-grid strong {
   display: block;
@@ -757,9 +757,9 @@ img {
 .step-grid small {
   display: block;
   margin-top: 7px;
-  color: rgba(0, 6, 51, 0.55);
-  font-size: 12px;
-  line-height: 1.55;
+  color: var(--text-secondary-color);
+  font-size: var(--text-secondary);
+  line-height: var(--leading-body);
 }
 .step-grid article.active {
   background: var(--navy);
@@ -851,8 +851,8 @@ img {
 }
 .reminder-grid span {
   color: var(--green);
-  font-size: 11px;
-  font-weight: 800;
+  font-size: var(--text-xs);
+  font-weight: 600;
 }
 .reminder-grid h3 {
   margin: 6px 0;
@@ -909,19 +909,20 @@ img {
   display: block;
 }
 .donation-list strong {
-  font-size: 13px;
+  font-size: var(--text-base);
 }
 .donation-list small {
   margin-top: 3px;
-  color: rgba(0, 6, 51, 0.55);
-  font-size: 11px;
+  color: var(--text-secondary-color);
+  font-size: var(--text-helper);
+  line-height: var(--leading-helper);
 }
 .donation-list b {
   padding: 4px 8px;
   border-radius: 999px;
   background: var(--green-soft);
   color: var(--green);
-  font-size: 10px;
+  font-size: var(--text-badge);
 }
 .donation-list > div:nth-child(2) b {
   background: var(--yellow-soft);
@@ -1022,8 +1023,8 @@ img {
   display: block;
 }
 .info-grid span {
-  font-size: 11px;
-  color: rgba(0, 6, 51, 0.5);
+  font-size: var(--text-xs);
+  color: var(--text-secondary-color);
   letter-spacing: 0.08em;
 }
 .info-grid strong {
@@ -1054,8 +1055,8 @@ img {
 .footer-about p {
   max-width: 340px;
   color: rgba(255, 255, 255, 0.62);
-  font-size: 13px;
-  line-height: 1.65;
+  font-size: var(--text-base);
+  line-height: 1.6;
 }
 .footer-about > a {
   display: inline-flex;
@@ -1068,12 +1069,14 @@ img {
   display: grid;
   align-content: start;
   gap: 10px;
-  font-size: 13px;
+  font-size: var(--text-secondary);
+  line-height: var(--leading-body);
 }
 .footer-col strong {
   margin-bottom: 4px;
   color: var(--white);
-  font-size: 13px;
+  font-size: var(--text-md);
+  font-weight: 600;
 }
 .footer-col a,
 .footer-col span {
@@ -1089,7 +1092,8 @@ img {
   gap: 20px;
   border-top: 0.8px solid rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.52);
-  font-size: 11px;
+  font-size: var(--text-helper);
+  line-height: var(--leading-helper);
 }
 
 
@@ -1291,7 +1295,7 @@ img {
   }
   .mobile-menu > div a {
     padding: 9px 10px;
-    font-size: 11px;
+    font-size: var(--text-base);
   }
   .nav-actions {
     display: none;
@@ -1416,7 +1420,7 @@ img {
 
 @media (max-width: 560px) {
   .section-kicker {
-    font-size: 11px;
+    font-size: var(--text-xs);
   }
   .section-head h2,
   .subject-grid h2,
@@ -1446,17 +1450,22 @@ img {
     font-size: 14px;
   }
   .quick-grid small {
-    font-size: 12px;
+    font-size: var(--text-secondary);
+    line-height: var(--leading-body);
   }
-  .footer-about p,
+  .footer-about p {
+    font-size: var(--text-base);
+  }
   .footer-col {
-    font-size: 12px;
+    font-size: var(--text-secondary);
   }
   .footer-col strong {
-    font-size: 12px;
+    font-size: var(--text-md);
+    font-weight: 600;
   }
   .footer-bottom {
-    font-size: 10px;
+    font-size: var(--text-helper);
+    line-height: var(--leading-helper);
   }
 
   .site-header {

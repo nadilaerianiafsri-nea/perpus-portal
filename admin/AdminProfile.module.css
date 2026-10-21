@@ -11,8 +11,10 @@
 
 .pageHeading h1 {
   margin: 0;
-  font-size: 26px;
-  line-height: 1.2;
+  font-size: var(--text-page);
+  line-height: var(--leading-title);
+  font-weight: 700;
+  overflow-wrap: anywhere;
 }
 
 .pageHeading p {
@@ -106,15 +108,16 @@
 
 .cardHeading h2 {
   margin: 0;
-  font-size: 21px;
-  line-height: 1.25;
+  font-size: var(--text-section);
+  line-height: var(--leading-section);
+  font-weight: 600;
 }
 
 .cardHeading p {
   margin: 6px 0 0;
-  color: #777;
-  font-size: 13px;
-  line-height: 1.55;
+  color: var(--text-secondary-color);
+  font-size: var(--text-secondary);
+  line-height: var(--leading-body);
 }
 
 .form {
@@ -130,8 +133,9 @@
 
 .field > span {
   color: var(--navy);
-  font-size: 13px;
-  font-weight: 700;
+  font-size: var(--text-form-label);
+  font-weight: 600;
+  line-height: var(--leading-helper);
 }
 
 .field input {
@@ -144,10 +148,11 @@
   background: #fff;
   color: var(--navy);
   font: inherit;
-  font-size: 14px;
+  font-size: var(--text-input);
   transition:
     border-color 150ms ease,
     box-shadow 150ms ease;
+  line-height: var(--leading-body);
 }
 
 .field input[readonly] {
@@ -165,9 +170,9 @@
 }
 
 .field small {
-  color: #777;
-  font-size: 12px;
-  line-height: 1.45;
+  color: var(--text-secondary-color);
+  font-size: var(--text-helper);
+  line-height: var(--leading-helper);
 }
 
 .securityInfo,
@@ -308,7 +313,7 @@
   }
 
   .pageHeading h1 {
-    font-size: 23px;
+    font-size: var(--text-page);
   }
 
   .identityCard {

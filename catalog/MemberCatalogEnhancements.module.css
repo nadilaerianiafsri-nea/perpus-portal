@@ -198,7 +198,7 @@
   background: #fff;
   color: #2b3056;
   font: inherit;
-  font-size: 13px;
+  font-size: var(--text-input);
 }
 .categoryOptions {
   max-height: 236px;
@@ -226,8 +226,9 @@
 }
 .filterHint {
   margin: 10px 0;
-  color: #777d8b;
-  font-size: 13px;
+  color: var(--text-secondary-color);
+  font-size: var(--text-secondary);
+  line-height: var(--leading-body);
 }
 .yearFields {
   display: grid;
@@ -238,7 +239,8 @@
   display: block;
   margin-bottom: 7px;
   color: #737b89;
-  font-size: 12px;
+  font-size: var(--text-form-label);
+  font-weight: 500;
 }
 .yearControl {
   position: relative;

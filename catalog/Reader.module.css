@@ -107,7 +107,8 @@
 
 .readerErrorPanel p {
   margin: 0;
-  font-size: 13px;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
 }
 
 .errorActions {
@@ -352,7 +353,7 @@
   border-radius: 99px;
   background: #fff;
   color: #000633;
-  font-size: 12px;
+  font-size: var(--text-helper);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   text-align: center;
@@ -505,8 +506,8 @@
 .readerStateCard p {
   margin: 12px 0 22px;
   color: #565656;
-  font-size: 14px;
-  line-height: 1.65;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
 }
 
 .stateAction {
@@ -595,7 +596,7 @@
 
   .overviewPageNumber {
     padding: 3px 7px;
-    font-size: 11px;
+    font-size: var(--text-helper);
   }
 
   .pageControls {

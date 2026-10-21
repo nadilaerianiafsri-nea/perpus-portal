@@ -8,15 +8,15 @@
   color: var(--navy);
   font-family: var(--font-outfit), Outfit, sans-serif;
 }
-.pageHeading h1 { margin: 0; font-size: 26px; }
-.pageHeading p { margin: 6px 0 0; color: #52699e; font-size: 14px; }
+.pageHeading h1 { margin: 0; font-size: var(--text-page); font-weight: 700; line-height: var(--leading-title); overflow-wrap: anywhere; }
+.pageHeading p { margin: 6px 0 0; color: #52699e; font-size: 14px; line-height: var(--leading-body); }
 .form { display: grid; gap: 16px; }
 .card { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 18px; display: grid; gap: 18px; }
-.cardHeading h2 { margin: 0; font-size: 18px; }
-.cardHeading p { margin: 5px 0 0; color: #52699e; font-size: 13px; }
+.cardHeading h2 { margin: 0; font-size: var(--text-section); font-weight: 600; line-height: var(--leading-section); }
+.cardHeading p { margin: 5px 0 0; color: var(--text-secondary-color); font-size: var(--text-secondary); line-height: var(--leading-body); }
 .formGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; }
 .formGrid label { display: grid; gap: 7px; min-width: 0; }
-.formGrid label > span { color: var(--navy-soft); font-weight: 600; font-size: 13px; }
+.formGrid label > span { color: var(--navy-soft); font-weight: 600; font-size: var(--text-form-label); line-height: var(--leading-helper); }
 .formGrid input, .formGrid textarea {
   width: 100%;
   box-sizing: border-box;
@@ -27,12 +27,14 @@
   color: var(--navy);
   background: #fff;
   resize: vertical;
+  font-size: var(--text-input);
+  line-height: var(--leading-body);
 }
 .formGrid input { min-height: 42px; }
-.formGrid small { color: #52699e; font-size: 11px; line-height: 1.45; }
+.formGrid small { color: var(--text-secondary-color); font-size: var(--text-helper); line-height: var(--leading-helper); }
 .fullField { grid-column: 1 / -1; }
 .phoneField { display: flex; align-items: stretch; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; background: #fff; }
-.phoneField > span { display: flex; align-items: center; padding: 0 11px; background: #f5f5f6; color: var(--navy); font-weight: 700; border-right: 1px solid var(--line); }
+.phoneField > span { display: flex; align-items: center; padding: 0 11px; background: #f5f5f6; color: var(--navy); font-weight: 700; border-right: 1px solid var(--line); font-size: var(--text-input); }
 .phoneField input { border: 0; border-radius: 0; outline: 0; }
 .formGrid input:hover, .formGrid textarea:hover, .phoneField:hover { border-color: var(--navy-soft); }
 .formGrid input:focus-visible, .formGrid textarea:focus-visible, .phoneField:focus-within { outline: 2px solid var(--yellow); outline-offset: 2px; }
@@ -62,7 +64,7 @@
 
 @media (max-width: 700px) {
   .page { gap: 14px; }
-  .pageHeading h1 { font-size: 23px; }
+  .pageHeading h1 { font-size: var(--text-page); }
   .formGrid { grid-template-columns: 1fr; }
   .fullField { grid-column: auto; }
   .actions button { width: 100%; }
