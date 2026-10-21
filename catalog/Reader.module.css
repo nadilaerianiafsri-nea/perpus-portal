@@ -16,7 +16,7 @@
 .readerControl,
 .secondary,
 .stateAction,
-.overviewItem {
+.quickSelectItem {
   font-family: var(--font-outfit), "Outfit", sans-serif;
 }
 
@@ -62,7 +62,7 @@
 .readerControl:focus-visible,
 .secondary:focus-visible,
 .stateAction:focus-visible,
-.overviewItem:focus-visible {
+.quickSelectItem:focus-visible {
   outline: 3px solid #ffd000;
   outline-offset: 3px;
 }
@@ -160,10 +160,8 @@
   overflow: auto;
 }
 
-.pdfViewerOverview {
-  overflow-x: auto;
-  overflow-y: hidden;
-  touch-action: pan-x;
+.pdfViewerQuickSelect {
+  overflow: hidden;
 }
 
 .pdfViewerFit .pdfPage canvas {
@@ -194,6 +192,11 @@
   justify-content: center;
   gap: 24px;
   perspective: 1400px;
+}
+
+.pdfSpreadSingle {
+  grid-template-columns: max-content;
+  justify-content: safe center;
 }
 
 .pdfPage {
@@ -291,29 +294,42 @@
   }
 }
 
-.overviewStrip {
+.quickSelectViewport {
+  width: 100%;
+  min-height: calc(100dvh - 140px);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.quickSelectStrip {
   width: max-content;
   min-width: 100%;
-  min-height: calc(100dvh - 140px);
-  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
-  padding: 0 24px;
+  gap: 24px;
+  padding: 18px 24px;
+  box-sizing: border-box;
+  touch-action: pan-y;
+  cursor: grab;
 }
 
-.overviewItem {
+.quickSelectStrip:active {
+  cursor: grabbing;
+}
+
+.quickSelectItem {
   min-width: 0;
   display: grid;
   justify-items: center;
-  gap: 8px;
-  padding: 10px;
+  gap: 10px;
+  padding: 12px;
   border: 1px solid transparent;
   border-radius: 12px;
   background: transparent;
   color: #000633;
-  opacity: 0.5;
+  opacity: 0.72;
   cursor: pointer;
   transition:
     transform 160ms ease,
@@ -322,34 +338,34 @@
     border-color 160ms ease;
 }
 
-.overviewItem:hover {
+.quickSelectItem:hover {
   border-color: #dcdde5;
   background: #fff;
-  opacity: 0.82;
+  opacity: 0.92;
   transform: scale(1.02);
 }
 
-.overviewItem canvas {
+.quickSelectItem canvas {
   margin: 0;
   box-shadow: 0 10px 24px #00063325;
 }
 
-.overviewItemActive {
+.quickSelectItemActive {
   border-color: #2b3056;
   background: #fff;
   opacity: 1;
-  transform: scale(1.04);
+  transform: scale(1.035);
 }
 
-.overviewItemActive:hover {
+.quickSelectItemActive:hover {
   border-color: #2b3056;
   opacity: 1;
-  transform: scale(1.04);
+  transform: scale(1.035);
 }
 
-.overviewPageNumber {
-  min-width: 30px;
-  padding: 4px 8px;
+.quickSelectPageNumber {
+  min-width: 34px;
+  padding: 5px 9px;
   border-radius: 99px;
   background: #fff;
   color: #000633;
@@ -366,6 +382,10 @@
   display: grid;
   place-items: center;
   pointer-events: none;
+}
+
+.controlsHoverZone {
+  display: none;
 }
 
 .pageControls {
@@ -414,13 +434,29 @@
   transition:
     transform 160ms ease,
     background 160ms ease,
-    color 160ms ease;
+    color 160ms ease,
+    border-color 160ms ease;
 }
 
 .readerControl:hover:not(:disabled) {
   background: #2b3056;
   color: #fff;
   transform: scale(1.05);
+}
+
+.pagePickerControl {
+  width: auto;
+  min-width: 62px;
+  padding: 0 12px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pagePickerControlActive {
+  border-color: #2b3056;
+  background: #2b3056;
+  color: #fff;
 }
 
 .pageIndicator {
@@ -541,6 +577,19 @@
   white-space: nowrap;
 }
 
+@media (hover: hover) and (pointer: fine) {
+  .controlsHoverZone {
+    width: min(560px, calc(100vw - 24px));
+    height: 104px;
+    position: fixed;
+    left: 50%;
+    bottom: 0;
+    z-index: 49;
+    display: block;
+    transform: translateX(-50%);
+  }
+}
+
 @media (max-width: 899px) {
   .pdfSpread {
     display: flex;
@@ -548,7 +597,7 @@
     min-width: 100%;
     min-height: calc(100dvh - 140px);
     align-items: center;
-    justify-content: center;
+    justify-content: safe center;
   }
 
   .pdfPreview,
@@ -556,8 +605,9 @@
     display: none;
   }
 
-  .overviewStrip {
-    justify-content: flex-start;
+  .quickSelectStrip {
+    gap: 16px;
+    padding: 14px 18px;
   }
 }
 
@@ -582,20 +632,23 @@
     box-shadow: 0 8px 20px #00063325;
   }
 
-  .overviewStrip {
+  .quickSelectViewport {
     min-height: calc(100dvh - 130px);
-    gap: 10px;
-    padding: 0 10px;
   }
 
-  .overviewItem {
-    gap: 6px;
+  .quickSelectStrip {
+    gap: 10px;
+    padding: 10px 8px;
+  }
+
+  .quickSelectItem {
+    gap: 7px;
     padding: 7px;
     border-radius: 10px;
   }
 
-  .overviewPageNumber {
-    padding: 3px 7px;
+  .quickSelectPageNumber {
+    padding: 4px 7px;
     font-size: var(--text-helper);
   }
 
@@ -608,6 +661,13 @@
   .readerControl {
     width: 40px;
     height: 40px;
+  }
+
+  .pagePickerControl {
+    width: auto;
+    min-width: 56px;
+    padding: 0 9px;
+    font-size: 11px;
   }
 
   .pageIndicator {
@@ -662,12 +722,41 @@
   }
 }
 
+@media (max-width: 360px) {
+  .pageControls {
+    gap: 3px;
+    padding: 4px;
+  }
+
+  .readerControl {
+    width: 36px;
+    height: 36px;
+  }
+
+  .pagePickerControl {
+    width: auto;
+    min-width: 48px;
+    padding: 0 7px;
+    font-size: 10px;
+  }
+
+  .pageIndicator {
+    min-width: 48px;
+    font-size: 11px;
+  }
+
+  .zoomIndicator {
+    min-width: 42px;
+    font-size: 11px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .readerBackButton,
   .readerControl,
   .secondary,
   .stateAction,
-  .overviewItem,
+  .quickSelectItem,
   .pageControls {
     transition: none;
   }
@@ -682,9 +771,9 @@
   .readerControl:hover:not(:disabled),
   .secondary:hover:not(:disabled),
   .stateAction:hover,
-  .overviewItem:hover,
-  .overviewItemActive,
-  .overviewItemActive:hover {
+  .quickSelectItem:hover,
+  .quickSelectItemActive,
+  .quickSelectItemActive:hover {
     transform: none;
   }
 

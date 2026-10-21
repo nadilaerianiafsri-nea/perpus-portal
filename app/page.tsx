@@ -391,7 +391,6 @@ export default async function Home() {
               <article>
                 <div className="reminder-icon"><FiCalendar /></div>
                 <div>
-                  <span>Perpanjangan</span>
                   <h3>Perpanjang Pinjaman +{settings.extensionDurationDays} Hari</h3>
                   <p>Ajukan perpanjangan langsung dari akun tanpa harus datang.</p>
                   <Link data-button="primary" data-button-size="sm" href="/dashboard/pinjaman">
@@ -402,7 +401,6 @@ export default async function Home() {
               <article>
                 <div className="reminder-icon"><FiBell /></div>
                 <div>
-                  <span>Reminder Otomatis</span>
                   <h3>Reminder via Email</h3>
                   <p>Notifikasi membantu Anda memantau masa pinjaman dan jatuh tempo.</p>
                   <Link data-button="accent" data-button-size="sm" href="/panduan">
