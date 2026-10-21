@@ -126,18 +126,17 @@
 
 .tableFooter { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 12px 14px; color: #52699e; font-size: 13px; }
 .footerActions { display: flex; align-items: center; gap: 7px; }
-.footerActions select, .footerActions button, .pageNumber { min-height: 34px; border: 1px solid var(--line); background: #fff; border-radius: 8px; color: var(--navy); font: inherit; }
-.footerActions select { padding: 0 9px; cursor: pointer; }
-.footerActions button { min-width: 34px; cursor: pointer; }
+.footerActions > button, .pageNumber { min-height: 34px; border: 1px solid var(--line); background: #fff; border-radius: 8px; color: var(--navy); font: inherit; }
+.footerActions > button { min-width: 34px; cursor: pointer; }
 .pageNumber { min-width: 34px; display: grid; place-items: center; background: var(--navy); color: #fff; border-color: var(--navy); }
-.footerActions select:hover, .footerActions button:not(:disabled):hover { border-color: var(--navy-soft); background: #f5f5f6; }
-.footerActions button:not(:disabled):hover { transform: scale(1.04); }
-.footerActions button:disabled { opacity: .45; cursor: not-allowed; }
+.footerActions > button:not(:disabled):hover { border-color: var(--navy-soft); background: #f5f5f6; }
+.footerActions > button:not(:disabled):hover { transform: scale(1.04); }
+.footerActions > button:disabled { opacity: .45; cursor: not-allowed; }
 
 .mobileList { display: none; }
 .srOnly { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
-.tabs button:focus-visible, .errorBox button:focus-visible, .footerActions select:focus-visible, .footerActions button:focus-visible, .searchBox:focus-within { outline: 2px solid var(--yellow); outline-offset: 2px; }
+.tabs button:focus-visible, .errorBox button:focus-visible, .footerActions > button:focus-visible, .searchBox:focus-within { outline: 2px solid var(--yellow); outline-offset: 2px; }
 
 @media (max-width: 700px) {
   .filterCard { align-items: stretch; flex-direction: column; }

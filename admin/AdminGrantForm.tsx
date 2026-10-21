@@ -1,5 +1,7 @@
 "use client";
 
+import AppSelect from "@/components/AppSelect";
+
 import { ButtonLabel } from '@/components/Button';
 import Link from "next/link";
 import { FiTrash2 } from "react-icons/fi";
@@ -336,12 +338,12 @@ export default function AdminGrantForm({ mode, id }: Props) {
               />
             </label>
 
-            <label className={styles.field}>
+            <label className={`${styles.field} ${styles.selectLabel}`}>
               <span>
                 Status Katalogisasi <b>*</b>
               </span>
 
-              <select
+              <AppSelect
                 value={form.status}
                 onChange={(event) =>
                   setForm((current) => ({
@@ -354,7 +356,7 @@ export default function AdminGrantForm({ mode, id }: Props) {
                 <option value="BELUM_DIKATALOGKAN">Belum Dikatalogkan</option>
 
                 <option value="SUDAH_DIKATALOGKAN">Sudah Dikatalogkan</option>
-              </select>
+              </AppSelect>
             </label>
 
             <label className={styles.fullField}>

@@ -817,11 +817,15 @@
   gap: 6px;
 }
 
-.fieldsGrid label > span,
+.fieldsGrid label > span:first-child,
 .descriptionField > span {
   color: var(--navy);
   font-size: 10px;
   font-weight: 500;
+}
+
+.fieldsGrid .selectLabel > span:first-child {
+  font-size: 12px;
 }
 
 .fieldsGrid b,
@@ -830,7 +834,6 @@
 }
 
 .fieldsGrid input,
-.fieldsGrid select,
 .fieldsGrid textarea,
 .descriptionField textarea {
   width: 100%;
@@ -845,7 +848,6 @@
 }
 
 .fieldsGrid input:focus,
-.fieldsGrid select:focus,
 .fieldsGrid textarea:focus,
 .descriptionField textarea:focus {
   border-color: var(--navy-soft);

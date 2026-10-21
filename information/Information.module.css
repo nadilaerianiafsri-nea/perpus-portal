@@ -300,6 +300,10 @@
   border-bottom: 1px solid #f1f1f3;
 }
 
+.filters > label {
+  min-width: 0;
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;

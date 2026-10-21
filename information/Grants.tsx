@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { FiGift, FiInfo } from "react-icons/fi";
 import SearchField from "@/components/SearchField";
+import AppSelect from "@/components/AppSelect";
 import StatCard, { type StatTone } from "@/components/StatCard";
 import GrantBadge from "./GrantBadge";
 import { type GrantsResponse, grantStatusLabels } from "./grantTypes";
@@ -121,7 +122,8 @@ export default function Grants() {
           />
           <label>
             <span className={common.srOnly}>Status hibah</span>
-            <select
+            <AppSelect
+              className={common.catalogSelect}
               aria-label="Status hibah"
               value={params.get("status") ?? ""}
               onChange={(e) => update({ status: e.target.value || null })}
@@ -132,11 +134,12 @@ export default function Grants() {
                   {label}
                 </option>
               ))}
-            </select>
+            </AppSelect>
           </label>
           <label>
             <span className={common.srOnly}>Tahun penerimaan</span>
-            <select
+            <AppSelect
+              className={common.catalogSelect}
               aria-label="Tahun penerimaan"
               value={params.get("year") ?? ""}
               onChange={(e) => update({ year: e.target.value || null })}
@@ -145,7 +148,7 @@ export default function Grants() {
               {years.map((year) => (
                 <option key={year}>{year}</option>
               ))}
-            </select>
+            </AppSelect>
           </label>
         </div>
         {loading ? (

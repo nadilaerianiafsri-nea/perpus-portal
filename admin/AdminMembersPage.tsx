@@ -1,5 +1,7 @@
 "use client";
 
+import AppSelect from "@/components/AppSelect";
+
 import AdminStatCard from "./AdminStatCard";
 import { FiUsers as CardUsers, FiBookOpen as CardBookOpen, FiBriefcase as CardBriefcase } from "react-icons/fi";
 
@@ -208,7 +210,7 @@ export default function AdminMembersPage() {
 
         <label className={styles.selectField}>
           <span>Jenis Anggota</span>
-          <select
+          <AppSelect
             value={memberType}
             onChange={(event) => {
               setMemberType(event.target.value as MemberTypeFilter);
@@ -219,12 +221,12 @@ export default function AdminMembersPage() {
             <option value="UMUM">Masyarakat Umum</option>
             <option value="MAHASISWA">Mahasiswa</option>
             <option value="PEGAWAI">Pegawai Internal</option>
-          </select>
+          </AppSelect>
         </label>
 
         <label className={styles.selectField}>
           <span>Status Verifikasi</span>
-          <select
+          <AppSelect
             value={verification}
             onChange={(event) => {
               setVerification(event.target.value as VerificationFilter);
@@ -234,7 +236,7 @@ export default function AdminMembersPage() {
             <option value="ALL">Semua Verifikasi</option>
             <option value="VERIFIED">Terverifikasi</option>
             <option value="UNVERIFIED">Belum Terverifikasi</option>
-          </select>
+          </AppSelect>
         </label>
       </section>
 

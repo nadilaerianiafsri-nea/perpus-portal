@@ -1,5 +1,7 @@
 "use client";
 
+import AppSelect from "@/components/AppSelect";
+
 import AdminStatCard from "./AdminStatCard";
 import { FiGift as CardGift, FiClock as CardClock, FiCheckCircle as CardCheckCircle, FiLayers as CardLayers } from "react-icons/fi";
 
@@ -174,7 +176,7 @@ export default function AdminGrantsPage() {
         <label className={styles.selectField}>
           <span>Status Katalogisasi</span>
 
-          <select
+          <AppSelect
             value={status}
             onChange={(event) => {
               setStatus(event.target.value as "" | AdminGrantStatus);
@@ -187,13 +189,13 @@ export default function AdminGrantsPage() {
             <option value="BELUM_DIKATALOGKAN">Belum Dikatalogkan</option>
 
             <option value="SUDAH_DIKATALOGKAN">Sudah Dikatalogkan</option>
-          </select>
+          </AppSelect>
         </label>
 
         <label className={styles.selectField}>
           <span>Tahun Penerimaan</span>
 
-          <select
+          <AppSelect
             value={year}
             onChange={(event) => {
               setYear(event.target.value);
@@ -208,7 +210,7 @@ export default function AdminGrantsPage() {
                 {value}
               </option>
             ))}
-          </select>
+          </AppSelect>
         </label>
       </section>
 

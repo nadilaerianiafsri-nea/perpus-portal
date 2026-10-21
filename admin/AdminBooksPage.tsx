@@ -1,6 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import AppSelect from "@/components/AppSelect";
+
 import AdminStatCard from "./AdminStatCard";
 import { FiBookOpen as CardBookOpen, FiCheckCircle as CardCheckCircle, FiArchive as CardArchive } from "react-icons/fi";
 
@@ -263,7 +265,7 @@ export default function AdminBooksPage() {
       <form className={enhancements.filterPanel} onSubmit={applyBookFilters}>
         <label className={enhancements.filterField}>
           <span>Ketersediaan</span>
-          <select
+          <AppSelect
             value={availabilityInput}
             onChange={(event) =>
               setAvailabilityInput(event.target.value as AvailabilityFilter)
@@ -272,7 +274,7 @@ export default function AdminBooksPage() {
             <option value="ALL">Semua</option>
             <option value="TERSEDIA">Tersedia</option>
             <option value="STOK_HABIS">Stok Habis</option>
-          </select>
+          </AppSelect>
         </label>
 
         <div className={enhancements.stockGroup}>

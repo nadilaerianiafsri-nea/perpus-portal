@@ -1,6 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import AppSelect from "@/components/AppSelect";
+
 import { adminCoverUrl } from "./adminBooks";
 import { ButtonLabel } from '@/components/Button';
 import Link from "next/link";
@@ -384,11 +386,11 @@ export default function AdminBookForm({
                   maxLength={64}
                 />
               </label>
-              <label className={styles.spanTwo}>
+              <label className={`${styles.spanTwo} ${styles.selectLabel}`}>
                 <span>
                   Subjek / Kategori <b>*</b>
                 </span>
-                <select
+                <AppSelect
                   className={enhancements.subjectSelect}
                   value={form.subject}
                   onChange={(e) => update("subject", e.target.value)}
@@ -402,7 +404,7 @@ export default function AdminBookForm({
                       {subject}
                     </option>
                   ))}
-                </select>
+                </AppSelect>
               </label>
             </div>
           </section>

@@ -1,6 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import AppSelect from "@/components/AppSelect";
+
 import AdminStatCard from "./AdminStatCard";
 import { FiClock as CardClock, FiAlertTriangle as CardAlertTriangle, FiXCircle as CardXCircle, FiCheckCircle as CardCheckCircle } from "react-icons/fi";
 
@@ -246,7 +248,7 @@ export default function AdminReservationsPage() {
 
           <label className={styles.selectField}>
             <span>Status</span>
-            <select
+            <AppSelect
               value={status}
               onChange={(event) => {
                 setStatus(event.target.value as StatusFilter);
@@ -258,12 +260,12 @@ export default function AdminReservationsPage() {
               <option value="KEDALUWARSA">Kedaluwarsa</option>
               <option value="DIBATALKAN">Dibatalkan</option>
               <option value="DIAMBIL">Sudah Diambil</option>
-            </select>
+            </AppSelect>
           </label>
 
           <label className={styles.selectField}>
             <span>Jenis Anggota</span>
-            <select
+            <AppSelect
               value={memberType}
               onChange={(event) => {
                 setMemberType(event.target.value as MemberFilter);
@@ -274,7 +276,7 @@ export default function AdminReservationsPage() {
               <option value="UMUM">Masyarakat Umum</option>
               <option value="MAHASISWA">Mahasiswa</option>
               <option value="PEGAWAI">Pegawai Internal</option>
-            </select>
+            </AppSelect>
           </label>
         </div>
 

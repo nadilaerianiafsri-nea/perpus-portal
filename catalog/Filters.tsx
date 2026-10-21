@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { FiCheck, FiChevronDown, FiSearch } from "react-icons/fi";
+import { FiCheck, FiSearch } from "react-icons/fi";
+import AppSelect from "@/components/AppSelect";
 import { type FilterOptions, availabilityLabels, typeLabels } from "./types";
 import {
   filterChoices,
@@ -199,12 +200,9 @@ export default function Filters({
               {member ? "Dari tahun" : "Tahun terbit dari"}
             </span>
             <span className={member ? enhancements.yearControl : undefined}>
-              <select
-                className={
-                  member
-                    ? enhancements.yearSelect
-                    : enhancements.catalogDropdown
-                }
+              <AppSelect
+                size="sm"
+                className={styles.catalogSelect}
                 aria-label="Tahun terbit dari"
                 aria-invalid={!!error}
                 aria-describedby={error ? "member-filter-error" : undefined}
@@ -215,8 +213,7 @@ export default function Filters({
                 {options.years.map((year) => (
                   <option key={year}>{year}</option>
                 ))}
-              </select>
-              {member ? <FiChevronDown aria-hidden /> : null}
+              </AppSelect>
             </span>
           </label>
           {!member ? <span>–</span> : null}
@@ -225,12 +222,9 @@ export default function Filters({
               {member ? "Sampai tahun" : "Tahun terbit sampai"}
             </span>
             <span className={member ? enhancements.yearControl : undefined}>
-              <select
-                className={
-                  member
-                    ? enhancements.yearSelect
-                    : enhancements.catalogDropdown
-                }
+              <AppSelect
+                size="sm"
+                className={styles.catalogSelect}
                 aria-label="Tahun terbit sampai"
                 aria-invalid={!!error}
                 aria-describedby={error ? "member-filter-error" : undefined}
@@ -241,8 +235,7 @@ export default function Filters({
                 {options.years.map((year) => (
                   <option key={year}>{year}</option>
                 ))}
-              </select>
-              {member ? <FiChevronDown aria-hidden /> : null}
+              </AppSelect>
             </span>
           </label>
         </div>

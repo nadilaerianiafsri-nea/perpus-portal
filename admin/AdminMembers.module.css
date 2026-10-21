@@ -52,8 +52,7 @@
   gap: 10px;
 }
 
-.searchBox,
-.selectField {
+.searchBox {
   min-height: 46px;
   border: 1px solid var(--line);
   border-radius: 11px;
@@ -89,25 +88,15 @@
 .selectField {
   position: relative;
   display: grid;
-  padding: 5px 11px 4px;
+  align-content: start;
+  gap: 6px;
+  min-width: 0;
 }
 
-.selectField span {
+.selectField > span:first-child {
   color: #777;
-  font-size: 8px;
-  line-height: 1;
-}
-
-.selectField select {
-  width: 100%;
-  min-height: 27px;
-  padding: 0;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: var(--navy);
-  font-size: 11px;
-  cursor: pointer;
+  font-size: 12px;
+  line-height: 1.4;
 }
 
 .errorBox {
@@ -598,14 +587,17 @@
   gap: 6px;
 }
 
-.formGrid label > span {
+.formGrid label > span:first-child:not([data-app-select]) {
   color: var(--navy);
   font-size: 10px;
   font-weight: 500;
 }
 
+.formGrid label:has([role="combobox"]) > span:first-child {
+  font-size: 12px;
+}
+
 .formGrid input,
-.formGrid select,
 .formGrid textarea {
   width: 100%;
   min-height: 40px;
@@ -619,7 +611,6 @@
 }
 
 .formGrid input:focus,
-.formGrid select:focus,
 .formGrid textarea:focus {
   border-color: var(--navy-soft);
 }

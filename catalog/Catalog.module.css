@@ -169,35 +169,16 @@
   color: #93939b;
 }
 
-.shell select {
-  max-width: 100%;
+.catalogSelect {
   width: 100%;
-  height: 44px;
-  padding: 0 32px 0 15px;
-  color: #444;
-  font: inherit;
-  font-size: 14px;
-  border: 1px solid #e1e1e5;
-  border-radius: 999px;
-  background: #fff;
-  cursor: pointer;
-  transition:
-    border-color 0.18s ease,
-    background 0.18s ease,
-    box-shadow 0.18s ease;
+  min-width: 0;
+  max-width: 100%;
 }
 
-.shell select option {
-  background: #fff;
-  color: #000633;
-  border-radius: 999px;
-}
-
-.shell select option:hover,
-.shell select option:focus,
-.shell select option:checked {
-  background: #e6e6eb;
-  color: #000633;
+.searchRow > label,
+.sortTools > label,
+.yearRange > label {
+  min-width: 0;
 }
 
 .catalogLayout {
@@ -327,12 +308,16 @@
   gap: 8px;
 }
 
-.sortTools select {
-  width: 158px;
+.sortSelect {
+  width: 174px;
+  max-width: 100%;
+  min-width: 0;
 }
 
-.sortTools .pageSize select {
-  width: 115px;
+.pageSizeSelect {
+  width: 144px;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .viewToggle {
@@ -725,13 +710,6 @@
   outline-offset: 3px;
 }
 
-.shell select:focus-visible {
-  outline: 2px solid #2b3056;
-  outline-offset: 2px;
-  border-color: #2b3056;
-  background: #fff;
-}
-
 .shell :global(.mobile-menu .nav-active) {
   background: #000633;
   color: #fff;
@@ -744,14 +722,8 @@
     text-decoration: underline;
   }
 
-  .searchInput input:hover,
-  .shell select:hover {
+  .searchInput input:hover {
     border-color: #2b3056;
-  }
-
-  .shell select:hover {
-    background: #fff;
-    border-radius: 999px;
   }
 
   .filterHeading button:hover {
@@ -1049,13 +1021,12 @@
     justify-content: space-between;
   }
 
-  .sortTools select {
+  .sortSelect {
     width: 140px;
-    font-size: 12px;
   }
 
-  .sortTools .pageSize select {
-    width: 104px;
+  .pageSizeSelect {
+    width: 136px;
   }
 
   .grid {
@@ -1140,7 +1111,6 @@
   .mobileFilter,
   .primaryButton,
   .closeDialog,
-  .shell select,
   .searchInput input {
     transition: none;
   }
@@ -1252,26 +1222,6 @@
   display: block;
 }
 
-.memberCatalog .sortTools select {
-  height: 38px;
-  min-height: 38px;
-  width: 145px;
-  padding: 0 22px 0 0;
-  border: 0;
-  border-radius: 0;
-  appearance: none;
-  background: transparent;
-  color: #2b3056;
-  font: inherit;
-  font-size: 13px;
-  cursor: pointer;
-  transition: border-color 160ms ease, background 160ms ease;
-}
-
-.memberCatalog .sortTools .pageSize select {
-  width: 117px;
-}
-
 .memberFilterButton {
   display: inline-flex;
   align-items: center;
@@ -1304,39 +1254,18 @@
   font-weight: 600;
 }
 
-.memberCatalog .memberFilterButton:hover,
-.memberCatalog .memberSort:hover {
+.memberCatalog .memberFilterButton:hover {
   border-color: #b6b8ca;
   background: #f8f8fa;
 }
 
 .memberCatalog .sortTools label.memberSort {
-  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
-  height: 40px;
-  padding: 0 12px;
-  border: 1px solid #dedfe6;
-  border-radius: 8px;
-  background: #fff;
+  min-width: 0;
   color: #737787;
   font-size: 12px;
-}
-.memberSort > svg {
-  position: absolute;
-  right: 12px;
-  pointer-events: none;
-  color: #2b3056;
-}
-
-.memberCatalog .memberSort:focus-within {
-  border-color: #2b3056;
-  box-shadow: 0 0 0 3px #2b305614;
-}
-
-.memberCatalog .memberSort select:focus-visible {
-  outline: none;
 }
 
 .memberCatalog .searchInput input:focus-visible {
@@ -1607,10 +1536,6 @@
   margin-top: 28px;
 }
 
-.memberCatalog .filterDialog select:hover {
-  transform: none;
-}
-
 .memberCatalog :is(a, button, input, select):focus-visible {
   outline: 3px solid #b08800;
   outline-offset: 3px;
@@ -1692,13 +1617,11 @@
     justify-self: end;
   }
 
-  .memberCatalog .sortTools select,
-  .memberCatalog .sortTools .pageSize select {
+  .memberCatalog .sortSelect {
+    flex: 1;
     width: 100%;
     max-width: 100%;
     min-width: 0;
-    padding: 0 22px 0 0;
-    font-size: 13px;
   }
 
   .memberCatalog .grid {
@@ -1761,8 +1684,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .memberCatalog .card,
-  .memberCatalog .memberFilterButton,
-  .memberCatalog .sortTools select {
+  .memberCatalog .memberFilterButton {
     transition: none;
   }
 

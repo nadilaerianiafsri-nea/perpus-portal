@@ -1,6 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import AppSelect from "@/components/AppSelect";
+
 import AdminStatCard from "./AdminStatCard";
 import { FiBookOpen as CardBookOpen, FiClock as CardClock, FiAlertTriangle as CardAlertTriangle, FiCheckCircle as CardCheckCircle } from "react-icons/fi";
 
@@ -215,7 +217,7 @@ export default function AdminReturnsPage() {
 
           <label className={styles.selectField}>
             <span>Status</span>
-            <select
+            <AppSelect
               value={status}
               onChange={(event) => {
                 setStatus(event.target.value as StatusFilter);
@@ -225,12 +227,12 @@ export default function AdminReturnsPage() {
               <option value="ALL">Semua Pinjaman Aktif</option>
               <option value="DUE_TODAY">Jatuh Tempo Hari Ini</option>
               <option value="OVERDUE">Terlambat</option>
-            </select>
+            </AppSelect>
           </label>
 
           <label className={styles.selectField}>
             <span>Jenis Anggota</span>
-            <select
+            <AppSelect
               value={memberType}
               onChange={(event) => {
                 setMemberType(event.target.value as MemberFilter);
@@ -241,7 +243,7 @@ export default function AdminReturnsPage() {
               <option value="UMUM">Masyarakat Umum</option>
               <option value="MAHASISWA">Mahasiswa</option>
               <option value="PEGAWAI">Pegawai Internal</option>
-            </select>
+            </AppSelect>
           </label>
         </div>
 

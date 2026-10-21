@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
-  FiChevronDown,
   FiGrid,
   FiList,
   FiSearch,
@@ -13,6 +12,7 @@ import {
 } from "react-icons/fi";
 import BookCard from "./BookCard";
 import SearchInput from "@/components/SearchField";
+import AppSelect from "@/components/AppSelect";
 import Filters from "./Filters";
 import MemberFilterDrawer from "./MemberFilterDrawer";
 import {
@@ -227,8 +227,8 @@ export default function Catalog({
         {!member ? (
           <label>
             <span className={styles.srOnly}>Kategori pencarian</span>
-            <select
-              className={memberStyles.catalogDropdown}
+            <AppSelect
+              className={styles.catalogSelect}
               aria-label="Kategori pencarian"
               value={
                 (query.get("subject") ?? "").includes(",")
@@ -243,7 +243,7 @@ export default function Catalog({
               {options.subjects.map((subject) => (
                 <option key={subject}>{subject}</option>
               ))}
-            </select>
+            </AppSelect>
           </label>
         ) : null}
       </div>
@@ -310,10 +310,8 @@ export default function Catalog({
                   <span className={styles.srOnly}>
                     Jumlah koleksi per halaman
                   </span>
-                  <select
-                    className={
-                      member ? undefined : memberStyles.catalogDropdown
-                    }
+                  <AppSelect
+                    className={styles.pageSizeSelect}
                     aria-label="Jumlah koleksi per halaman"
                     value={query.get("limit") ?? (ebook ? "8" : "20")}
                     onChange={(event) => update({ limit: event.target.value })}
@@ -332,16 +330,16 @@ export default function Catalog({
                         {limit} / halaman
                       </option>
                     ))}
-                  </select>
+                  </AppSelect>
                 </label>
               ) : null}
 
               <label className={member ? styles.memberSort : undefined}>
                 {member ? <span aria-hidden="true">Urutkan:</span> : null}
                 <span className={styles.srOnly}>Urutkan koleksi</span>
-                <select
+                <AppSelect
                   aria-label="Urutkan koleksi"
-                  className={member ? undefined : memberStyles.catalogDropdown}
+                  className={styles.sortSelect}
                   value={query.get("sort") ?? "relevance"}
                   onChange={(event) => update({ sort: event.target.value })}
                 >
@@ -350,8 +348,7 @@ export default function Catalog({
                       {label}
                     </option>
                   ))}
-                </select>
-                {member ? <FiChevronDown aria-hidden="true" /> : null}
+                </AppSelect>
               </label>
 
               {!member ? (

@@ -1,6 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import AppSelect from "@/components/AppSelect";
+
 import { adminCoverUrl } from "./adminBooks";
 import { ButtonLabel } from '@/components/Button';
 import Link from "next/link";
@@ -439,9 +441,9 @@ export default function AdminEBookForm({
                 <span>Bahasa <b>*</b></span>
                 <input value={form.language} onChange={(e) => update("language", e.target.value)} required maxLength={64} />
               </label>
-              <label className={styles.spanTwo}>
+              <label className={`${styles.spanTwo} ${styles.selectLabel}`}>
                 <span>Subjek / Kategori <b>*</b></span>
-                <select
+                <AppSelect
                   className={enhancements.subjectSelect}
                   value={form.subject}
                   onChange={(e) => update("subject", e.target.value)}
@@ -451,7 +453,7 @@ export default function AdminEBookForm({
                   {subjectCategories.map((subject) => (
                     <option key={subject} value={subject}>{subject}</option>
                   ))}
-                </select>
+                </AppSelect>
               </label>
             </div>
           </section>
@@ -462,9 +464,9 @@ export default function AdminEBookForm({
               <p>Atur cara anggota mengakses koleksi digital ini.</p>
             </div>
             <div className={styles.fieldsGrid}>
-              <label>
+              <label className={styles.selectLabel}>
                 <span>Mode Akses <b>*</b></span>
-                <select
+                <AppSelect
                   value={form.accessMode}
                   onChange={(e) => updateAccessMode(e.target.value as EBookAccessMode)}
                   required
@@ -472,7 +474,7 @@ export default function AdminEBookForm({
                   <option value="BACA_DI_WEBSITE">{accessModeLabel("BACA_DI_WEBSITE")}</option>
                   <option value="PENYEDIA_EKSTERNAL">{accessModeLabel("PENYEDIA_EKSTERNAL")}</option>
                   <option value="TIDAK_TERSEDIA">{accessModeLabel("TIDAK_TERSEDIA")}</option>
-                </select>
+                </AppSelect>
               </label>
               <label>
                 <span>Durasi Akses (hari)</span>

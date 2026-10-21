@@ -1,5 +1,7 @@
 "use client";
 
+import AppSelect from "@/components/AppSelect";
+
 import { ButtonLabel } from '@/components/Button';
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
@@ -229,7 +231,7 @@ export default function AdminMemberForm({ id }: Props) {
 
             <label>
               <span>Jenis Anggota *</span>
-              <select
+              <AppSelect
                 value={form.memberType}
                 onChange={(event) =>
                   update("memberType", event.target.value as AdminMemberType)
@@ -238,7 +240,7 @@ export default function AdminMemberForm({ id }: Props) {
                 <option value="UMUM">Masyarakat Umum</option>
                 <option value="MAHASISWA">Mahasiswa</option>
                 <option value="PEGAWAI">Pegawai Internal</option>
-              </select>
+              </AppSelect>
             </label>
 
             <label>

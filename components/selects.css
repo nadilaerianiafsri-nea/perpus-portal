@@ -1,0 +1,55 @@
+body [data-app-select] {
+  position: relative; display: grid; gap: 6px; min-width: 0;
+  color: var(--navy, #000633); font-family: var(--font-outfit), Outfit, sans-serif;
+}
+body [data-app-select] [data-select-label] { color: #4b5e8c; font-size: 12px; font-weight: 500; line-height: 1.5; }
+body [data-app-select] [data-select-trigger] {
+  display: flex; align-items: center; gap: 10px; width: 100%; min-width: 0; min-height: 48px;
+  margin: 0; padding: 11px 14px; border: 1px solid var(--line, #dcdfea); border-radius: 14px;
+  background: #fff; color: #000633; box-shadow: none; text-align: left;
+  font-family: inherit; font-size: 14px; font-weight: 500; line-height: 1.5; cursor: pointer;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+body [data-app-select] [data-select-trigger]:hover:not(:disabled) { border-color: #4b5e8c80; background: #fdfdfe; }
+body [data-app-select][data-select-size="sm"] [data-select-trigger] { gap: 6px; padding-inline: 10px; }
+body [data-app-select] [data-select-trigger]:is(:focus-visible, [aria-expanded="true"]) {
+  outline: 2px solid #2b305626; outline-offset: 2px; border-color: #2b3056;
+}
+body [data-app-select] [data-select-value] { flex: 1; min-width: 0; color: inherit; font-size: inherit; font-weight: inherit; line-height: inherit; overflow-wrap: anywhere; }
+body [data-app-select] [data-placeholder="true"] { color: #4b5e8c; }
+body [data-app-select] [data-select-icon] { display: flex; flex: 0 0 auto; color: #4b5e8c; }
+body [data-app-select] [data-select-icon] svg, body [data-app-select] [data-select-chevron] { width: 18px; height: 18px; flex: 0 0 auto; color: #4b5e8c; }
+body [data-app-select] [data-select-chevron] { transition: transform 160ms ease; }
+body [data-app-select] [aria-expanded="true"] [data-select-chevron] { transform: rotate(180deg); }
+body [data-app-select] [data-select-trigger]:disabled { background: #f3f4f7; color: #6b7280; border-color: #e1e4eb; cursor: not-allowed; opacity: .75; }
+body [data-app-select] [data-select-trigger][aria-invalid="true"] { border-color: #ff3b2f99; }
+body [data-app-select] [data-select-error] { color: #a8231b; font-size: 12px; line-height: 1.5; font-weight: 400; }
+body [data-app-select] [data-select-native] {
+  position: absolute; width: 1px; height: 1px; min-height: 0; padding: 0; margin: -1px;
+  border: 0; overflow: hidden; clip-path: inset(50%); opacity: 0; pointer-events: none;
+}
+body [data-select-panel] {
+  box-sizing: border-box; position: fixed; inset: auto; z-index: 1000; margin: 0; padding: 8px;
+  max-height: 320px; max-width: calc(100vw - 16px); overflow-y: auto; overscroll-behavior: contain;
+  border: 1px solid #2b30561a; border-radius: 18px; background: #fff; color: #000633;
+  box-shadow: 0 8px 24px #0006331a; font-family: var(--font-outfit), Outfit, sans-serif;
+  scrollbar-width: thin; scrollbar-color: #4b5e8c66 transparent;
+}
+body [data-select-panel]::-webkit-scrollbar { width: 6px; }
+body [data-select-panel]::-webkit-scrollbar-thumb { background: #4b5e8c66; border-radius: 99px; }
+body [data-select-panel] [role="option"] {
+  display: flex; align-items: center; gap: 12px; box-sizing: border-box; min-height: 44px; padding: 11px 14px;
+  border-radius: 11px; color: #000633; font-size: 14px; font-weight: 500; line-height: 1.5;
+  cursor: pointer; transition: background 160ms ease; overflow-wrap: anywhere;
+}
+body [data-select-panel] [role="option"] > span { flex: 1; min-width: 0; }
+body [data-select-panel] [aria-selected="true"] { background: #2b305614; font-weight: 600; }
+body [data-select-panel] [role="option"]:hover:not([aria-disabled="true"]),
+body [data-select-panel] [data-active="true"]:not([aria-selected="true"]):not([aria-disabled="true"]) { background: #ffd0001f; }
+body [data-select-panel] [data-active="true"]:not([aria-disabled="true"]) { outline: 1px solid #2b305640; outline-offset: -1px; }
+body [data-select-panel] [aria-disabled="true"] { color: #7a8297; cursor: not-allowed; }
+body [data-select-panel] [data-select-check] { flex: 0 0 auto; width: 18px; height: 18px; color: #2b3056; }
+body [data-select-panel] [data-select-empty] { margin: 0; padding: 14px; color: #4b5e8c; font-size: 14px; line-height: 1.5; }
+@media (prefers-reduced-motion: reduce) {
+  body [data-app-select] [data-select-trigger], body [data-app-select] [data-select-chevron], body [data-select-panel] [role="option"] { transition: none; }
+}

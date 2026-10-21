@@ -1,5 +1,7 @@
 "use client";
 
+import AppSelect from "@/components/AppSelect";
+
 import { useCallback, useEffect, useState, type KeyboardEvent } from "react";
 import { useRouter } from "next/navigation";
 import { FiSearch } from "react-icons/fi";
@@ -384,7 +386,7 @@ export default function AdminNotificationsPage() {
           <div className={styles.footerActions}>
             <label>
               <span className={styles.srOnly}>Data per halaman</span>
-              <select
+              <AppSelect
                 value={limit}
                 onChange={(event) => {
                   setLimit(Number(event.target.value));
@@ -394,7 +396,7 @@ export default function AdminNotificationsPage() {
                 <option value={10}>10 / halaman</option>
                 <option value={20}>20 / halaman</option>
                 <option value={50}>50 / halaman</option>
-              </select>
+              </AppSelect>
             </label>
             <button
               data-button="secondary"

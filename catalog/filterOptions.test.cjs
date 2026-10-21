@@ -8,14 +8,15 @@ const React = require("react");
 const { renderToStaticMarkup } = require("react-dom/server");
 
 function load(filename) {
-  const absolute = path.join(__dirname, filename);
+  const absolute = path.resolve(__dirname, filename);
   const loaded = new Module(absolute);
   loaded.require = (name) => {
     if (name.endsWith(".css")) return { __esModule: true, default: {} };
-    if (name.startsWith("./")) {
-      const target = [name + ".ts", name + ".tsx"].find((value) =>
-        fs.existsSync(path.join(__dirname, value)),
-      );
+    if (name.startsWith(".") || name.startsWith("@/")) {
+      const base = name.startsWith("@/")
+        ? path.resolve(__dirname, "..", name.slice(2))
+        : path.resolve(path.dirname(absolute), name);
+      const target = [base + ".ts", base + ".tsx"].find(fs.existsSync);
       if (target) return load(target);
     }
     return require(name);

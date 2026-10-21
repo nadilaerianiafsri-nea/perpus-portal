@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { FiCalendar, FiChevronDown, FiEdit2 } from "react-icons/fi";
+import { FiCalendar, FiEdit2 } from "react-icons/fi";
+import AppSelect from "./AppSelect";
 import { createPeriod, validatePeriodRange, type PeriodPreset, type PeriodValue } from "@/shared/period";
 import { Button } from "./Button";
 import styles from "./PeriodSelector.module.css";
@@ -17,7 +18,7 @@ type PeriodSelectorProps = {
 
 export default function PeriodSelector({ value, onChange, label = "Periode", disabled = false, loading = false, maxDate }: PeriodSelectorProps) {
   const id = useId();
-  const select = useRef<HTMLSelectElement>(null);
+  const select = useRef<HTMLButtonElement>(null);
   const panel = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState({ from: value.from, to: value.to });
@@ -66,15 +67,13 @@ export default function PeriodSelector({ value, onChange, label = "Periode", dis
 
   return <div className={styles.root} data-period-selector aria-busy={loading}>
     <div className={styles.control}>
-      <FiCalendar aria-hidden="true" />
-      <select ref={select} aria-label={label} value={open ? "custom" : value.preset} disabled={disabled} aria-controls={open ? id : undefined} aria-expanded={open} onChange={event => choose(event.target.value as PeriodPreset)}>
+      <AppSelect ref={select} icon={<FiCalendar />} aria-label={label} value={open ? "custom" : value.preset} disabled={disabled} onChange={event => choose(event.target.value as PeriodPreset)}>
         <option value="today">Hari Ini</option>
         <option value="this-week">Minggu Ini</option>
         <option value="this-month">Bulan Ini</option>
         <option value="custom">Rentang Waktu</option>
-      </select>
+      </AppSelect>
       {value.preset === "custom" && !open && <button className={styles.edit} type="button" disabled={disabled} aria-label={`Ubah rentang waktu ${label.toLowerCase()}`} title="Ubah rentang waktu" onClick={() => choose("custom")}><FiEdit2 aria-hidden="true" /></button>}
-      <FiChevronDown className={styles.chevron} aria-hidden="true" />
     </div>
     {open && <div ref={panel} id={id} popover="auto" role="dialog" aria-labelledby={`${id}-title`} className={styles.popover} data-period-popover onToggle={event => { if (event.newState === "closed") setOpen(false); }} onKeyDown={event => { if (event.key === "Escape") { event.preventDefault(); setOpen(false); } }}>
       <form className={styles.form} noValidate onSubmit={event => {

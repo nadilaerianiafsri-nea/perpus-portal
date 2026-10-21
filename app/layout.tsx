@@ -3,6 +3,7 @@ import { Outfit } from "next/font/google";
 import "./globals.css";
 import "@/components/buttons.css";
 import "@/components/records.css";
+import "@/components/selects.css";
 import RowActionTooltip from "@/components/RowActionTooltip";
 
 const outfit = Outfit({

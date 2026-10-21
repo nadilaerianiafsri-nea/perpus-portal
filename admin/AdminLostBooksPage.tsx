@@ -1,6 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import AppSelect from "@/components/AppSelect";
+
 import AdminStatCard from "./AdminStatCard";
 import { FiBox as CardBox, FiUsers as CardUsers, FiRefreshCw as CardRefreshCw } from "react-icons/fi";
 
@@ -19,7 +21,6 @@ import {
   type LostBooksResponse,
 } from "./adminTransactions";
 import styles from "./AdminTransactions.module.css";
-import enhancements from "./AdminTransactionEnhancements.module.css";
 
 type MemberFilter = "ALL" | "UMUM" | "MAHASISWA" | "PEGAWAI";
 type ExtensionFilter = "ALL" | "EXTENDED" | "NOT_EXTENDED";
@@ -179,9 +180,9 @@ export default function AdminLostBooksPage() {
           {searchError && <small id="search-input-error" role="alert">{searchError}</small>}
           </label>
 
-          <label className={`${styles.selectField} ${enhancements.interactiveFilter}`}>
+          <label className={styles.selectField}>
             <span>Status</span>
-            <select
+            <AppSelect
               value={status}
               onChange={(event) => {
                 setStatus(event.target.value as StatusFilter);
@@ -190,12 +191,12 @@ export default function AdminLostBooksPage() {
             >
               <option value="ALL">Semua Status</option>
               <option value="PROCESS">Proses</option>
-            </select>
+            </AppSelect>
           </label>
 
           <label className={styles.selectField}>
             <span>Jenis Anggota</span>
-            <select
+            <AppSelect
               value={memberType}
               onChange={(event) => {
                 setMemberType(event.target.value as MemberFilter);
@@ -206,12 +207,12 @@ export default function AdminLostBooksPage() {
               <option value="UMUM">Masyarakat Umum</option>
               <option value="MAHASISWA">Mahasiswa</option>
               <option value="PEGAWAI">Pegawai Internal</option>
-            </select>
+            </AppSelect>
           </label>
 
           <label className={styles.selectField}>
             <span>Perpanjangan</span>
-            <select
+            <AppSelect
               value={extension}
               onChange={(event) => {
                 setExtension(event.target.value as ExtensionFilter);
@@ -221,7 +222,7 @@ export default function AdminLostBooksPage() {
               <option value="ALL">Semua</option>
               <option value="EXTENDED">Pernah Diperpanjang</option>
               <option value="NOT_EXTENDED">Tidak Pernah</option>
-            </select>
+            </AppSelect>
           </label>
         </div>
 
