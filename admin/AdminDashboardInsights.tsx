@@ -22,10 +22,10 @@ export function TopBorrowedCollections({ collections, ...state }: SectionState &
   return <section className={styles.panel} aria-labelledby="top-borrowed-title" aria-busy={Boolean(state.loading)} data-dashboard-collections>
     <header className={styles.header}><h2 id="top-borrowed-title">Koleksi Paling Sering Dipinjam</h2><p>Berdasarkan seluruh riwayat peminjaman buku fisik</p></header>
     {state.loading || state.failed ? <SectionFeedback {...state} /> : collections?.length ? <ol className={styles.collectionList}>
-      {collections.map(item => <li key={item.id}><Link href={`/admin/koleksi/data-buku/${item.id}`} className={styles.collection} title={item.title} aria-label={`Lihat detail koleksi ${item.title}, ${item.borrowCount.toLocaleString("id-ID")} kali dipinjam`}>
-        <span className={styles.collectionTitle}>{item.title}</span>
+      {collections.map(item => <li key={item.id}><Link data-record-card href={`/admin/koleksi/data-buku/${item.id}`} className={styles.collection} title={item.title} aria-label={`Lihat detail koleksi ${item.title}, ${item.borrowCount.toLocaleString("id-ID")} kali dipinjam`}>
+        <span data-record-primary className={styles.collectionTitle}>{item.title}</span>
         <span className={styles.barTrack} aria-hidden="true"><span className={styles.bar} style={{ width: `${item.borrowCount / maximum * 100}%` }} /></span>
-        <strong className={styles.count}>{item.borrowCount.toLocaleString("id-ID")} <span>kali</span></strong>
+        <strong data-record-primary className={styles.count}>{item.borrowCount.toLocaleString("id-ID")} <span data-record-secondary>kali</span></strong>
       </Link></li>)}
     </ol> : <div className={styles.feedback}><FiBarChart2 aria-hidden="true" /><strong>Belum ada data peminjaman.</strong><p>Koleksi yang sudah dipinjam akan tampil di sini.</p></div>}
   </section>;
@@ -38,9 +38,9 @@ export function AdminActionRequired({ actions, ...state }: SectionState & { acti
   return <section className={styles.panel} aria-labelledby="action-required-title" aria-busy={Boolean(state.loading)} data-dashboard-actions>
     <header className={styles.header}><h2 id="action-required-title">Memerlukan Tindakan</h2><p>Item yang membutuhkan perhatian Admin</p></header>
     {state.loading || state.failed ? <SectionFeedback {...state} /> : items.length ? <ul className={styles.actionList}>
-      {items.map(item => { const Icon = actionIcons[item.icon as keyof typeof actionIcons]; return <li key={item.key}><Link href={item.href} className={`${styles.action} ${styles[item.tone]}`} aria-label={`${item.count.toLocaleString("id-ID")} ${item.label}. ${item.detail}`}>
+      {items.map(item => { const Icon = actionIcons[item.icon as keyof typeof actionIcons]; return <li key={item.key}><Link data-record-card href={item.href} className={`${styles.action} ${styles[item.tone]}`} aria-label={`${item.count.toLocaleString("id-ID")} ${item.label}. ${item.detail}`}>
         <span className={styles.icon} aria-hidden="true"><Icon /></span>
-        <span className={styles.actionCopy}><span><strong>{item.count.toLocaleString("id-ID")}</strong> {item.label}</span><small>{item.detail}</small></span>
+        <span className={styles.actionCopy}><span data-record-primary><strong>{item.count.toLocaleString("id-ID")}</strong> {item.label}</span><small>{item.detail}</small></span>
         <FiChevronRight className={styles.chevron} aria-hidden="true" />
       </Link></li>; })}
     </ul> : <div className={styles.feedback}><FiCheckCircle className={styles.positive} aria-hidden="true" /><strong>Tidak ada tindakan yang perlu ditangani saat ini.</strong></div>}

@@ -196,12 +196,12 @@ export default function AdminGrantDetail({ id }: Props) {
         <h2>Daftar Buku Hibah</h2>
 
         <div className={styles.tableScroller}>
-          <table className={styles.itemsTable}>
+          <table data-record-list className={styles.itemsTable}>
             <thead>
               <tr>
-                <th>NO.</th>
-                <th>JUDUL BUKU</th>
-                <th>JUMLAH</th>
+                <th scope="col" data-record-column="index">NO.</th>
+                <th scope="col">JUDUL BUKU</th>
+                <th scope="col" data-record-column="quantity">JUMLAH</th>
               </tr>
             </thead>
 

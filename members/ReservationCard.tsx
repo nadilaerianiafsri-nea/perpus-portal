@@ -30,21 +30,19 @@ export default function ReservationCard({ reservation, onExpire, onCancel, busy 
   reservation: Reservation; onExpire: () => void; onCancel?: () => void; busy?: boolean;
 }) {
   const active = reservation.status === "MENUNGGU_PENGAMBILAN";
-  return <article className={`${styles.card} ${!active ? styles.finished : ""}`} data-reservation-id={reservation.id}>
-    <header className={styles.header}><FiCalendar aria-hidden /><strong>{active ? "Reservasi Aktif" : "Reservasi Selesai"}</strong><span><FiClock aria-hidden />{labels[reservation.status]}</span></header>
+  return <article className={`${styles.card} ${!active ? styles.finished : ""}`} data-record-card data-reservation-id={reservation.id}>
+    <header className={styles.header}><FiCalendar aria-hidden /><strong>{active ? "Reservasi Aktif" : "Reservasi Selesai"}</strong><span data-record-badge><FiClock aria-hidden />{labels[reservation.status]}</span></header>
     <div className={styles.body}>
       <Link href={`/dashboard/koleksi/${reservation.book.id}`} className={styles.cover}><Image src={safeCoverUrl(reservation.book.coverUrl)} alt={`Sampul ${reservation.book.title}`} fill sizes="96px" unoptimized /></Link>
       <div className={styles.info}>
-        <Link href={`/dashboard/koleksi/${reservation.book.id}`}><h2>{reservation.book.title}</h2></Link>
-        <p className={styles.author}>{reservation.book.author}</p>
+        <Link href={`/dashboard/koleksi/${reservation.book.id}`}><h2 data-record-primary>{reservation.book.title}</h2></Link>
+        <p className={styles.author} data-record-secondary>{reservation.book.author}</p>
         <dl className={styles.metadata}>
-          <div><dt>Kode</dt><dd><strong>{reservation.book.code}</strong></dd></div>
-          <div><dt>Reservasi</dt><dd><time dateTime={reservation.createdAt}>{memberDate(reservation.createdAt, true)}</time></dd></div>
           <div><FiMapPin aria-hidden /><dt className={styles.srOnly}>Lokasi pengambilan</dt><dd>{reservation.pickupLocation}</dd></div>
-          <div className={styles.deadline}><FiCalendar aria-hidden /><dt>Batas:</dt><dd><time dateTime={reservation.expiresAt}>{memberDate(reservation.expiresAt, true)}</time></dd></div>
+          <div className={styles.deadline}><FiCalendar aria-hidden /><dt>Batas:</dt><dd><time data-record-primary dateTime={reservation.expiresAt}>{memberDate(reservation.expiresAt, true)}</time></dd></div>
         </dl>
-        <div className={styles.footer}><small>Eksemplar: {reservation.copy.code}</small>{active && onCancel && <button data-button="danger" data-row-action="danger-soft" data-button-shape="square" title={`Batalkan reservasi ${reservation.book.title}`} data-button-size="sm" data-button-loading={busy} aria-busy={busy} type="button" disabled={busy} onClick={onCancel} aria-label={`Batalkan reservasi ${reservation.book.title}`}><FiXCircle aria-hidden="true" /></button>}</div>
-        {!active && <p className={styles.finishedNote}>{reservation.status === "DIAMBIL" ? "Pengambilan telah dikonfirmasi oleh petugas perpustakaan." : reservation.status === "KEDALUWARSA" ? "Batas pengambilan telah berakhir. Stok buku dilepas kembali." : "Reservasi telah dibatalkan. Stok buku dilepas kembali."}</p>}
+        <div className={styles.footer} data-record-action-group>{active && onCancel && <button data-button="danger" data-row-action="danger-soft" data-button-shape="square" title={`Batalkan reservasi ${reservation.book.title}`} data-button-size="sm" data-button-loading={busy} aria-busy={busy} type="button" disabled={busy} onClick={onCancel} aria-label={`Batalkan reservasi ${reservation.book.title}`}><FiXCircle aria-hidden="true" /></button>}</div>
+        {!active && <p className={styles.finishedNote} data-record-secondary>{reservation.status === "DIAMBIL" ? "Pengambilan telah dikonfirmasi oleh petugas perpustakaan." : reservation.status === "KEDALUWARSA" ? "Batas pengambilan telah berakhir. Stok buku dilepas kembali." : "Reservasi telah dibatalkan. Stok buku dilepas kembali."}</p>}
       </div>
       {active && <ReservationCountdown deadline={reservation.expiresAt} onExpire={onExpire} />}
     </div>

@@ -243,21 +243,19 @@ export default function AdminNotificationsPage() {
 
       <section className={styles.tableCard} aria-busy={loading}>
         <div className={styles.tableScroller}>
-          <table className={styles.table}>
+          <table data-record-list className={styles.table}>
             <thead>
               <tr>
-                <th>ANGGOTA</th>
-                <th>TRANSAKSI</th>
-                <th>JENIS PENGINGAT</th>
-                <th>KANAL</th>
-                <th>WAKTU</th>
-                <th>STATUS</th>
+                <th scope="col">JENIS / KONTEKS</th>
+                <th scope="col">PENERIMA</th>
+                <th scope="col" className={styles.statusColumn}>STATUS</th>
+                <th scope="col" className={styles.timeColumn}>WAKTU</th>
               </tr>
             </thead>
             <tbody>
               {loading && !result.data.length ? (
                 <tr>
-                  <td colSpan={6} className={styles.stateCell}>
+                  <td colSpan={4} className={styles.stateCell}>
                     Memuat log notifikasi...
                   </td>
                 </tr>
@@ -291,36 +289,32 @@ export default function AdminNotificationsPage() {
                     >
                       <td>
                         <div className={styles.memberCell}>
-                          <strong>{row.memberName}</strong>
-                          <small>{contactLabel(row)}</small>
-                        </div>
-                      </td>
-                      <td>{row.transactionCode}</td>
-                      <td>
-                        <div className={styles.memberCell}>
                           <strong>{row.reminderType}</strong>
                           {row.bookTitle ? <small>{row.bookTitle}</small> : null}
                         </div>
                       </td>
                       <td>
-                        <span className={styles.channelPill}>
-                          {channelLabel(row.channel)}
-                        </span>
+                        <div className={styles.memberCell}>
+                          <strong>{row.memberName}</strong>
+                          <small>{contactLabel(row)}</small>
+                        </div>
                       </td>
-                      <td>{formatAdminOperationDate(row.time)}</td>
                       <td>
                         <span
+                          data-record-badge
                           className={`${styles.statusPill} ${styles[`status${row.status}`]}`}
                         >
                           {statusLabel(row)}
                         </span>
+                        <small className={styles.channelContext}>{channelLabel(row.channel)}</small>
                       </td>
+                      <td>{formatAdminOperationDate(row.time)}</td>
                     </tr>
                   );
                 })
               ) : (
                 <tr>
-                  <td colSpan={6} className={styles.stateCell}>
+                  <td colSpan={4} className={styles.stateCell}>
                     Tidak ada log notifikasi yang sesuai.
                   </td>
                 </tr>
@@ -344,6 +338,7 @@ export default function AdminNotificationsPage() {
 
               return (
                 <article
+                  data-record-card
                   key={row.id}
                   className={`${styles.mobileCard} ${clickable ? styles.mobileClickable : ""} ${readState}`}
                   onClick={clickable ? () => void openNotification(row) : undefined}
@@ -362,24 +357,19 @@ export default function AdminNotificationsPage() {
                 >
                   <div className={styles.mobileHeading}>
                     <div>
-                      <strong>{row.memberName}</strong>
-                      <small>{row.transactionCode}</small>
+                      <strong data-record-primary>{row.reminderType}</strong>
+                      {row.bookTitle ? <small>{row.bookTitle}</small> : null}
                     </div>
                     <span
+                      data-record-badge
                       className={`${styles.statusPill} ${styles[`status${row.status}`]}`}
                     >
                       {statusLabel(row)}
                     </span>
                   </div>
                   <dl>
-                    <div><dt>Jenis Pengingat</dt><dd>{row.reminderType}</dd></div>
-                    {row.bookTitle ? <div><dt>Buku</dt><dd>{row.bookTitle}</dd></div> : null}
-                    <div><dt>Kanal</dt><dd>{channelLabel(row.channel)}</dd></div>
-                    <div><dt>Waktu</dt><dd>{formatAdminOperationDate(row.time)}</dd></div>
-                    <div>
-                      <dt>Kontak</dt>
-                      <dd>{contactLabel(row)}</dd>
-                    </div>
+                    <div><dt>Penerima</dt><dd><strong data-record-primary>{row.memberName}</strong><small className={styles.channelContext}>{contactLabel(row)}</small></dd></div>
+                    <div><dt>Waktu</dt><dd>{formatAdminOperationDate(row.time)}<small className={styles.channelContext}>{channelLabel(row.channel)}</small></dd></div>
                   </dl>
                 </article>
               );

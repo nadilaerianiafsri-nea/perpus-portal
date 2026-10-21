@@ -318,22 +318,20 @@ export default function AdminBooksPage() {
 
       <section className={styles.tableCard} aria-busy={loading}>
         <div className={styles.tableScroller}>
-          <table className={styles.table}>
+          <table className={styles.table} data-record-list data-record-scroll>
             <thead>
               <tr>
                 <th>BUKU</th>
                 <th>KODE</th>
-                <th>TAHUN</th>
-                <th>STOK TERSEDIA</th>
-                <th>KETERSEDIAAN</th>
+                <th>STOK</th>
                 <th>STATUS</th>
-                <th>AKSI</th>
+                <th data-record-actions="3">AKSI</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={7} className={styles.stateCell}>
+                  <td colSpan={5} className={styles.stateCell}>
                     Memuat data buku...
                   </td>
                 </tr>
@@ -353,23 +351,15 @@ export default function AdminBooksPage() {
                       </div>
                     </td>
                     <td className={styles.codeCell}>{book.code}</td>
-                    <td>{book.year}</td>
                     <td>
-                      <strong>{book.availableCopies}</strong> / {book.totalCopies}
+                      <div className={styles.stockCell}>
+                        <strong>{book.availableCopies} / {book.totalCopies}</strong>
+                        <small>{book.availableCopies > 0 ? "Tersedia" : "Stok Habis"}</small>
+                      </div>
                     </td>
                     <td>
                       <span
-                        className={`${styles.pill} ${
-                          book.availableCopies > 0
-                            ? styles.available
-                            : styles.stockOut
-                        }`}
-                      >
-                        {book.availableCopies > 0 ? "Tersedia" : "Stok Habis"}
-                      </span>
-                    </td>
-                    <td>
-                      <span
+                        data-record-badge
                         className={`${styles.pill} ${
                           book.isActive ? styles.active : styles.inactive
                         }`}
@@ -378,7 +368,7 @@ export default function AdminBooksPage() {
                       </span>
                     </td>
                     <td>
-                      <div className={styles.actions}>
+                      <div className={styles.actions} data-record-action-group>
                         <Link data-row-action="neutral"
                           data-button="secondary"
                           data-button-size="sm"
@@ -429,7 +419,7 @@ export default function AdminBooksPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={7} className={styles.stateCell}>
+                  <td colSpan={5} className={styles.stateCell}>
                     Tidak ada buku yang sesuai dengan pencarian atau filter.
                   </td>
                 </tr>

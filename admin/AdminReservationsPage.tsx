@@ -292,8 +292,8 @@ export default function AdminReservationsPage() {
           </div>
         ) : null}
 
-        <div className={styles.tableScroller}>
-          <table className={`${styles.table} ${styles.tableWide} ${styles.transactionTable}`}>
+        <div className={styles.tableScroller} data-record-scroll>
+          <table data-record-list data-record-scroll className={`${styles.table} ${styles.tableWide} ${styles.transactionTable} ${styles.reservationsTable}`}>
             <thead>
               <tr>
                 <th scope="col">ANGGOTA</th>
@@ -301,7 +301,7 @@ export default function AdminReservationsPage() {
                 <th scope="col">DIAJUKAN</th>
                 <th scope="col">BATAS PENGAMBILAN</th>
                 <th scope="col">STATUS</th>
-                <th scope="col">AKSI</th>
+                <th scope="col" data-record-actions="1">AKSI</th>
               </tr>
             </thead>
 
@@ -317,7 +317,7 @@ export default function AdminReservationsPage() {
                   <tr key={reservation.id}>
                     <td>
                       <div className={styles.memberCell}>
-                        <strong>{reservation.member.name}</strong>
+                        <strong data-record-primary>{reservation.member.name}</strong>
                         <small>
                           {memberTypeLabel(reservation.member.memberType)}
                         </small>
@@ -331,7 +331,7 @@ export default function AdminReservationsPage() {
                           alt=""
                         />
                         <div>
-                          <strong>{reservation.book.title}</strong>
+                          <strong data-record-primary>{reservation.book.title}</strong>
                           <small>{reservation.book.code}</small>
                         </div>
                       </div>
@@ -342,7 +342,7 @@ export default function AdminReservationsPage() {
                     <td>{formatTransactionDateTime(reservation.expiresAt)}</td>
 
                     <td>
-                      <span
+                      <span data-record-badge
                         className={`${styles.pill} ${
                           reservation.status === "MENUNGGU_PENGAMBILAN"
                             ? styles.warningPill

@@ -259,24 +259,23 @@ export default function AdminLoansPage() {
 
         <p className={`${styles.sectionCount} ${styles.transactionCount}`}>{result.meta.total} transaksi</p>
 
-        <div className={styles.tableScroller}>
-          <table className={`${styles.table} ${styles.tableWide} ${styles.transactionTable}`}>
+        <div className={styles.tableScroller} data-record-scroll>
+          <table data-record-list data-record-scroll className={`${styles.table} ${styles.tableWide} ${styles.transactionTable} ${styles.loansTable}`}>
             <thead>
               <tr>
                 <th scope="col">ANGGOTA</th>
                 <th scope="col">BUKU</th>
                 <th scope="col">DIPINJAM</th>
                 <th scope="col">JATUH TEMPO</th>
-                <th scope="col">PERPANJANGAN</th>
                 <th scope="col">STATUS</th>
-                <th scope="col">AKSI</th>
+                <th scope="col" data-record-actions="1">AKSI</th>
               </tr>
             </thead>
 
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={7} className={styles.stateCell}>
+                  <td colSpan={6} className={styles.stateCell}>
                     Memuat data peminjaman...
                   </td>
                 </tr>
@@ -294,7 +293,7 @@ export default function AdminLoansPage() {
                     <tr key={loan.id}>
                       <td>
                         <div className={styles.memberCell}>
-                          <strong>{loan.member.name}</strong>
+                          <strong data-record-primary>{loan.member.name}</strong>
                           <small>
                             {memberTypeLabel(loan.member.memberType)}
                           </small>
@@ -308,7 +307,7 @@ export default function AdminLoansPage() {
                             alt=""
                           />
                           <div>
-                            <strong>{loan.book.title}</strong>
+                            <strong data-record-primary>{loan.book.title}</strong>
                             <small>{loan.book.code}</small>
                           </div>
                         </div>
@@ -316,12 +315,15 @@ export default function AdminLoansPage() {
 
                       <td>{formatTransactionDate(loan.borrowedAt)}</td>
 
-                      <td>{formatTransactionDate(loan.dueAt)}</td>
-
-                      <td>{loan.extensionCount}×</td>
+                      <td>
+                        <div className={styles.memberCell}>
+                          <span>{formatTransactionDate(loan.dueAt)}</span>
+                          {loan.extensionCount > 0 ? <small data-record-secondary>Perpanjangan {loan.extensionCount} kali</small> : null}
+                        </div>
+                      </td>
 
                       <td>
-                        <span
+                        <span data-record-badge
                           className={`${styles.pill} ${
                             loanStatus === "TERLAMBAT"
                               ? styles.dangerPill
@@ -359,7 +361,7 @@ export default function AdminLoansPage() {
                 })
               ) : (
                 <tr>
-                  <td colSpan={7} className={styles.stateCell}>
+                  <td colSpan={6} className={styles.stateCell}>
                     Tidak ada pinjaman yang sesuai dengan pencarian atau filter.
                   </td>
                 </tr>
@@ -404,13 +406,12 @@ export default function AdminLoansPage() {
           <h2>Akses E-Book yang Sedang Berjalan</h2>
         </header>
 
-        <div className={styles.tableScroller}>
-          <table className={`${styles.table} ${styles.transactionTable}`}>
+        <div className={styles.tableScroller} data-record-scroll>
+          <table data-record-list data-record-scroll className={`${styles.table} ${styles.transactionTable} ${styles.ebookAccessTable}`}>
             <thead>
               <tr>
                 <th scope="col">ANGGOTA</th>
                 <th scope="col">JUDUL E-BOOK</th>
-                <th scope="col">KODE</th>
                 <th scope="col">MULAI AKSES</th>
                 <th scope="col">BERAKHIR</th>
                 <th scope="col">TIPE</th>
@@ -420,7 +421,7 @@ export default function AdminLoansPage() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={6} className={styles.stateCell}>
+                  <td colSpan={5} className={styles.stateCell}>
                     Memuat akses E-Book...
                   </td>
                 </tr>
@@ -436,8 +437,7 @@ export default function AdminLoansPage() {
                       </div>
                     </td>
 
-                    <td><strong>{ebook.book.title}</strong></td>
-                    <td>{ebook.book.code}</td>
+                    <td><div className={styles.memberCell}><strong data-record-primary>{ebook.book.title}</strong><small>{ebook.book.code}</small></div></td>
 
                     <td>{formatTransactionDate(ebook.addedAt)}</td>
 
@@ -448,7 +448,7 @@ export default function AdminLoansPage() {
                     </td>
 
                     <td>
-                      <span className={`${styles.pill} ${styles.bluePill}`}>
+                      <span data-record-badge className={`${styles.pill} ${styles.bluePill}`}>
                         E-Book
                       </span>
                     </td>
@@ -456,7 +456,7 @@ export default function AdminLoansPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} className={styles.stateCell}>
+                  <td colSpan={5} className={styles.stateCell}>
                     Tidak ada akses E-Book aktif.
                   </td>
                 </tr>

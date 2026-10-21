@@ -14,11 +14,11 @@
 .error p { margin: 0 0 10px; }
 .error button { min-height: 36px; padding: 7px 12px; border: 0; border-radius: 7px; background: #2B3056; color: #fff; cursor: pointer; }
 .tableScroller { width: 100%; overflow-x: auto; }
-.table { width: 100%; min-width: 860px; border-collapse: collapse; }
+.table { width: 100%; min-width: 0; border-collapse: collapse; }
 .table th, .table td { padding: 14px 16px; border-bottom: 1px solid #ebebeb; text-align: left; vertical-align: top; }
 .table th { background: #fafafa; color: #515151; font-size: 11px; font-weight: 700; letter-spacing: .03em; white-space: nowrap; }
 .table td { font-size: 13px; color: #363636; }
-.cellStack { display: grid; gap: 4px; min-width: 150px; }
+.cellStack { display: grid; gap: 4px; min-width: 0; }
 .cellStack strong { color: #000633; font-size: 13px; overflow-wrap: anywhere; }
 .cellStack small { color: #7b7b7b; overflow-wrap: anywhere; }
 .position { color: #2B3056 !important; font-weight: 700; }
@@ -37,3 +37,8 @@
 @media (max-width: 900px) { .summary { grid-template-columns: 1fr; }.toolbar { align-items: stretch; flex-direction: column; }.search { width: 100%; } }
 @media (max-width: 600px) { .page { gap: 16px; }.toolbar { padding: 12px; }.tabs { display: grid; grid-template-columns: 1fr; }.tabs button { min-height: 44px; }.pagination { justify-content: space-between; flex-wrap: wrap; }.pagination button { min-height: 44px; }.note { font-size: 12px; } }
 @media (max-width: 360px) { .heading h1 { font-size: 26px; }.table th, .table td { padding-inline: 12px; } }
+
+.table[data-record-list] th:nth-child(1) { width: 24%; }
+.table[data-record-list] th:nth-child(2) { width: 28%; }
+.cellStack { overflow-wrap: anywhere; }
+.cellStack > [data-record-badge] { justify-self: start; white-space: normal; }

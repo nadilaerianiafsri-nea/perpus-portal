@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
 import "@/components/buttons.css";
+import "@/components/records.css";
 import RowActionTooltip from "@/components/RowActionTooltip";
 
 const outfit = Outfit({

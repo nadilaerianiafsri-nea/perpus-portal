@@ -17,6 +17,7 @@
 .actionButton:disabled { cursor: wait; }
 .detail { display: inline-flex; align-items: center; margin-left: auto; color: #086caa; }
 .detail svg { flex-shrink: 0; }
+.message { overflow-wrap: anywhere; }
 .clickable:has(.cardLink:hover) .detail[data-button="secondary"] {
   background: var(--button-hover-bg);
   color: var(--button-hover-fg);

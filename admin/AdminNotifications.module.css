@@ -77,6 +77,9 @@
 .table tbody tr:hover { background: #f4f4f7; }
 .memberCell { display: grid; gap: 3px; }
 .memberCell small { color: #52699e; }
+.statusColumn { width: 150px; }
+.timeColumn { width: 160px; }
+.channelContext { display: block; margin-top: 4px; color: #52699e; }
 .channelPill, .statusPill { display: inline-flex; align-items: center; border-radius: 999px; padding: 5px 9px; font-size: 12px; font-weight: 700; white-space: nowrap; }
 .channelPill { background: #e8f6ff; color: #1570a8; }
 .statusTERKIRIM { background: #eef9e9; color: #386d25; }

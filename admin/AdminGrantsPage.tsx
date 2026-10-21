@@ -229,54 +229,42 @@ export default function AdminGrantsPage() {
 
       <section className={styles.tableCard} aria-busy={loading}>
         <div className={styles.tableScroller}>
-          <table className={styles.table}>
+          <table className={styles.table} data-record-list>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>DAFTAR BUKU</th>
-                <th>JUMLAH JUDUL</th>
-                <th>TOTAL BUKU</th>
                 <th>PEMBERI</th>
                 <th>TANGGAL</th>
+                <th>RINGKASAN</th>
                 <th>STATUS</th>
-                <th>AKSI</th>
+                <th data-record-actions="2">AKSI</th>
               </tr>
             </thead>
 
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={8} className={styles.stateCell}>
+                  <td colSpan={5} className={styles.stateCell}>
                     Memuat data hibah...
                   </td>
                 </tr>
               ) : result.data.length ? (
                 result.data.map((grant) => (
                   <tr key={grant.id}>
-                    <td className={styles.codeCell}>{grantCode(grant.id)}</td>
-
                     <td>
                       <div className={styles.titleCell}>
-                        <strong>{grant.items[0]?.title ?? "-"}</strong>
-
-                        {grant.items.length > 1 ? (
-                          <small>+{grant.items.length - 1} judul lainnya</small>
-                        ) : null}
+                        <strong>{grant.donorName}</strong>
                       </div>
                     </td>
-
-                    <td className={styles.numberCell}>{grant.totalTitles}</td>
-
-                    <td className={styles.numberCell}>
-                      {grant.totalBooks.toLocaleString("id-ID")}
-                    </td>
-
-                    <td>{grant.donorName}</td>
-
                     <td>{formatAdminGrantDate(grant.receivedAt)}</td>
-
+                    <td>
+                      <div className={styles.grantSummary}>
+                        <strong>{grant.totalTitles} judul</strong>
+                        <small>{grant.totalBooks.toLocaleString("id-ID")} buku</small>
+                      </div>
+                    </td>
                     <td>
                       <span
+                        data-record-badge
                         className={`${styles.statusPill} ${
                           grant.status === "SUDAH_DIKATALOGKAN"
                             ? styles.catalogued
@@ -288,7 +276,7 @@ export default function AdminGrantsPage() {
                     </td>
 
                     <td>
-                      <div className={styles.actions}>
+                      <div className={styles.actions} data-record-action-group>
                         <Link data-button-shape="square" title="Lihat detail hibah" aria-label={`Lihat detail hibah ${grantCode(grant.id)} dari ${grant.donorName}`} data-row-action="neutral"
                           data-button="secondary"
                           data-button-size="sm"
@@ -312,7 +300,7 @@ export default function AdminGrantsPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={8} className={styles.stateCell}>
+                  <td colSpan={5} className={styles.stateCell}>
                     Tidak ada data hibah yang sesuai dengan pencarian atau
                     filter.
                   </td>
@@ -323,17 +311,23 @@ export default function AdminGrantsPage() {
         </div>
 
         <div className={styles.mobileList}>
+          {loading ? (
+            <div className={styles.mobileState}>Memuat data hibah...</div>
+          ) : result.data.length === 0 ? (
+            <div className={styles.mobileState}>
+              Tidak ada data hibah yang sesuai dengan pencarian atau filter.
+            </div>
+          ) : null}
           {!loading &&
             result.data.map((grant) => (
-              <article key={grant.id} className={styles.mobileCard}>
+              <article key={grant.id} className={styles.mobileCard} data-record-card>
                 <div className={styles.mobileCardHeader}>
                   <div>
-                    <strong>{grantCode(grant.id)}</strong>
-
-                    <small>{grant.donorName}</small>
+                    <strong data-record-primary>{grant.donorName}</strong>
                   </div>
 
                   <span
+                    data-record-badge
                     className={`${styles.statusPill} ${
                       grant.status === "SUDAH_DIKATALOGKAN"
                         ? styles.catalogued
@@ -346,27 +340,19 @@ export default function AdminGrantsPage() {
 
                 <div className={styles.mobileInfo}>
                   <div>
-                    <span>Judul</span>
-                    <strong>{grant.totalTitles}</strong>
+                    <span data-record-secondary>Ringkasan</span>
+                    <strong data-record-primary>{grant.totalTitles} judul</strong>
+                    <small>{grant.totalBooks.toLocaleString("id-ID")} buku</small>
                   </div>
 
                   <div>
-                    <span>Total Buku</span>
-                    <strong>{grant.totalBooks.toLocaleString("id-ID")}</strong>
+                    <span data-record-secondary>Penerimaan</span>
+                    <strong data-record-primary>{formatAdminGrantDate(grant.receivedAt)}</strong>
                   </div>
 
-                  <div>
-                    <span>Penerimaan</span>
-                    <strong>{formatAdminGrantDate(grant.receivedAt)}</strong>
-                  </div>
-
-                  <div>
-                    <span>Buku Pertama</span>
-                    <strong>{grant.items[0]?.title ?? "-"}</strong>
-                  </div>
                 </div>
 
-                <div className={styles.mobileActions}>
+                <div className={styles.mobileActions} data-record-action-group>
                   <Link data-button-shape="square" title="Lihat detail hibah" aria-label={`Lihat detail hibah ${grantCode(grant.id)} dari ${grant.donorName}`} data-row-action="neutral"
                     data-button="secondary"
                     data-button-size="sm"

@@ -12,7 +12,6 @@ import { FiSearch, FiEye, FiEdit2, FiPower } from "react-icons/fi";
 
 import {
   adminMemberApiMessage,
-  formatAdminMemberDate,
   memberTypeLabel,
   type AdminMembersResponse,
 } from "./adminMembers";
@@ -255,25 +254,22 @@ export default function AdminMembersPage() {
 
       <section className={styles.tableCard} aria-busy={loading}>
         <div className={styles.tableScroller}>
-          <table className={styles.table}>
+          <table className={styles.table} data-record-list>
             <thead>
               <tr>
                 <th>NAMA</th>
                 <th>JENIS</th>
-                <th>EMAIL</th>
-                <th>WHATSAPP</th>
-                <th>VERIFIKASI</th>
+                <th>KONTAK</th>
                 <th>PINJAMAN</th>
                 <th>OVERDUE</th>
-                <th>TERDAFTAR</th>
-                <th>AKSI</th>
+                <th data-record-actions="3">AKSI</th>
               </tr>
             </thead>
 
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={9} className={styles.stateCell}>
+                  <td colSpan={6} className={styles.stateCell}>
                     Memuat data keanggotaan...
                   </td>
                 </tr>
@@ -283,45 +279,27 @@ export default function AdminMembersPage() {
                     <td>
                       <div className={styles.nameCell}>
                         <strong>{member.name}</strong>
-                        <small
-                          className={
-                            member.isActive
-                              ? styles.accountActive
-                              : styles.accountInactive
-                          }
-                        >
-                          {member.isActive ? "Aktif" : "Nonaktif"}
-                        </small>
                       </div>
                     </td>
 
                     <td>
-                      <span className={styles.typePill}>
+                      <span className={styles.typePill} data-record-badge>
                         {memberTypeLabel(member.memberType)}
                       </span>
                     </td>
 
-                    <td className={styles.emailCell}>{member.email}</td>
-
-                    <td>{member.whatsapp || "-"}</td>
-
                     <td>
-                      <span
-                        className={`${styles.verifyPill} ${
-                          member.emailVerified
-                            ? styles.verified
-                            : styles.unverified
-                        }`}
-                      >
-                        {member.emailVerified ? "Terverifikasi" : "Belum"}
-                      </span>
+                      <div className={styles.contactCell}>
+                        <strong>{member.email}</strong>
+                        <small>{member.whatsapp || "-"}</small>
+                      </div>
                     </td>
 
                     <td>{member.activeLoans}</td>
 
                     <td>
                       {member.overdue > 0 ? (
-                        <span className={styles.overduePill}>
+                        <span className={styles.overduePill} data-record-badge>
                           {member.overdue}
                         </span>
                       ) : (
@@ -329,10 +307,8 @@ export default function AdminMembersPage() {
                       )}
                     </td>
 
-                    <td>{formatAdminMemberDate(member.createdAt)}</td>
-
                     <td>
-                      <div className={styles.actions}>
+                      <div className={styles.actions} data-record-action-group>
                         <Link data-button-shape="square" title="Lihat detail anggota" aria-label={`Lihat detail anggota ${member.name}`} data-row-action="neutral"
                           data-button="secondary"
                           data-button-size="sm"
@@ -378,7 +354,7 @@ export default function AdminMembersPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={9} className={styles.stateCell}>
+                  <td colSpan={6} className={styles.stateCell}>
                     Tidak ada anggota yang sesuai dengan pencarian atau filter.
                   </td>
                 </tr>
@@ -392,56 +368,36 @@ export default function AdminMembersPage() {
             <div className={styles.mobileState}>Memuat data keanggotaan...</div>
           ) : result.data.length ? (
             result.data.map((member) => (
-              <article key={member.id} className={styles.mobileMemberCard}>
+              <article key={member.id} className={styles.mobileMemberCard} data-record-card>
                 <div className={styles.mobileCardHeading}>
                   <div>
-                    <strong>{member.name}</strong>
-                    <small>{member.email}</small>
+                    <strong data-record-primary>{member.name}</strong>
+                    <small>{memberTypeLabel(member.memberType)}</small>
                   </div>
 
-                  <span
-                    className={
-                      member.isActive
-                        ? styles.accountActive
-                        : styles.accountInactive
-                    }
-                  >
-                    {member.isActive ? "Aktif" : "Nonaktif"}
-                  </span>
                 </div>
 
                 <dl className={styles.mobileInfo}>
                   <div>
-                    <dt>Jenis</dt>
-                    <dd>{memberTypeLabel(member.memberType)}</dd>
-                  </div>
-                  <div>
-                    <dt>WhatsApp</dt>
-                    <dd>{member.whatsapp || "-"}</dd>
-                  </div>
-                  <div>
-                    <dt>Verifikasi</dt>
+                    <dt>Kontak</dt>
                     <dd>
-                      {member.emailVerified
-                        ? "Terverifikasi"
-                        : "Belum Terverifikasi"}
+                      <div className={styles.contactCell}>
+                        <strong data-record-primary>{member.email}</strong>
+                        <small>{member.whatsapp || "-"}</small>
+                      </div>
                     </dd>
                   </div>
                   <div>
                     <dt>Pinjaman</dt>
-                    <dd>{member.activeLoans}</dd>
+                    <dd data-record-primary>{member.activeLoans}</dd>
                   </div>
                   <div>
                     <dt>Overdue</dt>
-                    <dd>{member.overdue}</dd>
-                  </div>
-                  <div>
-                    <dt>Terdaftar</dt>
-                    <dd>{formatAdminMemberDate(member.createdAt)}</dd>
+                    <dd data-record-primary>{member.overdue}</dd>
                   </div>
                 </dl>
 
-                <div className={styles.mobileActions}>
+                <div className={styles.mobileActions} data-record-action-group>
                   <Link data-button-shape="square" title="Lihat detail anggota" aria-label={`Lihat detail anggota ${member.name}`} data-row-action="neutral"
                     data-button="secondary"
                     data-button-size="sm"

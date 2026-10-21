@@ -10,7 +10,7 @@
 .author { margin: 0 0 13px; color: #686868; font-size: 14px; overflow-wrap: anywhere; }
 .metadata { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0; font-size: 13px; }
 .metadata > div { display: flex; align-items: center; gap: 5px; min-height: 34px; padding: 7px 12px; border: 1px solid #eff0f3; border-radius: 9px; background: white; box-shadow: 0 2px 2px #00063312; }
-.metadata dt { flex: 0 0 auto; color: #737373; font-size: 11px; }
+.metadata dt { flex: 0 0 auto; color: #666; font-size: 12px; }
 .metadata dd { margin: 0; color: #3e3e3e; overflow-wrap: anywhere; }
 .metadata svg { flex: 0 0 16px; color: #2b3056; font-size: 16px; }
 .metadata .deadline { background: #fff4e5; }
@@ -18,7 +18,7 @@
 .footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding-top: 10px; }
 .footer small { color: #6b6b75; font-size: 11px; overflow-wrap: anywhere; }
 .countdown { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; min-height: 140px; padding: 14px 12px; border-radius: 14px; background: #1aa7f8; color: #00344f; box-shadow: 0 2px 2px #00063313; text-align: center; }
-.countdown > span,.countdown small { font-size: 11px; line-height: 1.4; }
+.countdown > span,.countdown small { font-size: 12px; line-height: 1.4; }
 .digits { display: flex; align-items: center; justify-content: center; gap: 7px; font-variant-numeric: tabular-nums; }
 .digits strong { display: grid; place-items: center; min-width: 37px; height: 42px; padding: 4px 7px; border-radius: 7px; background: #eef9ff; color: #086caa; font-size: 24px; }
 .digits > span { font-weight: 600; }
@@ -44,3 +44,14 @@
 .srOnly { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 @media (max-width: 1200px) { .body { grid-template-columns: 80px minmax(0, 1fr) 185px; gap: 13px; padding: 18px; }.cover { width: 80px; height: 112px; }.info h2 { font-size: 20px; }.metadata { grid-template-columns: minmax(0, 1fr); }.metadata > div { min-height: 33px; }.finished .body { grid-template-columns: 80px minmax(0, 1fr); } }
 @media (max-width: 600px) { .header { padding: 13px 15px; gap: 9px; }.header > span { flex-basis: 100%; margin-left: 25px; }.body,.finished .body { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 18px; }.cover { width: 96px; height: 128px; }.info h2 { margin-top: 0; font-size: 21px; }.author { font-size: 13px; }.metadata { gap: 8px; }.metadata > div { padding: 9px 11px; }.countdown { min-height: 136px; width: 100%; }.digits strong { min-width: 46px; font-size: 27px; height: 45px; }.countdown > span,.countdown small { font-size: 12px; }.information { align-items: flex-start; padding: 16px; }.information > svg { margin-top: 3px; }.information p { font-size: 12px; }.empty { padding: 33px 20px; }.history > div { padding-inline: 13px; } }
+
+.card[data-record-card] .info { min-width: 0; }
+.card[data-record-card] .info h2 { font-size: 14px; line-height: 1.5; }
+.card[data-record-card] .author { font-size: 12px; }
+.card[data-record-card] .metadata { grid-template-columns: minmax(0, 1fr); }
+.card[data-record-card] .metadata > div { flex-wrap: wrap; }
+@media (max-width: 600px) {
+  .card[data-record-card] .body { grid-template-columns: 64px minmax(0, 1fr); gap: 12px; padding: 16px; }
+  .card[data-record-card] .cover { width: 64px; height: 90px; }
+  .card[data-record-card] .countdown { grid-column: 1 / -1; min-height: 116px; }
+}

@@ -200,21 +200,19 @@ export default function AdminEBooksPage() {
 
       <section className={styles.tableCard} aria-busy={loading}>
         <div className={styles.tableScroller}>
-          <table className={styles.table}>
+          <table className={`${styles.table} ${styles.ebookTable}`} data-record-list data-record-scroll>
             <thead>
               <tr>
                 <th>E-BOOK</th>
-                <th>KODE</th>
-                <th>TAHUN</th>
                 <th>MODE AKSES</th>
                 <th>STATUS</th>
-                <th>AKSI</th>
+                <th data-record-actions="3">AKSI</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={6} className={styles.stateCell}>Memuat data E-Book...</td>
+                  <td colSpan={4} className={styles.stateCell}>Memuat data E-Book...</td>
                 </tr>
               ) : result.data.length ? (
                 result.data.map((book) => (
@@ -228,16 +226,14 @@ export default function AdminEBooksPage() {
                         </div>
                       </div>
                     </td>
-                    <td className={styles.codeCell}>{book.code}</td>
-                    <td>{book.year}</td>
-                    <td><span className={styles.modePill}>{accessModeLabel(book.accessMode)}</span></td>
+                    <td><span className={styles.modePill} data-record-badge>{accessModeLabel(book.accessMode)}</span></td>
                     <td>
-                      <span className={`${styles.pill} ${book.isActive ? styles.active : styles.inactive}`}>
+                      <span className={`${styles.pill} ${book.isActive ? styles.active : styles.inactive}`} data-record-badge>
                         {book.isActive ? "Aktif" : "Nonaktif"}
                       </span>
                     </td>
                     <td>
-                      <div className={styles.actions}>
+                      <div className={styles.actions} data-record-action-group>
                         <Link data-row-action="neutral" data-button="secondary" data-button-size="sm" data-button-shape="square" href={`/admin/koleksi/e-book/${book.id}`} className={styles.iconAction} aria-label={`Lihat detail E-Book ${book.title}`} title="Lihat detail E-Book">
                           <FiEye aria-hidden="true" />
                         </Link>
@@ -264,7 +260,7 @@ export default function AdminEBooksPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} className={styles.stateCell}>Tidak ada E-Book yang sesuai dengan pencarian atau filter.</td>
+                  <td colSpan={4} className={styles.stateCell}>Tidak ada E-Book yang sesuai dengan pencarian atau filter.</td>
                 </tr>
               )}
             </tbody>

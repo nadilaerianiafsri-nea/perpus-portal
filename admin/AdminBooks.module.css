@@ -214,9 +214,40 @@
 
 .table {
   width: 100%;
-  min-width: 910px;
+  min-width: 0;
   border-collapse: collapse;
   font-size: 12px;
+}
+
+.table[data-record-list] th:nth-child(2) { width: 16%; }
+.table[data-record-list] th:nth-child(3) { width: 16%; }
+.table[data-record-list] th:nth-child(4):not([data-record-actions]) { width: 14%; }
+.ebookTable[data-record-list] th:nth-child(2) { width: 24%; }
+.ebookTable[data-record-list] th:nth-child(3) { width: 17%; }
+
+.table[data-record-list] .bookCell,
+.table[data-record-list] .bookCell > div {
+  min-width: 0;
+}
+
+.table[data-record-list] .bookCell strong {
+  max-width: none;
+  overflow-wrap: anywhere;
+}
+
+.table[data-record-list] .codeCell,
+.table[data-record-list] .modePill {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.stockCell {
+  display: grid;
+  gap: 4px;
+}
+
+.stockCell small {
+  color: #777;
 }
 
 .table thead {

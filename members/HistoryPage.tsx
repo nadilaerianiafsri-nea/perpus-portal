@@ -20,7 +20,7 @@ function Status({ item }: { item: HistoryItem }) {
       : "Reservasi Dibatalkan";
 
   return (
-    <span className={returned ? styles.returned : styles.neutral}>
+    <span className={returned ? styles.returned : styles.neutral} data-record-badge>
       <Badge tone={returned ? "green" : "neutral"}>
         <Icon aria-hidden />
         {label}
@@ -97,12 +97,11 @@ export default function HistoryPage({
               key={`${item.sourceType}-${item.id}`}
               style={{ animationDelay: `${Math.min(index, 5) * 45}ms` }}
             >
-              <article className={styles.card}>
+              <article className={styles.card} data-record-card>
                 <div className={styles.cardContent}>
                   <div className={styles.cardHeading}>
                     <div>
-                      <span className={styles.type}>Fisik</span>
-                      <h3>
+                      <h3 data-record-primary>
                         <Link
                           className={styles.title}
                           href={`/dashboard/koleksi/${item.bookId}`}
@@ -116,14 +115,6 @@ export default function HistoryPage({
 
                   <dl className={styles.details}>
                     <div>
-                      <dt>Kode Buku</dt>
-                      <dd>{item.bookCode}</dd>
-                    </div>
-                    <div>
-                      <dt>Perpanjangan</dt>
-                      <dd>{item.extensionCount}×</dd>
-                    </div>
-                    <div>
                       <dt>{item.sourceType === "LOAN" ? "Dipinjam" : "Diajukan"}</dt>
                       <dd>{activityDate(item)}</dd>
                     </div>
@@ -132,6 +123,7 @@ export default function HistoryPage({
                       <dd>{historyDate(item.returnedAt)}</dd>
                     </div>
                   </dl>
+                  {item.extensionCount > 0 && <p className={styles.extensionCount} data-record-secondary>Perpanjangan: {item.extensionCount}x</p>}
                 </div>
 
                 <Link

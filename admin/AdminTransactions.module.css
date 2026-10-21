@@ -161,13 +161,13 @@
 
 .table {
   width: 100%;
-  min-width: 940px;
+  min-width: 0;
   border-collapse: collapse;
   font-size: 10px;
 }
 
 .tableWide {
-  min-width: 1080px;
+  min-width: 0;
 }
 
 .table thead {
@@ -201,7 +201,7 @@
 }
 
 .memberCell {
-  min-width: 150px;
+  min-width: 0;
 }
 
 .memberCell strong {
@@ -219,7 +219,7 @@
 }
 
 .bookCell {
-  min-width: 205px;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 9px;
@@ -304,7 +304,7 @@
   white-space: nowrap;
 }
 
-/* Shared readable records for Reservations, Loans and Returns only. */
+/* Operational record hierarchy; complete metadata remains in existing detail views. */
 .table.transactionTable {
   --transaction-body-size: 14px;
   --transaction-header-size: 12px;
@@ -352,19 +352,19 @@
 }
 
 .transactionTable .memberCell {
-  min-width: 160px;
+  min-width: 0;
 }
 
 .transactionTable .bookCell {
-  min-width: 220px;
+  min-width: 0;
 }
 
 .returnsActionsCell {
-  width: 1%;
+  width: 240px;
 }
 
 .returnsActions {
-  width: max-content;
+  width: 100%;
   gap: 8px;
 }
 
@@ -656,13 +656,6 @@
     font-size: 15px;
   }
 
-  .table {
-    min-width: 900px;
-  }
-
-  .tableWide {
-    min-width: 1020px;
-  }
 
   .pagination {
     justify-content: space-between;
@@ -693,4 +686,41 @@
   .confirmModalActions .secondaryAction {
     width: 100%;
   }
+}
+
+/* Keep name and book content flexible instead of reserving hidden metadata widths. */
+.table[data-record-list] .bookCell > div,
+.table[data-record-list] .memberCell {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.reservationsTable th:nth-child(1),
+.loansTable th:nth-child(1) {
+  width: 21%;
+}
+
+.reservationsTable th:nth-child(2),
+.loansTable th:nth-child(2) {
+  width: 27%;
+}
+
+.reservationsTable th:nth-child(3),
+.loansTable th:nth-child(3),
+.loansTable th:nth-child(4) {
+  width: 14%;
+}
+
+.reservationsTable th:nth-child(4) {
+  width: 18%;
+}
+
+.ebookAccessTable th:nth-child(1),
+.lostTable th:nth-child(1) {
+  width: 24%;
+}
+
+.ebookAccessTable th:nth-child(2),
+.lostTable th:nth-child(2) {
+  width: 32%;
 }

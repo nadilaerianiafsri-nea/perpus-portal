@@ -16,7 +16,6 @@ import {
   formatTransactionDate,
   memberTypeLabel,
   transactionApiMessage,
-  transactionId,
   type LostBooksResponse,
 } from "./adminTransactions";
 import styles from "./AdminTransactions.module.css";
@@ -240,38 +239,31 @@ export default function AdminLostBooksPage() {
           </div>
         ) : null}
 
-        <div className={styles.tableScroller}>
-          <table className={`${styles.table} ${styles.tableWide}`}>
+        <div className={styles.tableScroller} data-record-scroll>
+          <table data-record-list data-record-scroll className={`${styles.table} ${styles.tableWide} ${styles.transactionTable} ${styles.lostTable}`}>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>ANGGOTA</th>
-                <th>BUKU</th>
-                <th>DIPINJAM</th>
-                <th>JATUH TEMPO</th>
-                <th>PERPANJANGAN</th>
-                <th>STATUS</th>
-                <th>AKSI</th>
+                <th scope="col">ANGGOTA</th>
+                <th scope="col">BUKU</th>
+                <th scope="col">JATUH TEMPO</th>
+                <th scope="col">STATUS</th>
+                <th scope="col" data-record-actions="1">AKSI</th>
               </tr>
             </thead>
 
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={8} className={styles.stateCell}>
+                  <td colSpan={5} className={styles.stateCell}>
                     Memuat data buku hilang...
                   </td>
                 </tr>
               ) : result.data.length ? (
                 result.data.map((loan) => (
                   <tr key={loan.id}>
-                    <td className={styles.transactionCode}>
-                      {transactionId(loan.id)}
-                    </td>
-
                     <td>
                       <div className={styles.memberCell}>
-                        <strong>{loan.member.name}</strong>
+                        <strong data-record-primary>{loan.member.name}</strong>
                         <small>{memberTypeLabel(loan.member.memberType)}</small>
                       </div>
                     </td>
@@ -283,20 +275,21 @@ export default function AdminLostBooksPage() {
                           alt=""
                         />
                         <div>
-                          <strong>{loan.book.title}</strong>
+                          <strong data-record-primary>{loan.book.title}</strong>
                           <small>{loan.book.code}</small>
                         </div>
                       </div>
                     </td>
 
-                    <td>{formatTransactionDate(loan.borrowedAt)}</td>
-
-                    <td>{formatTransactionDate(loan.dueAt)}</td>
-
-                    <td>{loan.extensionCount}×</td>
+                    <td>
+                      <div className={styles.memberCell}>
+                        <span>{formatTransactionDate(loan.dueAt)}</span>
+                        {loan.extensionCount > 0 ? <small data-record-secondary>Perpanjangan {loan.extensionCount} kali</small> : null}
+                      </div>
+                    </td>
 
                     <td>
-                      <span className={`${styles.pill} ${styles.dangerPill}`}>
+                      <span data-record-badge className={`${styles.pill} ${styles.dangerPill}`}>
                         Buku Hilang
                       </span>
                     </td>
@@ -315,7 +308,7 @@ export default function AdminLostBooksPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={8} className={styles.stateCell}>
+                  <td colSpan={5} className={styles.stateCell}>
                     Tidak ada kasus buku hilang yang sesuai dengan pencarian
                     atau filter.
                   </td>

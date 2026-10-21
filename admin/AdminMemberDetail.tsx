@@ -58,6 +58,7 @@ export default function AdminMemberDetail({ id }: Props) {
   }, [id]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Preserve the existing detail-page fetch lifecycle during this presentation-only update.
     void load();
   }, [load]);
 
@@ -286,22 +287,23 @@ export default function AdminMemberDetail({ id }: Props) {
             {data.activeLoans.map((loan) => {
               const overdue =
                 loan.status === "AKTIF" &&
+                // eslint-disable-next-line react-hooks/purity -- Preserve the existing due-date comparison; changing its lifecycle is outside this list typography update.
                 new Date(loan.dueAt).getTime() < Date.now();
 
               return (
-                <article key={loan.id} className={styles.transactionRow}>
+                <article key={loan.id} className={styles.transactionRow} data-record-card>
                   <div>
-                    <strong>{loan.book.title}</strong>
+                    <strong data-record-primary>{loan.book.title}</strong>
                     <small>
                       {loan.book.code} · Eksemplar {loan.copy.code}
                     </small>
                   </div>
 
                   <div className={styles.transactionMeta}>
-                    <span>
+                    <span data-record-secondary>
                       Dipinjam {formatAdminMemberDate(loan.borrowedAt)}
                     </span>
-                    <strong className={overdue ? styles.overdueText : ""}>
+                    <strong data-record-primary className={overdue ? styles.overdueText : ""}>
                       {loan.status === "HILANG"
                         ? "Buku Hilang"
                         : `Jatuh tempo ${formatAdminMemberDateTime(
@@ -329,9 +331,10 @@ export default function AdminMemberDetail({ id }: Props) {
               <article
                 key={reservation.id}
                 className={styles.transactionRow}
+                data-record-card
               >
                 <div>
-                  <strong>{reservation.book.title}</strong>
+                  <strong data-record-primary>{reservation.book.title}</strong>
                   <small>
                     {reservation.book.code} · Eksemplar{" "}
                     {reservation.copy.code}
@@ -339,11 +342,11 @@ export default function AdminMemberDetail({ id }: Props) {
                 </div>
 
                 <div className={styles.transactionMeta}>
-                  <span>
+                  <span data-record-secondary>
                     Diajukan{" "}
                     {formatAdminMemberDateTime(reservation.createdAt)}
                   </span>
-                  <strong>
+                  <strong data-record-primary>
                     Batas{" "}
                     {formatAdminMemberDateTime(reservation.expiresAt)}
                   </strong>
@@ -364,19 +367,19 @@ export default function AdminMemberDetail({ id }: Props) {
         {data.history.length ? (
           <div className={styles.transactionList}>
             {data.history.map((loan) => (
-              <article key={loan.id} className={styles.transactionRow}>
+              <article key={loan.id} className={styles.transactionRow} data-record-card>
                 <div>
-                  <strong>{loan.book.title}</strong>
+                  <strong data-record-primary>{loan.book.title}</strong>
                   <small>
                     {loan.book.code} · Eksemplar {loan.copy.code}
                   </small>
                 </div>
 
                 <div className={styles.transactionMeta}>
-                  <span>
+                  <span data-record-secondary>
                     Dipinjam {formatAdminMemberDate(loan.borrowedAt)}
                   </span>
-                  <strong>
+                  <strong data-record-primary>
                     Dikembalikan{" "}
                     {formatAdminMemberDate(loan.returnedAt)}
                   </strong>

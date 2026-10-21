@@ -201,14 +201,14 @@ export default function AdminBookDetailPage({ id }: { id: string }) {
         {book.transactions.length ? (
           <div className={styles.transactionList}>
             {book.transactions.map((transaction) => (
-              <article key={transaction.id} className={styles.transactionRow}>
+              <article key={transaction.id} className={styles.transactionRow} data-record-card>
                 <div>
-                  <strong>{transaction.code}</strong>
+                  <strong data-record-primary>{transaction.code}</strong>
                   <small>
                     {transaction.member.name} · {transaction.copyCode} · batas {adminDate(transaction.deadline)}
                   </small>
                 </div>
-                <span className={styles.transactionBadge}>
+                <span className={styles.transactionBadge} data-record-badge>
                   <FiCheckCircle aria-hidden />
                   {transaction.type === "PEMINJAMAN" ? "Pinjaman Aktif" : "Reservasi Aktif"}
                 </span>

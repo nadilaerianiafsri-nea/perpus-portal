@@ -18,11 +18,10 @@
 .author { margin-bottom: 12px; font-size: 14px; color: #666; }
 .metadata { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; margin: 0; }
 .metadata > div { display: flex; align-items: baseline; flex-wrap: wrap; column-gap: 5px; padding: 9px 12px; background: #fff; border: 1px solid #f0f0f2; border-radius: 10px; box-shadow: 0 1px 2px #0006330a; }
-.metadata dt { color: #777; font-size: 11px; }
+.metadata dt { color: #666; font-size: 12px; }
 .metadata dd { margin: 0; color: #414141; font-size: 14px; overflow-wrap: anywhere; }
 .metadata .strong { font-weight: 700; }
-.metadata .extensionCount { align-items: start; border: 0; background: transparent; padding: 1px 0; box-shadow: none; }
-.extensionCount dt,.extensionCount dd { font-size: 12px; color: #666; }
+.extensionCount { margin: 8px 0 0; font-size: 12px; color: #666; }
 .metadata .overdueDate { background: #ffedec; border-color: #ffb3ae; }
 .overdueDate dt,.metadata .overdueDate dd { color: #b21e18; }
 .actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; align-self: center; }
@@ -148,4 +147,13 @@
   .viewTab:hover {
     transform: none;
   }
+}
+
+/* Operational loan rows keep the book, due date and available actions together. */
+.card[data-record-card] .information h2 { margin-top: 10px; font-size: 14px; line-height: 1.5; }
+.card[data-record-card] .author { font-size: 12px; }
+@media (max-width: 600px) {
+  .card[data-record-card] .body { grid-template-columns: 64px minmax(0, 1fr); gap: 12px; padding: 16px; }
+  .card[data-record-card] .cover { width: 64px; height: 90px; }
+  .card[data-record-card] .actions { grid-column: 2; }
 }

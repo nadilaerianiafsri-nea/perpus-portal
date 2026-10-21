@@ -170,10 +170,10 @@ export default function AdminEBookCirculationPage() {
           </div>
         ) : null}
 
-        <div className={styles.tableScroller}>
+        <div className={styles.tableScroller} data-record-scroll>
           {section === "ACTIVE" ? (
-            <table className={styles.table}>
-              <thead><tr><th>ANGGOTA</th><th>E-BOOK</th><th>MULAI</th><th>BATAS AKSES</th><th>STATUS</th></tr></thead>
+            <table data-record-list data-record-scroll className={styles.table}>
+              <thead><tr><th scope="col">ANGGOTA</th><th scope="col">E-BOOK</th><th scope="col">MULAI</th><th scope="col">BATAS AKSES</th><th scope="col">STATUS</th></tr></thead>
               <tbody>
                 {loading ? <StateRow colSpan={5} text="Memuat pinjaman aktif..." /> : data.activeLoans.data.length ? data.activeLoans.data.map((loan) => (
                   <tr key={loan.id}>
@@ -181,41 +181,42 @@ export default function AdminEBookCirculationPage() {
                     <td><BookCell book={loan.book} /></td>
                     <td>{dateTime(loan.borrowedAt)}</td>
                     <td>{dateTime(loan.dueAt)}</td>
-                    <td><span className={styles.activePill}>Aktif</span></td>
+                    <td><span data-record-badge className={styles.activePill}>Aktif</span></td>
                   </tr>
                 )) : <StateRow colSpan={5} text="Tidak ada pinjaman E-Book aktif." />}
               </tbody>
             </table>
           ) : section === "QUEUE" ? (
-            <table className={styles.table}>
-              <thead><tr><th>POSISI</th><th>ANGGOTA</th><th>E-BOOK</th><th>MASUK ANTREAN</th><th>PRIORITAS</th><th>STATUS</th></tr></thead>
+            <table data-record-list data-record-scroll className={styles.table}>
+              <thead><tr><th scope="col">ANGGOTA</th><th scope="col">E-BOOK</th><th scope="col">MASUK ANTREAN</th><th scope="col">STATUS AKSES</th></tr></thead>
               <tbody>
-                {loading ? <StateRow colSpan={6} text="Memuat antrean..." /> : data.queues.data.length ? data.queues.data.map((queue) => (
+                {loading ? <StateRow colSpan={4} text="Memuat antrean..." /> : data.queues.data.length ? data.queues.data.map((queue) => (
                   <tr key={queue.id}>
-                    <td className={styles.position}>#{queue.position ?? "-"}</td>
                     <td><PersonCell person={queue.user} /></td>
                     <td><BookCell book={queue.book} /></td>
                     <td>{dateTime(queue.queuedAt)}</td>
-                    <td>{queue.status === "DITAWARKAN" ? `Sampai ${dateTime(queue.claimExpiresAt)}` : "Menunggu giliran"}</td>
-                    <td><span className={queue.status === "DITAWARKAN" ? styles.offerPill : styles.waitPill}>{queue.status === "DITAWARKAN" ? "Prioritas 24 Jam" : "Menunggu"}</span></td>
+                    <td><div className={styles.cellStack}>
+                      <span data-record-badge className={queue.status === "DITAWARKAN" ? styles.offerPill : styles.waitPill}>{queue.status === "DITAWARKAN" ? "Prioritas 24 Jam" : "Menunggu"}</span>
+                      <small>Posisi #{queue.position ?? "-"}</small>
+                      <small>{queue.status === "DITAWARKAN" ? `Sampai ${dateTime(queue.claimExpiresAt)}` : "Menunggu giliran"}</small>
+                    </div></td>
                   </tr>
-                )) : <StateRow colSpan={6} text="Tidak ada anggota dalam antrean E-Book." />}
+                )) : <StateRow colSpan={4} text="Tidak ada anggota dalam antrean E-Book." />}
               </tbody>
             </table>
           ) : (
-            <table className={styles.table}>
-              <thead><tr><th>ANGGOTA</th><th>E-BOOK</th><th>MULAI</th><th>BATAS AKSES</th><th>SELESAI</th><th>HASIL</th></tr></thead>
+            <table data-record-list data-record-scroll className={styles.table}>
+              <thead><tr><th scope="col">ANGGOTA</th><th scope="col">E-BOOK</th><th scope="col">PERIODE AKSES</th><th scope="col">SELESAI</th><th scope="col">HASIL</th></tr></thead>
               <tbody>
-                {loading ? <StateRow colSpan={6} text="Memuat riwayat..." /> : data.history.data.length ? data.history.data.map((loan) => (
+                {loading ? <StateRow colSpan={5} text="Memuat riwayat..." /> : data.history.data.length ? data.history.data.map((loan) => (
                   <tr key={loan.id}>
                     <td><PersonCell person={loan.user} /></td>
                     <td><BookCell book={loan.book} /></td>
-                    <td>{dateTime(loan.borrowedAt)}</td>
-                    <td>{dateTime(loan.dueAt)}</td>
+                    <td><div className={styles.cellStack}><span>{dateTime(loan.borrowedAt)}</span><small>Batas {dateTime(loan.dueAt)}</small></div></td>
                     <td>{dateTime(loan.endedAt)}</td>
-                    <td><span className={loan.status === "DIKEMBALIKAN" ? styles.returnedPill : styles.expiredPill}>{endingLabel(loan.status)}</span></td>
+                    <td><span data-record-badge className={loan.status === "DIKEMBALIKAN" ? styles.returnedPill : styles.expiredPill}>{endingLabel(loan.status)}</span></td>
                   </tr>
-                )) : <StateRow colSpan={6} text="Belum ada riwayat peminjaman E-Book." />}
+                )) : <StateRow colSpan={5} text="Belum ada riwayat peminjaman E-Book." />}
               </tbody>
             </table>
           )}
@@ -239,11 +240,11 @@ export default function AdminEBookCirculationPage() {
 }
 
 function PersonCell({ person }: { person: Person }) {
-  return <div className={styles.cellStack}><strong>{person.name}</strong><small>{person.email}</small></div>;
+  return <div className={styles.cellStack}><strong data-record-primary>{person.name}</strong><small>{person.email}</small></div>;
 }
 
 function BookCell({ book }: { book: Book }) {
-  return <div className={styles.cellStack}><strong>{book.title}</strong><small>{book.code}</small></div>;
+  return <div className={styles.cellStack}><strong data-record-primary>{book.title}</strong><small>{book.code}</small></div>;
 }
 
 function StateRow({ colSpan, text }: { colSpan: number; text: string }) {

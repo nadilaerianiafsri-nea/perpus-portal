@@ -24,7 +24,7 @@ export function BookCover({ book, small = false }: { book: MemberBook; small?: b
   return <div className={`${styles.cover} ${small ? styles.coverSmall : ""}`}><Image src={safeCoverUrl(book.coverUrl)} alt={`Sampul ${book.title}`} fill sizes={small ? "40px" : "72px"} unoptimized /></div>;
 }
 export function Badge({ children, tone = "neutral" }: { children: React.ReactNode; tone?: string }) {
-  return <span className={`${styles.badge} ${styles[tone] ?? ""}`}>{children}</span>;
+  return <span data-record-badge className={`${styles.badge} ${styles[tone] ?? ""}`}>{children}</span>;
 }
 export function Countdown({ deadline, onExpire }: { deadline: string; onExpire: () => void }) {
   const seconds = useCountdown(deadline, onExpire);

@@ -188,19 +188,19 @@ export default function EBooksPage() {
                     {activeLoans.map((loan) => {
                       const progress = progressValue(loan.reading?.progress);
                       return (
-                        <article className={styles.card} key={loan.id}>
-                          <div className={styles.header}><FiMonitor aria-hidden />Pinjaman Aktif</div>
+                        <article className={styles.card} data-record-card key={loan.id}>
+                          <div className={styles.header} data-record-badge><FiMonitor aria-hidden />Pinjaman Aktif</div>
                           <div className={styles.body}>
                             <Link className={styles.cover} href={`/dashboard/koleksi/${loan.book.id}`} aria-label={`Lihat detail ${loan.book.title}`}>
                               <Image src={safeCoverUrl(loan.book.coverUrl)} alt={`Sampul ${loan.book.title}`} fill sizes="80px" unoptimized />
                             </Link>
                             <div className={styles.information}>
-                              <h3>{loan.book.title}</h3>
+                              <h3 data-record-primary>{loan.book.title}</h3>
                               <p className={styles.deadline}><FiClock aria-hidden />Akses sampai {formatDate(loan.dueAt)} WIB</p>
-                              <p>Progres membaca</p>
+                              <p data-record-secondary>Progres membaca</p>
                               <progress className={styles.progress} value={progress} max={100} aria-label={`Progres membaca ${loan.book.title}: ${progress}%`} />
-                              <span className={styles.percentage}>{progress}%</span>
-                              <div className={styles.actions}>
+                              <span className={styles.percentage} data-record-secondary>{progress}%</span>
+                              <div className={styles.actions} data-record-action-group>
                                 <Link data-button="primary" data-row-action="primary" data-button-shape="square" title={`Baca E-Book ${loan.book.title}`} aria-label={`Baca E-Book ${loan.book.title}`} className={styles.read} href={`/e-book/${loan.book.id}/baca`}><FiBookOpen aria-hidden="true" /></Link>
                                 <button data-button="success" data-row-action="success" data-button-shape="square" title={`Kembalikan E-Book ${loan.book.title}`} aria-label={`Kembalikan E-Book ${loan.book.title}`} data-button-loading={pendingKey === `${loan.bookId}:return`} aria-busy={pendingKey === `${loan.bookId}:return`} type="button" className={styles.secondary} disabled={Boolean(pendingKey)} onClick={() => void act(loan.bookId, "return", "E-Book berhasil dikembalikan.")}><FiCornerDownLeft aria-hidden="true" /></button>
                               </div>
@@ -227,20 +227,20 @@ export default function EBooksPage() {
                     {queues.map((queue) => {
                       const offered = queue.status === "DITAWARKAN";
                       return (
-                        <article className={styles.card} key={queue.id}>
-                          <div className={`${styles.header} ${offered ? styles.offerHeader : ""}`}><FiClock aria-hidden />{offered ? "Giliran Anda" : `Antrean #${queue.position ?? "-"}`}</div>
+                        <article className={styles.card} data-record-card key={queue.id}>
+                          <div className={`${styles.header} ${offered ? styles.offerHeader : ""}`} data-record-badge><FiClock aria-hidden />{offered ? "Giliran Anda" : `Antrean #${queue.position ?? "-"}`}</div>
                           <div className={styles.body}>
                             <Link className={styles.cover} href={`/dashboard/koleksi/${queue.book.id}`} aria-label={`Lihat detail ${queue.book.title}`}>
                               <Image src={safeCoverUrl(queue.book.coverUrl)} alt={`Sampul ${queue.book.title}`} fill sizes="80px" unoptimized />
                             </Link>
                             <div className={styles.information}>
-                              <h3>{queue.book.title}</h3>
+                              <h3 data-record-primary>{queue.book.title}</h3>
                               {offered ? (
                                 <p className={styles.offerText}>Prioritas Anda tersisa <strong>{remaining(queue.claimExpiresAt, now)}</strong>. Jika tidak diambil, giliran otomatis diteruskan.</p>
                               ) : (
                                 <p>Posisi antrean saat ini: <strong>#{queue.position ?? "-"}</strong></p>
                               )}
-                              <div className={styles.actions}>
+                              <div className={styles.actions} data-record-action-group>
                                 {offered ? <button data-button="primary" data-row-action="primary" data-button-shape="square" title={`Pinjam E-Book ${queue.book.title}`} aria-label={`Pinjam E-Book ${queue.book.title}`} data-button-loading={pendingKey === `${queue.bookId}:borrow`} aria-busy={pendingKey === `${queue.bookId}:borrow`} type="button" className={styles.read} disabled={Boolean(pendingKey)} onClick={() => void act(queue.bookId, "borrow", "E-Book berhasil dipinjam selama 7 hari.")}><FiBookOpen aria-hidden="true" /></button> : null}
                                 <button data-button="danger" data-row-action="danger-soft" data-button-shape="square" title={`Batalkan antrean E-Book ${queue.book.title}`} aria-label={`Batalkan antrean E-Book ${queue.book.title}`} data-button-loading={pendingKey === `${queue.bookId}:queue/cancel`} aria-busy={pendingKey === `${queue.bookId}:queue/cancel`} type="button" className={styles.secondary} disabled={Boolean(pendingKey)} onClick={() => void act(queue.bookId, "queue/cancel", "Antrean E-Book berhasil dibatalkan.")}><FiXCircle aria-hidden="true" /></button>
                               </div>
@@ -272,18 +272,18 @@ export default function EBooksPage() {
                     {visibleHistory.map((ebook) => {
                       const progress = progressValue(ebook.progress);
                       return (
-                        <article className={styles.card} key={ebook.id} data-ebook-id={ebook.book.id}>
-                          <div className={styles.header}><FiMonitor aria-hidden />Pernah Dibaca</div>
+                        <article className={styles.card} data-record-card key={ebook.id} data-ebook-id={ebook.book.id}>
+                          <div className={styles.header} data-record-badge><FiMonitor aria-hidden />Pernah Dibaca</div>
                           <div className={styles.body}>
                             <Link className={styles.cover} href={`/dashboard/koleksi/${ebook.book.id}`} aria-label={`Lihat detail ${ebook.book.title}`}>
                               <Image src={safeCoverUrl(ebook.book.coverUrl)} alt={`Sampul ${ebook.book.title}`} fill sizes="80px" unoptimized />
                             </Link>
                             <div className={styles.information}>
-                              <h3>{ebook.book.title}</h3>
-                              <p>Progres terakhir</p>
+                              <h3 data-record-primary>{ebook.book.title}</h3>
+                              <p data-record-secondary>Progres terakhir</p>
                               <progress className={styles.progress} value={progress} max={100} aria-label={`Progres membaca ${ebook.book.title}: ${progress}%`} />
-                              <span className={styles.percentage}>{progress}%</span>
-                              <div className={styles.actions}>
+                              <span className={styles.percentage} data-record-secondary>{progress}%</span>
+                              <div className={styles.actions} data-record-action-group>
                                 {ebook.circulation.state === "AVAILABLE" ? (
                                   <button data-button="primary" data-row-action="primary" data-button-shape="square" title={`Pinjam lagi E-Book ${ebook.book.title}`} aria-label={`Pinjam lagi E-Book ${ebook.book.title}`} data-button-loading={pendingKey === `${ebook.bookId}:borrow`} aria-busy={pendingKey === `${ebook.bookId}:borrow`} type="button" className={styles.read} disabled={Boolean(pendingKey)} onClick={() => void act(ebook.bookId, "borrow", "E-Book berhasil dipinjam kembali selama 7 hari.")}><FiBookOpen aria-hidden="true" /></button>
                                 ) : (

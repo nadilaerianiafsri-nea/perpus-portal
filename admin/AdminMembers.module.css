@@ -150,7 +150,7 @@
 
 .table {
   width: 100%;
-  min-width: 1050px;
+  min-width: 0;
   border-collapse: collapse;
   font-size: 11px;
 }
@@ -204,6 +204,31 @@
 .emailCell {
   max-width: 210px;
   overflow-wrap: anywhere;
+}
+
+.table th:nth-child(1) { width: 21%; }
+.table th:nth-child(2) { width: 17%; }
+.table th:nth-child(4),
+.table th:nth-child(5) { width: 104px; }
+
+.contactCell {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+  overflow-wrap: anywhere;
+}
+
+.contactCell strong {
+  color: var(--navy);
+}
+
+.contactCell small {
+  color: #777;
+}
+
+.table .typePill {
+  white-space: normal;
+  text-align: center;
 }
 
 .typePill,
@@ -386,6 +411,12 @@
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.detailHeading > div:first-child {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .primaryButton {
@@ -702,6 +733,14 @@
     display: block;
     color: var(--navy);
     font-size: 12px;
+  }
+
+  .mobileCardHeading > div {
+    min-width: 0;
+  }
+
+  .mobileInfo > div:first-child {
+    grid-column: 1 / -1;
   }
 
   .mobileCardHeading small {

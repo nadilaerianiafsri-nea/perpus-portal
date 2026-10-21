@@ -259,24 +259,22 @@ export default function AdminReturnsPage() {
           </div>
         ) : null}
 
-        <div className={styles.tableScroller}>
-          <table className={`${styles.table} ${styles.tableWide} ${styles.transactionTable} ${styles.returnsTable}`}>
+        <div className={styles.tableScroller} data-record-scroll>
+          <table data-record-list data-record-scroll className={`${styles.table} ${styles.tableWide} ${styles.transactionTable} ${styles.returnsTable}`}>
             <thead>
               <tr>
                 <th scope="col">ANGGOTA</th>
                 <th scope="col">BUKU</th>
-                <th scope="col">DIPINJAM</th>
                 <th scope="col">JATUH TEMPO</th>
-                <th scope="col">PERPANJANGAN</th>
                 <th scope="col">STATUS</th>
-                <th scope="col" className={styles.returnsActionsCell}>AKSI</th>
+                <th scope="col" data-record-actions="text" className={styles.returnsActionsCell}>AKSI</th>
               </tr>
             </thead>
 
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={7} className={styles.stateCell}>
+                  <td colSpan={5} className={styles.stateCell}>
                     Memuat data pengembalian...
                   </td>
                 </tr>
@@ -288,7 +286,7 @@ export default function AdminReturnsPage() {
                     <tr key={loan.id}>
                       <td>
                         <div className={styles.memberCell}>
-                          <strong>{loan.member.name}</strong>
+                          <strong data-record-primary>{loan.member.name}</strong>
                           <small>
                             {memberTypeLabel(loan.member.memberType)}
                           </small>
@@ -304,20 +302,16 @@ export default function AdminReturnsPage() {
                             alt=""
                           />
                           <div>
-                            <strong>{loan.book.title}</strong>
+                            <strong data-record-primary>{loan.book.title}</strong>
                             <small>{loan.book.code}</small>
                           </div>
                         </div>
                       </td>
 
-                      <td>{formatTransactionDate(loan.borrowedAt)}</td>
-
                       <td>{formatTransactionDate(loan.dueAt)}</td>
 
-                      <td>{loan.extensionCount}×</td>
-
                       <td>
-                        <span
+                        <span data-record-badge
                           className={`${styles.pill} ${
                             loanStatus === "TERLAMBAT"
                               ? styles.dangerPill
@@ -335,7 +329,7 @@ export default function AdminReturnsPage() {
                       </td>
 
                       <td className={styles.returnsActionsCell}>
-                        <div className={`${styles.actionGroup} ${styles.returnsActions}`}>
+                        <div data-record-action-group="text" className={`${styles.actionGroup} ${styles.returnsActions}`}>
                           <button aria-label={`Konfirmasi pengembalian ${loan.book.title} oleh ${loan.member.name}`} data-row-action="success" aria-busy={processingId === loan.id}
                             data-button="success"
                             data-button-size="sm"
@@ -382,7 +376,7 @@ export default function AdminReturnsPage() {
                 })
               ) : (
                 <tr>
-                  <td colSpan={7} className={styles.stateCell}>
+                  <td colSpan={5} className={styles.stateCell}>
                     Tidak ada pinjaman yang sesuai dengan pencarian atau filter.
                   </td>
                 </tr>

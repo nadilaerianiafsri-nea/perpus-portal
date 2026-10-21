@@ -47,10 +47,10 @@ export default function NotificationsPage() {
     {resource.loading ? <LoadingCards /> : resource.error ? <ErrorState message={resource.error} retry={resource.reload} /> : !notifications.length ? <EmptyState message={filter === "Semua" ? "Belum ada notifikasi." : "Semua notifikasi sudah dibaca."} /> : notifications.map(item => {
       const destination = notificationDestination(item.href);
       const linked = destination !== null;
-      return <article key={item.id} className={`${styles.card} ${styles.notification} ${!item.readAt ? styles.unread : ""} ${linked ? interaction.clickable : ""}`}>
+      return <article data-record-card key={item.id} className={`${styles.card} ${styles.notification} ${!item.readAt ? styles.unread : ""} ${linked ? interaction.clickable : ""}`}>
         <span className={styles.notificationIcon}><FiBell aria-hidden /></span>
         <div className={styles.bookInfo}>
-          <h2>{linked ? <Link
+          <h2 data-record-primary>{linked ? <Link
             className={interaction.cardLink}
             href={destination!}
             aria-label={`Lihat detail: ${item.title}`}
@@ -73,8 +73,8 @@ export default function NotificationsPage() {
               if (event.key === " ") { event.preventDefault(); if (!event.repeat) event.currentTarget.click(); }
             }}
           >{item.title}</Link> : item.title}</h2>
-          <p>{item.message}</p><time dateTime={item.createdAt}>{memberDate(item.createdAt, true)}</time>
-          <div className={styles.notificationActions}>
+          <p className={interaction.message}>{item.message}</p><time dateTime={item.createdAt}>{memberDate(item.createdAt, true)}</time>
+          <div className={styles.notificationActions} data-record-action-group>
             <Badge tone={item.readAt ? "neutral" : "blue"}>{item.readAt ? "Sudah Dibaca" : "Belum Dibaca"}</Badge>
             {!item.readAt && <button data-button="ghost" data-row-action="neutral" data-button-shape="square" title={`Tandai dibaca: ${item.title}`} aria-label={`Tandai dibaca: ${item.title}`} data-button-size="sm" data-button-loading={busy === String(item.id)} aria-busy={busy === String(item.id)} className={interaction.actionButton} disabled={busy !== null} onClick={event => { event.stopPropagation(); void markRead(item.id); }}><FiCheck aria-hidden="true" /></button>}
             {linked && <span data-button="secondary" data-button-shape="square" data-button-size="sm" className={interaction.detail} data-notification-detail aria-hidden><FiEye aria-hidden="true" /></span>}

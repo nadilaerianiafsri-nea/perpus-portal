@@ -1,0 +1,117 @@
+/* Opt-in operational records only. Public cards, forms, details and KPIs retain
+   their existing hierarchy. Context-specific columns remain page-owned. */
+:root {
+  --record-body-size: 14px;
+  --record-primary-size: 14px;
+  --record-secondary-size: 12px;
+  --record-header-size: 12px;
+  --record-badge-size: 12px;
+  --record-cell-padding: 14px;
+}
+
+:root body table[data-record-list] {
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+  font-family: var(--font-outfit), "Outfit", sans-serif;
+  font-size: var(--record-body-size);
+  line-height: 1.5;
+}
+:root body table[data-record-list] th {
+  height: auto;
+  padding: 12px var(--record-cell-padding);
+  font-size: var(--record-header-size);
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+:root body table[data-record-list] td {
+  padding: var(--record-cell-padding);
+  font-size: var(--record-body-size);
+  line-height: 1.5;
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+}
+:root body table[data-record-list] td > :is(div, a),
+:root body table[data-record-list] td > div > div {
+  min-width: 0;
+  max-width: 100%;
+}
+:root body table[data-record-list] strong,
+:root body [data-record-primary] {
+  font-size: var(--record-primary-size);
+  font-weight: 600;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+:root body table[data-record-list] small,
+:root body [data-record-card] :is(small, dt, time),
+:root body [data-record-secondary] {
+  font-size: var(--record-secondary-size);
+  font-weight: 400;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+:root body [data-record-card] {
+  min-width: 0;
+  font-size: var(--record-body-size);
+  line-height: 1.5;
+}
+:root body [data-record-card] :is(p, dd, h2, h3) {
+  font-size: var(--record-body-size);
+  line-height: 1.5;
+}
+:root body [data-record-card] [data-record-secondary] {
+  font-size: var(--record-secondary-size);
+}
+:root body [data-record-card] [data-record-primary] {
+  font-size: var(--record-primary-size);
+  font-weight: 600;
+  line-height: 1.5;
+}
+:root body table[data-record-list] [data-record-badge],
+:root body [data-record-card] [data-record-badge] {
+  max-width: 100%;
+  font-size: var(--record-badge-size);
+  line-height: 1.4;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+:root body [data-record-action-group] {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+:root body table[data-record-list] th[data-record-actions="1"] { width: 76px; }
+:root body table[data-record-list] th[data-record-actions="2"] { width: 116px; }
+:root body table[data-record-list] th[data-record-actions="3"] { width: 164px; }
+:root body table[data-record-list] th[data-record-actions="text"] { width: 240px; }
+:root body table[data-record-list] th[data-record-column="index"] { width: 56px; }
+:root body table[data-record-list] th[data-record-column="quantity"] { width: 110px; }
+:root body [data-record-action-group="text"] {
+  width: 100%;
+  flex-direction: column;
+  align-items: stretch;
+}
+:root body [data-record-action-group="text"] > button[data-button][data-row-action] {
+  width: 100%;
+  min-width: 0;
+  padding-inline: 14px;
+  font-size: var(--record-body-size);
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+@media (min-width: 1680px) {
+  :root body table[data-record-list] th[data-record-actions="text"] { width: 360px; }
+  :root body [data-record-action-group="text"] { flex-direction: row; }
+  :root body [data-record-action-group="text"] > button[data-button][data-row-action] { width: auto; }
+}
+@media (max-width: 1100px) {
+  :root body table[data-record-list][data-record-scroll] {
+    min-width: var(--record-scroll-width, 720px);
+  }
+}
