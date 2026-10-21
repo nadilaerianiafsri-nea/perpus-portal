@@ -11,8 +11,8 @@ type RevealTarget = {
 };
 
 const BASE_DELAY = 72;
-const COLLECTION_DELAY = 82;
-const MAX_DELAY = 410;
+const COLLECTION_DELAY = 86;
+const MAX_DELAY = 420;
 
 function addTarget(
   targets: Map<HTMLElement, RevealTarget>,
@@ -46,6 +46,7 @@ export default function LandingRevealObserver() {
     if (!root) return;
 
     const targets = new Map<HTMLElement, RevealTarget>();
+    const groupedTargets = new Set<HTMLElement>();
 
     root.querySelectorAll(`
       .stats-card,
@@ -57,16 +58,42 @@ export default function LandingRevealObserver() {
       addSequence(targets, group.querySelectorAll(":scope > *"), "up");
     });
 
-    const collectionGrid = root.querySelector(".book-grid");
-    if (collectionGrid) {
-      Array.from(collectionGrid.children).forEach((element, index) => {
+    /*
+     * Koleksi terbaru bergerak sebagai satu komposisi: dua card pertama masuk
+     * dari kiri, dua card berikutnya dari kanan, lalu CTA naik lembut.
+     * Grid menjadi trigger agar semua card benar-benar mulai ketika section
+     * koleksi masuk viewport, bukan lebih awal saat halaman baru hydrate.
+     */
+    const collectionGrid = root.querySelector<HTMLElement>("[data-collection-grid]");
+    const collectionCards = Array.from(
+      root.querySelectorAll<HTMLElement>("[data-collection-card]"),
+    );
+    const collectionTargets: HTMLElement[] = [];
+
+    if (collectionCards.length) {
+      const midpoint = Math.ceil(collectionCards.length / 2);
+
+      collectionCards.forEach((element, index) => {
+        const direction: RevealDirection = index < midpoint ? "left" : "right";
+        const inwardIndex =
+          index < midpoint ? index : collectionCards.length - 1 - index;
+
         addTarget(
           targets,
           element,
-          index % 2 === 0 ? "left" : "right",
-          index * COLLECTION_DELAY,
+          direction,
+          Math.max(0, inwardIndex) * COLLECTION_DELAY,
         );
+        groupedTargets.add(element);
+        collectionTargets.push(element);
       });
+    }
+
+    const collectionCta = root.querySelector<HTMLElement>("[data-collection-cta]");
+    if (collectionCta) {
+      addTarget(targets, collectionCta, "up", COLLECTION_DELAY * 2);
+      groupedTargets.add(collectionCta);
+      collectionTargets.push(collectionCta);
     }
 
     addSequence(targets, root.querySelectorAll(".section-head"), "up", 0);
@@ -129,15 +156,41 @@ export default function LandingRevealObserver() {
         });
       },
       {
-        threshold: 0.12,
-        rootMargin: "0px 0px -6% 0px",
+        threshold: 0.14,
+        rootMargin: "0px 0px -5% 0px",
       },
     );
 
-    targets.forEach(({ element }) => observer.observe(element));
+    targets.forEach(({ element }) => {
+      if (!groupedTargets.has(element)) observer.observe(element);
+    });
+
+    let collectionObserver: IntersectionObserver | null = null;
+    if (collectionGrid && collectionTargets.length) {
+      collectionObserver = new IntersectionObserver(
+        (entries) => {
+          if (!entries.some((entry) => entry.isIntersecting)) return;
+
+          collectionTargets.forEach((element) => {
+            element.classList.add("landing-reveal-visible");
+          });
+          collectionObserver?.disconnect();
+        },
+        {
+          threshold: 0.16,
+          rootMargin: "0px 0px -4% 0px",
+        },
+      );
+      collectionObserver.observe(collectionGrid);
+    } else {
+      collectionTargets.forEach((element) => {
+        element.classList.add("landing-reveal-visible");
+      });
+    }
 
     return () => {
       observer.disconnect();
+      collectionObserver?.disconnect();
       delete root.dataset.revealReady;
       targets.forEach(({ element }) => {
         element.classList.remove("landing-reveal-item", "landing-reveal-visible");

@@ -25,7 +25,7 @@ async function json<T>(path: string): Promise<T> {
 
 export async function getHomeData(): Promise<HomeData> {
   const [latest, summary, filters, grants] = await Promise.allSettled([
-    json<CatalogResponse>("/collections?limit=6&sort=newest&type=FISIK"),
+    json<CatalogResponse>("/collections?limit=6&sort=newest"),
     json<{ physicalTitles: number; ebooks: number }>("/members/public/summary"),
     json<FilterOptions>("/collections/filters"),
     json<GrantsResponse>("/grants?limit=3&page=1"),

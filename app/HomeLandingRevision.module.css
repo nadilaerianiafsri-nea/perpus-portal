@@ -108,104 +108,353 @@
   z-index: 2;
 }
 
-/* Modern, minimal ornaments. They never capture pointer events. */
+/* Edge ornaments: visible enough to enrich the canvas, still quiet around content. */
 .collectionBlend::before,
+.collectionBlend::after,
+.subjectBlend::before,
 .subjectBlend::after,
+.serviceBlend::before,
+.serviceBlend::after,
 .borrowBlend::before,
+.borrowBlend::after,
+.ebookBlend::before,
 .ebookBlend::after,
 .reminderBlend::before,
+.reminderBlend::after,
+.donationBlend::before,
 .donationBlend::after,
-.infoBlend::before {
+.memberBlend::before,
+.memberBlend::after,
+.infoBlend::before,
+.infoBlend::after {
   content: "";
   position: absolute;
   z-index: 0;
   pointer-events: none;
 }
 
+/* Koleksi: sky ring on the right, quiet navy dots on the left. */
 .collectionBlend::before {
-  width: 220px;
-  height: 220px;
-  top: 52px;
-  right: -92px;
-  border: 1px solid color-mix(in srgb, var(--sky) 52%, transparent);
+  width: 320px;
+  height: 320px;
+  top: 18px;
+  right: -126px;
+  border: 1.2px solid color-mix(in srgb, var(--sky) 72%, transparent);
   border-radius: 50%;
-  box-shadow: inset 0 0 0 34px color-mix(in srgb, var(--sky) 8%, transparent);
+  box-shadow:
+    inset 0 0 0 46px color-mix(in srgb, var(--sky) 10%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--navy) 2%, transparent);
+}
+
+.collectionBlend::after {
+  width: 190px;
+  height: 160px;
+  left: 1.5%;
+  bottom: 28px;
+  opacity: 0.42;
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--navy) 22%, transparent) 1.15px,
+    transparent 1.7px
+  );
+  background-size: 16px 16px;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--navy) 34%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--navy) 34%,
+    transparent 100%
+  );
+}
+
+/* Kategori: open arc at the left, dot field near the illustration. */
+.subjectBlend::before {
+  width: 330px;
+  height: 330px;
+  left: -190px;
+  top: 46px;
+  border: 1px solid color-mix(in srgb, var(--yellow) 24%, transparent);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 42px color-mix(in srgb, var(--sky) 8%, transparent),
+    0 0 0 84px color-mix(in srgb, var(--navy) 2%, transparent);
 }
 
 .subjectBlend::after {
-  width: 150px;
-  height: 150px;
-  right: 5%;
-  bottom: 28px;
-  opacity: 0.34;
+  width: 210px;
+  height: 190px;
+  right: 3.5%;
+  bottom: 20px;
+  opacity: 0.44;
   background-image: radial-gradient(
     circle,
-    color-mix(in srgb, var(--navy) 18%, transparent) 1px,
-    transparent 1.5px
+    color-mix(in srgb, var(--navy) 20%, transparent) 1.1px,
+    transparent 1.6px
   );
   background-size: 14px 14px;
-  -webkit-mask-image: linear-gradient(135deg, transparent 8%, var(--navy) 42%, transparent 94%);
-  mask-image: linear-gradient(135deg, transparent 8%, var(--navy) 42%, transparent 94%);
+  -webkit-mask-image: linear-gradient(
+    135deg,
+    transparent 6%,
+    var(--navy) 38%,
+    transparent 94%
+  );
+  mask-image: linear-gradient(
+    135deg,
+    transparent 6%,
+    var(--navy) 38%,
+    transparent 94%
+  );
 }
 
-.borrowBlend::before {
-  width: 250px;
-  height: 250px;
-  left: -150px;
-  bottom: 34px;
-  border: 1px solid color-mix(in srgb, var(--navy) 8%, transparent);
+/* Layanan gelap: one yellow ring and one soft dotted glow. */
+.serviceBlend::before {
+  width: 340px;
+  height: 340px;
+  left: -190px;
+  top: 72px;
+  border: 1px solid color-mix(in srgb, var(--yellow) 24%, transparent);
   border-radius: 50%;
   box-shadow:
-    0 0 0 34px color-mix(in srgb, var(--sky) 8%, transparent),
-    0 0 0 70px color-mix(in srgb, var(--navy) 2%, transparent);
+    0 0 0 48px color-mix(in srgb, var(--white) 3%, transparent),
+    0 0 0 96px color-mix(in srgb, var(--stat-teal) 4%, transparent);
+}
+
+.serviceBlend::after {
+  width: 230px;
+  height: 210px;
+  right: 1.5%;
+  bottom: 24px;
+  opacity: 0.38;
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--white) 32%, transparent) 1.2px,
+    transparent 1.8px
+  );
+  background-size: 17px 17px;
+  -webkit-mask-image: radial-gradient(circle, var(--navy) 16%, transparent 76%);
+  mask-image: radial-gradient(circle, var(--navy) 16%, transparent 76%);
+}
+
+/* Panduan: opposing arcs frame the step cards. */
+.borrowBlend::before {
+  width: 330px;
+  height: 330px;
+  left: -186px;
+  bottom: 18px;
+  border: 1px solid color-mix(in srgb, var(--navy) 10%, transparent);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 40px color-mix(in srgb, var(--sky) 9%, transparent),
+    0 0 0 78px color-mix(in srgb, var(--navy) 2%, transparent);
+}
+
+.borrowBlend::after {
+  width: 270px;
+  height: 270px;
+  right: -142px;
+  top: 42px;
+  border: 1px solid color-mix(in srgb, var(--sky) 58%, transparent);
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 34px color-mix(in srgb, var(--sky) 7%, transparent);
+}
+
+/* E-book: dotted edge on the left, broad sky orb on the right. */
+.ebookBlend::before {
+  width: 190px;
+  height: 180px;
+  left: 2%;
+  bottom: 34px;
+  opacity: 0.36;
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--stat-teal) 28%, transparent) 1.15px,
+    transparent 1.7px
+  );
+  background-size: 15px 15px;
+  -webkit-mask-image: linear-gradient(
+    45deg,
+    transparent 2%,
+    var(--navy) 38%,
+    transparent 96%
+  );
+  mask-image: linear-gradient(
+    45deg,
+    transparent 2%,
+    var(--navy) 38%,
+    transparent 96%
+  );
 }
 
 .ebookBlend::after {
-  width: 280px;
-  height: 280px;
-  right: -110px;
-  top: 18%;
+  width: 390px;
+  height: 390px;
+  right: -164px;
+  top: 10%;
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    color-mix(in srgb, var(--sky) 56%, transparent) 0%,
-    color-mix(in srgb, var(--sky) 18%, transparent) 42%,
+    color-mix(in srgb, var(--sky) 64%, transparent) 0%,
+    color-mix(in srgb, var(--sky) 20%, transparent) 44%,
+    transparent 74%
+  );
+}
+
+/* Reminder: yellow arc plus restrained navy dots. */
+.reminderBlend::before {
+  width: 250px;
+  height: 250px;
+  left: -92px;
+  top: 34px;
+  border: 1px solid color-mix(in srgb, var(--yellow) 30%, transparent);
+  border-radius: 50%;
+  box-shadow: 0 0 0 36px color-mix(in srgb, var(--yellow-soft) 16%, transparent);
+}
+
+.reminderBlend::after {
+  width: 180px;
+  height: 170px;
+  right: 3%;
+  bottom: 28px;
+  opacity: 0.36;
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--navy) 18%, transparent) 1.1px,
+    transparent 1.6px
+  );
+  background-size: 15px 15px;
+  -webkit-mask-image: radial-gradient(circle, var(--navy) 20%, transparent 76%);
+  mask-image: radial-gradient(circle, var(--navy) 20%, transparent 76%);
+}
+
+/* Hibah: the left arc now finishes inside this section; right edge gets ring + dots. */
+.donationBlend::before {
+  width: 280px;
+  height: 280px;
+  left: -150px;
+  bottom: 86px;
+  border: 1px solid color-mix(in srgb, var(--orange) 16%, transparent);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 34px color-mix(in srgb, var(--cream) 28%, transparent),
+    0 0 0 68px color-mix(in srgb, var(--yellow-soft) 14%, transparent);
+}
+
+.donationBlend::after {
+  width: 320px;
+  height: 280px;
+  right: -96px;
+  top: 34px;
+  opacity: 0.5;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      circle at 48% 50%,
+      transparent 0 45%,
+      color-mix(in srgb, var(--yellow) 28%, transparent) 45.5% 46.4%,
+      transparent 47% 100%
+    ),
+    radial-gradient(
+      circle,
+      color-mix(in srgb, var(--yellow) 38%, transparent) 1.15px,
+      transparent 1.75px
+    );
+  background-size:
+    100% 100%,
+    16px 16px;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--navy) 26%,
+    var(--navy) 72%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--navy) 26%,
+    var(--navy) 72%,
+    transparent 100%
+  );
+}
+
+/* Membership: soft left glow breaks the false continuation; right edge carries the visible ornament. */
+.memberBlend::before {
+  width: 360px;
+  height: 360px;
+  left: -184px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--sky) 18%, transparent) 0%,
+    color-mix(in srgb, var(--sky) 7%, transparent) 44%,
     transparent 72%
   );
 }
 
-.reminderBlend::before {
-  width: 170px;
-  height: 170px;
-  left: 4%;
-  top: 40px;
-  border: 1px solid color-mix(in srgb, var(--yellow) 20%, transparent);
+.memberBlend::after {
+  width: 330px;
+  height: 300px;
+  right: -102px;
+  top: 34px;
+  opacity: 0.46;
   border-radius: 50%;
-}
-
-.donationBlend::after {
-  width: 160px;
-  height: 160px;
-  right: 6%;
-  top: 36px;
-  opacity: 0.42;
-  background-image: radial-gradient(
-    circle,
-    color-mix(in srgb, var(--yellow) 38%, transparent) 1.2px,
-    transparent 1.6px
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      transparent 0 44%,
+      color-mix(in srgb, var(--sky) 44%, transparent) 44.5% 45.4%,
+      transparent 46% 100%
+    ),
+    radial-gradient(
+      circle,
+      color-mix(in srgb, var(--yellow) 34%, transparent) 1.1px,
+      transparent 1.7px
+    );
+  background-size:
+    100% 100%,
+    17px 17px;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--navy) 24%,
+    var(--navy) 76%,
+    transparent 100%
   );
-  background-size: 16px 16px;
-  -webkit-mask-image: radial-gradient(circle, var(--navy) 18%, transparent 74%);
-  mask-image: radial-gradient(circle, var(--navy) 18%, transparent 74%);
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--navy) 24%,
+    var(--navy) 76%,
+    transparent 100%
+  );
 }
 
+/* Informasi: two large cropped rings finish the page without filling the center. */
 .infoBlend::before {
-  width: 210px;
-  height: 210px;
-  left: -122px;
-  bottom: -92px;
-  border: 1px solid color-mix(in srgb, var(--sky) 48%, transparent);
+  width: 280px;
+  height: 280px;
+  left: -154px;
+  bottom: -108px;
+  border: 1px solid color-mix(in srgb, var(--sky) 64%, transparent);
   border-radius: 50%;
+  box-shadow: inset 0 0 0 38px color-mix(in srgb, var(--sky) 8%, transparent);
+}
+
+.infoBlend::after {
+  width: 270px;
+  height: 270px;
+  right: -136px;
+  top: 24px;
+  border: 1px solid color-mix(in srgb, var(--yellow) 22%, transparent);
+  border-radius: 50%;
+  box-shadow: 0 0 0 38px color-mix(in srgb, var(--yellow-soft) 10%, transparent);
 }
 
 .statsBand {
@@ -310,6 +559,13 @@
   align-items: stretch;
 }
 
+.latestCollectionGrid
+  :global(.landing-reveal-item[data-reveal-direction="left"]),
+.latestCollectionGrid
+  :global(.landing-reveal-item[data-reveal-direction="right"]) {
+  --reveal-distance-inline: 52px;
+}
+
 .latestBookCard {
   min-width: 0;
   min-height: 410px;
@@ -406,19 +662,13 @@
 .collectionContinueCard {
   min-width: 0;
   min-height: 410px;
-  padding: 24px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-end;
-  gap: 8px;
+  overflow: hidden;
+  position: relative;
   border: 0.8px solid color-mix(in srgb, var(--yellow) 42%, var(--line));
   border-radius: 18px;
-  background: linear-gradient(
-    155deg,
-    var(--white) 0%,
-    color-mix(in srgb, var(--yellow-soft) 54%, var(--white)) 100%
-  );
+  background: var(--white);
   color: var(--navy);
   box-shadow: var(--home-shadow);
   cursor: pointer;
@@ -430,21 +680,72 @@
     box-shadow 0.28s ease;
 }
 
-.collectionContinueCard span {
+.collectionContinueMedia {
+  position: relative;
+  width: 100%;
+  flex: 1 1 58%;
+  min-height: 218px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--cream) 54%, var(--white));
+}
+
+.collectionContinueMedia img {
+  object-fit: cover;
+  opacity: 0.56;
+  filter: saturate(0.68) contrast(0.92);
+  transform: scale(1.015);
+  transition:
+    opacity 0.36s ease,
+    filter 0.36s ease,
+    transform 0.46s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.collectionContinueMediaOverlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--white) 6%, transparent) 0%,
+    color-mix(in srgb, var(--white) 20%, transparent) 48%,
+    color-mix(in srgb, var(--yellow-soft) 72%, var(--white)) 100%
+  );
+}
+
+.collectionContinueBody {
+  position: relative;
+  z-index: 2;
+  min-height: 156px;
+  padding: 18px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 7px;
+  background: linear-gradient(
+    155deg,
+    var(--white) 0%,
+    color-mix(in srgb, var(--yellow-soft) 66%, var(--white)) 100%
+  );
+}
+
+.collectionContinueBody span {
   color: var(--orange);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.12em;
 }
 
-.collectionContinueCard strong {
-  max-width: 165px;
-  font-size: 21px;
-  line-height: 1.18;
+.collectionContinueBody strong {
+  max-width: 172px;
+  color: var(--navy);
+  font-size: 22px;
+  line-height: 1.16;
 }
 
-.collectionContinueCard svg {
-  margin-top: 4px;
+.collectionContinueBody svg {
+  margin-top: 3px;
+  color: var(--navy);
   font-size: 20px;
   transition: transform 0.24s ease;
 }
@@ -750,43 +1051,10 @@
   --reveal-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Minimal section eyebrow: hierarchy without a boxed label. */
-:global(.section-kicker) {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  width: fit-content;
-  margin-bottom: 11px;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  color: var(--orange);
-  font-family: "Outfit", ui-sans-serif, system-ui, sans-serif;
-  font-size: 11px;
-  font-weight: 800;
-  line-height: 1.2;
-  letter-spacing: 0.105em;
-  text-transform: uppercase;
-}
-
-:global(.section-kicker)::before {
-  content: "";
-  width: 24px;
-  height: 1.5px;
-  flex: 0 0 auto;
-  border-radius: 999px;
-  background: currentColor;
-  opacity: 0.52;
-}
-
-:global(.section-kicker.yellow) {
-  color: var(--yellow);
-}
-
 /* IntersectionObserver-managed reveal. Section backgrounds never animate. */
-:global([data-landing-reveal-root][data-reveal-ready="true"] .landing-reveal-item) {
+:global(
+  [data-landing-reveal-root][data-reveal-ready="true"] .landing-reveal-item
+) {
   opacity: 0;
   will-change: opacity, transform;
   transition:
@@ -795,23 +1063,39 @@
   transition-delay: var(--reveal-delay, 0ms);
 }
 
-:global([data-landing-reveal-root][data-reveal-ready="true"] .landing-reveal-item[data-reveal-direction="up"]) {
+:global(
+  [data-landing-reveal-root][data-reveal-ready="true"]
+    .landing-reveal-item[data-reveal-direction="up"]
+) {
   transform: translate3d(0, var(--reveal-distance-block), 0) scale(0.985);
 }
 
-:global([data-landing-reveal-root][data-reveal-ready="true"] .landing-reveal-item[data-reveal-direction="left"]) {
-  transform: translate3d(calc(var(--reveal-distance-inline) * -1), 0, 0) scale(0.992);
+:global(
+  [data-landing-reveal-root][data-reveal-ready="true"]
+    .landing-reveal-item[data-reveal-direction="left"]
+) {
+  transform: translate3d(calc(var(--reveal-distance-inline) * -1), 0, 0)
+    scale(0.992);
 }
 
-:global([data-landing-reveal-root][data-reveal-ready="true"] .landing-reveal-item[data-reveal-direction="right"]) {
+:global(
+  [data-landing-reveal-root][data-reveal-ready="true"]
+    .landing-reveal-item[data-reveal-direction="right"]
+) {
   transform: translate3d(var(--reveal-distance-inline), 0, 0) scale(0.992);
 }
 
-:global([data-landing-reveal-root][data-reveal-ready="true"] .landing-reveal-item[data-reveal-direction="scale"]) {
+:global(
+  [data-landing-reveal-root][data-reveal-ready="true"]
+    .landing-reveal-item[data-reveal-direction="scale"]
+) {
   transform: translate3d(0, 18px, 0) scale(0.97);
 }
 
-:global([data-landing-reveal-root][data-reveal-ready="true"] .landing-reveal-item.landing-reveal-visible) {
+:global(
+  [data-landing-reveal-root][data-reveal-ready="true"]
+    .landing-reveal-item.landing-reveal-visible
+) {
   opacity: 1;
   transform: translate3d(0, 0, 0) scale(1);
   will-change: auto;
@@ -899,12 +1183,18 @@
     text-decoration: none;
   }
 
-  .collectionContinueCard:hover strong {
+  .collectionContinueCard:hover .collectionContinueBody strong {
     text-decoration: none;
   }
 
-  .collectionContinueCard:hover svg {
+  .collectionContinueCard:hover .collectionContinueBody svg {
     transform: translateX(5px);
+  }
+
+  .collectionContinueCard:hover .collectionContinueMedia img {
+    opacity: 0.64;
+    filter: saturate(0.78) contrast(0.96);
+    transform: scale(1.045);
   }
 
   .subjectBlend :global(.subject-list a:hover) {
@@ -1106,16 +1396,29 @@
   }
 
   .collectionBlend::before,
+  .collectionBlend::after,
+  .subjectBlend::before,
+  .subjectBlend::after,
+  .serviceBlend::before,
+  .serviceBlend::after,
   .borrowBlend::before,
+  .borrowBlend::after,
+  .ebookBlend::before,
+  .ebookBlend::after,
   .reminderBlend::before,
-  .infoBlend::before {
+  .reminderBlend::after,
+  .donationBlend::before,
+  .donationBlend::after,
+  .memberBlend::after,
+  .infoBlend::before,
+  .infoBlend::after {
     transform: scale(0.72);
-    opacity: 0.58;
+    opacity: 0.24;
   }
 
-  .subjectBlend::after,
-  .donationBlend::after {
-    opacity: 0.22;
+  .memberBlend::before {
+    transform: translateY(-50%) scale(0.72);
+    opacity: 0.24;
   }
 
   .heroVisual {
@@ -1180,7 +1483,16 @@
   }
 
   .collectionContinueCard {
-    min-height: 190px;
+    min-height: 350px;
+  }
+
+  .collectionContinueMedia {
+    min-height: 194px;
+  }
+
+  .collectionContinueBody {
+    min-height: 142px;
+    padding: 17px 18px 19px;
   }
 
   .subjectBlend :global(.subject-list a) {
@@ -1204,19 +1516,31 @@
     border-radius: 20px;
   }
 
-  :global([data-landing-reveal-root][data-reveal-ready="true"] .landing-reveal-item[data-reveal-direction="up"]) {
+  :global(
+    [data-landing-reveal-root][data-reveal-ready="true"]
+      .landing-reveal-item[data-reveal-direction="up"]
+  ) {
     transform: translate3d(0, 22px, 0) scale(0.99);
   }
 
-  :global([data-landing-reveal-root][data-reveal-ready="true"] .landing-reveal-item[data-reveal-direction="left"]) {
+  :global(
+    [data-landing-reveal-root][data-reveal-ready="true"]
+      .landing-reveal-item[data-reveal-direction="left"]
+  ) {
     transform: translate3d(-24px, 0, 0) scale(0.995);
   }
 
-  :global([data-landing-reveal-root][data-reveal-ready="true"] .landing-reveal-item[data-reveal-direction="right"]) {
+  :global(
+    [data-landing-reveal-root][data-reveal-ready="true"]
+      .landing-reveal-item[data-reveal-direction="right"]
+  ) {
     transform: translate3d(24px, 0, 0) scale(0.995);
   }
 
-  :global([data-landing-reveal-root][data-reveal-ready="true"] .landing-reveal-item[data-reveal-direction="scale"]) {
+  :global(
+    [data-landing-reveal-root][data-reveal-ready="true"]
+      .landing-reveal-item[data-reveal-direction="scale"]
+  ) {
     transform: translate3d(0, 14px, 0) scale(0.98);
   }
 }

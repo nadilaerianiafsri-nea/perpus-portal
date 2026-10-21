@@ -49,6 +49,10 @@ export default async function Home() {
     title: renderPublicText(step.title.replace(/^\d+\.\s*/, ""), settings),
     description: renderPublicText(step.description, settings),
   }));
+  const continuationPreview =
+    homeData.latestBooks[4] ??
+    homeData.latestBooks[homeData.latestBooks.length - 1] ??
+    null;
 
   return (
     <>
@@ -163,15 +167,15 @@ export default async function Home() {
         >
           <div className="landing-shell">
             <div className="section-head">
-              <span className="section-kicker">KOLEKSI</span>
               <h2>{content.home.latestTitle}</h2>
               <p>{content.home.latestDescription}</p>
             </div>
             {homeData.latestBooks.length ? (
-              <div className={`book-grid ${styles.latestCollectionGrid}`}>
+              <div className={`book-grid ${styles.latestCollectionGrid}`} data-collection-grid>
                 {homeData.latestBooks.slice(0, 4).map((book) => (
                   <Link
                     className={`book-card ${styles.latestBookCard}`}
+                    data-collection-card
                     href={`/koleksi/${book.id}`}
                     aria-label={`Lihat detail ${book.title}`}
                     key={book.id}
@@ -202,12 +206,26 @@ export default async function Home() {
                 ))}
                 <Link
                   className={styles.collectionContinueCard}
+                  data-collection-cta
                   href="/koleksi"
                   aria-label="Lihat semua koleksi publik"
                 >
-                  <span>KOLEKSI PUBLIK</span>
-                  <strong>Lihat semua koleksi</strong>
-                  <FiArrowRight />
+                  {continuationPreview ? (
+                    <div className={styles.collectionContinueMedia} aria-hidden="true">
+                      <Image
+                        src={safeCoverUrl(continuationPreview.coverUrl)}
+                        alt=""
+                        fill
+                        sizes="(max-width: 560px) 100vw, (max-width: 1080px) 50vw, 220px"
+                      />
+                      <div className={styles.collectionContinueMediaOverlay} />
+                    </div>
+                  ) : null}
+                  <div className={styles.collectionContinueBody}>
+                    <span>KOLEKSI PUBLIK</span>
+                    <strong>Lihat semua koleksi</strong>
+                    <FiArrowRight />
+                  </div>
                 </Link>
               </div>
             ) : (
@@ -221,7 +239,6 @@ export default async function Home() {
         <section className={`subject-section section-pad compact-section ${styles.subjectBlend} ${styles.revealSection}`}>
           <div className="landing-shell subject-grid">
             <div>
-              <span className="section-kicker">KATEGORI KOLEKSI</span>
               <h2>{content.home.subjectsTitle}</h2>
               <p>{content.home.subjectsDescription}</p>
               {homeData.subjects.length ? (
@@ -256,7 +273,6 @@ export default async function Home() {
         >
           <div className="landing-shell">
             <div className="section-head centered light">
-              <span className="section-kicker yellow">LAYANAN KAMI</span>
               <h2>{content.home.servicesTitle}</h2>
               <p>{content.home.servicesDescription}</p>
             </div>
@@ -309,7 +325,6 @@ export default async function Home() {
         <section className={`borrow-flow section-pad compact-section ${styles.borrowBlend} ${styles.revealSection}`}>
           <div className="landing-shell">
             <div className="section-head centered">
-              <span className="section-kicker">PANDUAN LAYANAN</span>
               <h2>{content.home.borrowingTitle}</h2>
               <p>{content.home.borrowingDescription}</p>
             </div>
@@ -336,7 +351,6 @@ export default async function Home() {
               <Image src="/images/ASSET PERPUS/Hero pegang buku.png" alt="Baca E-Book Perpustakaan" fill sizes="480px" />
             </div>
             <div className="ebook-copy">
-              <span className="section-kicker">KOLEKSI DIGITAL</span>
               <h2>{content.home.ebookTitle}</h2>
               <p>{content.home.ebookDescription}</p>
               <ul>
@@ -359,7 +373,6 @@ export default async function Home() {
         <section className={`reminder-section section-pad compact-section ${styles.reminderBlend} ${styles.revealSection}`}>
           <div className="landing-shell">
             <div className="section-head centered">
-              <span className="section-kicker">PENGINGAT PEMINJAMAN</span>
               <h2>{content.home.reminderTitle}</h2>
               <p>{content.home.reminderDescription}</p>
             </div>
@@ -393,7 +406,6 @@ export default async function Home() {
         <section className={`donation-section section-pad compact-section ${styles.donationBlend} ${styles.revealSection}`}>
           <div className="landing-shell donation-grid">
             <div>
-              <span className="section-kicker">TRANSPARANSI & HIBAH</span>
               <h2>{content.home.grantsTitle}</h2>
               <p>{content.home.grantsDescription}</p>
               {homeData.latestGrants.length ? (
@@ -425,7 +437,6 @@ export default async function Home() {
         <section className={`member-cta section-pad compact-dark-section ${styles.memberBlend} ${styles.revealSection}`}>
           <div className="landing-shell member-grid">
             <div>
-              <span className="section-kicker yellow">KEANGGOTAAN PERPUSTAKAAN</span>
               <h2>{content.home.membershipTitle}</h2>
               <p>{content.home.membershipDescription}</p>
               <ul>

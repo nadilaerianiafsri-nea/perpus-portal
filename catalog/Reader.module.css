@@ -15,7 +15,8 @@
 .readerBackButton,
 .readerControl,
 .secondary,
-.stateAction {
+.stateAction,
+.overviewItem {
   font-family: var(--font-outfit), "Outfit", sans-serif;
 }
 
@@ -60,7 +61,8 @@
 .readerBackButton:focus-visible,
 .readerControl:focus-visible,
 .secondary:focus-visible,
-.stateAction:focus-visible {
+.stateAction:focus-visible,
+.overviewItem:focus-visible {
   outline: 3px solid #ffd000;
   outline-offset: 3px;
 }
@@ -141,33 +143,58 @@
 .pdfViewer {
   width: 100%;
   min-height: 100dvh;
+  height: 100dvh;
   box-sizing: border-box;
   position: relative;
-  padding: 64px 24px 104px;
-  overflow: auto;
+  padding: 50px 24px 90px;
   background: #f5f5f6;
+  overscroll-behavior: contain;
+}
+
+.pdfViewerFit {
+  overflow: hidden;
+  touch-action: pan-y;
+  cursor: grab;
+}
+
+.pdfViewerZoomed {
+  overflow: auto;
   touch-action: pan-x pan-y;
+  cursor: grab;
+}
+
+.pdfViewerOverview {
+  overflow-x: auto;
+  overflow-y: hidden;
+  touch-action: pan-x;
+}
+
+.pdfViewerZoomed:active,
+.pdfViewerFit:active {
+  cursor: grabbing;
 }
 
 .pdfSpread {
   width: max-content;
   min-width: 100%;
+  min-height: calc(100dvh - 140px);
   display: grid;
   grid-template-columns:
-    clamp(160px, 16vw, 260px)
+    clamp(150px, 15vw, 240px)
     max-content
-    clamp(160px, 16vw, 260px);
-  align-items: start;
+    clamp(150px, 15vw, 240px);
+  align-items: center;
   justify-content: center;
-  gap: 28px;
+  gap: 24px;
+  perspective: 1400px;
 }
 
 .pdfPage {
-  min-height: calc(100dvh - 168px);
   position: relative;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
+  transform-style: preserve-3d;
 }
 
 .pdfViewer canvas {
@@ -179,18 +206,53 @@
   border-radius: 4px;
   background: #fff;
   box-shadow: 0 14px 35px #00063325;
+  user-select: none;
+}
+
+.pageTurnNext {
+  transform-origin: left center;
+  animation: pageTurnNext 260ms cubic-bezier(0.2, 0.72, 0.2, 1) both;
+}
+
+.pageTurnPrevious {
+  transform-origin: right center;
+  animation: pageTurnPrevious 260ms cubic-bezier(0.2, 0.72, 0.2, 1) both;
+}
+
+@keyframes pageTurnNext {
+  from {
+    opacity: 0.58;
+    transform: translateX(28px) rotateY(-13deg) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0) rotateY(0) scale(1);
+  }
+}
+
+@keyframes pageTurnPrevious {
+  from {
+    opacity: 0.58;
+    transform: translateX(-28px) rotateY(13deg) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0) rotateY(0) scale(1);
+  }
 }
 
 .pdfPreview,
 .pdfPreviewSlot {
-  width: clamp(160px, 16vw, 260px);
+  width: clamp(150px, 15vw, 240px);
 }
 
 .pdfPreview {
-  align-self: start;
-  opacity: 0.32;
+  align-self: center;
+  opacity: 0.28;
   transform: scale(0.94);
-  transform-origin: top center;
+  transform-origin: center;
   pointer-events: none;
   animation: readerPreviewIn 180ms ease-out both;
 }
@@ -217,9 +279,77 @@
   }
 
   to {
-    opacity: 0.32;
+    opacity: 0.28;
     transform: translateY(0) scale(0.94);
   }
+}
+
+.overviewStrip {
+  width: max-content;
+  min-width: 100%;
+  min-height: calc(100dvh - 140px);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 0 24px;
+}
+
+.overviewItem {
+  min-width: 0;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  color: #000633;
+  opacity: 0.5;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    opacity 160ms ease,
+    background 160ms ease,
+    border-color 160ms ease;
+}
+
+.overviewItem:hover {
+  border-color: #dcdde5;
+  background: #fff;
+  opacity: 0.82;
+  transform: scale(1.02);
+}
+
+.overviewItem canvas {
+  margin: 0;
+  box-shadow: 0 10px 24px #00063325;
+}
+
+.overviewItemActive {
+  border-color: #2b3056;
+  background: #fff;
+  opacity: 1;
+  transform: scale(1.04);
+}
+
+.overviewItemActive:hover {
+  border-color: #2b3056;
+  opacity: 1;
+  transform: scale(1.04);
+}
+
+.overviewPageNumber {
+  min-width: 30px;
+  padding: 4px 8px;
+  border-radius: 99px;
+  background: #fff;
+  color: #000633;
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
 }
 
 .pageLoading {
@@ -245,6 +375,21 @@
   background: #fff;
   box-shadow: 0 10px 24px #00063325;
   transform: translateX(-50%);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.pageControlsVisible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.pageControlsHidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(10px);
 }
 
 .readerControl {
@@ -391,14 +536,21 @@
 
 @media (max-width: 899px) {
   .pdfSpread {
-    display: block;
+    display: flex;
     width: max-content;
     min-width: 100%;
+    min-height: calc(100dvh - 140px);
+    align-items: center;
+    justify-content: center;
   }
 
   .pdfPreview,
   .pdfPreviewSlot {
     display: none;
+  }
+
+  .overviewStrip {
+    justify-content: flex-start;
   }
 }
 
@@ -411,17 +563,33 @@
   }
 
   .pdfViewer {
-    padding: 58px 10px 90px;
+    padding: 48px 10px 82px;
   }
 
-  .pdfPage {
-    min-height: calc(100dvh - 148px);
+  .pdfSpread {
+    min-height: calc(100dvh - 130px);
   }
 
   .pdfViewer canvas {
-    max-width: none;
     border-radius: 3px;
     box-shadow: 0 8px 20px #00063325;
+  }
+
+  .overviewStrip {
+    min-height: calc(100dvh - 130px);
+    gap: 10px;
+    padding: 0 10px;
+  }
+
+  .overviewItem {
+    gap: 6px;
+    padding: 7px;
+    border-radius: 10px;
+  }
+
+  .overviewPageNumber {
+    padding: 3px 7px;
+    font-size: 11px;
   }
 
   .pageControls {
@@ -491,18 +659,25 @@
   .readerBackButton,
   .readerControl,
   .secondary,
-  .stateAction {
+  .stateAction,
+  .overviewItem,
+  .pageControls {
     transition: none;
   }
 
-  .pdfPreview {
+  .pdfPreview,
+  .pageTurnNext,
+  .pageTurnPrevious {
     animation: none;
   }
 
   .readerBackButton:hover:not(:disabled),
   .readerControl:hover:not(:disabled),
   .secondary:hover:not(:disabled),
-  .stateAction:hover {
+  .stateAction:hover,
+  .overviewItem:hover,
+  .overviewItemActive,
+  .overviewItemActive:hover {
     transform: none;
   }
 
