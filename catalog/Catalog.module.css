@@ -72,12 +72,8 @@
 
 .shell > .main {
   margin-top: 0;
-<<<<<<< Updated upstream
 
-  padding-top: 118px;
-=======
   padding-top: 132px;
->>>>>>> Stashed changes
 }
 
 .catalogPage {
@@ -1697,10 +1693,7 @@
   font-size: 13px;
 
   cursor: pointer;
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
   transition:
     border-color 160ms ease,
     background 160ms ease;
@@ -1740,10 +1733,7 @@
   font-weight: 500;
 
   cursor: pointer;
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
   transition:
     border-color 160ms ease,
     background 160ms ease;
@@ -1876,10 +1866,7 @@
   box-shadow: 0 2px 5px #00063305;
 
   animation: none;
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
   transition:
     transform 180ms ease,
     border-color 180ms ease,
@@ -2381,10 +2368,7 @@
 }
 
 /* Compact recommendations reuse BookCard in both public and member details. */
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
 .relatedCard {
   border-radius: 10px;
   animation: none;
@@ -2392,55 +2376,37 @@
     border-color 180ms ease,
     box-shadow 180ms ease;
 }
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
 .relatedCard:hover {
   border-color: #bdc1d2;
   box-shadow: 0 4px 12px #0006330c;
 }
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
 .relatedCard .cover {
   aspect-ratio: 4 / 5;
   max-height: 176px;
   border-bottom: 1px solid #e8e9ee;
   background: #f0f1f5;
 }
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
 .relatedCard .cover img {
   object-fit: contain;
   padding: 12px;
   transform: none;
 }
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
 .relatedCard .typeBadge {
   top: 8px;
   left: 8px;
   padding: 4px 6px;
   font-size: 9px;
 }
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
 .relatedCard .cardBody {
   padding: 12px;
   gap: 0;
 }
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
 .relatedCard .cardBody h2 {
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -2452,10 +2418,7 @@
   font-weight: 600;
   line-height: 19px;
 }
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
 .relatedCard .cardBody p {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2463,44 +2426,29 @@
   font-size: 12px;
   line-height: 18px;
 }
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
 .relatedCard small {
   font-size: 11px;
   line-height: 17px;
 }
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
 .relatedCard .memberCardFooter {
   gap: 10px;
   padding-top: 12px;
 }
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
 .relatedCard .status {
   font-size: 10px;
   min-height: 21px;
 }
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
 .relatedCard .detailLink {
   min-height: 33px;
   margin-top: 0;
   padding: 7px;
   font-size: 11px;
 }
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
 .relatedCard .detailLink:hover {
   background: #2b3056;
   border-color: #2b3056;
@@ -2645,7 +2593,6 @@
   border-top: 3px solid var(--yellow);
 
   border-radius: 20px;
-<<<<<<< Updated upstream
 
   background: linear-gradient(
     180deg,
@@ -2654,13 +2601,6 @@
     color-mix(in srgb, var(--sky) 13%, var(--white)) 100%
   );
 
-=======
-  background: linear-gradient(
-    180deg,
-    var(--white) 0%,
-    color-mix(in srgb, var(--sky) 13%, var(--white)) 100%
-  );
->>>>>>> Stashed changes
   box-shadow:
     0 2px 5px color-mix(in srgb, var(--navy) 7%, transparent),
     0 18px 42px color-mix(in srgb, var(--navy) 8%, transparent);
@@ -2972,7 +2912,6 @@
   border: 1px solid color-mix(in srgb, var(--navy) 10%, var(--line));
 
   border-radius: 20px;
-<<<<<<< Updated upstream
 
   background: linear-gradient(
     180deg,
@@ -2981,13 +2920,6 @@
     color-mix(in srgb, var(--sky) 18%, var(--white)) 100%
   );
 
-=======
-  background: linear-gradient(
-    180deg,
-    var(--white) 0%,
-    color-mix(in srgb, var(--sky) 18%, var(--white)) 100%
-  );
->>>>>>> Stashed changes
   box-shadow: 0 24px 70px color-mix(in srgb, var(--navy) 26%, transparent);
 }
 
