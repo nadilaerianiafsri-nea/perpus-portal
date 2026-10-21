@@ -192,8 +192,8 @@ export default function AdminLoansPage() {
           {searchError && <small className={styles.searchError} id="search-input-error" role="alert">{searchError}</small>}
 
           <label className={styles.selectField}>
-            <span>Status</span>
             <AppSelect
+              aria-label="Filter status peminjaman"
               value={status}
               onChange={(event) => {
                 setStatus(event.target.value as StatusFilter);
@@ -208,15 +208,15 @@ export default function AdminLoansPage() {
           </label>
 
           <label className={styles.selectField}>
-            <span>Jenis Anggota</span>
             <AppSelect
+              aria-label="Filter jenis anggota peminjaman"
               value={memberType}
               onChange={(event) => {
                 setMemberType(event.target.value as MemberFilter);
                 setPage(1);
               }}
             >
-              <option value="ALL">Semua Jenis</option>
+              <option value="ALL">Semua Jenis Anggota</option>
               <option value="UMUM">Masyarakat Umum</option>
               <option value="MAHASISWA">Mahasiswa</option>
               <option value="PEGAWAI">Pegawai Internal</option>
@@ -224,15 +224,15 @@ export default function AdminLoansPage() {
           </label>
 
           <label className={styles.selectField}>
-            <span>Jatuh Tempo</span>
             <AppSelect
+              aria-label="Filter jatuh tempo peminjaman"
               value={due}
               onChange={(event) => {
                 setDue(event.target.value as DueFilter);
                 setPage(1);
               }}
             >
-              <option value="ALL">Semua Tanggal</option>
+              <option value="ALL">Semua Jatuh Tempo</option>
               <option value="TODAY">Hari Ini</option>
               <option value="7_DAYS">7 Hari</option>
               <option value="30_DAYS">30 Hari</option>

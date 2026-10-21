@@ -169,9 +169,8 @@ export default function AdminGrantsPage() {
         </label>
 
         <label className={styles.selectField}>
-          <span>Status Katalogisasi</span>
-
           <AppSelect
+            aria-label="Filter status katalogisasi hibah"
             value={status}
             onChange={(event) => {
               setStatus(event.target.value as "" | AdminGrantStatus);
@@ -179,7 +178,7 @@ export default function AdminGrantsPage() {
               setPage(1);
             }}
           >
-            <option value="">Semua Status</option>
+            <option value="">Semua Status Hibah</option>
 
             <option value="BELUM_DIKATALOGKAN">Belum Dikatalogkan</option>
 
@@ -188,9 +187,8 @@ export default function AdminGrantsPage() {
         </label>
 
         <label className={styles.selectField}>
-          <span>Tahun Penerimaan</span>
-
           <AppSelect
+            aria-label="Filter tahun penerimaan hibah"
             value={year}
             onChange={(event) => {
               setYear(event.target.value);

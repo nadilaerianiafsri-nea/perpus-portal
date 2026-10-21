@@ -703,13 +703,8 @@
   margin: 0;
   overflow: hidden;
   color: var(--stat-slate);
-<<<<<<< HEAD
   font-size: var(--text-secondary);
   line-height: 1.45;
-=======
-  font-size: 12px;
-  line-height: 1.32;
->>>>>>> ef418fa (fix: refine ebook reader controls and quick page select)
   text-overflow: ellipsis;
   white-space: nowrap;
 }

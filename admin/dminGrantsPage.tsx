@@ -1,5 +1,7 @@
 "use client";
 
+import AppSelect from "@/components/AppSelect";
+
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
@@ -168,23 +170,23 @@ export default function AdminGrantsPage() {
         </label>
 
         <label className={styles.selectField}>
-          <span>Status Katalogisasi</span>
-          <select
+          <AppSelect
+            aria-label="Filter status katalogisasi hibah"
             value={status}
             onChange={(event) => {
               setStatus(event.target.value as "" | AdminGrantStatus);
               setPage(1);
             }}
           >
-            <option value="">Semua Status</option>
+            <option value="">Semua Status Hibah</option>
             <option value="BELUM_DIKATALOGKAN">Belum Dikatalogkan</option>
             <option value="SUDAH_DIKATALOGKAN">Sudah Dikatalogkan</option>
-          </select>
+          </AppSelect>
         </label>
 
         <label className={styles.selectField}>
-          <span>Tahun Penerimaan</span>
-          <select
+          <AppSelect
+            aria-label="Filter tahun penerimaan hibah"
             value={year}
             onChange={(event) => {
               setYear(event.target.value);
@@ -198,7 +200,7 @@ export default function AdminGrantsPage() {
                 {value}
               </option>
             ))}
-          </select>
+          </AppSelect>
         </label>
       </section>
 

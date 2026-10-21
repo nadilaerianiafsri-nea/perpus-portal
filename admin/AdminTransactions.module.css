@@ -89,10 +89,10 @@
   padding: 12px;
   display: grid;
   grid-template-columns:
-    minmax(260px, 1fr)
-    minmax(150px, 190px)
-    minmax(150px, 190px)
-    minmax(150px, 190px);
+    minmax(220px, 1fr)
+    minmax(200px, 210px)
+    minmax(200px, 210px)
+    minmax(200px, 210px);
   align-items: end;
   gap: 9px;
   border: 1px solid #ececef;
@@ -162,17 +162,10 @@
 .selectField {
   display: grid;
   align-content: start;
-  gap: 6px;
+  gap: 0;
   min-width: 0;
 }
 
-.selectField > span:first-child {
-  color: var(--text-secondary-color);
-  font-size: 12px;
-  line-height: 1.4;
-
-  font-weight: 500;
-}
 
 .tableScroller {
   overflow-x: auto;
@@ -624,6 +617,16 @@
   min-height: 38px;
   padding: 9px 14px;
   font-size: var(--text-button);
+}
+
+@media (max-width: 1320px) {
+  .filterBar:where(:not(.filterBarThree)) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .filterBar:where(:not(.filterBarThree)) .searchBox {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (max-width: 1180px) {

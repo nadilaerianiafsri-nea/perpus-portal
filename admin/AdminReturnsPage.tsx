@@ -212,8 +212,8 @@ export default function AdminReturnsPage() {
           {searchError && <small className={styles.searchError} id="search-input-error" role="alert">{searchError}</small>}
 
           <label className={styles.selectField}>
-            <span>Status</span>
             <AppSelect
+              aria-label="Filter status pengembalian"
               value={status}
               onChange={(event) => {
                 setStatus(event.target.value as StatusFilter);
@@ -227,15 +227,15 @@ export default function AdminReturnsPage() {
           </label>
 
           <label className={styles.selectField}>
-            <span>Jenis Anggota</span>
             <AppSelect
+              aria-label="Filter jenis anggota pengembalian"
               value={memberType}
               onChange={(event) => {
                 setMemberType(event.target.value as MemberFilter);
                 setPage(1);
               }}
             >
-              <option value="ALL">Semua Jenis</option>
+              <option value="ALL">Semua Jenis Anggota</option>
               <option value="UMUM">Masyarakat Umum</option>
               <option value="MAHASISWA">Mahasiswa</option>
               <option value="PEGAWAI">Pegawai Internal</option>

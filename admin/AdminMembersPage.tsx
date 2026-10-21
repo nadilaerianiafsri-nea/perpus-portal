@@ -208,15 +208,15 @@ export default function AdminMembersPage() {
           </label>
 
         <label className={styles.selectField}>
-          <span>Jenis Anggota</span>
           <AppSelect
+            aria-label="Filter jenis anggota"
             value={memberType}
             onChange={(event) => {
               setMemberType(event.target.value as MemberTypeFilter);
               setPage(1);
             }}
           >
-            <option value="ALL">Semua Jenis</option>
+            <option value="ALL">Semua Jenis Anggota</option>
             <option value="UMUM">Masyarakat Umum</option>
             <option value="MAHASISWA">Mahasiswa</option>
             <option value="PEGAWAI">Pegawai Internal</option>
@@ -224,8 +224,8 @@ export default function AdminMembersPage() {
         </label>
 
         <label className={styles.selectField}>
-          <span>Status Verifikasi</span>
           <AppSelect
+            aria-label="Filter status verifikasi anggota"
             value={verification}
             onChange={(event) => {
               setVerification(event.target.value as VerificationFilter);

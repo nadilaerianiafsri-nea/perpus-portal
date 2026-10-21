@@ -177,29 +177,29 @@ export default function AdminLostBooksPage() {
           {searchError && <small className={styles.searchError} id="search-input-error" role="alert">{searchError}</small>}
 
           <label className={styles.selectField}>
-            <span>Status</span>
             <AppSelect
+              aria-label="Filter status proses buku hilang"
               value={status}
               onChange={(event) => {
                 setStatus(event.target.value as StatusFilter);
                 setPage(1);
               }}
             >
-              <option value="ALL">Semua Status</option>
+              <option value="ALL">Semua Status Proses</option>
               <option value="PROCESS">Proses</option>
             </AppSelect>
           </label>
 
           <label className={styles.selectField}>
-            <span>Jenis Anggota</span>
             <AppSelect
+              aria-label="Filter jenis anggota buku hilang"
               value={memberType}
               onChange={(event) => {
                 setMemberType(event.target.value as MemberFilter);
                 setPage(1);
               }}
             >
-              <option value="ALL">Semua Jenis</option>
+              <option value="ALL">Semua Jenis Anggota</option>
               <option value="UMUM">Masyarakat Umum</option>
               <option value="MAHASISWA">Mahasiswa</option>
               <option value="PEGAWAI">Pegawai Internal</option>
@@ -207,17 +207,17 @@ export default function AdminLostBooksPage() {
           </label>
 
           <label className={styles.selectField}>
-            <span>Perpanjangan</span>
             <AppSelect
+              aria-label="Filter riwayat perpanjangan"
               value={extension}
               onChange={(event) => {
                 setExtension(event.target.value as ExtensionFilter);
                 setPage(1);
               }}
             >
-              <option value="ALL">Semua</option>
+              <option value="ALL">Semua Perpanjangan</option>
               <option value="EXTENDED">Pernah Diperpanjang</option>
-              <option value="NOT_EXTENDED">Tidak Pernah</option>
+              <option value="NOT_EXTENDED">Belum Diperpanjang</option>
             </AppSelect>
           </label>
         </div>

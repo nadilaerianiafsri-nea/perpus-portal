@@ -264,14 +264,14 @@ export default function AdminBooksPage() {
 
       <form className={enhancements.filterPanel} onSubmit={applyBookFilters}>
         <label className={enhancements.filterField}>
-          <span>Ketersediaan</span>
           <AppSelect
+            aria-label="Filter ketersediaan buku"
             value={availabilityInput}
             onChange={(event) =>
               setAvailabilityInput(event.target.value as AvailabilityFilter)
             }
           >
-            <option value="ALL">Semua</option>
+            <option value="ALL">Semua Ketersediaan</option>
             <option value="TERSEDIA">Tersedia</option>
             <option value="STOK_HABIS">Stok Habis</option>
           </AppSelect>
