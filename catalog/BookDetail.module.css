@@ -45,15 +45,6 @@
   line-height: var(--leading-title);
   letter-spacing: -0.035em;
 }
-.heading h1::after {
-  content: "";
-  display: block;
-  width: 46px;
-  height: 3px;
-  margin-top: 10px;
-  border-radius: 2px;
-  background: #ffd000;
-}
 .backLink {
   display: inline-flex;
   align-items: center;

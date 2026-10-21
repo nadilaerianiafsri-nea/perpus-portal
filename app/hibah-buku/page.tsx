@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import { FiGift } from "react-icons/fi";
 import CatalogShell from "@/catalog/CatalogShell";
 import PageBreadcrumb from "@/components/PageBreadcrumb";
 import Grants from "@/information/Grants";
@@ -14,16 +13,7 @@ export default function Page() {
       <main className={`${common.main} ${styles.main} ${styles.grantMain}`}>
         <PageBreadcrumb label="Hibah Buku" />
         <header className={`${styles.heading} ${styles.grantHeading}`}>
-          <span className={styles.heroIcon}>
-            <FiGift aria-hidden="true" />
-          </span>
-          <div>
-            <h1>Informasi Hibah Buku</h1>
-            <p>
-              Daftar koleksi hibah yang telah diterima perpustakaan. Halaman ini
-              bersifat informatif.
-            </p>
-          </div>
+          <h1 data-page-title>Informasi Hibah Buku</h1>
         </header>
         <Suspense fallback={<p role="status">Memuat informasi hibah...</p>}>
           <Grants />

@@ -382,12 +382,7 @@ export default function AdminEBookForm({
             <span>/</span>
             <strong>{mode === "create" ? "Tambah E-Book" : "Edit E-Book"}</strong>
           </div>
-          <h1>{mode === "create" ? "Tambah E-Book" : "Edit E-Book"}</h1>
-          <p>
-            {mode === "create"
-              ? "Tambahkan koleksi digital baru ke katalog perpustakaan."
-              : `Memperbarui data ${form.code}. Perubahan langsung berlaku setelah disimpan.`}
-          </p>
+          <h1 data-page-title>{mode === "create" ? "Tambah E-Book" : "Edit E-Book"}</h1>
         </div>
         <Link data-button="back" data-button-size="md" href={backHref} className={styles.backButton}>
           <FiArrowLeft aria-hidden />

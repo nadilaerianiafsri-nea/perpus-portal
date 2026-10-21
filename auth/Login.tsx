@@ -123,8 +123,7 @@ export default function Login() {
           </span>
         </Link>
         <header className={styles.heading}>
-          <h1 id="login-title">Masuk</h1>
-          <p>Masuk ke akun anggota Anda.</p>
+          <h1 id="login-title" data-page-title>Masuk</h1>
         </header>
 
         <form className={styles.loginForm} method="post" onSubmit={handleLogin}>

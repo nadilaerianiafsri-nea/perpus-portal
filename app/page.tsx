@@ -61,10 +61,9 @@ export default async function Home() {
         <section className={`hero ${styles.heroBlend}`} id="beranda">
           <div className="landing-shell hero-grid">
             <div className="hero-copy">
-              <h1 className="hero-title-cms">
+              <h1 className="hero-title-cms" data-page-title>
                 {renderPublicText(content.home.heroTitle, settings)}
               </h1>
-              <p>{renderPublicText(content.home.heroDescription, settings)}</p>
               <form className="hero-search" action="/koleksi" method="get">
                 <input
                   name="search"

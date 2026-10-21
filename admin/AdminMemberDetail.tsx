@@ -137,8 +137,7 @@ export default function AdminMemberDetail({ id }: Props) {
             <strong>Detail Anggota</strong>
           </div>
 
-          <h1>{member.name}</h1>
-          <p>{member.email}</p>
+          <h1 data-page-title>{member.name}</h1>
         </div>
 
         <div className={styles.headingActions}>

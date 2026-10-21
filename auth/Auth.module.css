@@ -283,6 +283,14 @@
   gap: 15px;
 }
 
+.memberList legend {
+  margin-bottom: 15px;
+  padding: 0;
+  color: #696970;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
 .memberCard {
   width: 100%;
   min-height: 98px;

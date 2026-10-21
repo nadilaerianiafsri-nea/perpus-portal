@@ -265,20 +265,15 @@ export default function Register() {
     <AuthShell registration>
       <div className={`${styles.formWrap} ${styles.registerWrap}`}>
         <header className={styles.heading}>
-          <h2 ref={heading} tabIndex={-1}>
+          <h2 ref={heading} tabIndex={-1} data-page-title>
             {step === 1 ? "Daftar Anggota" : "Formulir Pendaftaran"}
           </h2>
-          <p>
-            {step === 1
-              ? "Pilih jenis keanggotaan Anda."
-              : `Jenis anggota: ${selected.title}`}
-          </p>
         </header>
 
         {step === 1 ? (
           <>
             <fieldset className={styles.memberList}>
-              <legend className={styles.visuallyHidden}>Jenis keanggotaan</legend>
+              <legend>Pilih jenis keanggotaan Anda.</legend>
               {memberOptions.map((option) => {
                 const Icon = option.icon;
                 const active = memberType === option.value;
@@ -340,6 +335,7 @@ export default function Register() {
               aria-busy={loading}
               noValidate
             >
+              <p className={styles.statusCopy}>Jenis anggota: {selected.title}</p>
               {field(
                 "name",
                 "Nama Lengkap",

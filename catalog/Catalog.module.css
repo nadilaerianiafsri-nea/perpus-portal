@@ -118,7 +118,7 @@
 
 .main h1 {
   font-size: clamp(29px, 3vw, 38px);
-  margin: 0 0 30px;
+  margin: 0 0 var(--page-header-gap);
   letter-spacing: -0.03em;
 }
 
@@ -1178,19 +1178,12 @@
 }
 
 .memberCatalog > h1 {
-  margin-bottom: 8px;
+  margin-bottom: var(--page-header-gap);
   font-size: clamp(27px, 2.5vw, 34px);
   line-height: 1.2;
   letter-spacing: -0.035em;
 }
 
-.memberCatalog .memberSubtitle {
-  max-width: 680px;
-  margin: 0 0 22px;
-  color: #686a77;
-  font-size: var(--text-base);
-  line-height: 1.65;
-}
 
 .memberCatalog .searchRow {
   margin-bottom: 14px;
@@ -1589,14 +1582,10 @@
 
 @media (max-width: 600px) {
   .memberCatalog > h1 {
-    margin-bottom: 8px;
+    margin-bottom: var(--page-header-gap);
     font-size: 27px;
   }
 
-  .memberCatalog .memberSubtitle {
-    margin-bottom: 18px;
-    font-size: var(--text-base);
-  }
 
   .memberCatalog .searchInput input {
     font-size: var(--text-input);
@@ -1772,7 +1761,7 @@
 }
 
 .publicCollectionCatalog > h1 {
-  margin: 0 0 28px;
+  margin: 0 0 var(--page-header-gap);
   color: var(--navy);
   font-size: clamp(36px, 3.5vw, 48px);
   line-height: 1.05;

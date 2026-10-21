@@ -71,65 +71,13 @@
   align-self: center;
   padding-block: 6px;
 }
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  border-radius: 6px;
-  background: #eaf7ff;
-  color: #076fa9;
-  font-size: 12px;
-  font-weight: 500;
-}
 .page .title {
-  margin: 14px 0 10px;
+  margin: 0 0 10px;
   color: #000633;
   font-size: var(--text-detail-title);
   font-weight: 700;
   line-height: var(--leading-title);
   letter-spacing: -0.035em;
-  overflow-wrap: anywhere;
-}
-.page .author {
-  margin: 0;
-  color: #737886;
-  font-size: 15px;
-  line-height: 1.6;
-}
-.quickMetadata {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 12px;
-  margin: 20px 0 0;
-  padding: 0;
-  list-style: none;
-}
-.quickMetadata li {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  color: #565d70;
-  font-size: var(--text-secondary);
-  overflow-wrap: anywhere;
-}
-.quickMetadata li + li::before {
-  content: "";
-  display: block;
-  height: 12px;
-  width: 1px;
-  flex-shrink: 0;
-  background: #dadde5;
-}
-.page .excerpt {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  overflow: hidden;
-  margin: 18px 0 0;
-  color: #636977;
-  font-size: var(--text-body);
-  line-height: 1.6;
   overflow-wrap: anywhere;
 }
 .page .readActions {

@@ -153,11 +153,7 @@ export default function AdminLoansPage() {
   return (
     <div className={styles.page}>
       <header className={styles.pageHeading}>
-        <h1>Peminjaman</h1>
-        <p>
-          Pantau pinjaman buku fisik, jatuh tempo, keterlambatan, perpanjangan,
-          dan akses E-Book.
-        </p>
+        <h1 data-page-title>Peminjaman</h1>
       </header>
 
       <section className={styles.statsFour} aria-label="Ringkasan peminjaman">

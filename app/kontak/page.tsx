@@ -3,10 +3,7 @@ import PageBreadcrumb from "@/components/PageBreadcrumb";
 import ServiceDetails from "@/components/ServiceDetails";
 import ContactForm from "@/information/ContactForm";
 import { getLibrarySettings } from "@/information/librarySettings";
-import {
-  getPublicContent,
-  renderPublicText,
-} from "@/information/publicContent";
+import { getPublicContent } from "@/information/publicContent";
 import { serviceInfo } from "@/shared/serviceInfo.cjs";
 import common from "@/catalog/Catalog.module.css";
 import info from "@/information/Information.module.css";
@@ -30,8 +27,7 @@ export default async function Page() {
         <PageBreadcrumb label="Kontak" />
 
         <header className={info.heading}>
-          <h1>{content.contact.title}</h1>
-          <p>{renderPublicText(content.contact.intro, settings)}</p>
+          <h1 data-page-title>{content.contact.title}</h1>
         </header>
 
         <div className={styles.grid}>

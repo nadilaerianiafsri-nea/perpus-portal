@@ -187,11 +187,7 @@ export default function AdminMemberForm({ id }: Props) {
             <strong>Edit</strong>
           </div>
 
-          <h1>Edit Anggota</h1>
-          <p>
-            Perbarui data administratif anggota tanpa mengubah email dan kata
-            sandi akun.
-          </p>
+          <h1 data-page-title>Edit Anggota</h1>
         </div>
       </header>
 

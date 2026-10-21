@@ -21,8 +21,7 @@ export default async function Page() {
       <main className={`${common.main} ${styles.main} ${styles.helpMain}`}>
         <PageBreadcrumb label="Panduan" />
         <header className={styles.heading}>
-          <h1>Panduan Peminjaman</h1>
-          <p>Alur layanan dari pendaftaran hingga pengembalian.</p>
+          <h1 data-page-title>Panduan Peminjaman</h1>
         </header>
         <section className={styles.steps} aria-label="Langkah peminjaman buku">
           {guideSteps.map(({ title, description }) => (

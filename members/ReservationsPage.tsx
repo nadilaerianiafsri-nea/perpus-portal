@@ -33,7 +33,7 @@ export default function ReservationsPage() {
     catch (error) { setActionError(error instanceof Error ? error.message : "Reservasi belum dapat dibatalkan."); }
     finally { pending.current = false; setBusy(null); }
   }
-  return <div className={styles.pageStack}><PageHeading title="Reservasi Saya" description="Buku yang menunggu pengambilan. Ambil sebelum batas waktu 24 jam." />
+  return <div className={styles.pageStack}><PageHeading title="Reservasi Saya" />
     {notice && <p className={styles.success} role="status">{notice}</p>}{actionError && !selectedReservation && <p className={styles.error} role="alert">{actionError}</p>}
     {resource.loading ? <LoadingCards /> : resource.error ? <ErrorState message={resource.error} retry={resource.reload} /> : <>
       {!active.length ? <section className={reservationStyles.empty}><FiCalendar aria-hidden /><h2>Belum ada reservasi aktif.</h2><p>Buku yang Anda reservasi akan muncul di sini.</p><Link data-button="primary" className={styles.button} href="/dashboard/koleksi">Cari Koleksi</Link></section> : active.map(reservation => <ReservationCard key={reservation.id} reservation={reservation} onExpire={expired} onCancel={() => { setActionError(""); setSelectedReservation(reservation); }} busy={busy !== null} />)}

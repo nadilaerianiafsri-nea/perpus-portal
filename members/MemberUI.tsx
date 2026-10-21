@@ -17,8 +17,8 @@ export function ErrorState({ message, retry }: { message: string; retry: () => v
 export function EmptyState({ message, href, label = "Cari Koleksi" }: { message: string; href?: string; label?: string }) {
   return <div className={styles.empty}><FiBookOpen size={32} aria-hidden /><p>{message}</p>{href && <Link data-button="primary" className={styles.button} href={href}>{label}</Link>}</div>;
 }
-export function PageHeading({ title, description, children }: { title: string; description: string; children?: React.ReactNode }) {
-  return <div className={styles.pageHeading}><div><h1>{title}</h1><p>{description}</p></div>{children}</div>;
+export function PageHeading({ title, children }: { title: string; children?: React.ReactNode }) {
+  return <div className={styles.pageHeading}><div><h1 data-page-title>{title}</h1></div>{children}</div>;
 }
 export function BookCover({ book, small = false }: { book: MemberBook; small?: boolean }) {
   return <div className={`${styles.cover} ${small ? styles.coverSmall : ""}`}><Image src={safeCoverUrl(book.coverUrl)} alt={`Sampul ${book.title}`} fill sizes={small ? "40px" : "72px"} unoptimized /></div>;

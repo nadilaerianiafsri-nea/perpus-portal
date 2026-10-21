@@ -26,7 +26,7 @@ export default async function BookDetail({
   if (unavailable) {
     const state = (
       <section className={`${styles.page} ${styles.error}`} role="alert">
-        <h1>Detail koleksi belum dapat dimuat.</h1>
+        <h1 data-page-title>Detail koleksi belum dapat dimuat.</h1>
         <p>Silakan coba lagi untuk melihat informasi buku.</p>
         <Link data-button="primary" data-button-size="md" className={styles.primaryLink} href={`${basePath}/${id}`}>
           Coba Lagi

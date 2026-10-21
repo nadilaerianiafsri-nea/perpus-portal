@@ -279,12 +279,7 @@ export default function AdminBookForm({
               {mode === "create" ? "Tambah Buku" : "Edit Data Buku"}
             </strong>
           </div>
-          <h1>{mode === "create" ? "Tambah Data Buku" : "Edit Data Buku"}</h1>
-          <p>
-            {mode === "create"
-              ? "Tambahkan koleksi buku fisik baru ke katalog perpustakaan."
-              : `Memperbarui data ${form.code}. Perubahan langsung berlaku di katalog setelah disimpan.`}
-          </p>
+          <h1 data-page-title>{mode === "create" ? "Tambah Data Buku" : "Edit Data Buku"}</h1>
         </div>
         <Link data-button="back" data-button-size="md" href={backHref} className={styles.backButton}>
           <FiArrowLeft aria-hidden />

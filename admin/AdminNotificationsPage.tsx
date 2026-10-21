@@ -189,8 +189,7 @@ export default function AdminNotificationsPage() {
     <div className={styles.page}>
       <header className={styles.pageHeading}>
         <div>
-          <h1>Notifikasi</h1>
-          <p>Monitor reservasi baru, pengingat Email, dan tindak lanjut WhatsApp anggota.</p>
+          <h1 data-page-title>Notifikasi</h1>
         </div>
       </header>
 

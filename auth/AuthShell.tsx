@@ -26,11 +26,7 @@ export default function AuthShell({ children, registration = false, login = fals
         </Link>
 
         <div className={styles.heroCopy}>
-          <h1>Satu portal untuk seluruh koleksi.</h1>
-          <p>
-            Kelola reservasi, pinjaman, e-book, dan pengingat layanan dalam
-            satu dashboard yang bersih dan modern.
-          </p>
+          <h1 data-page-title>Satu portal untuk seluruh koleksi.</h1>
         </div>
 
         <small className={styles.prototype}>

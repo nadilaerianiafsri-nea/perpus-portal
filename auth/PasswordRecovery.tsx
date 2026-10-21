@@ -27,8 +27,9 @@ export default function PasswordRecovery({ token, reset = false }: { token?: str
     if (result.ok && reset) { setPassword(''); setConfirmation(''); }
   }
   return <AuthShell registration><div className={styles.formWrap}>
-    <header className={styles.heading}><h2>{reset ? 'Reset Kata Sandi' : 'Lupa Kata Sandi'}</h2><p>{reset ? 'Buat kata sandi baru untuk akun Anda.' : 'Masukkan email akun Anda untuk menerima link reset.'}</p></header>
+    <header className={styles.heading}><h2 data-page-title>{reset ? 'Reset Kata Sandi' : 'Lupa Kata Sandi'}</h2></header>
     <form className={styles.loginCard} onSubmit={submit} aria-busy={loading}>
+      <p className={styles.statusCopy}>{reset ? 'Buat kata sandi baru untuk akun Anda.' : 'Masukkan email akun Anda untuk menerima link reset.'}</p>
       {reset ? <>
         {!token && <p role="alert">Token reset tidak valid. Minta link reset baru.</p>}
         {!done && <><label className={styles.field}><span>Kata Sandi Baru <b>*</b></span><input type="password" autoComplete="new-password" minLength={8} required value={password} disabled={loading || !token} onChange={(e) => setPassword(e.target.value)} /></label>

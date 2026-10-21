@@ -5,8 +5,9 @@ import styles from './Auth.module.css';
 
 export default function WaitingVerification({ email, notice }: { email: string; notice?: string }) {
   return <AuthShell registration><div className={styles.formWrap}>
-    <header className={styles.heading}><h2>Pendaftaran berhasil</h2><p>Silakan verifikasi email Anda sebelum masuk.</p></header>
+    <header className={styles.heading}><h2 data-page-title>Pendaftaran berhasil</h2></header>
     <div className={styles.loginCard}>
+      <p className={styles.statusCopy}>Silakan verifikasi email Anda sebelum masuk.</p>
       <p className={styles.statusCopy}>Periksa kotak masuk dan folder spam{email ? <> untuk <strong>{email}</strong></> : ''}.</p>
       {notice && <p className={styles.inlineInfo} role="status">{notice}</p>}
       <ResendVerification email={email} />

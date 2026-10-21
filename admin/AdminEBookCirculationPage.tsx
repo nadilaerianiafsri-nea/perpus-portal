@@ -130,11 +130,7 @@ export default function AdminEBookCirculationPage() {
   return (
     <div className={styles.page}>
       <header className={styles.heading}>
-        <h1>Sirkulasi E-Book</h1>
-        <p>
-          Monitoring pinjaman digital, antrean, prioritas 24 jam, dan riwayat
-          akses E-Book. Proses peminjaman tetap otomatis tanpa persetujuan admin.
-        </p>
+        <h1 data-page-title>Sirkulasi E-Book</h1>
       </header>
 
       <section className={styles.summary} aria-label="Ringkasan sirkulasi E-Book">

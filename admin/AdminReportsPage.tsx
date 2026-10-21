@@ -111,8 +111,7 @@ export default function AdminReportsPage() {
     <div className={styles.page}>
       <header className={styles.pageHeading}>
         <div>
-          <h1>Laporan</h1>
-          <p>Ringkasan aktivitas perpustakaan berdasarkan periode yang dipilih.</p>
+          <h1 data-page-title>Laporan</h1>
         </div>
         <div className={styles.toolbar}>
           <PeriodSelector value={period} onChange={applyPeriod} loading={loading} label="Periode laporan" />

@@ -18,7 +18,7 @@ export default function VerifyEmail({ token }: { token: string }) {
   }, [token, attempt]);
   const message = !token ? 'Token verifikasi tidak valid.' : !result ? 'Sedang memverifikasi email...' : result.ok ? result.alreadyVerified ? 'Email sudah pernah diverifikasi.' : 'Email berhasil diverifikasi.' : result.code === 'TOKEN_EXPIRED' ? 'Token verifikasi sudah kedaluwarsa. Silakan minta email verifikasi baru.' : result.message;
   return <AuthShell registration><div className={styles.formWrap}>
-    <header className={styles.heading}><h2>Verifikasi Email</h2></header>
+    <header className={styles.heading}><h2 data-page-title>Verifikasi Email</h2></header>
     <div className={styles.loginCard} aria-busy={!!token && !result}>
       <p className={styles.statusCopy} role="status">{message}</p>
       {result && !result.ok && <button data-button="primary" data-button-size="lg" className={styles.linkButton} onClick={() => { setResult(null); setAttempt((n) => n + 1); }}>Coba lagi</button>}

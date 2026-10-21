@@ -119,11 +119,7 @@ export default function AdminGrantsPage() {
     <div className={styles.page}>
       <header className={styles.pageHeading}>
         <div>
-          <h1>Hibah Buku</h1>
-          <p>
-            Catat buku yang telah diterima dari individu, komunitas, organisasi,
-            maupun instansi.
-          </p>
+          <h1 data-page-title>Hibah Buku</h1>
         </div>
 
         <Link href="/admin/hibah-buku/tambah" className={styles.addButton}>

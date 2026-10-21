@@ -6,7 +6,7 @@ export default function NotFound() {
     <CatalogShell>
       <main className={styles.main}>
         <div className={styles.state}>
-          <h1>Koleksi tidak ditemukan.</h1>
+          <h1 data-page-title>Koleksi tidak ditemukan.</h1>
           <Link data-button="ghost" data-button-size="md" href="/koleksi">Kembali ke Koleksi</Link>
         </div>
       </main>

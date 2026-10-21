@@ -123,10 +123,7 @@ export default function LoansPage() {
 
   return (
     <div className={shared.pageStack}>
-      <PageHeading
-        title="Pinjaman Saya"
-        description="Kelola pinjaman aktif dan lihat riwayat buku yang pernah Anda pinjam."
-      />
+      <PageHeading title="Pinjaman Saya" />
 
       <section className={styles.statsGrid} aria-label="Statistik pinjaman saya">
         <StatCard label="Sedang Dipinjam" value={resource.loading ? "–" : loans.length} tone="primary" icon={<FiBookOpen />} />

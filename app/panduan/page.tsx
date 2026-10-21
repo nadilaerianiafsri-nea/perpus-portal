@@ -27,8 +27,7 @@ export default async function Page() {
         <PageBreadcrumb label="Panduan" />
 
         <header className={styles.heading}>
-          <h1>{content.guide.title}</h1>
-          <p>{renderPublicText(content.guide.intro, settings)}</p>
+          <h1 data-page-title>{content.guide.title}</h1>
         </header>
 
         <section className={styles.steps} aria-label="Langkah peminjaman buku">

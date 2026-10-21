@@ -273,9 +273,7 @@ export default function AdminGrantForm({ mode, id }: Props) {
             <strong>{mode === "create" ? "Tambah Data" : "Edit Data"}</strong>
           </div>
 
-          <h1>{mode === "create" ? "Tambah Data Hibah" : "Edit Data Hibah"}</h1>
-
-          <p>Satu penerimaan dapat berisi satu atau beberapa judul buku.</p>
+          <h1 data-page-title>{mode === "create" ? "Tambah Data Hibah" : "Edit Data Hibah"}</h1>
         </div>
 
         <Link data-button="back" data-button-size="md" href={cancelHref} className={styles.secondaryButton}>

@@ -54,5 +54,5 @@ export default function ProfilePage() {
   const resource = useMemberResource<{ profile: MemberProfile }>("profile");
   const { refresh } = useMember();
   async function saved(profile: MemberProfile) { resource.update({ profile }); await refresh(); }
-  return <div className={styles.pageStack}><PageHeading title="Profil Saya" description="Perbarui data kontak Anda agar pengingat perpustakaan dapat diterima." />{resource.loading ? <LoadingCards /> : resource.error ? <ErrorState message={resource.error} retry={resource.reload} /> : resource.data && <ProfileForm profile={resource.data.profile} onSaved={saved} />}</div>;
+  return <div className={styles.pageStack}><PageHeading title="Profil Saya" />{resource.loading ? <LoadingCards /> : resource.error ? <ErrorState message={resource.error} retry={resource.reload} /> : resource.data && <ProfileForm profile={resource.data.profile} onSaved={saved} />}</div>;
 }

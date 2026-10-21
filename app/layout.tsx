@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
 import "@/components/typography.css";
+import "@/components/page-headers.css";
 import "@/components/buttons.css";
 import "@/components/records.css";
 import "@/components/selects.css";

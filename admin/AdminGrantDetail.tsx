@@ -91,8 +91,7 @@ export default function AdminGrantDetail({ id }: Props) {
             <strong>Detail Hibah</strong>
           </div>
 
-          <h1>Detail Hibah</h1>
-          <p>Informasi lengkap penerimaan dan daftar buku hibah.</p>
+          <h1 data-page-title>Detail Hibah</h1>
         </div>
 
         <div className={styles.detailActions}>

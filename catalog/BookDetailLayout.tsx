@@ -80,7 +80,7 @@ export default function BookDetailLayout({
         <span aria-current="page">Detail</span>
       </nav>
       <header className={styles.heading}>
-        <h1>Detail Buku</h1>
+        <h1 data-page-title>Detail Buku</h1>
         <Link data-button={member ? "back" : "ghost"} data-button-size="md" className={styles.backLink} href={basePath}>
           <FiArrowLeft aria-hidden />{" "}
           {member ? "Kembali ke Katalog" : "Kembali ke Koleksi"}

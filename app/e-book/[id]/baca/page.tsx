@@ -54,7 +54,7 @@ function ReaderState({
     <main className={styles.readerPage}>
       <section className={styles.readerState}>
         <div className={styles.readerStateCard}>
-          <h1>{title}</h1>
+          <h1 data-page-title>{title}</h1>
           <p>{message}</p>
           <Link data-button="back" data-button-size="md" className={styles.stateAction} href={href}>
             Kembali ke Detail E-Book

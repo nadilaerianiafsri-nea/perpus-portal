@@ -32,8 +32,7 @@ export default async function Page() {
         <PageBreadcrumb label="FAQ" />
 
         <header className={styles.heading}>
-          <h1>{content.faq.title}</h1>
-          <p>{renderPublicText(content.faq.intro, settings)}</p>
+          <h1 data-page-title>{content.faq.title}</h1>
         </header>
 
         <FAQ items={faqItems} />

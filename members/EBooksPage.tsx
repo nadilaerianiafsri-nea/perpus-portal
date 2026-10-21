@@ -119,10 +119,7 @@ export default function EBooksPage() {
 
   return (
     <div className={shared.pageStack}>
-      <PageHeading
-        title="E-Book Saya"
-        description="Kelola pinjaman aktif, antrean, dan riwayat E-Book dalam satu menu."
-      />
+      <PageHeading title="E-Book Saya" />
 
       {notice ? <div className={styles.notice} role="status">{notice}</div> : null}
 

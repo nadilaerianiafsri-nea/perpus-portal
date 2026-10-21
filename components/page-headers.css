@@ -1,0 +1,23 @@
+/* Opt in only page titles; section headings and content retain their styling. */
+:root {
+  --page-title-accent-width: 80px;
+  --page-title-accent-height: 4px;
+  --page-title-accent-gap: 12px;
+  --page-header-gap: 24px;
+}
+
+[data-page-title] {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+[data-page-title]::after {
+  content: "";
+  display: block;
+  width: var(--page-title-accent-width);
+  max-width: 100%;
+  height: var(--page-title-accent-height);
+  margin-top: var(--page-title-accent-gap);
+  border-radius: 999px;
+  background: var(--yellow);
+}

@@ -20,8 +20,7 @@ export default async function Page() {
       <main className={`${common.main} ${info.main} ${info.helpMain}`}>
         <PageBreadcrumb label="Kontak" />
         <header className={info.heading}>
-          <h1>Hubungi Kami</h1>
-          <p>Informasi layanan dan formulir pesan.</p>
+          <h1 data-page-title>Hubungi Kami</h1>
         </header>
         <div className={styles.grid}>
           <section className={styles.card} aria-labelledby="service-heading">

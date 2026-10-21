@@ -200,13 +200,7 @@ export default function Catalog({
 
   const content = (
     <>
-      <h1>{ebook ? "Katalog E-Book" : "Katalog Koleksi"}</h1>
-      {member ? (
-        <p className={styles.memberSubtitle}>
-          Temukan buku fisik dan E-Book yang tersedia di Perpustakaan Kemenkum
-          Riau.
-        </p>
-      ) : null}
+      <h1 data-page-title>{ebook ? "Katalog E-Book" : "Katalog Koleksi"}</h1>
 
       <div
         className={`${styles.searchRow} ${member ? memberStyles.memberSearchRow : ""}`}

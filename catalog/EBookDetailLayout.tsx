@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { FiArrowLeft, FiMonitor, FiShield } from "react-icons/fi";
+import { FiArrowLeft, FiShield } from "react-icons/fi";
 import { DetailCard } from "./BookDetailLayout";
 import EBookCover from "./EBookCover";
 import type { BookDetail } from "./types";
@@ -21,6 +21,7 @@ export default function EBookDetailLayout({
   const Container = member ? "div" : "main";
   const listHref = member ? "/dashboard/koleksi" : "/koleksi";
   const metadata = [
+    ["Penulis / Pengarang", book.author || "Penulis belum tersedia"],
     ["ISBN / ISSN", book.isbnIssn || "Belum tersedia"],
     ["Penerbit", book.publisher || "Belum tersedia"],
     ["Tahun Terbit", book.year],
@@ -67,23 +68,9 @@ export default function EBookDetailLayout({
           <span className={styles.coverCaption}>KOLEKSI DIGITAL</span>
         </div>
         <div className={styles.heroContent}>
-          <span className={styles.badge}>
-            <FiMonitor aria-hidden /> E-Book
-          </span>
-          <h1 id="ebook-title" className={styles.title}>
+          <h1 data-page-title id="ebook-title" className={styles.title}>
             {book.title}
           </h1>
-          <p className={styles.author}>
-            oleh {book.author || "Penulis belum tersedia"}
-          </p>
-          <ul className={styles.quickMetadata} aria-label="Ringkasan katalog">
-            <li>{book.year}</li>
-            {book.language ? <li>Bahasa {book.language}</li> : null}
-            {book.subject ? <li>{book.subject}</li> : null}
-          </ul>
-          <p className={styles.excerpt}>
-            {book.description?.trim() || "Deskripsi belum tersedia."}
-          </p>
           <div className={`${shared.actions} ${styles.readActions}`}>
             {action}
           </div>

@@ -19,8 +19,7 @@ export default async function Page() {
       <main className={`${common.main} ${styles.main} public-info-refresh`}>
         <PageBreadcrumb label="Tentang" />
         <header className={styles.heading}>
-          <h1>{content.about.title}</h1>
-          <p>{content.about.intro}</p>
+          <h1 data-page-title>{content.about.title}</h1>
         </header>
         <section className={styles.features} aria-label="Layanan perpustakaan">
           {content.about.features.map(({ title, description }, index) => {
