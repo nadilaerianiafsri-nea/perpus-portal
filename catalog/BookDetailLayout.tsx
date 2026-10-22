@@ -61,14 +61,6 @@ export default function BookDetailLayout({
 
     return (
       <main className={`${styles.page} ${styles.publicPage}`}>
-        <nav className={styles.breadcrumb} aria-label="Detail koleksi">
-          <Link href="/">Beranda</Link>
-          <span>/</span>
-          <Link href={basePath}>Koleksi</Link>
-          <span>/</span>
-          <span aria-current="page">Detail</span>
-        </nav>
-
         <header className={`${styles.heading} ${styles.publicHeading}`}>
           <div className={styles.headingCopy}>
             <h1 data-page-title>Detail Buku</h1>
@@ -116,8 +108,13 @@ export default function BookDetailLayout({
         </section>
 
         <div className={styles.publicDetailGrid}>
-          <DetailCard title="Informasi Bibliografi" id="book-public-catalog-title">
-            <dl className={`${styles.catalogFields} ${styles.publicCatalogFields}`}>
+          <DetailCard
+            title="Informasi Bibliografi"
+            id="book-public-catalog-title"
+          >
+            <dl
+              className={`${styles.catalogFields} ${styles.publicCatalogFields}`}
+            >
               {publicMetadata.map(([label, value]) => (
                 <div key={label}>
                   <dt>{label}</dt>

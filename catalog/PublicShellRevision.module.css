@@ -441,11 +441,11 @@
   }
 
   .publicShell :global(section[aria-label="Hasil pencarian"] article:hover) {
-    border-color: color-mix(in srgb, var(--sky) 76%, var(--navy));
-    background: color-mix(in srgb, var(--sky) 26%, var(--white));
+    border-color: color-mix(in srgb, var(--sky) 88%, var(--navy));
+    background: color-mix(in srgb, var(--sky) 44%, var(--white));
     box-shadow:
-      0 4px 8px color-mix(in srgb, var(--navy) 7%, transparent),
-      0 22px 44px color-mix(in srgb, var(--navy) 11%, transparent);
+      0 5px 10px color-mix(in srgb, var(--navy) 8%, transparent),
+      0 24px 46px color-mix(in srgb, var(--navy) 13%, transparent);
     transform: translateY(-5px) scale(1.008);
   }
 
@@ -861,6 +861,12 @@
 
 .publicShell :global(main:has(nav[aria-label="Detail koleksi"]) > header h1) {
   font-size: clamp(32px, 3.5vw, 46px);
+}
+
+@media (hover: hover) {
+  .publicShell :global(main:has(nav[aria-label="Detail koleksi"]) a[data-button]:hover) {
+    text-decoration: none;
+  }
 }
 
 @media (hover: hover) {
@@ -1371,3 +1377,29 @@
   }
 }
 
+
+/* Final collection hover + public detail action consistency. */
+@media (hover: hover) {
+  .publicShell :global(section[aria-label="Hasil pencarian"] article:hover),
+  .publicShell :global(section[aria-label="Hasil pencarian"] article:focus-within) {
+    border-color: color-mix(in srgb, var(--sky) 94%, var(--navy));
+    background: color-mix(in srgb, var(--sky) 66%, transparent);
+    box-shadow:
+      0 6px 12px color-mix(in srgb, var(--navy) 9%, transparent),
+      0 26px 48px color-mix(in srgb, var(--navy) 15%, transparent);
+    transform: translateY(-5px) scale(1.008);
+  }
+
+  .publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) article:hover),
+  .publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) article:focus-within) {
+    border-color: color-mix(in srgb, var(--sky) 92%, var(--navy));
+    background: color-mix(in srgb, var(--sky) 62%, transparent);
+    box-shadow: 0 20px 40px color-mix(in srgb, var(--navy) 13%, transparent);
+    transform: translateY(-4px);
+  }
+
+  .publicShell :global(main:has(nav[aria-label="Detail koleksi"]) a[data-button]:hover),
+  .publicShell :global(main:has(nav[aria-label="Detail koleksi"]) a[data-button]:focus-visible) {
+    text-decoration: none;
+  }
+}

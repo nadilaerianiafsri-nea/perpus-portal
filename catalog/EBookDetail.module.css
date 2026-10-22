@@ -610,3 +610,59 @@
     transform: none;
   }
 }
+
+/* Final public E-Book alignment with the physical-book detail design. */
+.publicEbookCover img {
+  object-fit: contain;
+}
+
+.publicAccessFields > div {
+  align-items: center;
+}
+
+.publicAccessFields dd {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.publicPage .relatedGrid {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.publicPage .relatedGrid article:hover,
+.publicPage .relatedGrid article:focus-within {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--sky) 92%, var(--navy));
+  background: color-mix(in srgb, var(--sky) 62%, transparent);
+  box-shadow: 0 20px 38px color-mix(in srgb, var(--navy) 14%, transparent);
+}
+
+.publicPage .relatedGrid article > div:last-child > a:last-child,
+.publicPage .relatedGrid article > div:last-child > a:last-child:hover {
+  text-decoration: none;
+}
+
+@media (max-width: 1100px) {
+  .publicPage .relatedGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .publicAccessFields > div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .publicAccessFields dd {
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .publicPage .relatedGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}

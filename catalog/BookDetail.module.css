@@ -400,16 +400,20 @@
 
 .publicPage .breadcrumb {
   width: fit-content;
-  margin-bottom: 20px;
-  padding: 8px 12px;
-  border: 1px solid color-mix(in srgb, var(--navy) 10%, var(--line));
+  margin-bottom: 22px;
+  padding: 9px 14px;
+  border: 1px solid color-mix(in srgb, var(--sky) 72%, var(--navy));
   border-radius: 999px;
-  background: color-mix(in srgb, var(--white) 92%, var(--sky));
-  box-shadow: 0 8px 20px color-mix(in srgb, var(--navy) 7%, transparent);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--sky) 52%, var(--white)) 0%,
+    color-mix(in srgb, var(--white) 94%, var(--sky)) 100%
+  );
+  box-shadow: 0 9px 22px color-mix(in srgb, var(--navy) 8%, transparent);
 }
 .publicPage .breadcrumb a {
   color: var(--navy);
-  font-weight: 650;
+  font-weight: 700;
 }
 .publicPage .breadcrumb a:hover {
   color: var(--navy);
@@ -417,10 +421,11 @@
   text-underline-offset: 3px;
 }
 .publicPage .breadcrumb > span:not(:last-child) {
-  color: color-mix(in srgb, var(--navy) 44%, var(--white));
+  color: color-mix(in srgb, var(--navy) 52%, var(--white));
 }
 .publicPage .breadcrumb > :last-child {
-  color: color-mix(in srgb, var(--navy) 72%, var(--white));
+  color: color-mix(in srgb, var(--navy) 76%, var(--white));
+  font-weight: 650;
 }
 
 .publicPage .relatedGrid article {
@@ -434,9 +439,9 @@
 .publicPage .relatedGrid article:hover,
 .publicPage .relatedGrid article:focus-within {
   transform: translateY(-4px);
-  border-color: color-mix(in srgb, var(--sky) 76%, var(--navy));
-  background: color-mix(in srgb, var(--sky) 24%, var(--white));
-  box-shadow: 0 18px 34px color-mix(in srgb, var(--navy) 12%, transparent);
+  border-color: color-mix(in srgb, var(--sky) 92%, var(--navy));
+  background: color-mix(in srgb, var(--sky) 62%, transparent);
+  box-shadow: 0 20px 38px color-mix(in srgb, var(--navy) 14%, transparent);
 }
 .publicPage .relatedGrid article > div:last-child > a:last-child {
   min-height: 42px;
@@ -501,12 +506,11 @@
   padding: 30px;
   border-color: color-mix(in srgb, var(--navy) 10%, var(--line));
   border-radius: 20px;
-  background:
-    linear-gradient(
-      135deg,
-      color-mix(in srgb, var(--sky) 52%, var(--white)) 0%,
-      var(--white) 72%
-    );
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--sky) 52%, var(--white)) 0%,
+    var(--white) 72%
+  );
   box-shadow: 0 18px 42px color-mix(in srgb, var(--navy) 8%, transparent);
   animation: publicDetailEnter 0.42s ease both;
   transition:
@@ -516,23 +520,73 @@
 }
 .publicHero:hover {
   transform: translateY(-2px);
-  border-color: color-mix(in srgb, var(--yellow) 58%, var(--line));
+  border-color: color-mix(in srgb, var(--sky) 82%, var(--navy));
   box-shadow: 0 22px 48px color-mix(in srgb, var(--navy) 10%, transparent);
 }
 .publicCoverStage {
+  position: relative;
   display: grid;
   place-items: center;
   min-height: 310px;
-  padding: 24px;
-  border: 1px solid color-mix(in srgb, var(--navy) 8%, var(--line));
-  border-radius: 16px;
-  background: color-mix(in srgb, var(--cream) 58%, var(--white));
+  padding: 28px;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid color-mix(in srgb, var(--sky) 70%, var(--navy));
+  border-radius: 28px;
+  background:
+    radial-gradient(
+      circle at 18% 18%,
+      color-mix(in srgb, var(--sky) 54%, transparent) 0 54px,
+      transparent 55px
+    ),
+    radial-gradient(
+      circle at 84% 78%,
+      color-mix(in srgb, var(--sky) 34%, transparent) 0 72px,
+      transparent 73px
+    ),
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--sky) 64%, var(--white)) 0%,
+      color-mix(in srgb, var(--white) 88%, var(--sky)) 58%,
+      color-mix(in srgb, var(--cream) 20%, var(--white)) 100%
+    );
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--white) 72%, transparent);
+}
+.publicCoverStage::before,
+.publicCoverStage::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.publicCoverStage::before {
+  width: 190px;
+  height: 190px;
+  top: -72px;
+  right: -46px;
+  background: color-mix(in srgb, var(--sky) 64%, transparent);
+  box-shadow:
+    -210px 188px 0 -42px color-mix(in srgb, var(--sky) 38%, transparent),
+    -64px 278px 0 -66px color-mix(in srgb, var(--cream) 54%, transparent);
+}
+.publicCoverStage::after {
+  width: 118px;
+  height: 118px;
+  left: -34px;
+  bottom: -28px;
+  border: 20px solid color-mix(in srgb, var(--white) 62%, transparent);
+  background: color-mix(in srgb, var(--sky) 22%, transparent);
 }
 .publicCover {
+  z-index: 1;
   width: min(100%, 220px);
-  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--navy) 8%, var(--line));
+  border-radius: 16px;
   background: var(--white);
-  box-shadow: 0 14px 30px color-mix(in srgb, var(--navy) 14%, transparent);
+  box-shadow:
+    0 18px 36px color-mix(in srgb, var(--navy) 16%, transparent),
+    0 0 0 8px color-mix(in srgb, var(--white) 42%, transparent);
 }
 .publicHeroContent {
   display: grid;
@@ -588,8 +642,28 @@
     color 0.18s ease,
     box-shadow 0.18s ease;
 }
+.publicActions :is(a, button),
+.publicActions :is(a, button):hover,
+.publicActions :is(a, button):focus-visible {
+  text-decoration: none;
+}
 .publicActions :is(a, button):hover:not(:disabled) {
-  transform: translateY(-1px) scale(1.01);
+  text-decoration: none;
+  transform: translateY(-1px) scale(1.02);
+}
+.publicActions a[data-button="primary"]:hover {
+  background: color-mix(in srgb, var(--navy) 82%, var(--sky));
+  color: var(--white);
+  box-shadow: 0 12px 26px color-mix(in srgb, var(--navy) 20%, transparent);
+}
+.publicActions a[data-button="secondary"]:hover {
+  border-color: color-mix(in srgb, var(--sky) 74%, var(--navy));
+  background: color-mix(in srgb, var(--sky) 62%, var(--white));
+  color: var(--navy);
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--navy) 10%, transparent);
+}
+.publicBackLink:hover {
+  text-decoration: none;
 }
 .publicDetailGrid {
   display: grid;
@@ -609,7 +683,8 @@
 }
 .publicDetailGrid > .card:hover {
   transform: translateY(-2px);
-  border-color: color-mix(in srgb, var(--yellow) 55%, var(--line));
+  border-color: color-mix(in srgb, var(--sky) 76%, var(--navy));
+  background: color-mix(in srgb, var(--sky) 18%, var(--white));
   box-shadow: 0 16px 34px color-mix(in srgb, var(--navy) 9%, transparent);
 }
 .publicDescriptionCard {
@@ -780,4 +855,47 @@
     animation: none;
     transform: none;
   }
+}
+
+/* Public detail header: transparent for both physical books and E-Books. */
+.page.publicPage > .publicHeading {
+  overflow: visible;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.page.publicPage > .publicHeading::before,
+.page.publicPage > .publicHeading::after {
+  content: none;
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .page.publicPage > .publicHeading {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+}
+
+/* Public detail: button-style links must never show text underline. */
+.page.publicPage a[data-button],
+.page.publicPage a[data-button]:hover,
+.page.publicPage a[data-button]:focus,
+.page.publicPage a[data-button]:focus-visible,
+.page.publicPage .publicBackLink,
+.page.publicPage .publicBackLink:hover,
+.page.publicPage .publicBackLink:focus-visible,
+.page.publicPage .publicActions a,
+.page.publicPage .publicActions a:hover,
+.page.publicPage .publicActions a:focus-visible,
+.page.publicPage .relatedGrid a[data-button],
+.page.publicPage .relatedGrid a[data-button]:hover,
+.page.publicPage .relatedGrid a[data-button]:focus-visible {
+  text-decoration: none !important;
 }

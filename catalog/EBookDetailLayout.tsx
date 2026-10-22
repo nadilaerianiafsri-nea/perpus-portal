@@ -34,97 +34,69 @@ export default function EBookDetailLayout({
       ["Tahun Terbit", book.year],
       ...(book.edition ? [["Edisi", book.edition]] : []),
       ["Bahasa", book.language || "Belum tersedia"],
-      ["Subjek", book.subject || "Belum tersedia"],
       ["Format", book.format || "Digital"],
+      ["Subjek", book.subject || "Belum tersedia"],
     ];
 
     return (
       <main
-        className={`${shared.page} ${shared.publicPage} ${styles.page} ${styles.publicPage}`}
+        className={`${shared.page} ${shared.publicPage} ${styles.publicPage}`}
       >
-        <nav className={shared.breadcrumb} aria-label="Detail E-Book">
-          <Link href="/">Beranda</Link>
-          <span>/</span>
-          <Link href={listHref}>Koleksi</Link>
-          <span>/</span>
-          <span aria-current="page">Detail</span>
-        </nav>
-
-        <header className={styles.publicHeading}>
-          <div className={styles.headingCopy}>
-            <span className={styles.publicKicker}>E-BOOK</span>
+        <header className={`${shared.heading} ${shared.publicHeading}`}>
+          <div className={shared.headingCopy}>
             <h1 data-page-title>Detail E-Book</h1>
-            <p>
-              Informasi koleksi digital dan akses yang tersedia untuk
-              pengunjung perpustakaan.
-            </p>
           </div>
           <Link
-            data-button="ghost"
+            data-button="primary"
             data-button-size="md"
             href={listHref}
-            className={styles.publicBackLink}
+            className={`${shared.backLink} ${shared.publicBackLink}`}
           >
             <FiArrowLeft aria-hidden /> Kembali ke Koleksi
           </Link>
         </header>
 
-        <section className={styles.publicHero} aria-labelledby="ebook-title">
-          <div className={styles.publicCoverStage}>
-            <div className={styles.publicCover}>
+        <section
+          className={`${shared.card} ${shared.publicHero}`}
+          aria-labelledby="ebook-title"
+        >
+          <div className={shared.publicCoverStage}>
+            <div
+              className={`${shared.cover} ${shared.publicCover} ${styles.publicEbookCover}`}
+            >
               <EBookCover src={book.coverUrl} title={book.title} />
             </div>
-            <span className={styles.coverCaption}>KOLEKSI DIGITAL</span>
           </div>
 
-          <div className={styles.publicHeroContent}>
-            <span className={styles.publicType}>E-Book</span>
-            <h2 id="ebook-title" className={styles.publicTitle}>
+          <div className={shared.publicHeroContent}>
+            <span className={shared.publicType}>E-Book</span>
+            <h2 id="ebook-title" className={shared.publicBookTitle}>
               {book.title}
             </h2>
-            <p className={styles.publicAuthor}>
+            <p className={shared.publicAuthor}>
               {book.author || "Penulis belum tersedia"}
             </p>
-            <div className={styles.publicFacts}>
+            <div className={shared.publicFacts}>
               <span>{book.subject || "Subjek belum tersedia"}</span>
               <span>{book.year}</span>
             </div>
-            <div className={`${shared.actions} ${styles.publicActions}`}>
+            <div className={`${shared.actions} ${shared.publicActions}`}>
               {action}
             </div>
-            <p className={styles.publicAccessHint}>
+            <p className={`${shared.note} ${styles.publicAccessHint}`}>
               <FiShield aria-hidden /> Akses membaca memerlukan akun anggota.
             </p>
           </div>
         </section>
 
-        <div className={styles.publicDetails}>
-          <div className={styles.publicDescriptionColumn}>
-            <DetailCard title="Deskripsi" id="book-public-description-title">
-              <p className={styles.description}>
-                {book.description?.trim() || "Deskripsi belum tersedia."}
-              </p>
-            </DetailCard>
-
-            <DetailCard title="Akses E-Book" id="ebook-public-access-title">
-              <dl className={styles.accessFields}>
-                <div>
-                  <dt>Jenis Akses</dt>
-                  <dd>{access}</dd>
-                </div>
-                <div>
-                  <dt>Akun</dt>
-                  <dd>Memerlukan akun anggota</dd>
-                </div>
-              </dl>
-            </DetailCard>
-          </div>
-
+        <div className={shared.publicDetailGrid}>
           <DetailCard
             title="Informasi Bibliografi"
             id="book-public-catalog-title"
           >
-            <dl className={styles.metadata}>
+            <dl
+              className={`${shared.catalogFields} ${shared.publicCatalogFields}`}
+            >
               {publicMetadata.map(([label, value]) => (
                 <div key={label}>
                   <dt>{label}</dt>
@@ -133,6 +105,39 @@ export default function EBookDetailLayout({
               ))}
             </dl>
           </DetailCard>
+
+          <DetailCard title="Akses E-Book" id="ebook-public-access-title">
+            <dl
+              className={`${shared.availabilityFields} ${shared.publicAvailability} ${styles.publicAccessFields}`}
+            >
+              <div>
+                <dt>Jenis Akses</dt>
+                <dd>{access}</dd>
+              </div>
+              <div>
+                <dt>Akun</dt>
+                <dd>Memerlukan akun anggota</dd>
+              </div>
+            </dl>
+            <p className={shared.note}>
+              Masuk sebagai anggota untuk menggunakan akses baca E-Book.
+            </p>
+          </DetailCard>
+
+          <section
+            className={`${shared.card} ${shared.publicDescriptionCard}`}
+            aria-labelledby="book-public-description-title"
+          >
+            <h2
+              id="book-public-description-title"
+              className={shared.sectionTitle}
+            >
+              Deskripsi
+            </h2>
+            <p className={shared.description}>
+              {book.description?.trim() || "Deskripsi belum tersedia."}
+            </p>
+          </section>
         </div>
 
         {related}
