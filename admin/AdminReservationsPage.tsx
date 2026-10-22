@@ -13,7 +13,7 @@ import { FiClock as CardClock, FiAlertTriangle as CardAlertTriangle, FiXCircle a
 import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import { plainTextMessage } from "../members/inputSecurity";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { FiSearch, FiDownload } from "react-icons/fi";
 
@@ -27,6 +27,8 @@ import styles from "./AdminTransactions.module.css";
 import ui from "./AdminReservationTools.module.css";
 import { reservationActionLabel, reservationStatusLabel, reservationsCsv, sortReservations, type ReservationSort } from "./adminReservations";
 import { jakartaDateInput } from "@/shared/period";
+import { useReservationPickup } from "./useReservationPickup";
+import ReservationPickupDialog from "./ReservationPickupDialog";
 
 type StatusFilter =
   | "ALL"
@@ -77,6 +79,9 @@ export default function AdminReservationsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [revision, setRevision] = useState(0);
+  const loadVersion = useRef(0);
+  const focusAfterPickup = useRef<number | null>(null);
+  const listTitle = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -96,6 +101,7 @@ export default function AdminReservationsPage() {
 
   const load = useCallback(async () => {
     void revision;
+    const version = ++loadVersion.current;
 
     setLoading(true);
     setError("");
@@ -129,6 +135,7 @@ export default function AdminReservationsPage() {
       }
 
       const payload = (await response.json()) as ReservationsResponse;
+      if (version !== loadVersion.current) return;
 
       if (page > payload.meta.totalPages) {
         setPage(payload.meta.totalPages);
@@ -137,20 +144,35 @@ export default function AdminReservationsPage() {
 
       setResult(payload);
     } catch (reason) {
+      if (version !== loadVersion.current) return;
       setError(
         reason instanceof Error
           ? reason.message
           : "Data reservasi belum dapat dimuat.",
       );
     } finally {
-      setLoading(false);
+      if (version === loadVersion.current) setLoading(false);
     }
   }, [memberType, page, revision, search, status]);
+
+  const pickup = useReservationPickup(id => {
+    focusAfterPickup.current = id;
+    setRevision(value => value + 1);
+  });
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- Existing fetch lifecycle starts the loading state before requesting data.
     void load();
+    return () => { loadVersion.current += 1; };
   }, [load]);
+
+  useEffect(() => {
+    const id = focusAfterPickup.current;
+    if (loading || id === null) return;
+    const detail = document.querySelector<HTMLAnchorElement>(`a[data-reservation-detail="${id}"]`);
+    (detail ?? listTitle.current)?.focus({ preventScroll: true });
+    focusAfterPickup.current = null;
+  }, [loading, result]);
 
   const orderedRows = sortReservations(result.data.filter(row => inTransactionPeriod(row.createdAt, period)), sortOrder);
   const exportDisabled = loading || Boolean(error) || Boolean(searchError) || searchInput.trim() !== search || !orderedRows.length;
@@ -182,7 +204,7 @@ export default function AdminReservationsPage() {
 
       <section className={styles.panel}>
         <header className={styles.panelHeader}>
-          <h2>Daftar Reservasi Buku</h2>
+          <h2 ref={listTitle} tabIndex={-1}>Daftar Reservasi Buku</h2>
           <p>Data reservasi diperbarui langsung dari transaksi anggota.</p>
         </header>
 
@@ -277,7 +299,7 @@ export default function AdminReservationsPage() {
                 <th scope="col">DIAJUKAN</th>
                 <th scope="col">BATAS PENGAMBILAN</th>
                 <th scope="col">STATUS</th>
-                <th scope="col" className={ui.processColumn}>AKSI</th>
+                <th scope="col" className={ui.actionsColumn}>AKSI</th>
               </tr>
             </thead>
 
@@ -334,11 +356,20 @@ export default function AdminReservationsPage() {
                     </td>
 
                     <td>
-                      <ButtonLink variant={reservationActionLabel(reservation.status) === "Proses" ? "primary" : "secondary"} size="md" className={ui.processLink}
+                      <div className={ui.actionStack}>
+                      {reservationActionLabel(reservation.status) === "Sudah Diambil" ? (
+                        <Button variant="primary" accentHover disabled={pickup.pending || loading || Boolean(error)}
+                          loading={pickup.pending && pickup.target?.id === reservation.id} loadingLabel="Memproses..."
+                          aria-label={`Konfirmasi buku ${reservation.book.title} sudah diambil oleh ${reservation.member.name}`}
+                          onClick={() => pickup.open(reservation)}>Sudah Diambil</Button>
+                      ) : null}
+                      <ButtonLink variant="secondary" rowAction="neutral" size="md"
+                        data-reservation-detail={reservation.id}
                         href={`/admin/transaksi/reservasi/${reservation.id}?anggota=${reservation.member.id}`}
-                        aria-label={`${reservationActionLabel(reservation.status) === "Proses" ? "Proses" : "Lihat detail"} reservasi ${reservation.book.title} oleh ${reservation.member.name}`}>
-                        {reservationActionLabel(reservation.status)}
+                        aria-label={`Lihat detail reservasi ${reservation.book.title} oleh ${reservation.member.name}`}>
+                        Detail
                       </ButtonLink>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -384,8 +415,7 @@ export default function AdminReservationsPage() {
           </nav>
         ) : null}
       </section>
-
-
+      <ReservationPickupDialog pickup={pickup} />
     </div>
   );
 }

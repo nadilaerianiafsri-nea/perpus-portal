@@ -26,14 +26,19 @@
   --button-height: var(--select-control-height);
 }
 
-.processLink {
-  white-space: nowrap;
+.actionStack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  width: 100%;
+  max-width: 132px;
+  --action-neutral-fg: var(--button-navy);
 }
 
-:root .table .processLink[data-button="primary"][data-button] {
-  --button-hover-bg: var(--yellow);
-  --button-hover-fg: var(--navy);
-  --button-hover-stroke: var(--yellow);
+:root .table .actionStack [data-button][data-button] {
+  --button-height: 42px;
+  white-space: nowrap;
 }
 
 .table {
@@ -56,8 +61,8 @@
   width: 18%;
 }
 
-.table .processColumn {
-  width: 120px;
+.table .actionsColumn {
+  width: 164px;
 }
 
 .scopeNote {

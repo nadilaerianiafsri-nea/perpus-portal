@@ -278,7 +278,7 @@ export default function AdminReturnsPage() {
                 <th scope="col">BUKU</th>
                 <th scope="col">JATUH TEMPO</th>
                 <th scope="col">STATUS</th>
-                <th scope="col" data-record-actions="text" className={styles.returnsActionsCell}>AKSI</th>
+                <th scope="col" className={styles.returnsActionsCell}>AKSI</th>
               </tr>
             </thead>
 

@@ -24,7 +24,7 @@ function load(filename) {
 const api = fs.existsSync("admin/adminReservations.ts") ? load("admin/adminReservations.ts") : {};
 
 test("reservation actions follow actual status enums including almost-expired waiting reservations", () => {
-  assert.equal(api.reservationActionLabel("MENUNGGU_PENGAMBILAN"), "Proses");
+  assert.equal(api.reservationActionLabel("MENUNGGU_PENGAMBILAN"), "Sudah Diambil");
   for (const status of ["KEDALUWARSA", "DIAMBIL", "DIBATALKAN", "UNKNOWN_FINAL"]) {
     assert.equal(api.reservationActionLabel(status), "Detail");
   }

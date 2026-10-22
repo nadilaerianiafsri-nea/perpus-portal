@@ -2,10 +2,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FiArrowLeft, FiBookOpen, FiCheckCircle, FiClock, FiInfo, FiUser } from "react-icons/fi";
 import { Button } from "@/components/Button";
-import ConfirmDialog from "@/components/ConfirmDialog";
+import ReservationPickupDialog from "./ReservationPickupDialog";
+import { useReservationPickup } from "./useReservationPickup";
 import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import type { AdminBookDetailResponse } from "./adminBooks";
 import { loadReservation, reservationFinalNotice, reservationStatusLabel } from "./adminReservations";
@@ -13,16 +14,9 @@ import { useCountdown } from "@/members/useCountdown";
 import {
   formatTransactionDateTime,
   memberTypeLabel,
-  transactionApiMessage,
   type ReservationRow,
 } from "./adminTransactions";
 import styles from "./AdminReservationDetail.module.css";
-
-type PickupTarget = {
-  id: number;
-  memberName: string;
-  bookTitle: string;
-};
 
 type BookLocation = { location: string; shelf: string; copyLocation: string };
 
@@ -41,22 +35,25 @@ export default function AdminReservationDetail({ id, memberId }: { id: number; m
   const [reservation, setReservation] = useState<ReservationRow | null>(null);
   const [location, setLocation] = useState<BookLocation | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [loadError, setLoadError] = useState("");
-  const [processingId, setProcessingId] = useState<number | null>(null);
-  const [pickupTarget, setPickupTarget] = useState<PickupTarget | null>(null);
   const [revision, setRevision] = useState(0);
+  const focusAfterPickup = useRef(false);
+  const backLink = useRef<HTMLAnchorElement>(null);
+  const pickup = useReservationPickup(() => {
+    focusAfterPickup.current = true;
+    setRevision(value => value + 1);
+  });
+  const resetPickup = pickup.reset;
 
   useEffect(() => {
     const controller = new AbortController();
 
     async function load() {
       setLoading(true);
-      setError("");
       setLoadError("");
       setReservation(null);
       setLocation(null);
-      setPickupTarget(null);
+      resetPickup();
 
       try {
         const row = await loadReservation(id, memberId, controller.signal);
@@ -72,7 +69,13 @@ export default function AdminReservationDetail({ id, memberId }: { id: number; m
 
     void load();
     return () => controller.abort();
-  }, [id, memberId, revision]);
+  }, [id, memberId, revision, resetPickup]);
+
+  useEffect(() => {
+    if (loading || !focusAfterPickup.current) return;
+    backLink.current?.focus({ preventScroll: true });
+    focusAfterPickup.current = false;
+  }, [loading, reservation]);
 
   useEffect(() => {
     if (!reservation) return;
@@ -103,44 +106,8 @@ export default function AdminReservationDetail({ id, memberId }: { id: number; m
     return () => controller.abort();
   }, [reservation]);
 
-  async function confirmPickup() {
-    if (!pickupTarget || processingId !== null) return;
-
-    setProcessingId(pickupTarget.id);
-    setError("");
-
-    try {
-      const response = await fetch(
-        `/api/members/admin/reservations/${pickupTarget.id}/pickup`,
-        {
-          method: "POST",
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          await transactionApiMessage(
-            response,
-            "Pengambilan buku gagal dikonfirmasi.",
-          ),
-        );
-      }
-
-      setPickupTarget(null);
-      setRevision((value) => value + 1);
-    } catch (reason) {
-      setError(
-        reason instanceof Error
-          ? reason.message
-          : "Pengambilan buku gagal dikonfirmasi.",
-      );
-    } finally {
-      setProcessingId(null);
-    }
-  }
-
   const waiting = reservation?.status === "MENUNGGU_PENGAMBILAN";
-  const title = waiting ? "Proses Reservasi" : "Detail Reservasi";
+  const title = "Detail Reservasi";
   const statusTone = waiting ? styles.waiting : reservation?.status === "DIAMBIL"
     ? styles.pickedUp : reservation?.status === "KEDALUWARSA" ? styles.expired : styles.cancelled;
 
@@ -155,7 +122,7 @@ export default function AdminReservationDetail({ id, memberId }: { id: number; m
           </nav>
           <h1 data-page-title>{title}</h1>
         </div>
-        <Link href={backHref} data-button="back" data-button-size="md">
+        <Link ref={backLink} href={backHref} data-button="back" data-button-size="md">
           <FiArrowLeft aria-hidden="true" /> Kembali
         </Link>
       </header>
@@ -225,7 +192,7 @@ export default function AdminReservationDetail({ id, memberId }: { id: number; m
           </section>
 
           <section className={styles.actionPanel} aria-label="Pengambilan reservasi">
-            {error && !pickupTarget ? <p className={styles.mutationError} role="alert">{error}</p> : null}
+            {pickup.error && !pickup.target ? <p className={styles.mutationError} role="alert">{pickup.error}</p> : null}
             <div className={styles.note}>
               <FiInfo aria-hidden="true" />
               <p>{waiting
@@ -238,42 +205,20 @@ export default function AdminReservationDetail({ id, memberId }: { id: number; m
                 <Button
                   className={styles.confirmButton}
                   variant="primary"
+                  accentHover
                   size="md"
                   icon={<FiCheckCircle />}
-                  loading={processingId !== null}
+                  loading={pickup.pending}
                   loadingLabel="Mengonfirmasi..."
-                  onClick={() => {
-                    setError("");
-                    setPickupTarget({ id: reservation.id, memberName: reservation.member.name, bookTitle: reservation.book.title });
-                  }}
-                >Konfirmasi Pengambilan</Button>
+                  onClick={() => pickup.open(reservation)}
+                >Sudah Diambil</Button>
               ) : null}
             </div>
           </section>
         </>
       )}
 
-      {pickupTarget ? (
-        <ConfirmDialog
-          open
-          title="Konfirmasi Pengambilan"
-          description="Periksa kembali sebelum mengonfirmasi pengambilan."
-          variant="primary"
-          confirmLabel="Konfirmasi Pengambilan"
-          loadingLabel="Mengonfirmasi..."
-          pending={processingId !== null}
-          error={error}
-          onConfirm={confirmPickup}
-          onCancel={() => setPickupTarget(null)}
-        >
-          <ul>
-            <li><strong>Anggota:</strong> {pickupTarget.memberName}</li>
-            <li><strong>Buku:</strong> {pickupTarget.bookTitle}</li>
-            <li>Pastikan buku sudah diserahkan kepada anggota.</li>
-            <li>Reservasi akan berubah menjadi pinjaman aktif.</li>
-          </ul>
-        </ConfirmDialog>
-      ) : null}
+      <ReservationPickupDialog pickup={pickup} />
     </div>
   );
 }

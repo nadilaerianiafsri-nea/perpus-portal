@@ -11,7 +11,7 @@ import {
 export type ReservationSort = "newest" | "oldest";
 
 export function reservationActionLabel(status: string) {
-  return status === "MENUNGGU_PENGAMBILAN" ? "Proses" : "Detail";
+  return status === "MENUNGGU_PENGAMBILAN" ? "Sudah Diambil" : "Detail";
 }
 
 export function reservationFinalNotice(status: string) {
