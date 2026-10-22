@@ -27,6 +27,16 @@ export class AdminEBooksController {
     return this.ebooks.circulation(query);
   }
 
+  @Get('circulation/loans/:id')
+  circulationLoanDetail(@Param('id') id: string) {
+    return this.ebooks.circulationDetail('loan', id);
+  }
+
+  @Get('circulation/queues/:id')
+  circulationQueueDetail(@Param('id') id: string) {
+    return this.ebooks.circulationDetail('queue', id);
+  }
+
   @Get(':id')
   detail(@Param('id') id: string) {
     return this.ebooks.detail(id);

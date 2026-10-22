@@ -1,4 +1,9 @@
 import { AdminEBooksService } from './admin-ebooks.service';
+import { AdminEBooksController } from './admin-ebooks.controller';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { AdminRoleGuard } from '../admin-books/admin-role.guard';
+import { RequestMethod } from '@nestjs/common';
+import { GUARDS_METADATA, METHOD_METADATA, PATH_METADATA } from '@nestjs/common/constants';
 
 describe('AdminEBooksService circulation monitoring', () => {
   function harness() {
@@ -6,10 +11,12 @@ describe('AdminEBooksService circulation monitoring', () => {
       eBookLoan: {
         count: jest.fn(),
         findMany: jest.fn(),
+        findUnique: jest.fn(),
       },
       eBookQueue: {
         count: jest.fn(),
         findMany: jest.fn(),
+        findUnique: jest.fn(),
       },
     };
     return {
@@ -86,5 +93,64 @@ describe('AdminEBooksService circulation monitoring', () => {
     await expect(service.circulation({ mutate: 'true' })).rejects.toThrow(
       'Parameter tidak diizinkan.',
     );
+  });
+
+  it('selects read-only loan detail by its own ID, including member type and no technical credentials', async () => {
+    const { prisma, service } = harness();
+    prisma.eBookLoan.findUnique.mockResolvedValue({ id: 7, status: 'DIKEMBALIKAN' });
+    const detail = await service.circulationDetail('loan', '7');
+    expect(detail).toEqual({ kind: 'loan', record: { id: 7, status: 'DIKEMBALIKAN' } });
+    expect(prisma.eBookLoan.findUnique).toHaveBeenCalledWith({
+      where: { id: 7 },
+      select: {
+        id: true, status: true,
+        borrowedAt: true, dueAt: true, endedAt: true,
+        user: { select: { id: true, name: true, email: true, memberType: true } },
+        book: { select: { id: true, title: true, code: true, coverUrl: true, author: true, licenseNote: true } },
+      },
+    });
+    expect(prisma.eBookQueue.findUnique).not.toHaveBeenCalled();
+  });
+
+  it('queue detail uses a separate entity ID and calculates position across all active entries with timestamp/id ordering', async () => {
+    const { prisma, service } = harness();
+    const queuedAt = new Date('2026-10-20T03:00:00Z');
+    prisma.eBookQueue.findUnique.mockResolvedValue({ id: 7, bookId: 2, status: 'MENUNGGU', queuedAt, user: {}, book: {} });
+    prisma.eBookQueue.count.mockResolvedValue(4);
+    const detail = await service.circulationDetail('queue', '7');
+    expect(detail.record).toHaveProperty('position', 5);
+    expect(detail.record).not.toHaveProperty('bookId');
+    expect(prisma.eBookQueue.count).toHaveBeenCalledWith({ where: {
+      bookId: 2, status: { in: ['MENUNGGU', 'DITAWARKAN'] },
+      OR: [{ queuedAt: { lt: queuedAt } }, { queuedAt, id: { lt: 7 } }],
+    } });
+    expect(prisma.eBookLoan.findUnique).not.toHaveBeenCalled();
+  });
+
+  it('closed queue detail has no fabricated active position and missing/invalid records fail safely', async () => {
+    const { prisma, service } = harness();
+    prisma.eBookQueue.findUnique.mockResolvedValue({ id: 7, bookId: 2, status: 'DIBATALKAN' });
+    expect((await service.circulationDetail('queue', '7')).record).toHaveProperty('position', null);
+    expect(prisma.eBookQueue.count).not.toHaveBeenCalled();
+    prisma.eBookLoan.findUnique.mockResolvedValue(null);
+    await expect(service.circulationDetail('loan', '7')).rejects.toThrow('Akses E-Book tidak ditemukan.');
+    prisma.eBookQueue.findUnique.mockResolvedValue(null);
+    await expect(service.circulationDetail('queue', '7')).rejects.toThrow('Antrean E-Book tidak ditemukan.');
+    for (const id of ['0', '-1', '1.5', '2147483648', 'abc']) {
+      await expect(service.circulationDetail('loan', id)).rejects.toThrow();
+    }
+    expect(prisma.eBookLoan.findUnique).toHaveBeenCalledTimes(1);
+  });
+
+  it('both detail routes remain GET-only under the existing authentication and admin role guards', () => {
+    expect(Reflect.getMetadata(GUARDS_METADATA, AdminEBooksController)).toEqual([JwtAuthGuard, AdminRoleGuard]);
+    for (const [name, path] of [
+      ['circulationLoanDetail', 'circulation/loans/:id'],
+      ['circulationQueueDetail', 'circulation/queues/:id'],
+    ] as const) {
+      const method = Object.getOwnPropertyDescriptor(AdminEBooksController.prototype, name)?.value as object;
+      expect(Reflect.getMetadata(METHOD_METADATA, method)).toBe(RequestMethod.GET);
+      expect(Reflect.getMetadata(PATH_METADATA, method)).toBe(path);
+    }
   });
 });

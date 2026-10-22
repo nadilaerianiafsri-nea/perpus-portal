@@ -187,11 +187,11 @@ export class AdminEBooksService {
       : {};
 
     const includeLoan = {
-      user: { select: { id: true, name: true, email: true } },
+      user: { select: { id: true, name: true, email: true, memberType: true } },
       book: { select: { id: true, title: true, code: true, coverUrl: true } },
     } as const;
     const includeQueue = {
-      user: { select: { id: true, name: true, email: true } },
+      user: { select: { id: true, name: true, email: true, memberType: true } },
       book: { select: { id: true, title: true, code: true, coverUrl: true } },
     } as const;
 
@@ -293,6 +293,37 @@ export class AdminEBooksService {
         meta: pageMeta(page, limit, historyTotal),
       },
     };
+  }
+
+  /** Monitoring only: never settles loans, promotes queues, or changes access. */
+  async circulationDetail(kind: 'loan' | 'queue', rawId: string) {
+    const id = parseId(rawId);
+    const user = { select: { id: true, name: true, email: true, memberType: true } } as const;
+    const book = { select: { id: true, title: true, code: true, coverUrl: true, author: true, licenseNote: true } } as const;
+    if (kind === 'loan') {
+      const record = await this.prisma.eBookLoan.findUnique({
+        where: { id },
+        select: { id: true, status: true, borrowedAt: true, dueAt: true, endedAt: true, user, book },
+      });
+      if (!record) throw new NotFoundException('Akses E-Book tidak ditemukan.');
+      return { kind, record };
+    }
+    const row = await this.prisma.eBookQueue.findUnique({
+      where: { id },
+      select: {
+        id: true, bookId: true, status: true, queuedAt: true, offeredAt: true, claimExpiresAt: true,
+        claimedAt: true, cancelledAt: true, expiredAt: true, user, book,
+      },
+    });
+    if (!row) throw new NotFoundException('Antrean E-Book tidak ditemukan.');
+    const { bookId, ...record } = row;
+    const position = row.status === 'MENUNGGU' || row.status === 'DITAWARKAN'
+      ? 1 + await this.prisma.eBookQueue.count({ where: {
+        bookId, status: { in: ['MENUNGGU', 'DITAWARKAN'] },
+        OR: [{ queuedAt: { lt: row.queuedAt } }, { queuedAt: row.queuedAt, id: { lt: id } }],
+      } })
+      : null;
+    return { kind, record: { ...record, position } };
   }
 
   async detail(rawId: string) {

@@ -40,3 +40,25 @@
 .table[data-record-list] th:nth-child(2) { width: 28%; }
 .cellStack { overflow-wrap: anywhere; }
 .cellStack > [data-record-badge] { justify-self: start; white-space: normal; }
+
+.filters.filters {
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 260px) auto;
+  align-items: start;
+  padding-top: 16px;
+}
+:root .filters .exportButton[data-button][data-button] { --button-height: 48px; }
+:root .table .detailButton[data-button][data-button] { --button-height: 42px; min-width: 88px; font-size: 14px; font-weight: 600; white-space: nowrap; }
+.table .actionsColumn { width: 120px; }
+.table[data-record-list] { --record-scroll-width: 960px; }
+.table[data-record-list] th { font-size: 12px; }
+.table[data-record-list] td, .cellStack strong { font-size: 14px; }
+.cellStack small { font-size: 12px; }
+.note { padding: 12px 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--button-soft); color: var(--text-secondary-color); font-size: 14px; }
+@media (max-width: 1100px) {
+  .filters.filters { grid-template-columns: minmax(0, 1fr) auto; }
+  .filters > label { grid-column: 1 / -1; }
+}
+@media (max-width: 700px) {
+  .filters.filters { grid-template-columns: minmax(0, 1fr); }
+  .exportButton { width: 100%; }
+}
