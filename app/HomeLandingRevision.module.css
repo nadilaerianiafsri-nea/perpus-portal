@@ -594,6 +594,11 @@
     box-shadow 0.28s ease;
 }
 
+/* Buku kelima tetap tidak mengubah komposisi desktop/tablet. */
+.latestBookCard:nth-child(5) {
+  display: none;
+}
+
 .latestBookCover {
   width: 100%;
   height: auto;
@@ -709,18 +714,6 @@
   line-height: 1.32;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.latestBookAvailability {
-  margin-top: auto;
-  padding: 5px 9px;
-  border: 0.8px solid color-mix(in srgb, var(--green) 28%, var(--line));
-  border-radius: 999px;
-  background: var(--green-soft);
-  color: var(--green);
-  font-size: 10px;
-  font-weight: 750;
-  line-height: 1.2;
 }
 
 .collectionContinueCard {
@@ -1596,7 +1589,31 @@
 @media (max-width: 560px) {
   .heroBlend :global(.hero-copy) {
     padding-top: 108px;
-    padding-bottom: 72px;
+    padding-bottom: 32px;
+  }
+
+  .heroBlend :global(.hero-title-cms) {
+    font-size: 40px;
+    line-height: 1.02;
+  }
+
+  .heroBlend :global(.hero-actions) {
+    width: 100%;
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+
+  .heroBlend :global(.hero-actions > a) {
+    min-width: 0;
+    flex: 1 1 0;
+    padding-inline: 10px;
+    justify-content: center;
+    white-space: nowrap;
+    font-size: 13px;
+  }
+
+  .heroBlend :global(.hero-actions > a svg) {
+    flex: 0 0 auto;
   }
 
   .revealSection {
@@ -1634,11 +1651,12 @@
   }
 
   .heroVisual {
+    margin-top: -24px;
     border-radius: 0;
   }
 
   .heroVisual img {
-    object-position: center top;
+    object-position: 68% top;
     -webkit-mask-image: none;
     mask-image: none;
   }
@@ -1678,16 +1696,23 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
     margin-top: 18px;
+    align-items: stretch;
+  }
+
+  .latestCollectionGrid > * {
+    align-self: stretch;
   }
 
   .latestBookCard:nth-child(3),
-  .latestBookCard:nth-child(4) {
+  .latestBookCard:nth-child(4),
+  .latestBookCard:nth-child(5) {
     display: flex;
   }
 
   .latestBookCard,
   .collectionContinueCard {
     width: 100%;
+    height: 100%;
     min-height: 0;
     margin-inline: 0;
     border-radius: 14px;
@@ -1697,12 +1722,14 @@
     min-height: 0;
   }
 
-  .latestBookCover {
+  .latestBookCover,
+  .collectionContinueMedia {
     aspect-ratio: 4 / 5;
   }
 
   .latestBookInfo {
     min-height: 0;
+    flex: 1 1 auto;
     padding: 10px 11px 11px;
   }
 
@@ -1720,12 +1747,6 @@
   .latestBookInfo p {
     font-size: 10px;
     line-height: 1.22;
-  }
-
-  .latestBookAvailability {
-    margin-top: 7px;
-    padding: 4px 7px;
-    font-size: 9px;
   }
 
   .latestBookType {
@@ -1754,6 +1775,7 @@
 
   .collectionContinueBody {
     min-height: 0;
+    flex: 1 1 auto;
     padding: 12px 12px 14px;
     gap: 5px;
   }
@@ -1769,8 +1791,49 @@
     line-height: 1.12;
   }
 
+  .subjectBlend :global(.subject-grid) {
+    width: 100%;
+    max-width: 100%;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+  }
+
+  .subjectBlend :global(.subject-grid > *),
+  .subjectBlend :global(.subject-list),
+  .ebookBlend :global(.ebook-grid),
+  .ebookBlend :global(.ebook-grid > *),
+  .ebookBlend :global(.ebook-copy) {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .subjectBlend :global(.subject-list) {
+    margin-inline: 0;
+  }
+
   .subjectBlend :global(.subject-list a) {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin-inline: 0;
     border-radius: 12px;
+  }
+
+  .subjectBlend :global(.subject-art) {
+    width: min(280px, 82vw);
+    height: 220px;
+    min-height: 220px;
+    margin: 8px auto 0;
+    justify-self: center;
+    border-radius: 18px;
+  }
+
+  .subjectBlend :global(.subject-art img) {
+    object-fit: contain;
+    object-position: center;
   }
 
   .serviceBlend :global(.feature-row) {
@@ -1837,6 +1900,30 @@
       .landing-reveal-item[data-reveal-direction="scale"]
   ) {
     transform: translate3d(0, 14px, 0) scale(0.98);
+  }
+
+  :global([data-landing-reveal-root][data-reveal-ready="true"])
+    .subjectBlend
+    :global(.landing-reveal-item[data-reveal-direction="left"]),
+  :global([data-landing-reveal-root][data-reveal-ready="true"])
+    .subjectBlend
+    :global(.landing-reveal-item[data-reveal-direction="right"]),
+  :global([data-landing-reveal-root][data-reveal-ready="true"])
+    .ebookBlend
+    :global(.landing-reveal-item[data-reveal-direction="left"]),
+  :global([data-landing-reveal-root][data-reveal-ready="true"])
+    .ebookBlend
+    :global(.landing-reveal-item[data-reveal-direction="right"]) {
+    transform: translate3d(0, 14px, 0) scale(0.995);
+  }
+
+  :global([data-landing-reveal-root][data-reveal-ready="true"])
+    .subjectBlend
+    :global(.landing-reveal-item.landing-reveal-visible),
+  :global([data-landing-reveal-root][data-reveal-ready="true"])
+    .ebookBlend
+    :global(.landing-reveal-item.landing-reveal-visible) {
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 
