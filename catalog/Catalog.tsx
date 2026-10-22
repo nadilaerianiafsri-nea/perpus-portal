@@ -8,6 +8,7 @@ import {
   FiList,
   FiSearch,
   FiSliders,
+  FiTrash2,
   FiX,
 } from "react-icons/fi";
 import BookCard from "./BookCard";
@@ -94,7 +95,8 @@ export default function Catalog({
 
   useEffect(() => {
     if (member) return;
-    const nextView = new URLSearchParams(queryText).get("view") === "list" ? "list" : "grid";
+    const nextView =
+      new URLSearchParams(queryText).get("view") === "list" ? "list" : "grid";
     setView(nextView);
   }, [member, queryText]);
 
@@ -121,7 +123,10 @@ export default function Catalog({
   const detailBasePath = member ? "/dashboard/koleksi" : "/koleksi";
   const key = `${member}:${ebook}:${queryString}:${retry}`;
   const loading = result?.key !== key;
-  const response = !loading ? result?.data : undefined;
+  // Keep the previous page visible while the next request is in flight.
+  // This avoids the catalog flashing back to a full skeleton on every
+  // public filter, sort, view, or pagination interaction.
+  const response = result?.data;
   const error = !loading ? result?.error : undefined;
 
   useEffect(() => {
@@ -190,7 +195,9 @@ export default function Catalog({
         else next.delete(name);
       }
       if (!("page" in updates) && !("view" in updates)) next.delete("page");
-      router.push(`${pathname}${next.size ? `?${next}` : ""}`, { scroll: false });
+      router.push(`${pathname}${next.size ? `?${next}` : ""}`, {
+        scroll: false,
+      });
       return;
     }
 
@@ -268,7 +275,9 @@ export default function Catalog({
     }
   }
 
-  const currentPage = response?.meta.page ?? Number(query.get("page") || 1);
+  const requestedPage = Number(query.get("page") || 1);
+  const currentPage =
+    !member && loading ? requestedPage : (response?.meta.page ?? requestedPage);
   const totalPages = response?.meta.totalPages ?? 0;
   const pageStart = Math.max(1, Math.min(currentPage - 2, totalPages - 4));
   const pages = Array.from(
@@ -459,34 +468,68 @@ export default function Catalog({
                 </Link>
               ) : null}
 
-              {(member && !expandedChips ? chips.slice(0, 5) : chips).map(
-                (chip) => (
-                  <button
-                    data-button="ghost"
-                    data-button-size="sm"
-                    key={`${chip.name}:${chip.value}`}
-                    aria-label={`Hapus filter ${chip.label}`}
-                    onClick={() =>
-                      update({
-                        [chip.name]: ["yearFrom", "yearTo"].includes(chip.name)
-                          ? null
-                          : (query.get(chip.name) ?? "")
-                              .split(",")
-                              .filter(
-                                (value) =>
-                                  !(chip.values ?? [chip.value]).includes(
-                                    value,
-                                  ),
-                              )
-                              .join(",") || null,
-                      })
-                    }
-                  >
-                    {chip.label}
-                    <FiX />
-                  </button>
-                ),
-              )}
+              {member
+                ? (expandedChips ? chips : chips.slice(0, 5)).map((chip) => (
+                    <button
+                      data-button="ghost"
+                      data-button-size="sm"
+                      key={`${chip.name}:${chip.value}`}
+                      aria-label={`Hapus filter ${chip.label}`}
+                      onClick={() =>
+                        update({
+                          [chip.name]: ["yearFrom", "yearTo"].includes(
+                            chip.name,
+                          )
+                            ? null
+                            : (query.get(chip.name) ?? "")
+                                .split(",")
+                                .filter(
+                                  (value) =>
+                                    !(chip.values ?? [chip.value]).includes(
+                                      value,
+                                    ),
+                                )
+                                .join(",") || null,
+                        })
+                      }
+                    >
+                      {chip.label}
+                      <FiX />
+                    </button>
+                  ))
+                : chips.map((chip) => (
+                    <div
+                      data-active-filter-chip
+                      key={`${chip.name}:${chip.value}`}
+                    >
+                      <span>{chip.label}</span>
+                      <button
+                        type="button"
+                        data-filter-remove
+                        aria-label={`Hapus filter ${chip.label}`}
+                        title={`Hapus filter ${chip.label}`}
+                        onClick={() =>
+                          update({
+                            [chip.name]: ["yearFrom", "yearTo"].includes(
+                              chip.name,
+                            )
+                              ? null
+                              : (query.get(chip.name) ?? "")
+                                  .split(",")
+                                  .filter(
+                                    (value) =>
+                                      !(chip.values ?? [chip.value]).includes(
+                                        value,
+                                      ),
+                                  )
+                                  .join(",") || null,
+                          })
+                        }
+                      >
+                        <FiX aria-hidden="true" />
+                      </button>
+                    </div>
+                  ))}
               {member && chips.length > 5 ? (
                 <button
                   data-button="ghost"
@@ -501,19 +544,31 @@ export default function Catalog({
               ) : null}
 
               {!member || chips.length > 1 ? (
-                <button
-                  data-button="ghost"
-                  data-button-size="md"
-                  className={styles.clearChips}
-                  onClick={clear}
-                >
-                  <FiX /> Hapus semua
-                </button>
+                member ? (
+                  <button
+                    data-button="ghost"
+                    data-button-size="md"
+                    className={styles.clearChips}
+                    onClick={clear}
+                  >
+                    <FiX /> Hapus semua
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    data-clear-public-filters
+                    aria-label="Hapus semua filter"
+                    title="Hapus semua filter"
+                    onClick={clear}
+                  >
+                    <FiTrash2 aria-hidden="true" />
+                  </button>
+                )
               ) : null}
             </div>
           ) : null}
 
-          {loading ? (
+          {loading && !response ? (
             <div
               className={member && view === "list" ? styles.list : styles.grid}
               aria-label="Memuat koleksi"
@@ -526,7 +581,7 @@ export default function Catalog({
                 </div>
               ))}
             </div>
-          ) : error ? (
+          ) : error && !response ? (
             <div className={styles.state} role="alert">
               <h2>
                 {member
@@ -541,11 +596,7 @@ export default function Catalog({
               >
                 Coba Lagi
               </button>
-              <button
-                data-button="ghost"
-                data-button-size="md"
-                onClick={clear}
-              >
+              <button data-button="ghost" data-button-size="md" onClick={clear}>
                 Bersihkan Filter
               </button>
             </div>
@@ -567,7 +618,7 @@ export default function Catalog({
                 <button
                   data-button="secondary"
                   data-button-size="md"
-                  disabled={currentPage <= 1}
+                  disabled={loading || currentPage <= 1}
                   onClick={() => update({ page: String(currentPage - 1) })}
                 >
                   Sebelumnya
@@ -578,6 +629,7 @@ export default function Catalog({
                     data-button-size="sm"
                     key={page}
                     aria-current={page === currentPage ? "page" : undefined}
+                    disabled={loading && page !== currentPage}
                     onClick={() => update({ page: String(page) })}
                   >
                     {page}
@@ -586,7 +638,7 @@ export default function Catalog({
                 <button
                   data-button="secondary"
                   data-button-size="md"
-                  disabled={currentPage >= totalPages}
+                  disabled={loading || currentPage >= totalPages}
                   onClick={() => update({ page: String(currentPage + 1) })}
                 >
                   Berikutnya
@@ -606,11 +658,7 @@ export default function Catalog({
                   ? "Coba ubah atau hapus beberapa filter."
                   : "Coba kata kunci lain atau hapus filter yang dipilih."}
               </p>
-              <button
-                data-button="ghost"
-                data-button-size="md"
-                onClick={clear}
-              >
+              <button data-button="ghost" data-button-size="md" onClick={clear}>
                 Bersihkan Filter
               </button>
               {totalPages > 0 ? (
