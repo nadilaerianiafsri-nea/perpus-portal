@@ -1,0 +1,65 @@
+.filters.filters {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  --select-control-height: 48px;
+}
+
+.filters > label:first-child {
+  grid-column: 1 / -1;
+}
+
+.period {
+  display: flex;
+  min-width: 0;
+  --select-control-height: 48px;
+}
+
+.period > [data-period-selector] {
+  width: 100%;
+}
+
+.period > [data-period-selector] > div:first-child {
+  min-width: 0;
+}
+
+.scope {
+  margin: 0 26px 16px;
+  color: var(--text-secondary-color, #5d5d5d);
+  font-size: var(--text-helper, 12px);
+  line-height: 1.6;
+}
+
+.ebookFilters {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
+  align-items: end;
+  gap: 12px;
+  padding: 0 16px 16px;
+  --select-control-height: 48px;
+}
+
+.ebookFilters > label {
+  width: 100%;
+}
+
+.ebookScope {
+  margin-inline: 16px;
+}
+
+@media (max-width: 700px) {
+  .filters.filters,
+  .ebookFilters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .scope {
+    margin-inline: 26px;
+  }
+
+  .ebookFilters {
+    padding-inline: 12px;
+  }
+
+  .ebookScope {
+    margin-inline: 12px;
+  }
+}

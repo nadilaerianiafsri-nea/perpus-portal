@@ -10,6 +10,19 @@ import {
 
 export type ReservationSort = "newest" | "oldest";
 
+export function reservationActionLabel(status: string) {
+  return status === "MENUNGGU_PENGAMBILAN" ? "Proses" : "Detail";
+}
+
+export function reservationFinalNotice(status: string) {
+  switch (status) {
+    case "KEDALUWARSA": return "Reservasi telah kedaluwarsa dan tidak dapat diproses.";
+    case "DIAMBIL": return "Reservasi telah selesai dan sudah diproses menjadi pinjaman.";
+    case "DIBATALKAN": return "Reservasi telah dibatalkan.";
+    default: return "Reservasi ini hanya dapat dilihat sebagai detail.";
+  }
+}
+
 export function sortReservations(rows: ReservationRow[], order: ReservationSort) {
   return [...rows].sort((a, b) => {
     const left = Date.parse(a.createdAt), right = Date.parse(b.createdAt);

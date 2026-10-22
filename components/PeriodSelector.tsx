@@ -4,25 +4,36 @@ import { useEffect, useId, useRef, useState } from "react";
 import { FiCalendar, FiEdit2 } from "react-icons/fi";
 import AppSelect from "./AppSelect";
 import { createPeriod, validatePeriodRange, type PeriodPreset, type PeriodValue } from "@/shared/period";
+import { createTransactionPeriod, type TransactionPeriodPreset, type TransactionPeriodValue } from "@/shared/transactionPeriod";
 import { Button } from "./Button";
 import styles from "./PeriodSelector.module.css";
 
-type PeriodSelectorProps = {
-  value: PeriodValue;
-  onChange: (value: PeriodValue) => void;
+type SharedPeriodSelectorProps = {
   label?: string;
   disabled?: boolean;
   loading?: boolean;
   maxDate?: string;
 };
 
-export default function PeriodSelector({ value, onChange, label = "Periode", disabled = false, loading = false, maxDate }: PeriodSelectorProps) {
+type PeriodSelectorProps = SharedPeriodSelectorProps & ({
+  mode?: "default";
+  value: PeriodValue;
+  onChange: (value: PeriodValue) => void;
+} | {
+  mode: "transaction";
+  value: TransactionPeriodValue;
+  onChange: (value: TransactionPeriodValue) => void;
+});
+
+export default function PeriodSelector(props: PeriodSelectorProps) {
+  const { value, onChange, label = "Periode", disabled = false, loading = false, maxDate } = props;
+  const transaction = props.mode === "transaction";
   const id = useId();
   const select = useRef<HTMLButtonElement>(null);
   const panel = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState({ from: value.from, to: value.to });
-  const validation = validatePeriodRange(draft.from, draft.to, { maxDate });
+  const validation = validatePeriodRange(draft.from, draft.to, { maxDate, ...(transaction ? { maxDays: Infinity } : {}) });
 
   useEffect(() => {
     if (!open || !panel.current) return;
@@ -55,23 +66,29 @@ export default function PeriodSelector({ value, onChange, label = "Periode", dis
     };
   }, [open]);
 
-  function choose(preset: PeriodPreset) {
+  function choose(preset: PeriodPreset | TransactionPeriodPreset) {
     if (preset === "custom") {
       setDraft({ from: value.from, to: value.to });
       setOpen(true);
     } else {
       setOpen(false);
-      onChange(createPeriod(preset));
+      if (props.mode === "transaction") {
+        props.onChange(createTransactionPeriod(preset as Exclude<TransactionPeriodPreset, "custom">));
+      } else {
+        props.onChange(createPeriod(preset as Exclude<PeriodPreset, "custom">));
+      }
     }
   }
 
   return <div className={styles.root} data-period-selector aria-busy={loading}>
     <div className={styles.control}>
-      <AppSelect ref={select} icon={<FiCalendar />} aria-label={label} value={open ? "custom" : value.preset} disabled={disabled} onChange={event => choose(event.target.value as PeriodPreset)}>
+      <AppSelect ref={select} icon={<FiCalendar />} aria-label={label} value={open ? "custom" : value.preset} disabled={disabled} onChange={event => choose(event.target.value as PeriodPreset | TransactionPeriodPreset)}>
+        {transaction && <option value="all">Semua Waktu</option>}
         <option value="today">Hari Ini</option>
-        <option value="this-week">Minggu Ini</option>
+        {transaction ? <option value="last-seven-days">7 Hari Terakhir</option> : <option value="this-week">Minggu Ini</option>}
         <option value="this-month">Bulan Ini</option>
-        <option value="custom">Rentang Waktu</option>
+        {transaction && <option value="last-month">Bulan Lalu</option>}
+        <option value="custom">{transaction ? "Rentang Tanggal" : "Rentang Waktu"}</option>
       </AppSelect>
       {value.preset === "custom" && !open && <button className={styles.edit} type="button" disabled={disabled} aria-label={`Ubah rentang waktu ${label.toLowerCase()}`} title="Ubah rentang waktu" onClick={() => choose("custom")}><FiEdit2 aria-hidden="true" /></button>}
     </div>
@@ -82,7 +99,7 @@ export default function PeriodSelector({ value, onChange, label = "Periode", dis
         setOpen(false);
         onChange({ preset: "custom", ...draft });
       }}>
-        <h3 id={`${id}-title`}>Rentang Waktu</h3>
+        <h3 id={`${id}-title`}>{transaction ? "Rentang Tanggal" : "Rentang Waktu"}</h3>
         <label htmlFor={`${id}-from`}>Dari Tanggal</label>
         <input id={`${id}-from`} type="date" required max={maxDate} value={draft.from} aria-invalid={Boolean(validation)} aria-describedby={validation ? `${id}-error` : undefined} onChange={event => setDraft(current => ({ ...current, from: event.target.value }))} />
         <label htmlFor={`${id}-to`}>Sampai Tanggal</label>
@@ -92,7 +109,7 @@ export default function PeriodSelector({ value, onChange, label = "Periode", dis
           <Button variant="secondary" onClick={() => setOpen(false)}>Batal</Button>
           <Button type="submit" disabled={Boolean(validation) || disabled}>Terapkan</Button>
         </div>
-        <button className={styles.defaultAction} data-button="ghost" data-button-size="sm" type="button" disabled={disabled} onClick={() => choose("this-month")}>Kembali ke Bulan Ini</button>
+        <button className={styles.defaultAction} data-button="ghost" data-button-size="sm" type="button" disabled={disabled} onClick={() => choose(transaction ? "all" : "this-month")}>{transaction ? "Kembali ke Semua Waktu" : "Kembali ke Bulan Ini"}</button>
       </form>
     </div>}
   </div>;

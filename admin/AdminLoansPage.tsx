@@ -2,6 +2,8 @@
 "use client";
 
 import AppSelect from "@/components/AppSelect";
+import PeriodSelector from "@/components/PeriodSelector";
+import { createTransactionPeriod, inTransactionPeriod } from "@/shared/transactionPeriod";
 
 import AdminStatCard from "./AdminStatCard";
 import { FiBookOpen as CardBookOpen, FiMonitor as CardMonitor, FiClock as CardClock, FiAlertTriangle as CardAlertTriangle } from "react-icons/fi";
@@ -22,6 +24,7 @@ import {
   type LoansResponse,
 } from "./adminTransactions";
 import styles from "./AdminTransactions.module.css";
+import periodStyles from "./AdminTransactionPeriod.module.css";
 
 type StatusFilter = "ALL" | "ACTIVE" | "DUE_SOON" | "OVERDUE";
 type MemberFilter = "ALL" | "UMUM" | "MAHASISWA" | "PEGAWAI";
@@ -68,6 +71,7 @@ export default function AdminLoansPage() {
   const [memberType, setMemberType] = useState<MemberFilter>("ALL");
   const [due, setDue] = useState<DueFilter>(readDue(params.get("due")));
   const [page, setPage] = useState(1);
+  const [period, setPeriod] = useState(() => createTransactionPeriod("all"));
 
   const [result, setResult] = useState<LoansResponse>(emptyResult);
   const [loading, setLoading] = useState(true);
@@ -150,6 +154,8 @@ export default function AdminLoansPage() {
     void load();
   }, [load]);
 
+  const visibleLoans = result.data.filter((loan) => inTransactionPeriod(loan.borrowedAt, period));
+
   return (
     <div className={styles.page}>
       <header className={styles.pageHeading}>
@@ -175,7 +181,7 @@ export default function AdminLoansPage() {
           <h2>Buku Fisik yang Sedang Dipinjam</h2>
         </header>
 
-        <div className={styles.filterBar}>
+        <div className={`${styles.filterBar} ${periodStyles.filters}`}>
           <label className={styles.searchBox}>
             <FiSearch aria-hidden />
             <input
@@ -239,7 +245,14 @@ export default function AdminLoansPage() {
               <option value="THIS_MONTH">Bulan Ini</option>
             </AppSelect>
           </label>
+          <div className={periodStyles.period}>
+            <PeriodSelector mode="transaction" label="Filter waktu tanggal pinjam buku fisik" value={period} onChange={setPeriod} />
+          </div>
         </div>
+        <p className={periodStyles.scope}>
+          Waktu berdasarkan tanggal pinjam buku fisik (WIB), hanya pada halaman ini.
+          Ringkasan dan jumlah halaman tidak mengikuti filter waktu.
+        </p>
 
         {error ? (
           <div className={styles.errorBox} role="alert">
@@ -277,8 +290,8 @@ export default function AdminLoansPage() {
                     Memuat data peminjaman...
                   </td>
                 </tr>
-              ) : result.data.length ? (
-                result.data.map((loan) => {
+              ) : visibleLoans.length ? (
+                visibleLoans.map((loan) => {
                   const loanStatus = physicalLoanStatus(loan.dueAt);
 
                   const whatsappHref = whatsappReminderHref(

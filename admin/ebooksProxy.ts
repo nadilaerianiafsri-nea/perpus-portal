@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 import { API_URL } from '@/catalog/serverApi';
 
 const allowed: Record<string, RegExp> = {
-  GET: /^(?:|\d+)$/,
+  GET: /^(?:|\d+|circulation)$/,
   POST: /^$/,
   PATCH: /^\d+(?:\/status)?$/,
 };

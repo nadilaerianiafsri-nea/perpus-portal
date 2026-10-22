@@ -8,7 +8,8 @@ import { Button } from "@/components/Button";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import type { AdminBookDetailResponse } from "./adminBooks";
-import { loadReservation, reservationStatusLabel } from "./adminReservations";
+import { loadReservation, reservationFinalNotice, reservationStatusLabel } from "./adminReservations";
+import { useCountdown } from "@/members/useCountdown";
 import {
   formatTransactionDateTime,
   memberTypeLabel,
@@ -26,6 +27,15 @@ type PickupTarget = {
 type BookLocation = { location: string; shelf: string; copyLocation: string };
 
 const backHref = "/admin/transaksi/reservasi";
+const retainServerStatus = () => {};
+
+function PickupTimeRemaining({ deadline }: { deadline: string }) {
+  const seconds = useCountdown(deadline, retainServerStatus);
+  const label = seconds === null || !Number.isFinite(seconds) ? "Memuat sisa waktu..."
+    : seconds === 0 ? "Batas waktu telah tercapai"
+    : `${Math.floor(seconds / 3600)} jam ${Math.floor(seconds % 3600 / 60)} menit ${seconds % 60} detik`;
+  return <div><dt>Sisa waktu pengambilan</dt><dd role="timer" aria-live="off">{label}</dd></div>;
+}
 
 export default function AdminReservationDetail({ id, memberId }: { id: number; memberId: number | null }) {
   const [reservation, setReservation] = useState<ReservationRow | null>(null);
@@ -208,6 +218,7 @@ export default function AdminReservationDetail({ id, memberId }: { id: number; m
               <div><dt>Status reservasi</dt><dd><span className={`${styles.status} ${statusTone}`}>{reservationStatusLabel(reservation.status)}</span></dd></div>
               <div><dt>Waktu reservasi</dt><dd>{formatTransactionDateTime(reservation.createdAt)}</dd></div>
               <div><dt>Batas pengambilan</dt><dd>{formatTransactionDateTime(reservation.expiresAt)}</dd></div>
+              {waiting ? <PickupTimeRemaining deadline={reservation.expiresAt} /> : null}
               {reservation.pickedUpAt ? <div><dt>Waktu pengambilan</dt><dd>{formatTransactionDateTime(reservation.pickedUpAt)}</dd></div> : null}
               {reservation.cancelledAt ? <div><dt>Waktu pembatalan</dt><dd>{formatTransactionDateTime(reservation.cancelledAt)}</dd></div> : null}
             </dl>
@@ -219,7 +230,7 @@ export default function AdminReservationDetail({ id, memberId }: { id: number; m
               <FiInfo aria-hidden="true" />
               <p>{waiting
                 ? "Pastikan buku sudah diserahkan kepada anggota. Konfirmasi pengambilan akan membuat pinjaman aktif dan memulai masa peminjaman."
-                : `Reservasi berstatus ${reservationStatusLabel(reservation.status).toLowerCase()}.`}</p>
+                : reservationFinalNotice(reservation.status)}</p>
             </div>
             <div className={styles.actions}>
               <Link href={backHref} data-button="secondary" data-button-size="md">{waiting ? "Batal" : "Kembali ke Daftar"}</Link>

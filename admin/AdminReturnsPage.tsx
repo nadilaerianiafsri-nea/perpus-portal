@@ -2,6 +2,8 @@
 "use client";
 
 import AppSelect from "@/components/AppSelect";
+import PeriodSelector from "@/components/PeriodSelector";
+import { createTransactionPeriod, inTransactionPeriod } from "@/shared/transactionPeriod";
 
 import AdminStatCard from "./AdminStatCard";
 import { FiBookOpen as CardBookOpen, FiClock as CardClock, FiAlertTriangle as CardAlertTriangle, FiCheckCircle as CardCheckCircle } from "react-icons/fi";
@@ -22,6 +24,7 @@ import {
   type ReturnsResponse,
 } from "./adminTransactions";
 import styles from "./AdminTransactions.module.css";
+import periodStyles from "./AdminTransactionPeriod.module.css";
 
 type StatusFilter = "ALL" | "DUE_TODAY" | "OVERDUE";
 
@@ -57,6 +60,7 @@ export default function AdminReturnsPage() {
   const [status, setStatus] = useState<StatusFilter>("ALL");
   const [memberType, setMemberType] = useState<MemberFilter>("ALL");
   const [page, setPage] = useState(1);
+  const [period, setPeriod] = useState(() => createTransactionPeriod("all"));
 
   const [result, setResult] = useState<ReturnsResponse>(emptyResult);
   const [loading, setLoading] = useState(true);
@@ -170,6 +174,8 @@ export default function AdminReturnsPage() {
     }
   }
 
+  const visibleLoans = result.data.filter((loan) => inTransactionPeriod(loan.borrowedAt, period));
+
   return (
     <div className={styles.page}>
       <header className={styles.pageHeading}>
@@ -195,7 +201,7 @@ export default function AdminReturnsPage() {
           <h2>Daftar Buku untuk Pengembalian</h2>
         </header>
 
-        <div className={`${styles.filterBar} ${styles.filterBarThree}`}>
+        <div className={`${styles.filterBar} ${styles.filterBarThree} ${periodStyles.filters}`}>
           <label className={styles.searchBox}>
             <FiSearch aria-hidden />
             <input
@@ -241,7 +247,14 @@ export default function AdminReturnsPage() {
               <option value="PEGAWAI">Pegawai Internal</option>
             </AppSelect>
           </label>
+          <div className={periodStyles.period}>
+            <PeriodSelector mode="transaction" label="Filter waktu tanggal pinjam untuk pengembalian" value={period} onChange={setPeriod} />
+          </div>
         </div>
+        <p className={periodStyles.scope}>
+          Waktu berdasarkan tanggal pinjam (WIB), hanya untuk pinjaman yang menunggu pengembalian pada halaman ini.
+          Ringkasan dan jumlah halaman tidak mengikuti filter waktu.
+        </p>
 
         {error ? (
           <div className={styles.errorBox} role="alert">
@@ -276,8 +289,8 @@ export default function AdminReturnsPage() {
                     Memuat data pengembalian...
                   </td>
                 </tr>
-              ) : result.data.length ? (
-                result.data.map((loan) => {
+              ) : visibleLoans.length ? (
+                visibleLoans.map((loan) => {
                   const loanStatus = physicalLoanStatus(loan.dueAt);
 
                   return (

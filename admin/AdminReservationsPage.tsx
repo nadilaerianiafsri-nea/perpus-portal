@@ -2,11 +2,13 @@
 "use client";
 
 import AppSelect from "@/components/AppSelect";
+import PeriodSelector from "@/components/PeriodSelector";
+import { ButtonLink } from "@/components/Button";
+import { createTransactionPeriod, inTransactionPeriod } from "@/shared/transactionPeriod";
 
 import AdminStatCard from "./AdminStatCard";
 import { FiClock as CardClock, FiAlertTriangle as CardAlertTriangle, FiXCircle as CardXCircle, FiCheckCircle as CardCheckCircle } from "react-icons/fi";
 
-import Link from "next/link";
 import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import { plainTextMessage } from "../members/inputSecurity";
 
@@ -22,7 +24,7 @@ import {
 } from "./adminTransactions";
 import styles from "./AdminTransactions.module.css";
 import ui from "./AdminReservationTools.module.css";
-import { reservationStatusLabel, reservationsCsv, sortReservations, type ReservationSort } from "./adminReservations";
+import { reservationActionLabel, reservationStatusLabel, reservationsCsv, sortReservations, type ReservationSort } from "./adminReservations";
 import { jakartaDateInput } from "@/shared/period";
 
 type StatusFilter =
@@ -68,6 +70,7 @@ export default function AdminReservationsPage() {
   const [memberType, setMemberType] = useState<MemberFilter>("ALL");
   const [page, setPage] = useState(1);
   const [sortOrder, setSortOrder] = useState<ReservationSort>("newest");
+  const [period, setPeriod] = useState(() => createTransactionPeriod("all"));
 
   const [result, setResult] = useState<ReservationsResponse>(emptyResult);
   const [loading, setLoading] = useState(true);
@@ -148,7 +151,7 @@ export default function AdminReservationsPage() {
     void load();
   }, [load]);
 
-  const orderedRows = sortReservations(result.data, sortOrder);
+  const orderedRows = sortReservations(result.data.filter(row => inTransactionPeriod(row.createdAt, period)), sortOrder);
   const exportDisabled = loading || Boolean(error) || Boolean(searchError) || searchInput.trim() !== search || !orderedRows.length;
 
   function exportReservations() {
@@ -249,13 +252,14 @@ export default function AdminReservationsPage() {
                 <option value="PEGAWAI">Pegawai Internal</option>
               </AppSelect>
             </label>
+            <PeriodSelector mode="transaction" label="Waktu reservasi pada halaman ini" value={period} onChange={setPeriod} />
             <AppSelect aria-label="Urutan tanggal reservasi pada halaman ini" value={sortOrder} onChange={event => setSortOrder(event.target.value as ReservationSort)}>
               <option value="newest">Reservasi terbaru dulu</option>
               <option value="oldest">Reservasi terlama dulu</option>
             </AppSelect>
           </div>
         </div>
-        <p className={ui.scopeNote}>Urutan tanggal dan ekspor mengikuti data pada halaman ini.</p>
+        <p className={ui.scopeNote}>Waktu berdasarkan tanggal reservasi (WIB). Filter waktu, urutan, dan ekspor berlaku untuk data pada halaman ini.</p>
 
         {error ? (
           <div className={styles.errorBox} role="alert">
@@ -291,7 +295,7 @@ export default function AdminReservationsPage() {
                     Memuat data reservasi...
                   </td>
                 </tr>
-              ) : result.data.length ? (
+              ) : orderedRows.length ? (
                 orderedRows.map((reservation) => (
                   <tr key={reservation.id}>
                     <td>
@@ -337,15 +341,11 @@ export default function AdminReservationsPage() {
                     </td>
 
                     <td>
-                      {reservation.status === "MENUNGGU_PENGAMBILAN" ? (
-                        <Link data-button="primary" data-button-size="md" className={ui.processLink}
-                          href={`/admin/transaksi/reservasi/${reservation.id}?anggota=${reservation.member.id}`}
-                          aria-label={`Proses reservasi ${reservation.book.title} oleh ${reservation.member.name}`}>
-                          Proses
-                        </Link>
-                      ) : (
-                        "-"
-                      )}
+                      <ButtonLink variant={reservationActionLabel(reservation.status) === "Proses" ? "primary" : "secondary"} size="md" className={ui.processLink}
+                        href={`/admin/transaksi/reservasi/${reservation.id}?anggota=${reservation.member.id}`}
+                        aria-label={`${reservationActionLabel(reservation.status) === "Proses" ? "Proses" : "Lihat detail"} reservasi ${reservation.book.title} oleh ${reservation.member.name}`}>
+                        {reservationActionLabel(reservation.status)}
+                      </ButtonLink>
                     </td>
                   </tr>
                 ))

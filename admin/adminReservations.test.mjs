@@ -22,6 +22,19 @@ function load(filename) {
   return loaded.exports;
 }
 const api = fs.existsSync("admin/adminReservations.ts") ? load("admin/adminReservations.ts") : {};
+
+test("reservation actions follow actual status enums including almost-expired waiting reservations", () => {
+  assert.equal(api.reservationActionLabel("MENUNGGU_PENGAMBILAN"), "Proses");
+  for (const status of ["KEDALUWARSA", "DIAMBIL", "DIBATALKAN", "UNKNOWN_FINAL"]) {
+    assert.equal(api.reservationActionLabel(status), "Detail");
+  }
+});
+
+test("final reservation notices explain read-only outcome", () => {
+  assert.match(api.reservationFinalNotice("KEDALUWARSA"), /kedaluwarsa.*tidak dapat diproses/);
+  assert.match(api.reservationFinalNotice("DIAMBIL"), /diproses menjadi pinjaman/);
+  assert.match(api.reservationFinalNotice("DIBATALKAN"), /dibatalkan/);
+});
 const row = (id, createdAt = "2026-10-22T01:00:00Z") => ({
   id, createdAt, status: "MENUNGGU_PENGAMBILAN", expiresAt: "2026-10-23T01:00:00Z",
   pickedUpAt: null, cancelledAt: null,

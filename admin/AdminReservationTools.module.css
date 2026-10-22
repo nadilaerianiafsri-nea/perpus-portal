@@ -13,7 +13,7 @@
 .filters {
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
   min-width: 0;
 }
@@ -28,6 +28,12 @@
 
 .processLink {
   white-space: nowrap;
+}
+
+:root .table .processLink[data-button="primary"][data-button] {
+  --button-hover-bg: var(--yellow);
+  --button-hover-fg: var(--navy);
+  --button-hover-stroke: var(--yellow);
 }
 
 .table {
@@ -60,6 +66,10 @@
   color: var(--text-secondary-color);
   font-size: var(--text-helper);
   line-height: var(--leading-helper);
+}
+
+@media (max-width: 1100px) {
+  .filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 700px) {

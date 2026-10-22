@@ -1,11 +1,14 @@
 "use client";
 
 import AdminStatCard from "./AdminStatCard";
+import PeriodSelector from "@/components/PeriodSelector";
+import { createTransactionPeriod, inTransactionPeriod } from "@/shared/transactionPeriod";
 import { FiBookOpen as CardBookOpen, FiUsers as CardUsers, FiClock as CardClock } from "react-icons/fi";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import styles from "./AdminEBookCirculation.module.css";
+import periodStyles from "./AdminTransactionPeriod.module.css";
 
 type Meta = { page: number; limit: number; total: number; totalPages: number };
 type Person = { id: number; name: string; email: string };
@@ -58,6 +61,7 @@ export default function AdminEBookCirculationPage() {
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [period, setPeriod] = useState(() => createTransactionPeriod("all"));
   const [data, setData] = useState<Payload>(emptyPayload);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -127,6 +131,11 @@ export default function AdminEBookCirculationPage() {
     [data, section],
   );
 
+  const activeLoans = data.activeLoans.data.filter((loan) => inTransactionPeriod(loan.borrowedAt, period));
+  const queues = data.queues.data.filter((queue) => inTransactionPeriod(queue.queuedAt, period));
+  const history = data.history.data.filter((loan) => inTransactionPeriod(loan.endedAt, period));
+  const periodDateLabel = section === "ACTIVE" ? "tanggal mulai pinjam" : section === "QUEUE" ? "tanggal masuk antrean" : "tanggal selesai akses";
+
   return (
     <div className={styles.page}>
       <header className={styles.heading}>
@@ -146,6 +155,8 @@ export default function AdminEBookCirculationPage() {
             <button data-button="secondary" data-button-size="md" data-button-active={section === "QUEUE"} type="button" role="tab" aria-selected={section === "QUEUE"} className={section === "QUEUE" ? styles.activeTab : ""} onClick={() => { setSection("QUEUE"); setPage(1); }}>Antrean</button>
             <button data-button="secondary" data-button-size="md" data-button-active={section === "HISTORY"} type="button" role="tab" aria-selected={section === "HISTORY"} className={section === "HISTORY" ? styles.activeTab : ""} onClick={() => { setSection("HISTORY"); setPage(1); }}>Riwayat</button>
           </div>
+        </div>
+        <div className={periodStyles.ebookFilters}>
           <label className={styles.search}>
             <FiSearch aria-hidden />
             <input
@@ -157,7 +168,14 @@ export default function AdminEBookCirculationPage() {
               aria-label="Cari sirkulasi E-Book"
             />
           </label>
+          <div className={periodStyles.period}>
+            <PeriodSelector mode="transaction" label={`Filter waktu ${periodDateLabel} E-Book`} value={period} onChange={setPeriod} />
+          </div>
         </div>
+        <p className={`${periodStyles.scope} ${periodStyles.ebookScope}`}>
+          Waktu berdasarkan {periodDateLabel} (WIB), hanya pada halaman ini.
+          Ringkasan dan jumlah halaman tidak mengikuti filter waktu.
+        </p>
 
         {error ? (
           <div className={styles.error} role="alert">
@@ -171,7 +189,7 @@ export default function AdminEBookCirculationPage() {
             <table data-record-list data-record-scroll className={styles.table}>
               <thead><tr><th scope="col">ANGGOTA</th><th scope="col">E-BOOK</th><th scope="col">MULAI</th><th scope="col">BATAS AKSES</th><th scope="col">STATUS</th></tr></thead>
               <tbody>
-                {loading ? <StateRow colSpan={5} text="Memuat pinjaman aktif..." /> : data.activeLoans.data.length ? data.activeLoans.data.map((loan) => (
+                {loading ? <StateRow colSpan={5} text="Memuat pinjaman aktif..." /> : activeLoans.length ? activeLoans.map((loan) => (
                   <tr key={loan.id}>
                     <td><PersonCell person={loan.user} /></td>
                     <td><BookCell book={loan.book} /></td>
@@ -179,14 +197,14 @@ export default function AdminEBookCirculationPage() {
                     <td>{dateTime(loan.dueAt)}</td>
                     <td><span data-record-badge className={styles.activePill}>Aktif</span></td>
                   </tr>
-                )) : <StateRow colSpan={5} text="Tidak ada pinjaman E-Book aktif." />}
+                )) : <StateRow colSpan={5} text="Tidak ada pinjaman E-Book aktif yang sesuai dengan filter pada halaman ini." />}
               </tbody>
             </table>
           ) : section === "QUEUE" ? (
             <table data-record-list data-record-scroll className={styles.table}>
               <thead><tr><th scope="col">ANGGOTA</th><th scope="col">E-BOOK</th><th scope="col">MASUK ANTREAN</th><th scope="col">STATUS AKSES</th></tr></thead>
               <tbody>
-                {loading ? <StateRow colSpan={4} text="Memuat antrean..." /> : data.queues.data.length ? data.queues.data.map((queue) => (
+                {loading ? <StateRow colSpan={4} text="Memuat antrean..." /> : queues.length ? queues.map((queue) => (
                   <tr key={queue.id}>
                     <td><PersonCell person={queue.user} /></td>
                     <td><BookCell book={queue.book} /></td>
@@ -197,14 +215,14 @@ export default function AdminEBookCirculationPage() {
                       <small>{queue.status === "DITAWARKAN" ? `Sampai ${dateTime(queue.claimExpiresAt)}` : "Menunggu giliran"}</small>
                     </div></td>
                   </tr>
-                )) : <StateRow colSpan={4} text="Tidak ada anggota dalam antrean E-Book." />}
+                )) : <StateRow colSpan={4} text="Tidak ada antrean E-Book yang sesuai dengan filter pada halaman ini." />}
               </tbody>
             </table>
           ) : (
             <table data-record-list data-record-scroll className={styles.table}>
               <thead><tr><th scope="col">ANGGOTA</th><th scope="col">E-BOOK</th><th scope="col">PERIODE AKSES</th><th scope="col">SELESAI</th><th scope="col">HASIL</th></tr></thead>
               <tbody>
-                {loading ? <StateRow colSpan={5} text="Memuat riwayat..." /> : data.history.data.length ? data.history.data.map((loan) => (
+                {loading ? <StateRow colSpan={5} text="Memuat riwayat..." /> : history.length ? history.map((loan) => (
                   <tr key={loan.id}>
                     <td><PersonCell person={loan.user} /></td>
                     <td><BookCell book={loan.book} /></td>
@@ -212,7 +230,7 @@ export default function AdminEBookCirculationPage() {
                     <td>{dateTime(loan.endedAt)}</td>
                     <td><span data-record-badge className={loan.status === "DIKEMBALIKAN" ? styles.returnedPill : styles.expiredPill}>{endingLabel(loan.status)}</span></td>
                   </tr>
-                )) : <StateRow colSpan={5} text="Belum ada riwayat peminjaman E-Book." />}
+                )) : <StateRow colSpan={5} text="Tidak ada riwayat peminjaman E-Book yang sesuai dengan filter pada halaman ini." />}
               </tbody>
             </table>
           )}
