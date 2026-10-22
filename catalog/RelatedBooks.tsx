@@ -48,7 +48,7 @@ export default async function RelatedBooks({
               key={item.id}
               book={item}
               basePath={basePath}
-              member
+              member={member}
               compact
             />
           ))}

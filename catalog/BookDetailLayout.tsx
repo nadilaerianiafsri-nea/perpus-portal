@@ -45,9 +45,135 @@ export default function BookDetailLayout({
   action: ReactNode;
   related: ReactNode;
 }) {
-  const Container = member ? "div" : "main";
-  const ebook = book.type === "EBOOK";
   const basePath = member ? "/dashboard/koleksi" : "/koleksi";
+
+  if (!member) {
+    const publicMetadata = [
+      ["Kode Koleksi", book.code],
+      ["ISBN / ISSN", book.isbnIssn || "Belum tersedia"],
+      ["Penerbit", book.publisher || "Belum tersedia"],
+      ["Tahun Terbit", book.year],
+      ...(book.edition ? [["Edisi", book.edition]] : []),
+      ["Bahasa", book.language || "Belum tersedia"],
+      ["Format", book.format || "Fisik"],
+      ["Subjek", book.subject || "Belum tersedia"],
+    ];
+
+    return (
+      <main className={`${styles.page} ${styles.publicPage}`}>
+        <nav className={styles.breadcrumb} aria-label="Detail koleksi">
+          <Link href="/">Beranda</Link>
+          <span>/</span>
+          <Link href={basePath}>Koleksi</Link>
+          <span>/</span>
+          <span aria-current="page">Detail</span>
+        </nav>
+
+        <header className={`${styles.heading} ${styles.publicHeading}`}>
+          <div className={styles.headingCopy}>
+            <h1 data-page-title>Detail Buku</h1>
+          </div>
+          <Link
+            data-button="primary"
+            data-button-size="md"
+            className={`${styles.backLink} ${styles.publicBackLink}`}
+            href={basePath}
+          >
+            <FiArrowLeft aria-hidden /> Kembali ke Koleksi
+          </Link>
+        </header>
+
+        <section
+          className={`${styles.card} ${styles.publicHero}`}
+          aria-labelledby="public-book-title"
+        >
+          <div className={styles.publicCoverStage}>
+            <div className={`${styles.cover} ${styles.publicCover}`}>
+              <Image
+                src={safeCoverUrl(book.coverUrl)}
+                alt={`Sampul ${book.title}`}
+                fill
+                priority
+                sizes="(max-width: 700px) 160px, 220px"
+              />
+            </div>
+          </div>
+
+          <div className={styles.publicHeroContent}>
+            <span className={styles.publicType}>{typeLabels[book.type]}</span>
+            <h2 id="public-book-title" className={styles.publicBookTitle}>
+              {book.title}
+            </h2>
+            <p className={styles.publicAuthor}>{book.author}</p>
+            <div className={styles.publicFacts}>
+              <span>{book.subject || "Subjek belum tersedia"}</span>
+              <span>{book.year}</span>
+            </div>
+            <div className={`${styles.actions} ${styles.publicActions}`}>
+              {action}
+            </div>
+          </div>
+        </section>
+
+        <div className={styles.publicDetailGrid}>
+          <DetailCard title="Informasi Bibliografi" id="book-public-catalog-title">
+            <dl className={`${styles.catalogFields} ${styles.publicCatalogFields}`}>
+              {publicMetadata.map(([label, value]) => (
+                <div key={label}>
+                  <dt>{label}</dt>
+                  <dd>{value}</dd>
+                </div>
+              ))}
+            </dl>
+          </DetailCard>
+
+          <DetailCard title="Ketersediaan" id="book-public-availability-title">
+            <dl
+              className={`${styles.availabilityFields} ${styles.publicAvailability}`}
+            >
+              <div>
+                <dt>Status Koleksi</dt>
+                <dd>
+                  <BookStatus book={book} />
+                </dd>
+              </div>
+              <div>
+                <dt>Stok Tersedia</dt>
+                <dd className={styles.stock}>
+                  {book.totalCopies > 0
+                    ? `${book.availableCopies} dari ${book.totalCopies} eksemplar tersedia`
+                    : "Informasi stok belum tersedia"}
+                </dd>
+              </div>
+            </dl>
+            <p className={styles.note}>
+              Masuk sebagai anggota untuk mengajukan peminjaman dan melihat
+              informasi layanan anggota.
+            </p>
+          </DetailCard>
+
+          <section
+            className={`${styles.card} ${styles.publicDescriptionCard}`}
+            aria-labelledby="book-public-description-title"
+          >
+            <h2
+              id="book-public-description-title"
+              className={styles.sectionTitle}
+            >
+              Deskripsi
+            </h2>
+            <p className={styles.description}>
+              {book.description?.trim() || "Deskripsi belum tersedia."}
+            </p>
+          </section>
+        </div>
+
+        {related}
+      </main>
+    );
+  }
+
+  const ebook = book.type === "EBOOK";
   const locations = [
     ...new Set(book.copies.map((copy) => copy.location).filter(Boolean)),
   ];
@@ -64,26 +190,27 @@ export default function BookDetailLayout({
     ["Subjek", book.subject],
     ...(ebook ? [["Format", book.format]] : []),
   ];
+
   return (
-    <Container className={`${styles.page} ${member ? styles.memberPage : ""}`}>
+    <div className={`${styles.page} ${styles.memberPage}`}>
       <nav className={styles.breadcrumb} aria-label="Detail koleksi">
         <Link href="/">Beranda</Link>
         <span>/</span>
-        {member ? (
-          <>
-            <Link href="/dashboard">Dashboard</Link>
-            <span>/</span>
-          </>
-        ) : null}
+        <Link href="/dashboard">Dashboard</Link>
+        <span>/</span>
         <Link href={basePath}>Koleksi</Link>
         <span>/</span>
         <span aria-current="page">Detail</span>
       </nav>
       <header className={styles.heading}>
         <h1 data-page-title>Detail Buku</h1>
-        <Link data-button={member ? "back" : "ghost"} data-button-size="md" className={styles.backLink} href={basePath}>
-          <FiArrowLeft aria-hidden />{" "}
-          {member ? "Kembali ke Katalog" : "Kembali ke Koleksi"}
+        <Link
+          data-button="back"
+          data-button-size="md"
+          className={styles.backLink}
+          href={basePath}
+        >
+          <FiArrowLeft aria-hidden /> Kembali ke Katalog
         </Link>
       </header>
       <div className={styles.cardGrid}>
@@ -212,6 +339,6 @@ export default function BookDetailLayout({
         </dl>
       </section>
       {related}
-    </Container>
+    </div>
   );
 }

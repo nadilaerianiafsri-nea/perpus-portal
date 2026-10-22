@@ -66,23 +66,34 @@ export async function getRelatedBooks(
       unavailable: sources.every((source) => source.status === "rejected"),
     };
   }
-  const query = new URLSearchParams({ limit: "8", sort: "relevance" });
-  if (book.subject) query.set("subject", book.subject);
-  try {
-    // Recommendations share the public-safe catalogue for both shells.
-    const response = await fetch(`${API_URL}/collections?${query}`, {
-      cache: "no-store",
-      signal: AbortSignal.timeout(10000),
-    });
-    if (!response.ok) return { books: [], unavailable: true };
-    const data = (await response.json()) as CatalogResponse;
-    return {
-      books: data.data.filter((item) => item.id !== book.id).slice(0, 6),
-      unavailable: false,
-    };
-  } catch {
-    return { books: [], unavailable: true };
+  const primaryQuery = new URLSearchParams({ limit: "8", sort: "relevance" });
+  if (book.subject) primaryQuery.set("subject", book.subject);
+  const fallbackQuery = new URLSearchParams({ limit: "8", sort: "yearDesc" });
+  const queries = book.subject ? [primaryQuery, fallbackQuery] : [fallbackQuery];
+
+  const sources = await Promise.allSettled(
+    queries.map(async (query) => {
+      const response = await fetch(`${API_URL}/collections?${query}`, {
+        cache: "no-store",
+        signal: AbortSignal.timeout(10000),
+      });
+      if (!response.ok) throw new Error("Recommendations unavailable");
+      return ((await response.json()) as CatalogResponse).data;
+    }),
+  );
+
+  const candidates = new Map<number, Book>();
+  for (const source of sources) {
+    if (source.status !== "fulfilled") continue;
+    for (const item of source.value) {
+      if (item.id !== book.id) candidates.set(item.id, item);
+    }
   }
+
+  return {
+    books: [...candidates.values()].slice(0, 6),
+    unavailable: sources.every((source) => source.status === "rejected"),
+  };
 }
 
 export async function getBook(

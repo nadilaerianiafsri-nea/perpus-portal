@@ -18,8 +18,128 @@ export default function EBookDetailLayout({
   action: ReactNode;
   related: ReactNode;
 }) {
-  const Container = member ? "div" : "main";
   const listHref = member ? "/dashboard/koleksi" : "/koleksi";
+  const access =
+    book.accessMode === "PENYEDIA_EKSTERNAL"
+      ? "Melalui penyedia eksternal"
+      : book.accessMode === "TIDAK_TERSEDIA"
+        ? "Belum tersedia"
+        : "Baca di Website";
+
+  if (!member) {
+    const publicMetadata = [
+      ["Kode Koleksi", book.code],
+      ["ISBN / ISSN", book.isbnIssn || "Belum tersedia"],
+      ["Penerbit", book.publisher || "Belum tersedia"],
+      ["Tahun Terbit", book.year],
+      ...(book.edition ? [["Edisi", book.edition]] : []),
+      ["Bahasa", book.language || "Belum tersedia"],
+      ["Subjek", book.subject || "Belum tersedia"],
+      ["Format", book.format || "Digital"],
+    ];
+
+    return (
+      <main
+        className={`${shared.page} ${shared.publicPage} ${styles.page} ${styles.publicPage}`}
+      >
+        <nav className={shared.breadcrumb} aria-label="Detail E-Book">
+          <Link href="/">Beranda</Link>
+          <span>/</span>
+          <Link href={listHref}>Koleksi</Link>
+          <span>/</span>
+          <span aria-current="page">Detail</span>
+        </nav>
+
+        <header className={styles.publicHeading}>
+          <div className={styles.headingCopy}>
+            <span className={styles.publicKicker}>E-BOOK</span>
+            <h1 data-page-title>Detail E-Book</h1>
+            <p>
+              Informasi koleksi digital dan akses yang tersedia untuk
+              pengunjung perpustakaan.
+            </p>
+          </div>
+          <Link
+            data-button="ghost"
+            data-button-size="md"
+            href={listHref}
+            className={styles.publicBackLink}
+          >
+            <FiArrowLeft aria-hidden /> Kembali ke Koleksi
+          </Link>
+        </header>
+
+        <section className={styles.publicHero} aria-labelledby="ebook-title">
+          <div className={styles.publicCoverStage}>
+            <div className={styles.publicCover}>
+              <EBookCover src={book.coverUrl} title={book.title} />
+            </div>
+            <span className={styles.coverCaption}>KOLEKSI DIGITAL</span>
+          </div>
+
+          <div className={styles.publicHeroContent}>
+            <span className={styles.publicType}>E-Book</span>
+            <h2 id="ebook-title" className={styles.publicTitle}>
+              {book.title}
+            </h2>
+            <p className={styles.publicAuthor}>
+              {book.author || "Penulis belum tersedia"}
+            </p>
+            <div className={styles.publicFacts}>
+              <span>{book.subject || "Subjek belum tersedia"}</span>
+              <span>{book.year}</span>
+            </div>
+            <div className={`${shared.actions} ${styles.publicActions}`}>
+              {action}
+            </div>
+            <p className={styles.publicAccessHint}>
+              <FiShield aria-hidden /> Akses membaca memerlukan akun anggota.
+            </p>
+          </div>
+        </section>
+
+        <div className={styles.publicDetails}>
+          <div className={styles.publicDescriptionColumn}>
+            <DetailCard title="Deskripsi" id="book-public-description-title">
+              <p className={styles.description}>
+                {book.description?.trim() || "Deskripsi belum tersedia."}
+              </p>
+            </DetailCard>
+
+            <DetailCard title="Akses E-Book" id="ebook-public-access-title">
+              <dl className={styles.accessFields}>
+                <div>
+                  <dt>Jenis Akses</dt>
+                  <dd>{access}</dd>
+                </div>
+                <div>
+                  <dt>Akun</dt>
+                  <dd>Memerlukan akun anggota</dd>
+                </div>
+              </dl>
+            </DetailCard>
+          </div>
+
+          <DetailCard
+            title="Informasi Bibliografi"
+            id="book-public-catalog-title"
+          >
+            <dl className={styles.metadata}>
+              {publicMetadata.map(([label, value]) => (
+                <div key={label}>
+                  <dt>{label}</dt>
+                  <dd>{value}</dd>
+                </div>
+              ))}
+            </dl>
+          </DetailCard>
+        </div>
+
+        {related}
+      </main>
+    );
+  }
+
   const metadata = [
     ["Penulis / Pengarang", book.author || "Penulis belum tersedia"],
     ["ISBN / ISSN", book.isbnIssn || "Belum tersedia"],
@@ -31,33 +151,26 @@ export default function EBookDetailLayout({
     ["Format", book.format || "Digital"],
     ...(book.edition ? [["Edisi", book.edition]] : []),
   ];
-  const access =
-    book.accessMode === "PENYEDIA_EKSTERNAL"
-      ? "Melalui penyedia eksternal"
-      : book.accessMode === "TIDAK_TERSEDIA"
-        ? "Belum tersedia"
-        : "Baca di Website";
+
   return (
-    <Container
-      className={`${shared.page} ${member ? shared.memberPage : ""} ${styles.page}`}
-    >
+    <div className={`${shared.page} ${shared.memberPage} ${styles.page}`}>
       <div className={styles.topline}>
         <nav className={shared.breadcrumb} aria-label="Detail E-Book">
           <Link href="/">Beranda</Link>
           <span>/</span>
-          {member ? (
-            <>
-              <Link href="/dashboard">Dashboard</Link>
-              <span>/</span>
-            </>
-          ) : null}
+          <Link href="/dashboard">Dashboard</Link>
+          <span>/</span>
           <Link href={listHref}>Koleksi</Link>
           <span>/</span>
           <span aria-current="page">Detail</span>
         </nav>
-        <Link data-button={member ? "back" : "ghost"} data-button-size="md" href={listHref} className={styles.backLink}>
-          <FiArrowLeft aria-hidden />{" "}
-          {member ? "Kembali ke Katalog" : "Kembali ke Koleksi"}
+        <Link
+          data-button="back"
+          data-button-size="md"
+          href={listHref}
+          className={styles.backLink}
+        >
+          <FiArrowLeft aria-hidden /> Kembali ke Katalog
         </Link>
       </div>
       <section className={styles.hero} aria-labelledby="ebook-title">
@@ -118,6 +231,6 @@ export default function EBookDetailLayout({
         </DetailCard>
       </div>
       {related}
-    </Container>
+    </div>
   );
 }
