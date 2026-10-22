@@ -7,6 +7,7 @@ import styles from "./NotFoundState.module.css";
 
 type Props = {
   context?: "public" | "admin" | "member";
+  standalone?: boolean;
   title?: string;
   description?: string;
   primaryHref?: string;
@@ -21,14 +22,14 @@ const destinations = {
 
 export default function NotFoundState({
   context = "public",
+  standalone = true,
   title = "Halaman Tidak Ditemukan",
   description = "Halaman yang Anda cari tidak tersedia, telah dipindahkan, atau alamat yang digunakan tidak tepat.",
   primaryHref = destinations[context].href,
   primaryLabel = destinations[context].label,
 }: Props) {
-  const standalone = context === "public";
   const Container = standalone ? "main" : "section";
-  return <Container className={`${styles.page} ${standalone ? styles.standalone : styles.contextual}`} aria-labelledby="not-found-title" data-not-found={context}>
+  return <Container className={`${styles.page} ${standalone ? styles.standalone : styles.contextual}`} aria-labelledby="not-found-title" data-not-found={context} data-not-found-mode={standalone ? "standalone" : "resource"}>
     {standalone ? <Link href="/" className={styles.brand} aria-label="Perpustakaan Kemenkum Riau — Beranda">
       <span className={styles.brandMark} aria-hidden="true">P</span>
       <span><strong>Perpustakaan</strong><small>KEMENKUM RIAU</small></span>

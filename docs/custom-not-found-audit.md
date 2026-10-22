@@ -1,5 +1,7 @@
 # Custom Not Found — 22 Oktober 2026
 
+> Catatan ini mendokumentasikan implementasi awal. Revisi terbaru mengubah **route 404 menjadi standalone**, sementara data/resource error tetap kontekstual. Lihat [audit standalone terbaru](standalone-not-found-audit.md) untuk arsitektur, seluruh file dan hasil verifikasi final.
+
 ## Tampilan dan navigasi
 
 Halaman 404 menggunakan Outfit, navy, latar light existing, garis kuning dan shared Button/ButtonLink. Desktop memakai dua kolom; layar kecil menempatkan visual di atas teks. Asset existing `/images/ASSET PERPUS/asset buku kaca pembesar.png` dipilih karena sesuai konteks pencarian koleksi dan identitas Riau; dimuat responsif melalui Next Image tanpa asset atau dependency baru.

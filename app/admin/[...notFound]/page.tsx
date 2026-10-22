@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-// Match only otherwise unknown admin paths so the existing protected layout stays mounted.
+// Unknown paths keep the parent auth guard, outside the valid-content shell group.
 export default function UnknownAdminPage() {
   notFound();
 }
