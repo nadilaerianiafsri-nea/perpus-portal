@@ -1,0 +1,1173 @@
+.publicShell {
+  min-height: 100dvh;
+  font-family: inherit;
+  background:
+    radial-gradient(
+      circle at 92% 8%,
+      color-mix(in srgb, var(--sky) 34%, transparent) 0%,
+      transparent 26%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--sky) 18%, var(--white)) 0%,
+      var(--white) 34%,
+      color-mix(in srgb, var(--cream) 18%, var(--white)) 100%
+    );
+}
+
+.publicShell > :global(main) {
+  position: relative;
+  isolation: isolate;
+}
+
+.publicShell > :global(main)::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 96px;
+  right: -110px;
+  width: 250px;
+  height: 250px;
+  border: 1px solid color-mix(in srgb, var(--sky) 62%, transparent);
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 42px color-mix(in srgb, var(--sky) 8%, transparent);
+  pointer-events: none;
+}
+
+.publicShell :global(nav[aria-label="Jejak navigasi"]) {
+  width: fit-content;
+  margin-bottom: 18px;
+  padding: 7px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--white) 90%, transparent);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--navy) 6%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.publicShell :global(nav[aria-label="Jejak navigasi"] a) {
+  cursor: pointer;
+  text-underline-offset: 3px;
+}
+
+.publicShell :global([data-page-title]) {
+  color: var(--navy);
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) > header) {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 24px;
+  padding: 26px 28px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background:
+    linear-gradient(
+      135deg,
+      var(--white) 0%,
+      color-mix(in srgb, var(--sky) 22%, var(--white)) 100%
+    );
+  box-shadow:
+    0 2px 5px color-mix(in srgb, var(--navy) 6%, transparent),
+    0 18px 42px color-mix(in srgb, var(--navy) 7%, transparent);
+  animation: publicHeaderEnter 0.42s ease both;
+}
+
+.publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) > header)::after {
+  content: "";
+  position: absolute;
+  width: 110px;
+  height: 110px;
+  right: -36px;
+  top: -48px;
+  border: 18px solid color-mix(in srgb, var(--yellow) 22%, transparent);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) > header h1) {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+}
+
+.publicShell :global(main article),
+.publicShell :global(main aside),
+.publicShell :global(main section[aria-labelledby]) {
+  transition:
+    transform 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease,
+    background 0.22s ease;
+}
+
+.publicShell :global(main article) {
+  border-radius: 18px;
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--navy) 6%, transparent);
+  animation: publicCardEnter 0.42s ease both;
+}
+
+.publicShell :global(main article:nth-of-type(2)) {
+  animation-delay: 0.04s;
+}
+
+.publicShell :global(main article:nth-of-type(3)) {
+  animation-delay: 0.08s;
+}
+
+.publicShell :global(main article:nth-of-type(4)) {
+  animation-delay: 0.12s;
+}
+
+.publicShell :global(main input),
+.publicShell :global(main textarea),
+.publicShell :global(main select) {
+  font-family: inherit;
+}
+
+.publicShell :global(main input:focus),
+.publicShell :global(main textarea:focus),
+.publicShell :global(main select:focus) {
+  border-color: color-mix(in srgb, var(--navy) 48%, var(--line));
+  outline: 0;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sky) 58%, transparent);
+}
+
+.publicShell :global(main a) {
+  cursor: pointer;
+}
+
+.publicShell :global(main button) {
+  cursor: pointer;
+}
+
+.publicShell :global(main iframe) {
+  border-radius: 16px;
+  box-shadow: 0 10px 26px color-mix(in srgb, var(--navy) 8%, transparent);
+}
+
+/* Public catalog */
+.publicShell :global(main:has(section[aria-label="Hasil pencarian"])) {
+  width: min(1180px, calc(100% - 32px));
+}
+
+.publicShell :global(main:has(section[aria-label="Hasil pencarian"]) > h1) {
+  position: relative;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  font-size: clamp(32px, 3.5vw, 46px);
+}
+
+.publicShell :global(main:has(section[aria-label="Hasil pencarian"]) > h1)::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 70px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--yellow);
+}
+
+.publicShell :global(main:has(section[aria-label="Hasil pencarian"]) > div:first-of-type) {
+  margin-bottom: 22px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--white);
+  box-shadow:
+    0 2px 5px color-mix(in srgb, var(--navy) 5%, transparent),
+    0 14px 34px color-mix(in srgb, var(--navy) 6%, transparent);
+  animation: publicCardEnter 0.36s ease both;
+}
+
+.publicShell :global(main:has(section[aria-label="Hasil pencarian"]) > div:nth-of-type(2)) {
+  gap: 24px;
+}
+
+.publicShell :global(main:has(section[aria-label="Hasil pencarian"]) aside) {
+  top: 106px;
+  padding: 18px;
+  border-color: color-mix(in srgb, var(--navy) 12%, var(--line));
+  border-top: 3px solid var(--yellow);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--white) 96%, var(--sky));
+  box-shadow:
+    0 2px 5px color-mix(in srgb, var(--navy) 5%, transparent),
+    0 18px 38px color-mix(in srgb, var(--navy) 7%, transparent);
+  animation: publicCardEnter 0.4s ease 0.04s both;
+}
+
+.publicShell :global(main:has(section[aria-label="Hasil pencarian"]) aside fieldset) {
+  margin: 0 0 6px;
+  padding: 0 0 8px;
+  border-bottom: 1px solid color-mix(in srgb, var(--navy) 8%, var(--line));
+}
+
+.publicShell :global(main:has(section[aria-label="Hasil pencarian"]) aside fieldset:last-child) {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.publicShell :global(main:has(section[aria-label="Hasil pencarian"]) aside > div > div:first-child) {
+  margin-bottom: 6px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--yellow);
+}
+
+.publicShell :global(main:has(section[aria-label="Hasil pencarian"]) aside fieldset legend) {
+  margin-bottom: 5px;
+}
+
+.publicShell :global(main:has(section[aria-label="Hasil pencarian"]) aside > div > div:first-child button) {
+  min-height: 34px;
+  padding: 7px 13px;
+  border: 1px solid color-mix(in srgb, var(--yellow) 78%, var(--navy));
+  border-radius: 999px;
+  background: var(--yellow);
+  color: var(--navy);
+  font-weight: 700;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+.publicShell :global(main:has(section[aria-label="Hasil pencarian"]) aside label) {
+  margin-bottom: 2px;
+  padding: 5px 7px;
+  border-radius: 12px;
+}
+
+.publicShell :global(section[aria-label="Hasil pencarian"]) {
+  min-width: 0;
+  animation: publicCardEnter 0.4s ease 0.08s both;
+}
+
+.publicShell :global(section[aria-label="Hasil pencarian"] > div:first-child) {
+  min-height: 58px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--white);
+  box-shadow: 0 10px 26px color-mix(in srgb, var(--navy) 5%, transparent);
+}
+
+.publicShell :global(label:has(select[aria-label="Jumlah koleksi per halaman"])) {
+  display: none;
+}
+
+.publicShell :global(section[aria-label="Hasil pencarian"] article) {
+  overflow: hidden;
+  border-color: color-mix(in srgb, var(--navy) 9%, var(--line));
+  border-radius: 18px;
+  background: var(--white);
+  box-shadow:
+    0 2px 5px color-mix(in srgb, var(--navy) 5%, transparent),
+    0 14px 32px color-mix(in srgb, var(--navy) 7%, transparent);
+}
+
+.publicShell :global(section[aria-label="Hasil pencarian"] article > a:first-child) {
+  overflow: hidden;
+  background: color-mix(in srgb, var(--sky) 36%, var(--white));
+}
+
+.publicShell :global(section[aria-label="Hasil pencarian"] article > a:first-child img) {
+  transition: transform 0.34s ease;
+}
+
+.publicShell :global(section[aria-label="Hasil pencarian"] article > a:first-child) {
+  aspect-ratio: 4 / 5;
+}
+
+.publicShell :global(section[aria-label="Hasil pencarian"] article > div:last-child) {
+  gap: 6px;
+  padding: 13px;
+}
+
+.publicShell :global(section[aria-label="Hasil pencarian"] article[data-catalog-view="list"]) {
+  min-height: 118px;
+}
+
+.publicShell :global(section[aria-label="Hasil pencarian"] article[data-catalog-view="list"] > a:first-child) {
+  width: 112px;
+  min-width: 112px;
+  aspect-ratio: auto;
+}
+
+.publicShell :global(section[aria-label="Hasil pencarian"] article[data-catalog-view="list"] > div:last-child) {
+  justify-content: center;
+  gap: 5px;
+  padding: 11px 13px;
+}
+
+.publicShell :global(section[aria-label="Hasil pencarian"] article[data-catalog-view="list"] h2) {
+  font-size: 14px;
+}
+
+.publicShell :global(section[aria-label="Hasil pencarian"] article[data-catalog-view="list"] p) {
+  font-size: 12px;
+}
+
+.publicShell :global(section[aria-label="Hasil pencarian"] article h2) {
+  font-size: 15px;
+  line-height: 1.28;
+}
+
+.publicShell :global(section[aria-label="Hasil pencarian"] article p),
+.publicShell :global(section[aria-label="Hasil pencarian"] article small) {
+  line-height: 1.35;
+}
+
+.publicShell :global(section[aria-label="Hasil pencarian"] article h2 a) {
+  color: var(--navy);
+  text-decoration: none;
+  text-underline-offset: 3px;
+}
+
+.publicShell :global(section[aria-label="Hasil pencarian"] nav[aria-label="Halaman katalog"]) {
+  margin-top: 30px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--white) 92%, transparent);
+  box-shadow: 0 10px 26px color-mix(in srgb, var(--navy) 5%, transparent);
+}
+
+.publicShell :global(section[aria-label="Hasil pencarian"] > div[role="alert"]),
+.publicShell :global(section[aria-label="Hasil pencarian"] > div:has(> h2):last-child) {
+  border-radius: 18px;
+}
+
+/* Information pages */
+.publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) article),
+.publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) > aside),
+.publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) section[aria-labelledby]) {
+  border-color: color-mix(in srgb, var(--navy) 10%, var(--line));
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--white) 96%, var(--sky));
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--navy) 7%, transparent);
+}
+
+.publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) section:has(> h2 > button)) {
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--navy) 10%, var(--line));
+  border-radius: 16px;
+  background: var(--white);
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--navy) 5%, transparent);
+}
+
+.publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) article h2),
+.publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) section h2) {
+  color: var(--navy);
+}
+
+.publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) details),
+.publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) section:has(> h2 > button)) {
+  border-radius: 16px;
+}
+
+.publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) button[aria-expanded]) {
+  border-radius: 16px;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) table) {
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+.publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) form button) {
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+@keyframes publicHeaderEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes publicCardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (hover: hover) {
+  .publicShell :global(nav[aria-label="Jejak navigasi"] a:hover),
+  .publicShell :global(main a:hover) {
+    text-decoration: underline;
+  }
+
+  .publicShell :global(main button:not(:disabled):hover) {
+    transform: scale(1.025);
+  }
+
+  .publicShell :global(main:has(section[aria-label="Hasil pencarian"]) aside label:hover) {
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--sky) 48%, var(--white));
+    color: var(--navy);
+  }
+
+  .publicShell :global(main:has(section[aria-label="Hasil pencarian"]) aside > div > div:first-child button:hover) {
+    border-color: var(--yellow);
+    background: color-mix(in srgb, var(--yellow) 82%, var(--white));
+    color: var(--navy);
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--yellow) 24%, transparent);
+    transform: scale(1.035);
+  }
+
+  .publicShell :global(section[aria-label="Hasil pencarian"] article:hover) {
+    border-color: color-mix(in srgb, var(--yellow) 72%, var(--line));
+    box-shadow:
+      0 4px 8px color-mix(in srgb, var(--navy) 7%, transparent),
+      0 22px 44px color-mix(in srgb, var(--navy) 11%, transparent);
+    transform: translateY(-5px) scale(1.008);
+  }
+
+  .publicShell :global(section[aria-label="Hasil pencarian"] article:hover > a:first-child img) {
+    transform: scale(1.045);
+  }
+
+  .publicShell :global(section[aria-label="Hasil pencarian"] article h2 a:hover) {
+    text-decoration: underline;
+  }
+
+  .publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) article:hover) {
+    border-color: color-mix(in srgb, var(--yellow) 54%, var(--line));
+    background: color-mix(in srgb, var(--yellow-soft) 28%, var(--white));
+    box-shadow: 0 20px 42px color-mix(in srgb, var(--navy) 10%, transparent);
+    transform: translateY(-4px);
+  }
+
+  .publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) button[aria-expanded]:hover) {
+    background: color-mix(in srgb, var(--sky) 46%, var(--white));
+    color: var(--navy);
+  }
+
+  .publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) form button:not(:disabled):hover) {
+    background: color-mix(in srgb, var(--navy) 88%, var(--white));
+    color: var(--white);
+    box-shadow: 0 10px 24px color-mix(in srgb, var(--navy) 16%, transparent);
+    transform: scale(1.025);
+  }
+}
+
+@media (max-width: 900px) {
+  .publicShell > :global(main)::before {
+    right: -150px;
+    opacity: 0.52;
+  }
+
+  .publicShell :global(main:has(section[aria-label="Hasil pencarian"]) > div:nth-of-type(2)) {
+    gap: 18px;
+  }
+}
+
+@media (max-width: 760px) {
+  .publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) > header) {
+    margin-bottom: 18px;
+    padding: 22px;
+    border-radius: 18px;
+  }
+
+  .publicShell :global(main:has(section[aria-label="Hasil pencarian"]) > h1) {
+    font-size: 34px;
+  }
+
+  .publicShell :global(main:has(section[aria-label="Hasil pencarian"]) > div:first-of-type) {
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .publicShell :global(section[aria-label="Hasil pencarian"] > div:first-child) {
+    align-items: stretch;
+    border-radius: 14px;
+  }
+
+  .publicShell :global(dialog[aria-label="Filter koleksi"]) {
+    border-top: 3px solid var(--yellow);
+  }
+
+  .publicShell :global(dialog[aria-label="Filter koleksi"] fieldset) {
+    margin: 0 0 6px;
+    padding: 0 0 8px;
+  }
+
+  .publicShell :global(dialog[aria-label="Filter koleksi"] fieldset legend) {
+    margin-bottom: 5px;
+  }
+
+  .publicShell :global(dialog[aria-label="Filter koleksi"] > div > div:first-child) {
+    margin-bottom: 6px;
+    padding-bottom: 8px;
+    border-bottom-color: var(--yellow);
+  }
+
+  .publicShell :global(dialog[aria-label="Filter koleksi"] > div > div:first-child button) {
+    border-radius: 999px;
+    background: var(--yellow);
+    color: var(--navy);
+    font-weight: 700;
+  }
+
+  .publicShell :global(section[aria-label="Hasil pencarian"] article) {
+    border-radius: 16px;
+  }
+
+  .publicShell :global(section[aria-label="Hasil pencarian"] nav[aria-label="Halaman katalog"]) {
+    border-radius: 14px;
+  }
+}
+
+@media (max-width: 560px) {
+  .publicShell > :global(main)::before {
+    display: none;
+  }
+
+  .publicShell :global(nav[aria-label="Jejak navigasi"]) {
+    margin-bottom: 14px;
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) > header) {
+    padding: 18px;
+    border-radius: 16px;
+  }
+
+  .publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) > header h1) {
+    font-size: 30px;
+    line-height: 1.08;
+  }
+
+  .publicShell :global(main:has(section[aria-label="Hasil pencarian"])) {
+    width: calc(100% - 24px);
+  }
+
+  .publicShell :global(main:has(section[aria-label="Hasil pencarian"]) > h1) {
+    margin-bottom: 16px;
+    padding-bottom: 13px;
+    font-size: 31px;
+  }
+
+  .publicShell :global(main:has(section[aria-label="Hasil pencarian"]) > h1)::after {
+    width: 58px;
+    height: 3px;
+  }
+
+  .publicShell :global(main:has(section[aria-label="Hasil pencarian"]) > div:first-of-type) {
+    margin-bottom: 16px;
+    padding: 10px;
+  }
+
+  .publicShell :global(section[aria-label="Hasil pencarian"] > div:first-child) {
+    gap: 9px;
+    padding: 9px;
+  }
+
+  .publicShell :global(section[aria-label="Hasil pencarian"] article) {
+    box-shadow: 0 9px 22px color-mix(in srgb, var(--navy) 7%, transparent);
+  }
+
+  .publicShell :global(section[aria-label="Hasil pencarian"] article[data-catalog-view="list"]) {
+    min-height: 104px;
+  }
+
+  .publicShell :global(section[aria-label="Hasil pencarian"] article[data-catalog-view="list"] > a:first-child) {
+    width: 92px;
+    min-width: 92px;
+  }
+
+  .publicShell :global(section[aria-label="Hasil pencarian"] article[data-catalog-view="list"] > div:last-child) {
+    padding: 9px 10px;
+  }
+
+  .publicShell :global(section[aria-label="Hasil pencarian"] nav[aria-label="Halaman katalog"]) {
+    gap: 5px;
+    margin-top: 22px;
+    padding: 8px;
+  }
+
+  .publicShell :global(main article) {
+    animation-duration: 0.32s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .publicShell :global(main article),
+  .publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) > header),
+  .publicShell :global(section[aria-label="Hasil pencarian"]) {
+    animation: none;
+  }
+
+  .publicShell :global(main article),
+  .publicShell :global(main button),
+  .publicShell :global(main a) {
+    transition: none;
+  }
+}
+
+/* Catalog refinement: active filters, list actions, year range, and detail heading. */
+.publicShell :global(
+  section[aria-label="Hasil pencarian"] > div:has(> button[aria-label^="Hapus filter"])
+) {
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.publicShell :global(
+  section[aria-label="Hasil pencarian"] > div:has(> button[aria-label^="Hapus filter"]) > button
+) {
+  min-height: 36px;
+  padding: 7px 12px;
+  border: 1px solid color-mix(in srgb, var(--navy) 14%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--sky) 58%, var(--white));
+  color: var(--navy);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--navy) 7%, transparent);
+  font-weight: 650;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.publicShell :global(
+  section[aria-label="Hasil pencarian"] > div:has(> button[aria-label^="Hapus filter"]) > button:last-child
+) {
+  border-color: color-mix(in srgb, var(--yellow) 70%, var(--line));
+  background: color-mix(in srgb, var(--yellow-soft) 72%, var(--white));
+}
+
+.publicShell :global(
+  main:has(section[aria-label="Hasil pencarian"]) aside fieldset:last-child > div
+) {
+  grid-template-columns: minmax(0, 1fr) 14px minmax(0, 1fr);
+  gap: 7px;
+}
+
+.publicShell :global(
+  main:has(section[aria-label="Hasil pencarian"]) aside fieldset:last-child label
+) {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.publicShell :global(
+  main:has(section[aria-label="Hasil pencarian"]) aside fieldset:last-child [data-app-select]
+) {
+  width: 100%;
+  min-width: 0;
+}
+
+.publicShell :global(
+  main:has(section[aria-label="Hasil pencarian"]) aside fieldset:last-child [data-select-trigger]
+) {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding-inline: 11px 9px;
+  border: 1px solid color-mix(in srgb, var(--navy) 16%, var(--line));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--sky) 26%, var(--white));
+  color: var(--navy);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  box-shadow: 0 5px 14px color-mix(in srgb, var(--navy) 5%, transparent);
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+.publicShell :global(
+  main:has(section[aria-label="Hasil pencarian"]) aside fieldset:last-child [data-select-value]
+) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.publicShell :global(section[aria-label="Hasil pencarian"] article a[data-public-detail]) {
+  min-height: 40px;
+  border: 1px solid var(--navy);
+  border-radius: 11px;
+  background: var(--navy);
+  color: var(--white);
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--navy) 14%, transparent);
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.publicShell :global(
+  section[aria-label="Hasil pencarian"] article[data-catalog-view="list"] > div:last-child
+) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  column-gap: 18px;
+  align-content: center;
+  align-items: center;
+}
+
+.publicShell :global(
+  section[aria-label="Hasil pencarian"] article[data-catalog-view="list"] h2
+),
+.publicShell :global(
+  section[aria-label="Hasil pencarian"] article[data-catalog-view="list"] p
+) {
+  grid-column: 1;
+}
+
+.publicShell :global(
+  section[aria-label="Hasil pencarian"] article[data-catalog-view="list"] a[data-public-detail]
+) {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  align-self: center;
+  width: auto;
+  min-width: 126px;
+  margin: 0 0 0 auto;
+  padding-inline: 18px;
+}
+
+.publicShell :global(
+  section[aria-label="Hasil pencarian"]:has(article[data-catalog-view="list"])
+) {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+}
+
+.publicShell :global(
+  section[aria-label="Hasil pencarian"]:has(article[data-catalog-view="list"]) > div:has(> article[data-catalog-view="list"])
+) {
+  flex: 1 1 auto;
+  align-content: start;
+}
+
+.publicShell :global(
+  section[aria-label="Hasil pencarian"]:has(article[data-catalog-view="list"]) nav[aria-label="Halaman katalog"]
+) {
+  margin-top: auto;
+}
+
+.publicShell :global(main:has(nav[aria-label="Detail koleksi"])) {
+  padding-top: 132px;
+}
+
+/* detail-heading-yellow-line */
+.publicShell :global(main:has(nav[aria-label="Detail koleksi"]) > header) {
+  position: relative;
+  overflow: visible;
+  margin-bottom: 24px;
+  padding: 0 0 16px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.publicShell :global(main:has(nav[aria-label="Detail koleksi"]) > header)::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: auto;
+  top: auto;
+  bottom: 0;
+  width: 70px;
+  height: 4px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--yellow);
+}
+
+.publicShell :global(main:has(nav[aria-label="Detail koleksi"]) > header h1) {
+  font-size: clamp(32px, 3.5vw, 46px);
+}
+
+@media (hover: hover) {
+  .publicShell :global(
+    section[aria-label="Hasil pencarian"] > div:has(> button[aria-label^="Hapus filter"]) > button:hover
+  ) {
+    border-color: color-mix(in srgb, var(--yellow) 68%, var(--navy));
+    background: color-mix(in srgb, var(--yellow-soft) 78%, var(--white));
+    box-shadow: 0 9px 20px color-mix(in srgb, var(--navy) 10%, transparent);
+    transform: translateY(-1px) scale(1.025);
+  }
+
+  .publicShell :global(
+    main:has(section[aria-label="Hasil pencarian"]) aside fieldset:last-child [data-select-trigger]:hover
+  ) {
+    border-color: color-mix(in srgb, var(--yellow) 72%, var(--navy));
+    background: color-mix(in srgb, var(--yellow-soft) 64%, var(--white));
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--yellow) 18%, transparent);
+    transform: scale(1.02);
+  }
+
+  .publicShell :global(section[aria-label="Hasil pencarian"] article a[data-public-detail]:hover) {
+    border-color: var(--yellow);
+    background: var(--yellow);
+    color: var(--navy);
+    box-shadow: 0 10px 22px color-mix(in srgb, var(--yellow) 22%, transparent);
+    text-decoration: none;
+    transform: scale(1.025);
+  }
+}
+
+@media (max-width: 760px) {
+  .publicShell :global(main:has(nav[aria-label="Detail koleksi"])) {
+    padding-top: 108px;
+  }
+
+  .publicShell :global(
+    section[aria-label="Hasil pencarian"] article[data-catalog-view="list"] > div:last-child
+  ) {
+    column-gap: 12px;
+  }
+
+  .publicShell :global(
+    section[aria-label="Hasil pencarian"] article[data-catalog-view="list"] a[data-public-detail]
+  ) {
+    min-width: 112px;
+    padding-inline: 14px;
+  }
+}
+
+@media (max-width: 560px) {
+  .publicShell :global(main:has(nav[aria-label="Detail koleksi"])) {
+    padding-top: 96px;
+  }
+
+  .publicShell :global(main:has(nav[aria-label="Detail koleksi"]) > header) {
+    gap: 12px;
+    padding-bottom: 13px;
+  }
+
+  .publicShell :global(main:has(nav[aria-label="Detail koleksi"]) > header)::after {
+    width: 58px;
+    height: 3px;
+  }
+
+  .publicShell :global(
+    section[aria-label="Hasil pencarian"] article[data-catalog-view="list"] > div:last-child
+  ) {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+  }
+
+  .publicShell :global(
+    section[aria-label="Hasil pencarian"] article[data-catalog-view="list"] h2
+  ),
+  .publicShell :global(
+    section[aria-label="Hasil pencarian"] article[data-catalog-view="list"] p
+  ),
+  .publicShell :global(
+    section[aria-label="Hasil pencarian"] article[data-catalog-view="list"] a[data-public-detail]
+  ) {
+    grid-column: 1;
+  }
+
+  .publicShell :global(
+    section[aria-label="Hasil pencarian"] article[data-catalog-view="list"] a[data-public-detail]
+  ) {
+    grid-row: auto;
+    justify-self: stretch;
+    width: 100%;
+    min-width: 0;
+    margin: 4px 0 0;
+  }
+}
+
+
+
+/* List-view refinement: wider sort menu, balanced rows, top-aligned copy. */
+.publicShell :global(
+  label:has([data-select-trigger][aria-label="Urutkan koleksi"]) [data-app-select]
+) {
+  width: 178px;
+  min-width: 178px;
+}
+
+.publicShell :global([data-select-trigger][aria-label="Urutkan koleksi"]) {
+  width: 100%;
+  min-width: 178px;
+  white-space: nowrap;
+}
+
+.publicShell :global([data-select-trigger][aria-label="Urutkan koleksi"] [data-select-value]) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:global([data-select-panel][aria-label="Urutkan koleksi"] [role="option"]) {
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+
+.publicShell :global(
+  section[aria-label="Hasil pencarian"] article[data-catalog-view="list"] > div:last-child
+) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto 1fr auto;
+  column-gap: 18px;
+  align-content: stretch;
+  align-items: start;
+  justify-content: initial;
+}
+
+.publicShell :global(
+  section[aria-label="Hasil pencarian"] article[data-catalog-view="list"] h2
+) {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: start;
+}
+
+.publicShell :global(
+  section[aria-label="Hasil pencarian"] article[data-catalog-view="list"] p
+) {
+  grid-column: 1;
+  grid-row: 2;
+  align-self: start;
+}
+
+.publicShell :global(
+  section[aria-label="Hasil pencarian"] article[data-catalog-view="list"] [data-public-list-type]
+) {
+  position: static;
+  grid-column: 1;
+  grid-row: 4;
+  align-self: end;
+  justify-self: start;
+  margin-top: 8px;
+}
+
+.publicShell :global(
+  section[aria-label="Hasil pencarian"] article[data-catalog-view="list"] [data-public-list-type] > span
+) {
+  position: static;
+  inset: auto;
+  display: inline-flex;
+  width: fit-content;
+}
+
+.publicShell :global(
+  section[aria-label="Hasil pencarian"] article[data-catalog-view="list"] a[data-public-detail]
+) {
+  grid-column: 2;
+  grid-row: 1 / 5;
+  align-self: center;
+  justify-self: end;
+}
+
+@media (min-width: 761px) {
+  .publicShell :global(
+    section[aria-label="Hasil pencarian"]:has(article[data-catalog-view="list"]) > div:has(> article[data-catalog-view="list"])
+  ) {
+    display: grid;
+    grid-auto-rows: minmax(118px, 1fr);
+    align-content: stretch;
+  }
+
+  .publicShell :global(
+    section[aria-label="Hasil pencarian"] article[data-catalog-view="list"]
+  ) {
+    height: 100%;
+  }
+}
+
+@media (max-width: 760px) {
+  .publicShell :global(
+    label:has([data-select-trigger][aria-label="Urutkan koleksi"]) [data-app-select]
+  ) {
+    width: 168px;
+    min-width: 168px;
+  }
+
+  .publicShell :global([data-select-trigger][aria-label="Urutkan koleksi"]) {
+    min-width: 168px;
+  }
+}
+
+@media (max-width: 560px) {
+  .publicShell :global(
+    section[aria-label="Hasil pencarian"] article[data-catalog-view="list"] > div:last-child
+  ) {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto 1fr auto auto;
+    align-content: stretch;
+  }
+
+  .publicShell :global(
+    section[aria-label="Hasil pencarian"] article[data-catalog-view="list"] [data-public-list-type]
+  ) {
+    grid-column: 1;
+    grid-row: 4;
+    align-self: end;
+    margin-top: 6px;
+  }
+
+  .publicShell :global(
+    section[aria-label="Hasil pencarian"] article[data-catalog-view="list"] a[data-public-detail]
+  ) {
+    grid-column: 1;
+    grid-row: 5;
+    align-self: stretch;
+    justify-self: stretch;
+    width: 100%;
+    min-width: 0;
+    margin: 8px 0 0;
+  }
+}
+
+
+/* Final catalog controls: readable year menus, pagination breathing room, client-only view toggle support. */
+:global([data-select-panel][aria-label="Tahun terbit dari"]),
+:global([data-select-panel][aria-label="Tahun terbit sampai"]) {
+  width: 164px !important;
+  min-width: 164px !important;
+}
+
+:global([data-select-panel][aria-label="Tahun terbit dari"] [role="option"]),
+:global([data-select-panel][aria-label="Tahun terbit sampai"] [role="option"]) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+  padding-inline: 16px 12px;
+  white-space: nowrap;
+  word-break: keep-all;
+  overflow-wrap: normal;
+}
+
+:global([data-select-panel][aria-label="Tahun terbit dari"] [role="option"] > span:first-child),
+:global([data-select-panel][aria-label="Tahun terbit sampai"] [role="option"] > span:first-child) {
+  min-width: max-content;
+  white-space: nowrap;
+  word-break: keep-all;
+  overflow-wrap: normal;
+}
+
+.publicShell :global(
+  section[aria-label="Hasil pencarian"]:has(article[data-catalog-view="list"]) > div:has(> article[data-catalog-view="list"])
+) {
+  padding-bottom: 24px;
+}
+
+.publicShell :global(
+  section[aria-label="Hasil pencarian"]:has(article[data-catalog-view="list"]) nav[aria-label="Halaman katalog"]
+) {
+  flex-shrink: 0;
+  margin-top: 0 !important;
+}
+
+@media (max-width: 760px) {
+  :global([data-select-panel][aria-label="Tahun terbit dari"]),
+  :global([data-select-panel][aria-label="Tahun terbit sampai"]) {
+    width: 152px !important;
+    min-width: 152px !important;
+  }
+
+  .publicShell :global(
+    section[aria-label="Hasil pencarian"]:has(article[data-catalog-view="list"]) > div:has(> article[data-catalog-view="list"])
+  ) {
+    padding-bottom: 18px;
+  }
+}
+
+/* Public interaction stability: compact list rows and readable year menus. */
+:global([data-select-panel][aria-label="Tahun terbit dari"]),
+:global([data-select-panel][aria-label="Tahun terbit sampai"]) {
+  width: min(210px, calc(100vw - 16px)) !important;
+  min-width: min(210px, calc(100vw - 16px)) !important;
+}
+
+:global([data-select-panel][aria-label="Tahun terbit dari"] [role="option"]),
+:global([data-select-panel][aria-label="Tahun terbit sampai"] [role="option"]),
+:global([data-select-panel][aria-label="Tahun terbit dari"] [role="option"] *),
+:global([data-select-panel][aria-label="Tahun terbit sampai"] [role="option"] *) {
+  white-space: nowrap !important;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+}
+
+@media (min-width: 761px) {
+  .publicShell :global(
+    section[aria-label="Hasil pencarian"]:has(article[data-catalog-view="list"])
+  ) {
+    display: block;
+    align-self: auto;
+  }
+
+  .publicShell :global(
+    section[aria-label="Hasil pencarian"]:has(article[data-catalog-view="list"]) > div:has(> article[data-catalog-view="list"])
+  ) {
+    display: grid;
+    grid-auto-rows: auto;
+    gap: 14px;
+    align-content: start;
+    padding-bottom: 0;
+  }
+
+  .publicShell :global(
+    section[aria-label="Hasil pencarian"] article[data-catalog-view="list"]
+  ) {
+    height: auto;
+    min-height: 158px;
+  }
+
+  .publicShell :global(
+    section[aria-label="Hasil pencarian"] article[data-catalog-view="list"] > a:first-child
+  ) {
+    width: 118px;
+    flex: 0 0 118px;
+    aspect-ratio: 3 / 4;
+  }
+
+  .publicShell :global(
+    section[aria-label="Hasil pencarian"]:has(article[data-catalog-view="list"]) nav[aria-label="Halaman katalog"]
+  ) {
+    margin-top: 28px !important;
+  }
+}

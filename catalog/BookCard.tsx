@@ -1,7 +1,13 @@
 import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import Image from "next/image";
 import Link from "next/link";
-import { FiBookOpen, FiCheckCircle, FiClock, FiEye, FiMonitor } from "react-icons/fi";
+import {
+  FiBookOpen,
+  FiCheckCircle,
+  FiClock,
+  FiEye,
+  FiMonitor,
+} from "react-icons/fi";
 import { type Book, availabilityLabels, typeLabels } from "./types";
 import styles from "./Catalog.module.css";
 
@@ -49,33 +55,54 @@ export default function BookCard({
         </Link>
       </h2>
       <p title={member ? book.author : undefined}>{book.author}</p>
-      <small>
-        {member ? (
-          <>
-            {book.year}
-            {book.language ? ` · ${book.language}` : ""}
-            <span className={styles.memberBookCode}>{book.code}</span>
-          </>
-        ) : (
-          <>
-            {book.code} · {book.year}
-          </>
-        )}
-      </small>
+      {member ? (
+        <small>
+          {book.year}
+          {book.language ? ` · ${book.language}` : ""}
+          <span className={styles.memberBookCode}>{book.code}</span>
+        </small>
+      ) : null}
     </>
   );
-  const actions = (
+  const typeBadge = (
+    <span className={styles.typeBadge}>
+      {book.type === "EBOOK" ? <FiMonitor /> : <FiBookOpen />}
+      {typeLabels[book.type]}
+    </span>
+  );
+  const memberActions = (
     <>
       <BookStatus book={book} />
-      <Link data-button="secondary" data-button-size="md" data-row-action="neutral" data-button-shape={rowAction ? "square" : undefined} title={rowAction ? "Lihat detail koleksi" : undefined} aria-label={rowAction ? `Lihat detail ${book.title}` : undefined} className={styles.detailLink} href={detailHref}>
+      <Link
+        data-button="secondary"
+        data-button-size="md"
+        data-row-action="neutral"
+        data-button-shape={rowAction ? "square" : undefined}
+        title={rowAction ? "Lihat detail koleksi" : undefined}
+        aria-label={rowAction ? `Lihat detail ${book.title}` : undefined}
+        className={styles.detailLink}
+        href={detailHref}
+      >
         {rowAction ? <FiEye aria-hidden="true" /> : "Lihat Detail"}
       </Link>
     </>
+  );
+  const publicAction = (
+    <Link
+      data-button="primary"
+      data-button-size="md"
+      data-public-detail
+      className={styles.detailLink}
+      href={detailHref}
+    >
+      Lihat Detail
+    </Link>
   );
 
   return (
     <article
       className={`${styles.card}${compact ? ` ${styles.relatedCard}` : ""}`}
+      data-catalog-view={rowAction ? "list" : "grid"}
     >
       <Link
         href={detailHref}
@@ -94,10 +121,7 @@ export default function BookCard({
                 : "(max-width: 600px) 50vw, (max-width: 1000px) 33vw, 25vw"
           }
         />
-        <span className={styles.typeBadge}>
-          {book.type === "EBOOK" ? <FiMonitor /> : <FiBookOpen />}
-          {typeLabels[book.type]}
-        </span>
+        {member || !rowAction ? typeBadge : null}
       </Link>
       <div className={styles.cardBody}>
         {member ? (
@@ -105,10 +129,13 @@ export default function BookCard({
         ) : (
           details
         )}
+        {!member && rowAction ? (
+          <span data-public-list-type>{typeBadge}</span>
+        ) : null}
         {member ? (
-          <div className={styles.memberCardFooter}>{actions}</div>
+          <div className={styles.memberCardFooter}>{memberActions}</div>
         ) : (
-          actions
+          publicAction
         )}
       </div>
     </article>

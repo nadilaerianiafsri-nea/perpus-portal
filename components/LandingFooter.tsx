@@ -33,7 +33,7 @@ export default async function LandingFooter({
           <div className={`footer-col ${styles.linkColumn}`}>
             <strong>Jelajahi</strong>
             <Link href="/koleksi">Koleksi</Link>
-            <Link href="/e-book">E-Book</Link>
+            <Link href="/koleksi?type=EBOOK">E-Book</Link>
             <Link href="/hibah-buku">Hibah Buku</Link>
             <Link href="/panduan">Panduan</Link>
           </div>
@@ -79,7 +79,7 @@ export default async function LandingFooter({
         <div className={`footer-col ${styles.linkColumn}`}>
           <strong>Jelajahi</strong>
           <Link href="/koleksi">Koleksi</Link>
-          <Link href="/e-book">E-Book</Link>
+          <Link href="/koleksi?type=EBOOK">E-Book</Link>
           <Link href="/hibah-buku">Hibah Buku</Link>
           <Link href="/panduan">Panduan</Link>
         </div>

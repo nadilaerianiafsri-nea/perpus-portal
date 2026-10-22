@@ -48,8 +48,7 @@ export default async function Home() {
     description: renderPublicText(step.description, settings),
   }));
   const displayedCollectionBooks = homeData.latestBooks.slice(0, 5);
-  const continuationPreview =
-    homeData.latestBooks[5] ?? homeData.latestBooks[4] ?? null;
+  const continuationPreview = homeData.latestBooks[5] ?? homeData.latestBooks[4] ?? null;
 
   return (
     <>
@@ -92,7 +91,7 @@ export default async function Home() {
                   data-button="secondary"
                   data-button-size="md"
                   className="soft-link"
-                  href="/e-book"
+                  href="/koleksi?type=EBOOK"
                 >
                   <FiBookOpen /> Jelajahi E-Book
                 </Link>
@@ -136,45 +135,23 @@ export default async function Home() {
           </div>
         </section>
 
-        <section
-          className={`quick-section ${styles.quickBand} ${styles.revealSection}`}
-        >
+        <section className={`quick-section ${styles.quickBand} ${styles.revealSection}`}>
           <div className="landing-shell quick-grid">
             <Link href="/koleksi">
-              <span>
-                <FiSearch />
-              </span>
-              <div>
-                <strong>Cari Buku</strong>
-                <small>Telusuri koleksi & ketersediaan</small>
-              </div>
+              <span><FiSearch /></span>
+              <div><strong>Cari Buku</strong><small>Telusuri koleksi & ketersediaan</small></div>
             </Link>
             <Link href="/dashboard/pinjaman">
-              <span>
-                <FiList />
-              </span>
-              <div>
-                <strong>Peminjaman Saya</strong>
-                <small>Pinjaman & riwayat aktif Anda</small>
-              </div>
+              <span><FiList /></span>
+              <div><strong>Peminjaman Saya</strong><small>Pinjaman & riwayat aktif Anda</small></div>
             </Link>
-            <Link href="/e-book">
-              <span>
-                <FiBookOpen />
-              </span>
-              <div>
-                <strong>E-Book</strong>
-                <small>Baca koleksi digital kapan saja</small>
-              </div>
+            <Link href="/koleksi?type=EBOOK">
+              <span><FiBookOpen /></span>
+              <div><strong>E-Book</strong><small>Baca koleksi digital kapan saja</small></div>
             </Link>
             <Link href="/panduan">
-              <span>
-                <FiCalendar />
-              </span>
-              <div>
-                <strong>Panduan Peminjaman</strong>
-                <small>Alur dan aturan layanan</small>
-              </div>
+              <span><FiCalendar /></span>
+              <div><strong>Panduan Peminjaman</strong><small>Alur dan aturan layanan</small></div>
             </Link>
           </div>
         </section>
@@ -189,10 +166,7 @@ export default async function Home() {
               <p>{content.home.latestDescription}</p>
             </div>
             {displayedCollectionBooks.length ? (
-              <div
-                className={`book-grid ${styles.latestCollectionGrid}`}
-                data-collection-grid
-              >
+              <div className={`book-grid ${styles.latestCollectionGrid}`} data-collection-grid>
                 {displayedCollectionBooks.map((book) => (
                   <Link
                     className={`book-card ${styles.latestBookCard}`}
@@ -234,10 +208,7 @@ export default async function Home() {
                   aria-label="Lihat semua koleksi publik"
                 >
                   {continuationPreview ? (
-                    <div
-                      className={styles.collectionContinueMedia}
-                      aria-hidden="true"
-                    >
+                    <div className={styles.collectionContinueMedia} aria-hidden="true">
                       <Image
                         src={safeCoverUrl(continuationPreview.coverUrl)}
                         alt=""
@@ -259,16 +230,13 @@ export default async function Home() {
               </div>
             ) : (
               <div className="landing-empty-state">
-                Koleksi terbaru belum dapat dimuat. Silakan buka katalog untuk
-                melihat data terkini.
+                Koleksi terbaru belum dapat dimuat. Silakan buka katalog untuk melihat data terkini.
               </div>
             )}
           </div>
         </section>
 
-        <section
-          className={`subject-section section-pad compact-section ${styles.subjectBlend} ${styles.revealSection}`}
-        >
+        <section className={`subject-section section-pad compact-section ${styles.subjectBlend} ${styles.revealSection}`}>
           <div className="landing-shell subject-grid">
             <div>
               <h2>{content.home.subjectsTitle}</h2>
@@ -280,15 +248,12 @@ export default async function Home() {
                       href={`/koleksi?subject=${encodeURIComponent(item)}`}
                       key={item}
                     >
-                      {item}
-                      <FiArrowRight />
+                      {item}<FiArrowRight />
                     </Link>
                   ))}
                 </div>
               ) : (
-                <p className="landing-inline-state">
-                  Daftar subjek belum dapat dimuat.
-                </p>
+                <p className="landing-inline-state">Daftar subjek belum dapat dimuat.</p>
               )}
             </div>
             <div className="subject-art">
@@ -316,42 +281,25 @@ export default async function Home() {
                 <span className="mini-tag">Layanan 01</span>
                 <h3>Cari Koleksi & Reservasi Buku</h3>
                 <p>
-                  Telusuri koleksi lengkap perpustakaan, cek status
-                  ketersediaan, lalu reservasi langsung sebelum datang.
+                  Telusuri koleksi lengkap perpustakaan, cek status ketersediaan,
+                  lalu reservasi langsung sebelum datang.
                 </p>
                 <div className="pill-row">
-                  <span>
-                    <FiSearch /> Katalog lengkap
-                  </span>
-                  <span>
-                    <FiClock /> Reservasi {settings.reservationDurationHours}{" "}
-                    jam
-                  </span>
-                  <span>
-                    <FiMapPin /> Cek rak buku
-                  </span>
+                  <span><FiSearch /> Katalog lengkap</span>
+                  <span><FiClock /> Reservasi {settings.reservationDurationHours} jam</span>
+                  <span><FiMapPin /> Cek rak buku</span>
                 </div>
                 <Link className="feature-text-link" href="/koleksi">
                   Buka katalog <FiArrowRight />
                 </Link>
               </div>
               <div className="feature-art">
-                <Image
-                  src="/images/ASSET PERPUS/Hero pegang buku.png"
-                  alt="Cari koleksi dan reservasi"
-                  fill
-                  sizes="460px"
-                />
+                <Image src="/images/ASSET PERPUS/Hero pegang buku.png" alt="Cari koleksi dan reservasi" fill sizes="460px" />
               </div>
             </div>
             <div className="feature-row reverse landing-motion-card">
               <div className="feature-art">
-                <Image
-                  src="/images/ASSET PERPUS/Hero peminjaman.png"
-                  alt="Perpanjangan peminjaman"
-                  fill
-                  sizes="460px"
-                />
+                <Image src="/images/ASSET PERPUS/Hero peminjaman.png" alt="Perpanjangan peminjaman" fill sizes="460px" />
               </div>
               <div className="feature-copy">
                 <span className="mini-tag">Layanan 02</span>
@@ -362,16 +310,9 @@ export default async function Home() {
                     : `Perpanjang pinjaman +${settings.extensionDurationDays} hari dari akun anggota dan pantau pengingat sebelum jatuh tempo.`}
                 </p>
                 <div className="pill-row">
-                  <span>
-                    <FiCalendar /> Perpanjang {settings.extensionDurationDays}{" "}
-                    hari
-                  </span>
-                  <span>
-                    <FiBell /> Reminder otomatis
-                  </span>
-                  <span>
-                    <FiMail /> Info via email
-                  </span>
+                  <span><FiCalendar /> Perpanjang {settings.extensionDurationDays} hari</span>
+                  <span><FiBell /> Reminder otomatis</span>
+                  <span><FiMail /> Info via email</span>
                 </div>
                 <Link className="feature-text-link" href="/dashboard/pinjaman">
                   Kelola pinjaman <FiArrowRight />
@@ -381,9 +322,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <section
-          className={`borrow-flow section-pad compact-section ${styles.borrowBlend} ${styles.revealSection}`}
-        >
+        <section className={`borrow-flow section-pad compact-section ${styles.borrowBlend} ${styles.revealSection}`}>
           <div className="landing-shell">
             <div className="section-head centered">
               <h2>{content.home.borrowingTitle}</h2>
@@ -391,10 +330,7 @@ export default async function Home() {
             </div>
             <div className="step-grid">
               {steps.map(({ no, title, description }, index) => (
-                <article
-                  className={index === 5 ? "active" : ""}
-                  key={`${no}-${title}`}
-                >
+                <article className={index === 5 ? "active" : ""} key={`${no}-${title}`}>
                   <span>{no}</span>
                   <strong>{title}</strong>
                   <small>{description}</small>
@@ -402,59 +338,31 @@ export default async function Home() {
               ))}
             </div>
             <div className="section-action-center">
-              <Link
-                data-button="secondary"
-                data-button-size="sm"
-                href="/panduan"
-              >
+              <Link data-button="secondary" data-button-size="sm" href="/panduan">
                 Lihat panduan lengkap <FiArrowRight />
               </Link>
             </div>
           </div>
         </section>
 
-        <section
-          className={`ebook-section section-pad compact-section ${styles.ebookBlend} ${styles.revealSection}`}
-          id="ebook"
-        >
+        <section className={`ebook-section section-pad compact-section ${styles.ebookBlend} ${styles.revealSection}`} id="ebook">
           <div className="landing-shell ebook-grid">
             <div className="ebook-art landing-motion-card">
-              <Image
-                src="/images/ASSET PERPUS/Hero pegang buku.png"
-                alt="Baca E-Book Perpustakaan"
-                fill
-                sizes="480px"
-              />
+              <Image src="/images/ASSET PERPUS/Hero pegang buku.png" alt="Baca E-Book Perpustakaan" fill sizes="480px" />
             </div>
             <div className="ebook-copy">
               <h2>{content.home.ebookTitle}</h2>
               <p>{content.home.ebookDescription}</p>
               <ul>
-                <li>
-                  <FiCheckCircle /> Baca langsung di browser
-                </li>
-                <li>
-                  <FiCheckCircle /> Akses dengan akun anggota
-                </li>
-                <li>
-                  <FiCheckCircle /> Tersedia untuk perangkat mobile
-                </li>
+                <li><FiCheckCircle /> Baca langsung di browser</li>
+                <li><FiCheckCircle /> Akses dengan akun anggota</li>
+                <li><FiCheckCircle /> Tersedia untuk perangkat mobile</li>
               </ul>
               <div className="hero-actions">
-                <Link
-                  data-button="primary"
-                  data-button-size="md"
-                  className="navy-btn"
-                  href="/e-book"
-                >
+                <Link data-button="primary" data-button-size="md" className="navy-btn" href="/koleksi?type=EBOOK">
                   <FiBookOpen /> Jelajahi E-Book
                 </Link>
-                <Link
-                  data-button="secondary"
-                  data-button-size="md"
-                  className="outline-btn"
-                  href="/e-book"
-                >
+                <Link data-button="secondary" data-button-size="md" className="outline-btn" href="/koleksi?type=EBOOK">
                   Lihat Semua
                 </Link>
               </div>
@@ -462,9 +370,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <section
-          className={`reminder-section section-pad compact-section ${styles.reminderBlend} ${styles.revealSection}`}
-        >
+        <section className={`reminder-section section-pad compact-section ${styles.reminderBlend} ${styles.revealSection}`}>
           <div className="landing-shell">
             <div className="section-head centered">
               <h2>{content.home.reminderTitle}</h2>
@@ -472,40 +378,21 @@ export default async function Home() {
             </div>
             <div className="reminder-grid">
               <article>
-                <div className="reminder-icon">
-                  <FiCalendar />
-                </div>
+                <div className="reminder-icon"><FiCalendar /></div>
                 <div>
-                  <h3>
-                    Perpanjang Pinjaman +{settings.extensionDurationDays} Hari
-                  </h3>
-                  <p>
-                    Ajukan perpanjangan langsung dari akun tanpa harus datang.
-                  </p>
-                  <Link
-                    data-button="primary"
-                    data-button-size="sm"
-                    href="/dashboard/pinjaman"
-                  >
+                  <h3>Perpanjang Pinjaman +{settings.extensionDurationDays} Hari</h3>
+                  <p>Ajukan perpanjangan langsung dari akun tanpa harus datang.</p>
+                  <Link data-button="primary" data-button-size="sm" href="/dashboard/pinjaman">
                     Kelola Pinjaman <FiArrowRight />
                   </Link>
                 </div>
               </article>
               <article>
-                <div className="reminder-icon">
-                  <FiBell />
-                </div>
+                <div className="reminder-icon"><FiBell /></div>
                 <div>
                   <h3>Reminder via Email</h3>
-                  <p>
-                    Notifikasi membantu Anda memantau masa pinjaman dan jatuh
-                    tempo.
-                  </p>
-                  <Link
-                    data-button="accent"
-                    data-button-size="sm"
-                    href="/panduan"
-                  >
+                  <p>Notifikasi membantu Anda memantau masa pinjaman dan jatuh tempo.</p>
+                  <Link data-button="accent" data-button-size="sm" href="/panduan">
                     Lihat Panduan <FiArrowRight />
                   </Link>
                 </div>
@@ -514,111 +401,42 @@ export default async function Home() {
           </div>
         </section>
 
-        <section
-          className={`member-cta section-pad compact-dark-section ${styles.memberBlend} ${styles.revealSection}`}
-        >
+        <section className={`member-cta section-pad compact-dark-section ${styles.memberBlend} ${styles.revealSection}`}>
           <div className="landing-shell member-grid">
             <div>
               <h2>{content.home.membershipTitle}</h2>
               <p>{content.home.membershipDescription}</p>
               <ul>
-                <li>
-                  <FiCheckCircle /> Koleksi fisik dengan reservasi
-                </li>
-                <li>
-                  <FiCheckCircle /> E-book yang bisa dibaca kapan saja
-                </li>
-                <li>
-                  <FiCheckCircle /> Reminder jatuh tempo otomatis
-                </li>
-                <li>
-                  <FiCheckCircle /> Riwayat pinjaman terintegrasi
-                </li>
+                <li><FiCheckCircle /> Koleksi fisik dengan reservasi</li>
+                <li><FiCheckCircle /> E-book yang bisa dibaca kapan saja</li>
+                <li><FiCheckCircle /> Reminder jatuh tempo otomatis</li>
+                <li><FiCheckCircle /> Riwayat pinjaman terintegrasi</li>
               </ul>
               <div className="hero-actions">
-                <Link
-                  data-button="primary"
-                  data-button-size="md"
-                  data-button-inverse
-                  className="yellow-btn"
-                  href="/register"
-                >
+                <Link data-button="primary" data-button-size="md" data-button-inverse className="yellow-btn" href="/register">
                   Daftar Anggota
                 </Link>
-                <Link
-                  data-button="ghost"
-                  data-button-size="md"
-                  data-button-inverse
-                  className="dark-outline-btn"
-                  href="/login"
-                >
+                <Link data-button="ghost" data-button-size="md" data-button-inverse className="dark-outline-btn" href="/login">
                   Masuk
                 </Link>
               </div>
             </div>
             <div className="member-art landing-motion-card">
-              <Image
-                src="/images/ASSET PERPUS/Hero pegang buku.png"
-                alt="Keanggotaan perpustakaan"
-                fill
-                sizes="380px"
-              />
+              <Image src="/images/ASSET PERPUS/Hero pegang buku.png" alt="Keanggotaan perpustakaan" fill sizes="380px" />
             </div>
           </div>
         </section>
 
-        <section
-          className={`info-section section-pad compact-section ${styles.infoBlend} ${styles.revealSection}`}
-        >
+        <section className={`info-section section-pad compact-section ${styles.infoBlend} ${styles.revealSection}`}>
           <div className="landing-shell">
-            <div className="section-head">
-              <h2>{content.home.informationTitle}</h2>
-            </div>
+            <div className="section-head"><h2>{content.home.informationTitle}</h2></div>
             <div className="info-grid">
-              <article>
-                <FiClock />
-                <div>
-                  <span>JAM LAYANAN</span>
-                  <strong>{settings.serviceHours}</strong>
-                </div>
-              </article>
-              <article>
-                <FiMapPin />
-                <div>
-                  <span>ALAMAT</span>
-                  <strong>
-                    <a
-                      href={serviceInfo.openStreetMapUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {settings.address}
-                    </a>
-                  </strong>
-                </div>
-              </article>
-              <article>
-                <FiPhone />
-                <div>
-                  <span>KONTAK</span>
-                  <strong>
-                    <a href={`tel:${settings.phoneE164}`}>
-                      {formatPublicPhone(settings.phoneE164)}
-                    </a>
-                  </strong>
-                  <a href={`mailto:${serviceInfo.email}`}>
-                    {serviceInfo.email}
-                  </a>
-                </div>
-              </article>
+              <article><FiClock /><div><span>JAM LAYANAN</span><strong>{settings.serviceHours}</strong></div></article>
+              <article><FiMapPin /><div><span>ALAMAT</span><strong><a href={serviceInfo.openStreetMapUrl} target="_blank" rel="noopener noreferrer">{settings.address}</a></strong></div></article>
+              <article><FiPhone /><div><span>KONTAK</span><strong><a href={`tel:${settings.phoneE164}`}>{formatPublicPhone(settings.phoneE164)}</a></strong><a href={`mailto:${serviceInfo.email}`}>{serviceInfo.email}</a></div></article>
             </div>
             <div className="contact-center">
-              <Link
-                data-button="primary"
-                data-button-size="md"
-                className="outline-btn"
-                href="/kontak"
-              >
+              <Link data-button="primary" data-button-size="md" className="outline-btn" href="/kontak">
                 <FiMail /> Hubungi Kami
               </Link>
             </div>

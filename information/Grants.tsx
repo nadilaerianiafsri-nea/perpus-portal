@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { FiGift, FiInfo } from "react-icons/fi";
 import SearchField from "@/components/SearchField";
 import AppSelect from "@/components/AppSelect";
@@ -19,9 +19,10 @@ const dateFormat = new Intl.DateTimeFormat("id-ID", {
 
 export default function Grants() {
   const params = useSearchParams();
-  const router = useRouter();
   const pathname = usePathname();
-  const query = params.toString();
+  const [queryText, setQueryText] = useState(() => params.toString());
+  const queryParams = new URLSearchParams(queryText);
+  const query = queryText;
   const [retry, setRetry] = useState(0);
   const [searchRevision, setSearchRevision] = useState(0);
   const [result, setResult] = useState<{
@@ -33,9 +34,17 @@ export default function Grants() {
   const loading = result?.key !== key;
   const response = !loading ? result?.data : undefined;
   const error = !loading && result?.error;
-  // Global summary and year options remain stable while another filtered page loads.
   const summary = result?.data?.summary;
   const years = result?.data?.years ?? [];
+
+  useEffect(() => {
+    const syncFromHistory = () => {
+      setQueryText(window.location.search.replace(/^\?/, ""));
+    };
+    window.addEventListener("popstate", syncFromHistory);
+    return () => window.removeEventListener("popstate", syncFromHistory);
+  }, []);
+
   useEffect(() => {
     const controller = new AbortController();
     fetch(`/api/grants?${query}`, {
@@ -54,21 +63,30 @@ export default function Grants() {
       });
     return () => controller.abort();
   }, [query, key]);
+  function commitQuery(next: URLSearchParams) {
+    const nextText = next.toString();
+    setQueryText(nextText);
+    const href = `${pathname}${nextText ? `?${nextText}` : ""}`;
+    window.history.replaceState(window.history.state, "", href);
+  }
+
   function update(updates: Record<string, string | null>) {
-    const next = new URLSearchParams(window.location.search);
+    const next = new URLSearchParams(queryText);
     for (const [name, value] of Object.entries(updates)) {
       if (value) next.set(name, value);
       else next.delete(name);
     }
     if (!("page" in updates)) next.delete("page");
-    router.push(`${pathname}${next.size ? `?${next}` : ""}`, { scroll: false });
+    commitQuery(next);
   }
+
   function clear() {
     setSearchRevision((value) => value + 1);
-    router.push(pathname, { scroll: false });
+    commitQuery(new URLSearchParams());
   }
+
   const active = ["search", "status", "year", "page"].some((name) =>
-    params.has(name),
+    queryParams.has(name),
   );
   const stats = [
     { label: "Total Judul Hibah", value: summary?.totalTitles, icon: FiGift, tone: "dark" },
@@ -97,25 +115,18 @@ export default function Grants() {
                 value !== undefined ? (
                   value.toLocaleString("id-ID")
                 ) : loading ? (
-                  <span
-                    className={styles.skeleton}
-                    aria-label="Memuat statistik"
-                  />
+                  <span className={styles.skeleton} aria-label="Memuat statistik" />
                 ) : (
                   "—"
                 )
           } />
         ))}
       </section>
-      <section
-        className={styles.tableCard}
-        aria-label="Daftar hibah diterima"
-        aria-busy={loading}
-      >
+      <section className={styles.tableCard} aria-label="Daftar hibah diterima" aria-busy={loading}>
         <div className={styles.filters}>
           <SearchField
             key={searchRevision}
-            initialValue={params.get("search") ?? ""}
+            initialValue={queryParams.get("search") ?? ""}
             onSearch={(value) => update({ search: value.trim() || null })}
             placeholder="Cari judul atau pemberi hibah"
             label="Cari hibah"
@@ -125,14 +136,12 @@ export default function Grants() {
             <AppSelect
               className={common.catalogSelect}
               aria-label="Status hibah"
-              value={params.get("status") ?? ""}
+              value={queryParams.get("status") ?? ""}
               onChange={(e) => update({ status: e.target.value || null })}
             >
               <option value="">Semua</option>
               {Object.entries(grantStatusLabels).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
+                <option key={value} value={value}>{label}</option>
               ))}
             </AppSelect>
           </label>
@@ -141,7 +150,7 @@ export default function Grants() {
             <AppSelect
               className={common.catalogSelect}
               aria-label="Tahun penerimaan"
-              value={params.get("year") ?? ""}
+              value={queryParams.get("year") ?? ""}
               onChange={(e) => update({ year: e.target.value || null })}
             >
               <option value="">Semua</option>
@@ -168,9 +177,7 @@ export default function Grants() {
         ) : response?.data.length ? (
           <>
             <table className={styles.table}>
-              <caption className={common.srOnly}>
-                Daftar hibah buku yang sudah diterima
-              </caption>
+              <caption className={common.srOnly}>Daftar hibah buku yang sudah diterima</caption>
               <thead>
                 <tr>
                   <th scope="col">Judul Buku</th>
@@ -191,9 +198,7 @@ export default function Grants() {
                         {dateFormat.format(new Date(grant.receivedAt))}
                       </time>
                     </td>
-                    <td>
-                      <GrantBadge status={grant.status} />
-                    </td>
+                    <td><GrantBadge status={grant.status} /></td>
                   </tr>
                 ))}
               </tbody>
@@ -203,21 +208,11 @@ export default function Grants() {
                 <article className={styles.grantCard} key={grant.id}>
                   <h2>{grant.title}</h2>
                   <dl>
-                    <div>
-                      <dt>Jumlah</dt>
-                      <dd>{grant.quantity.toLocaleString("id-ID")} eks.</dd>
-                    </div>
-                    <div>
-                      <dt>Asal / Pemberi</dt>
-                      <dd>{grant.donorName}</dd>
-                    </div>
+                    <div><dt>Jumlah</dt><dd>{grant.quantity.toLocaleString("id-ID")} eks.</dd></div>
+                    <div><dt>Asal / Pemberi</dt><dd>{grant.donorName}</dd></div>
                     <div>
                       <dt>Penerimaan</dt>
-                      <dd>
-                        <time dateTime={grant.receivedAt.slice(0, 10)}>
-                          {dateFormat.format(new Date(grant.receivedAt))}
-                        </time>
-                      </dd>
+                      <dd><time dateTime={grant.receivedAt.slice(0, 10)}>{dateFormat.format(new Date(grant.receivedAt))}</time></dd>
                     </div>
                   </dl>
                   <GrantBadge status={grant.status} />
@@ -247,25 +242,15 @@ export default function Grants() {
       </section>
       {totalPages > 1 && !loading && !error && (
         <nav className={common.pagination} aria-label="Halaman hibah">
-          <button data-button="secondary" data-button-size="md"
-            disabled={page <= 1}
-            onClick={() => update({ page: String(page - 1) })}
-          >
+          <button data-button="secondary" data-button-size="md" disabled={page <= 1} onClick={() => update({ page: String(page - 1) })}>
             Sebelumnya
           </button>
           {pages.map((value) => (
-            <button data-button={page === value ? "primary" : "ghost"} data-button-size="sm"
-              key={value}
-              aria-current={page === value ? "page" : undefined}
-              onClick={() => update({ page: String(value) })}
-            >
+            <button data-button={page === value ? "primary" : "ghost"} data-button-size="sm" key={value} aria-current={page === value ? "page" : undefined} onClick={() => update({ page: String(value) })}>
               {value}
             </button>
           ))}
-          <button data-button="secondary" data-button-size="md"
-            disabled={page >= totalPages}
-            onClick={() => update({ page: String(page + 1) })}
-          >
+          <button data-button="secondary" data-button-size="md" disabled={page >= totalPages} onClick={() => update({ page: String(page + 1) })}>
             Berikutnya
           </button>
         </nav>

@@ -7,7 +7,6 @@ type NavbarProps = {
   active?:
     | "beranda"
     | "koleksi"
-    | "ebook"
     | "hibah"
     | "tentang"
     | "panduan"
@@ -25,7 +24,6 @@ export default function LandingNavbar({
   const links = [
     ["Beranda", "/", "beranda"],
     ["Koleksi", "/koleksi", "koleksi"],
-    ["E-Book", "/e-book", "ebook"],
     ["Hibah Buku", "/hibah-buku", "hibah"],
     ["Tentang", "/tentang", "tentang"],
     ["Panduan", "/panduan", "panduan"],
@@ -37,9 +35,7 @@ export default function LandingNavbar({
     const handlePointerDown = (event: PointerEvent) => {
       const mobileMenu = mobileMenuRef.current;
 
-      if (!mobileMenu?.open) {
-        return;
-      }
+      if (!mobileMenu?.open) return;
 
       if (event.target instanceof Node && !mobileMenu.contains(event.target)) {
         mobileMenu.open = false;
@@ -47,14 +43,14 @@ export default function LandingNavbar({
     };
 
     document.addEventListener("pointerdown", handlePointerDown);
-
-    return () => {
-      document.removeEventListener("pointerdown", handlePointerDown);
-    };
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
   }, []);
 
   const actions = user ? (
-    <Link data-button="primary" data-button-size="md" data-button-shape="pill"
+    <Link
+      data-button="primary"
+      data-button-size="md"
+      data-button-shape="pill"
       className="member-btn"
       href={user.role === "ADMIN" ? "/admin" : "/dashboard"}
     >
@@ -62,10 +58,22 @@ export default function LandingNavbar({
     </Link>
   ) : (
     <>
-      <Link data-button="ghost" data-button-size="md" data-button-shape="pill" className="login-link" href="/login">
+      <Link
+        data-button="ghost"
+        data-button-size="md"
+        data-button-shape="pill"
+        className="login-link"
+        href="/login"
+      >
         Masuk
       </Link>
-      <Link data-button="primary" data-button-size="md" data-button-shape="pill" className="member-btn" href="/register">
+      <Link
+        data-button="primary"
+        data-button-size="md"
+        data-button-shape="pill"
+        className="member-btn"
+        href="/register"
+      >
         Daftar Anggota
       </Link>
     </>
