@@ -1,0 +1,58 @@
+.page {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+  color: var(--navy);
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.headingText { min-width: 0; }
+.heading h1 { margin: 8px 0 0; font-size: var(--text-page); line-height: var(--leading-title); }
+.breadcrumb { display: flex; flex-wrap: wrap; gap: 8px; color: var(--text-secondary-color); font-size: 14px; }
+.breadcrumb a { color: var(--navy); text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.informationGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.card, .statePanel { min-width: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--white); }
+.card { padding: 24px; }
+.card h2 { display: flex; align-items: center; gap: 10px; margin: 0 0 22px; font-size: 16px; font-weight: 700; line-height: 1.5; }
+.card h2 svg { flex-shrink: 0; color: var(--text-secondary-color); font-size: 18px; }
+.fields { display: grid; gap: 18px; min-width: 0; margin: 0; }
+.fields > div { min-width: 0; }
+.fields dt { margin-bottom: 6px; color: var(--text-secondary-color); font-size: 14px; line-height: 1.5; }
+.fields dd { margin: 0; font-size: 14px; font-weight: 500; line-height: 1.6; overflow-wrap: anywhere; }
+.fields dd.prominent { font-size: 15px; font-weight: 650; }
+.transactionFields { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.book { display: flex; align-items: flex-start; gap: 20px; min-width: 0; }
+.book img { width: 86px; height: 122px; flex: 0 0 86px; object-fit: cover; border: 1px solid var(--line); border-radius: 6px; background: var(--button-soft); }
+.book .fields { flex: 1; }
+.locationFields { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--line); }
+.status { display: inline-block; max-width: 100%; padding: 5px 10px; border: 1px solid var(--line); border-radius: 6px; font-size: 14px; font-weight: 650; line-height: 1.5; }
+.success { background: var(--green-soft); color: var(--green); }
+.warning { background: var(--yellow-soft); color: var(--navy); }
+.danger { background: var(--red-soft); color: var(--stat-danger); }
+.neutral { background: var(--button-soft); color: var(--text-secondary-color); }
+.statePanel { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 48px 24px; text-align: center; }
+.statePanel > svg { color: var(--text-secondary-color); font-size: 28px; }
+.statePanel h2 { margin: 0; font-size: 16px; }
+.statePanel p { max-width: 540px; margin: 0; color: var(--text-secondary-color); font-size: 14px; line-height: 1.65; overflow-wrap: anywhere; }
+
+@media (max-width: 900px) {
+  .informationGrid { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .transactionFields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 540px) {
+  .page { gap: 18px; }
+  .heading { align-items: flex-start; flex-wrap: wrap; gap: 14px; }
+  .heading h1 { overflow-wrap: anywhere; }
+  .card { padding: 20px 16px; }
+  .book { gap: 14px; }
+  .book img { width: 64px; height: 92px; flex-basis: 64px; }
+  .transactionFields, .locationFields { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+}

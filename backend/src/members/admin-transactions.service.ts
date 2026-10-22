@@ -1,12 +1,20 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { MemberType, Prisma, Role } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { MembersService } from './members.service';
-import { memberQuery } from './member.validation';
+import { memberQuery, positiveId } from './member.validation';
 
 const DAY = 86_400_000;
 const JAKARTA_OFFSET = 7 * 60 * 60 * 1000;
+
+const transactionMemberSelect = {
+  id: true,
+  name: true,
+  email: true,
+  memberType: true,
+  memberProfile: { select: { whatsapp: true } },
+} satisfies Prisma.UserSelect;
 
 type CommonInput = {
   search?: string;
@@ -317,6 +325,105 @@ export class AdminTransactionsService {
       email: row.user.email,
       memberType: row.user.memberType,
       whatsapp: row.user.memberProfile?.whatsapp ?? '',
+    };
+  }
+
+  async loanDetail(id: unknown) {
+    const row = await this.prisma.loan.findFirst({
+      where: {
+        id: positiveId(id),
+        book: { is: { type: 'FISIK' } },
+      },
+      select: {
+        id: true,
+        status: true,
+        borrowedAt: true,
+        dueAt: true,
+        returnedAt: true,
+        extensionCount: true,
+        user: { select: transactionMemberSelect },
+        book: {
+          select: {
+            id: true,
+            code: true,
+            title: true,
+            coverUrl: true,
+            shelf: true,
+          },
+        },
+        copy: { select: { id: true, code: true, location: true } },
+      },
+    });
+
+    if (!row) {
+      throw new NotFoundException('Peminjaman tidak ditemukan.');
+    }
+
+    return {
+      loan: {
+        id: row.id,
+        status: row.status,
+        borrowedAt: row.borrowedAt,
+        dueAt: row.dueAt,
+        returnedAt: row.returnedAt,
+        extensionCount: row.extensionCount,
+        member: this.reservationMember(row),
+        book: row.book,
+        copy: row.copy,
+      },
+    };
+  }
+
+  async ebookAccessDetail(id: unknown) {
+    const row = await this.prisma.userEBook.findFirst({
+      where: {
+        id: positiveId(id),
+        book: { is: { type: 'EBOOK' } },
+      },
+      select: {
+        id: true,
+        addedAt: true,
+        lastOpenedAt: true,
+        progress: true,
+        user: { select: transactionMemberSelect },
+        book: {
+          select: {
+            id: true,
+            code: true,
+            title: true,
+            coverUrl: true,
+            author: true,
+            accessDurationDays: true,
+          },
+        },
+      },
+    });
+
+    if (!row) {
+      throw new NotFoundException('Akses e-book tidak ditemukan.');
+    }
+
+    const endsAt =
+      row.book.accessDurationDays === null
+        ? null
+        : new Date(row.addedAt.getTime() + row.book.accessDurationDays * DAY);
+
+    return {
+      access: {
+        id: row.id,
+        addedAt: row.addedAt,
+        lastOpenedAt: row.lastOpenedAt,
+        endsAt,
+        progress: row.progress,
+        member: this.reservationMember(row),
+        book: {
+          id: row.book.id,
+          code: row.book.code,
+          title: row.book.title,
+          coverUrl: row.book.coverUrl,
+          author: row.book.author,
+        },
+      },
     };
   }
 

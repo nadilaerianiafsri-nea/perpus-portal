@@ -4,6 +4,10 @@
 import AppSelect from "@/components/AppSelect";
 import PeriodSelector from "@/components/PeriodSelector";
 import { createTransactionPeriod, inTransactionPeriod } from "@/shared/transactionPeriod";
+import { jakartaDateInput } from "@/shared/period";
+import { Button, ButtonLink } from "@/components/Button";
+import { downloadTransactionCsv } from "./transactionCsv";
+import { ebookAccessCsv, physicalLoansCsv } from "./adminLoanExports";
 
 import AdminStatCard from "./AdminStatCard";
 import { FiBookOpen as CardBookOpen, FiMonitor as CardMonitor, FiClock as CardClock, FiAlertTriangle as CardAlertTriangle } from "react-icons/fi";
@@ -13,7 +17,7 @@ import { plainTextMessage } from "../members/inputSecurity";
 
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { FiSearch, FiMessageCircle } from "react-icons/fi";
+import { FiSearch, FiMessageCircle, FiDownload } from "react-icons/fi";
 
 import {
   formatTransactionDate,
@@ -24,7 +28,7 @@ import {
   type LoansResponse,
 } from "./adminTransactions";
 import styles from "./AdminTransactions.module.css";
-import periodStyles from "./AdminTransactionPeriod.module.css";
+import ui from "./AdminLoanTools.module.css";
 
 type StatusFilter = "ALL" | "ACTIVE" | "DUE_SOON" | "OVERDUE";
 type MemberFilter = "ALL" | "UMUM" | "MAHASISWA" | "PEGAWAI";
@@ -72,6 +76,7 @@ export default function AdminLoansPage() {
   const [due, setDue] = useState<DueFilter>(readDue(params.get("due")));
   const [page, setPage] = useState(1);
   const [period, setPeriod] = useState(() => createTransactionPeriod("all"));
+  const [ebookPeriod, setEbookPeriod] = useState(() => createTransactionPeriod("all"));
 
   const [result, setResult] = useState<LoansResponse>(emptyResult);
   const [loading, setLoading] = useState(true);
@@ -155,6 +160,18 @@ export default function AdminLoansPage() {
   }, [load]);
 
   const visibleLoans = result.data.filter((loan) => inTransactionPeriod(loan.borrowedAt, period));
+  const visibleEbooks = result.ebooks.filter((ebook) => inTransactionPeriod(ebook.addedAt, ebookPeriod));
+  const exportPending = loading || Boolean(error) || Boolean(searchError) || searchInput.trim() !== search;
+
+  function exportLoans() {
+    if (exportPending || !visibleLoans.length) return;
+    downloadTransactionCsv(physicalLoansCsv(visibleLoans), `peminjaman-fisik-halaman-${result.meta.page}-${jakartaDateInput()}.csv`);
+  }
+
+  function exportEbooks() {
+    if (exportPending || !visibleEbooks.length) return;
+    downloadTransactionCsv(ebookAccessCsv(visibleEbooks), `akses-e-book-${jakartaDateInput()}.csv`);
+  }
 
   return (
     <div className={styles.page}>
@@ -181,7 +198,7 @@ export default function AdminLoansPage() {
           <h2>Buku Fisik yang Sedang Dipinjam</h2>
         </header>
 
-        <div className={`${styles.filterBar} ${periodStyles.filters}`}>
+        <div className={ui.tools}>
           <label className={styles.searchBox}>
             <FiSearch aria-hidden />
             <input
@@ -195,8 +212,13 @@ export default function AdminLoansPage() {
               aria-label="Cari peminjaman"
             />
           </label>
+          <Button variant="primary" accentHover icon={<FiDownload />} className={ui.exportButton}
+            aria-label="Ekspor data peminjaman CSV" disabled={exportPending || !visibleLoans.length} onClick={exportLoans}>
+            Ekspor CSV
+          </Button>
           {searchError && <small className={styles.searchError} id="search-input-error" role="alert">{searchError}</small>}
 
+          <div className={ui.filters}>
           <label className={styles.selectField}>
             <AppSelect
               aria-label="Filter status peminjaman"
@@ -245,13 +267,14 @@ export default function AdminLoansPage() {
               <option value="THIS_MONTH">Bulan Ini</option>
             </AppSelect>
           </label>
-          <div className={periodStyles.period}>
+          <div className={ui.period}>
             <PeriodSelector mode="transaction" label="Filter waktu tanggal pinjam buku fisik" value={period} onChange={setPeriod} />
           </div>
+          </div>
         </div>
-        <p className={periodStyles.scope}>
+        <p className={ui.scope}>
           Waktu berdasarkan tanggal pinjam buku fisik (WIB), hanya pada halaman ini.
-          Ringkasan dan jumlah halaman tidak mengikuti filter waktu.
+          Ekspor mengikuti data yang ditampilkan. Ringkasan dan jumlah halaman tidak mengikuti filter waktu.
         </p>
 
         {error ? (
@@ -271,7 +294,7 @@ export default function AdminLoansPage() {
         <p className={`${styles.sectionCount} ${styles.transactionCount}`}>{result.meta.total} transaksi</p>
 
         <div className={styles.tableScroller} data-record-scroll>
-          <table data-record-list data-record-scroll className={`${styles.table} ${styles.tableWide} ${styles.transactionTable} ${styles.loansTable}`}>
+          <table data-record-list data-record-scroll className={`${styles.table} ${styles.tableWide} ${styles.transactionTable} ${styles.loansTable} ${ui.physicalTable}`}>
             <thead>
               <tr>
                 <th scope="col">ANGGOTA</th>
@@ -279,7 +302,7 @@ export default function AdminLoansPage() {
                 <th scope="col">DIPINJAM</th>
                 <th scope="col">JATUH TEMPO</th>
                 <th scope="col">STATUS</th>
-                <th scope="col" data-record-actions="1">AKSI</th>
+                <th scope="col" className={ui.actionsColumn}>AKSI</th>
               </tr>
             </thead>
 
@@ -352,8 +375,11 @@ export default function AdminLoansPage() {
                       </td>
 
                       <td>
+                        <div className={ui.rowActions}>
+                        <ButtonLink variant="primary" accentHover href={`/admin/transaksi/peminjaman/${loan.id}`}
+                          aria-label={`Lihat detail peminjaman ${loan.book.title} oleh ${loan.member.name}`}>Detail</ButtonLink>
                         {loanStatus !== "AKTIF" && whatsappHref ? (
-                          <a data-button-shape="square" title="Kirim pengingat WhatsApp" aria-label={`Kirim pengingat WhatsApp kepada ${loan.member.name} untuk ${loan.book.title}`} data-row-action="primary"
+                          <a data-button-shape="square" title="Kirim pengingat WhatsApp" aria-label={`Kirim pengingat WhatsApp kepada ${loan.member.name} untuk ${loan.book.title}`} data-row-action="neutral"
                             data-button="secondary"
                             data-button-size="sm"
                             href={whatsappHref}
@@ -363,9 +389,8 @@ export default function AdminLoansPage() {
                           >
                             <FiMessageCircle aria-hidden="true" />
                           </a>
-                        ) : (
-                          "-"
-                        )}
+                        ) : null}
+                        </div>
                       </td>
                     </tr>
                   );
@@ -417,15 +442,29 @@ export default function AdminLoansPage() {
           <h2>Akses E-Book yang Sedang Berjalan</h2>
         </header>
 
+        <div className={ui.accessTools}>
+          <div className={ui.period}>
+            <PeriodSelector mode="transaction" label="Filter waktu mulai akses E-Book" value={ebookPeriod} onChange={setEbookPeriod} />
+          </div>
+          <Button variant="primary" accentHover icon={<FiDownload />} className={ui.exportButton}
+            aria-label="Ekspor data akses E-Book CSV" disabled={exportPending || !visibleEbooks.length} onClick={exportEbooks}>
+            Ekspor CSV
+          </Button>
+        </div>
+        <p className={ui.scope}>
+          Pencarian dan jenis anggota mengikuti filter di atas. Waktu berdasarkan mulai akses (WIB); filter waktu dan ekspor mengikuti akses yang ditampilkan.
+          Status dan jatuh tempo hanya untuk buku fisik.
+        </p>
+
         <div className={styles.tableScroller} data-record-scroll>
-          <table data-record-list data-record-scroll className={`${styles.table} ${styles.transactionTable} ${styles.ebookAccessTable}`}>
+          <table data-record-list data-record-scroll className={`${styles.table} ${styles.transactionTable} ${styles.ebookAccessTable} ${ui.accessTable}`}>
             <thead>
               <tr>
                 <th scope="col">ANGGOTA</th>
                 <th scope="col">JUDUL E-BOOK</th>
                 <th scope="col">MULAI AKSES</th>
                 <th scope="col">BERAKHIR</th>
-                <th scope="col">TIPE</th>
+                <th scope="col" className={ui.accessActionsColumn}>AKSI</th>
               </tr>
             </thead>
 
@@ -436,8 +475,8 @@ export default function AdminLoansPage() {
                     Memuat akses E-Book...
                   </td>
                 </tr>
-              ) : result.ebooks.length ? (
-                result.ebooks.map((ebook) => (
+              ) : visibleEbooks.length ? (
+                visibleEbooks.map((ebook) => (
                   <tr key={ebook.id}>
                     <td>
                       <div className={styles.memberCell}>
@@ -459,16 +498,15 @@ export default function AdminLoansPage() {
                     </td>
 
                     <td>
-                      <span data-record-badge className={`${styles.pill} ${styles.bluePill}`}>
-                        E-Book
-                      </span>
+                      <ButtonLink variant="primary" accentHover href={`/admin/transaksi/peminjaman/e-book/${ebook.id}`}
+                        aria-label={`Lihat detail akses E-Book ${ebook.book.title} oleh ${ebook.member.name}`}>Detail</ButtonLink>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
                   <td colSpan={5} className={styles.stateCell}>
-                    Tidak ada akses E-Book aktif.
+                    Tidak ada akses E-Book yang sesuai dengan pencarian atau filter.
                   </td>
                 </tr>
               )}

@@ -1,4 +1,4 @@
-import { csvCell } from "./adminOperations";
+import { transactionCsv } from "./transactionCsv";
 import {
   formatTransactionDateTime,
   memberTypeLabel,
@@ -53,13 +53,7 @@ export function reservationsCsv(rows: ReservationRow[]) {
       reservationStatusLabel(row.status),
     ]),
   ];
-  // Reuse the report encoder, including its quote escaping. Also guard formulas
-  // preceded by whitespace when these user-provided fields enter a spreadsheet.
-  const encode = (value: string | number) => {
-    const text = String(value ?? "");
-    return csvCell(/^[\s]*[=+\-@]|^[\t\r\n]/.test(text) ? `'${text}` : text);
-  };
-  return `\uFEFF${cells.map(row => row.map(encode).join(",")).join("\r\n")}`;
+  return transactionCsv(cells);
 }
 
 /** Resolve a live record using only existing, authorized GET endpoints. */

@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Param,
   Query,
   SetMetadata,
   UseGuards,
@@ -28,6 +29,18 @@ export class AdminTransactionsController {
   @Get('loans')
   loans(@Query() query: unknown) {
     return this.transactions.loans(memberQuery(query, ['search', 'status', 'memberType', 'due', 'page', 'limit']));
+  }
+
+  @Get('loans/:id')
+  loanDetail(@Param('id') id: string, @Query() query: unknown) {
+    memberQuery(query, []);
+    return this.transactions.loanDetail(id);
+  }
+
+  @Get('ebook-access/:id')
+  ebookAccessDetail(@Param('id') id: string, @Query() query: unknown) {
+    memberQuery(query, []);
+    return this.transactions.ebookAccessDetail(id);
   }
 
   @Get('returns')

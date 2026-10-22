@@ -3,7 +3,8 @@
 
 import AppSelect from "@/components/AppSelect";
 import PeriodSelector from "@/components/PeriodSelector";
-import { ButtonLink } from "@/components/Button";
+import { Button, ButtonLink } from "@/components/Button";
+import { downloadTransactionCsv } from "./transactionCsv";
 import { createTransactionPeriod, inTransactionPeriod } from "@/shared/transactionPeriod";
 
 import AdminStatCard from "./AdminStatCard";
@@ -156,14 +157,7 @@ export default function AdminReservationsPage() {
 
   function exportReservations() {
     if (exportDisabled) return;
-    const url = URL.createObjectURL(new Blob([reservationsCsv(orderedRows)], { type: "text/csv;charset=utf-8" }));
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `reservasi-halaman-${result.meta.page}-${jakartaDateInput()}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
+    downloadTransactionCsv(reservationsCsv(orderedRows), `reservasi-halaman-${result.meta.page}-${jakartaDateInput()}.csv`);
   }
 
   return (
@@ -206,17 +200,16 @@ export default function AdminReservationsPage() {
               aria-label="Cari reservasi"
             />
           </label>
-          <button
-            data-button="secondary"
-            data-button-size="md"
-            type="button"
+          <Button
+            variant="primary"
+            accentHover
             className={ui.exportButton}
             disabled={exportDisabled}
             onClick={exportReservations}
             aria-label="Ekspor CSV halaman ini"
           >
             <FiDownload aria-hidden /> Ekspor CSV
-          </button>
+          </Button>
           {searchError && <small className={styles.searchError} id="search-input-error" role="alert">{searchError}</small>}
 
           <div className={ui.filters}>

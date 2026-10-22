@@ -1,0 +1,55 @@
+.tools {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 12px;
+  margin: 14px 14px 10px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  --select-control-height: 48px;
+}
+
+.tools > label { grid-column: auto; }
+.filters {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  min-width: 0;
+}
+.period { min-width: 0; }
+.period > [data-period-selector] { width: 100%; }
+.period > [data-period-selector] > div:first-child { min-width: 0; }
+:root .tools .exportButton[data-button][data-button],
+:root .accessTools .exportButton[data-button][data-button] { --button-height: 48px; }
+.scope {
+  margin: 0;
+  padding: 0 26px 14px;
+  color: var(--text-secondary-color);
+  font-size: var(--text-helper);
+  line-height: var(--leading-helper);
+}
+.rowActions { display: flex; align-items: center; gap: 8px; }
+.rowActions > * { flex-shrink: 0; white-space: nowrap; }
+.physicalTable { --record-scroll-width: 1040px; }
+.physicalTable th:nth-child(1) { width: 19%; }
+.physicalTable th:nth-child(2) { width: 23%; }
+.physicalTable th:nth-child(3), .physicalTable th:nth-child(4) { width: 13%; }
+.physicalTable .actionsColumn { width: 174px; }
+.accessTable { --record-scroll-width: 800px; }
+.accessTable .accessActionsColumn { width: 120px; }
+.accessTools {
+  display: grid;
+  grid-template-columns: minmax(190px, 280px) auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 14px 26px;
+  --select-control-height: 48px;
+}
+@media (max-width: 1100px) { .filters { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 700px) {
+  .tools, .filters, .accessTools { grid-template-columns: minmax(0, 1fr); }
+  .exportButton { width: 100%; }
+}

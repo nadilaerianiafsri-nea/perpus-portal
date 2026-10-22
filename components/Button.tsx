@@ -20,6 +20,7 @@ type ButtonAppearance = {
   fullWidth?: boolean;
   icon?: ReactNode;
   rowAction?: RowActionVariant;
+  accentHover?: boolean;
 };
 
 type ButtonProps = ComponentProps<"button"> &
@@ -35,6 +36,7 @@ export function Button({
   fullWidth = false,
   icon,
   rowAction,
+  accentHover = false,
   loading = false,
   loadingLabel = "Memproses...",
   children,
@@ -48,6 +50,7 @@ export function Button({
       type={type}
       data-button={variant}
       data-row-action={rowAction}
+      data-button-hover={accentHover ? "accent" : undefined}
       data-button-size={size}
       data-button-full-width={fullWidth || undefined}
       data-button-loading={loading || undefined}
@@ -94,6 +97,7 @@ export function ButtonLink({
   fullWidth = false,
   icon,
   rowAction,
+  accentHover = false,
   children,
   ...props
 }: ComponentProps<typeof Link> & ButtonAppearance) {
@@ -102,6 +106,7 @@ export function ButtonLink({
       {...props}
       data-button={variant}
       data-row-action={rowAction}
+      data-button-hover={accentHover ? "accent" : undefined}
       data-button-size={size}
       data-button-full-width={fullWidth || undefined}
     >

@@ -281,6 +281,14 @@
   }
 }
 
+/* Primary transaction/navigation actions may opt into the website accent hover. */
+:root body [data-button="primary"][data-button-hover="accent"] {
+  --button-hover-bg: var(--button-accent);
+  --button-hover-fg: var(--button-navy);
+  --button-hover-stroke: var(--button-accent);
+  --button-pressed-bg: var(--button-accent);
+}
+
 /* Back navigation opts in independently of cancel and other secondary actions. */
 :root body [data-button="back"][data-button] {
   --button-bg: var(--button-navy);

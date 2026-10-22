@@ -69,6 +69,18 @@ test("buttons default to non-submit while navigation remains a real link", () =>
   assert.doesNotMatch(link, /role="button"/);
 });
 
+test("accent hover opts into shared button appearance without leaking a React prop", () => {
+  const { Button, ButtonLink } = loadButton();
+  for (const html of [
+    renderToStaticMarkup(React.createElement(Button, { accentHover: true }, "Ekspor CSV")),
+    renderToStaticMarkup(React.createElement(ButtonLink, { href: "/admin/transaksi/peminjaman/1", variant: "primary", accentHover: true }, "Detail")),
+  ]) {
+    assert.match(html, /data-button-hover="accent"/);
+    assert.doesNotMatch(html, /accentHover=/);
+  }
+  assert.doesNotMatch(renderToStaticMarkup(React.createElement(Button, {}, "Simpan")), /data-button-hover=/);
+});
+
 test("row action appearance opts in without changing navigation or mutation semantics", () => {
   const { Button, ButtonLink } = loadButton();
   const row = renderToStaticMarkup(React.createElement(ButtonLink, {
