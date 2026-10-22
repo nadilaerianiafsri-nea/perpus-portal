@@ -5,13 +5,14 @@ export interface MemberProfile {
   whatsapp: string; address: string; identityNumber: string;
   universityName: string | null; workUnit: string | null;
 }
-export interface MemberBook { id: number; title: string; code: string; coverUrl: string; author: string; }
+export interface MemberBook { id: number; title: string; code: string; coverUrl: string; author: string; type?: "FISIK" | "EBOOK"; }
 export interface Reservation {
   id: number; status: "MENUNGGU_PENGAMBILAN" | "KEDALUWARSA" | "DIBATALKAN" | "DIAMBIL";
   createdAt: string; expiresAt: string; pickupLocation: string; book: MemberBook;
   copy: { id: number; code: string; status: "TERSEDIA" | "DIRESERVASI" | "DIPINJAM" | "HILANG" };
 }
 export interface Loan {
+  lostReport?: import("./lostReport").LostReport | null;
   id: number; status: "AKTIF" | "DIKEMBALIKAN" | "HILANG";
   borrowedAt: string; dueAt: string; returnedAt: string | null;
   extensionCount: number; book: MemberBook; copy: { id: number; code: string };

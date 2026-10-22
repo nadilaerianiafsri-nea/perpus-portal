@@ -25,6 +25,9 @@
 .metadata .overdueDate { background: #ffedec; border-color: #ffb3ae; }
 .overdueDate dt,.metadata .overdueDate dd { color: #b21e18; }
 .actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; align-self: center; }
+.reportActions { flex-direction: column; align-items: stretch; min-width: 0; }
+.compactActions { display: flex; gap: 8px; }
+:root .reportButton[data-button][data-button] { --button-height: 42px; font-size: 14px; white-space: normal; }
 .extendButton,.replacementButton,.detailLink { min-height: 44px; display: flex; justify-content: center; align-items: center; gap: 10px; padding: 10px 13px; border-radius: 8px; font-size: 15px; text-align: center; }
 .extendButton { background: #2B3056; color: #fff; border: 1px solid #2B3056; }
 .extendButton:hover { background: #000633; }
@@ -129,6 +132,7 @@
 @media (max-width: 600px) {
  .statsGrid { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 600px) { .list { gap: 16px; }.body { grid-template-columns: minmax(0, 1fr); padding: 18px; gap: 16px; }.cover { width: 96px; height: 128px; }.information h2 { font-size: 20px; margin-top: 12px; }.actions { width: 100%; }.warning { padding: 12px 16px; align-items: start; line-height: 1.5; }.warning svg { margin-top: 2px; }.dialog { padding: 22px 18px; }.dialogActions > button { flex: 1; }.dialogDates dd { font-size: var(--text-detail-value); }
+  .compactActions > [data-button] { flex: 1; }
   .statsGrid { gap: 8px; }
   .viewTabs { gap: 6px; padding: 4px; }
   .viewTab { min-height: 44px; padding-inline: 9px; font-size: var(--text-button); }

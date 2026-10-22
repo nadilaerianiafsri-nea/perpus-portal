@@ -37,3 +37,23 @@ test("new detail allowlist does not expose mutations or arbitrary subpaths", asy
     assert.equal(result.status, 404);
   }
 });
+
+test("lost-report and case details forward only the exact session and existing namespace, with CSRF protection", async () => {
+  const previous = globalThis.fetch, calls = [];
+  globalThis.fetch = async (url, options) => { calls.push({ url: String(url), options }); return Response.json({ success: true }); };
+  try {
+    for (const [method, route] of [["GET", "me/loans/7"], ["POST", "me/loans/7/lost-report"], ["GET", "admin/transactions/lost-books/7"], ["POST", "admin/loans/7/lost/complete"]]) {
+      const response = await memberProxy(new Request("http://portal.test/api/members/" + route, { method, headers: { Cookie: "unrelated=private; perpus_session=member-only", Origin: "http://portal.test" }, ...(method === "POST" ? { body: "{}" } : {}) }), route);
+      assert.equal(response.status, 200);
+      assert.equal(calls.at(-1).url, "http://backend.test/members/" + route);
+      assert.equal(calls.at(-1).options.method, method);
+      assert.equal(calls.at(-1).options.headers.Cookie, "perpus_session=member-only");
+    }
+    const rejected = await memberProxy(new Request("http://portal.test/api/members/me/loans/7/lost-report", { method: "POST", headers: { Origin: "http://attacker.test" }, body: "{}" }), "me/loans/7/lost-report");
+    assert.equal(rejected.status, 403); assert.equal(calls.length, 4);
+    for (const [method, route] of [["POST", "me/loans/7/lost/complete"], ["PATCH", "me/loans/7"], ["GET", "me/loans/7/lost-report"]]) {
+      assert.equal((await memberProxy(new Request("http://portal.test/api/members/" + route, { method }), route)).status, 404);
+    }
+    assert.equal(calls.length, 4);
+  } finally { globalThis.fetch = previous; }
+});

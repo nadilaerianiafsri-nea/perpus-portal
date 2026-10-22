@@ -286,6 +286,7 @@ export class AdminOperationsService {
       this.prisma.loan.count({
         where: {
           status: 'HILANG',
+          lostResolvedAt: null,
         },
       }),
       this.prisma.user.count({
@@ -416,6 +417,7 @@ export class AdminOperationsService {
       this.prisma.loan.count({
         where: {
           status: 'HILANG', returnedAt: null,
+          lostResolvedAt: null,
           book: { is: { type: 'FISIK' } }, user: { is: { role: 'PENGUNJUNG' } },
         },
       }),
@@ -425,7 +427,7 @@ export class AdminOperationsService {
     return {
       expiringReservations,
       overdueLoans,
-      // HILANG is the existing unresolved lost workflow; no separate verification status exists.
+      // Verified lost loans awaiting completion; pending reports remain active loans.
       pendingLostBookReplacements,
       failedNotifications,
     };
@@ -447,6 +449,7 @@ export class AdminOperationsService {
           { emailDelivery: { not: 'NOT_REQUIRED' } },
           { whatsappDelivery: { not: 'NOT_REQUIRED' } },
           { eventKey: { startsWith: 'reservation:', endsWith: ':created' } },
+          { eventKey: { startsWith: 'loan:', endsWith: ':lost-report' } },
         ],
       },
       select: {
@@ -506,6 +509,7 @@ export class AdminOperationsService {
     const projected: AdminNotificationRow[] = [];
     for (const notice of notices) {
       const createdReservationId = reservationCreatedId(notice.eventKey);
+      const lostReportId = /^loan:(\d+):lost-report$/.exec(notice.eventKey)?.[1];
       const base = {
         sourceNotificationId: notice.id,
         memberName: notice.user.name,
@@ -530,6 +534,12 @@ export class AdminOperationsService {
           href: '/admin/transaksi/reservasi',
         });
       }
+
+      if (lostReportId) projected.push({
+        ...base, id: `${notice.id}:SYSTEM`, channel: 'SYSTEM', reminderType: 'Laporan Buku Hilang Baru',
+        time: notice.createdAt, status: 'MENUNGGU', readAt: readByNotification.get(notice.id) ?? null,
+        href: `/admin/transaksi/buku-hilang-penggantian/${lostReportId}`,
+      });
 
       if (notice.emailDelivery !== 'NOT_REQUIRED') {
         projected.push({
@@ -610,7 +620,7 @@ export class AdminOperationsService {
   async unreadNotificationCount(adminId: number) {
     const unread = await this.prisma.notification.count({
       where: {
-        eventKey: { startsWith: 'reservation:', endsWith: ':created' },
+        OR: [{ eventKey: { startsWith: 'reservation:', endsWith: ':created' } }, { eventKey: { startsWith: 'loan:', endsWith: ':lost-report' } }],
         adminReads: { none: { adminId } },
       },
     });
@@ -621,7 +631,7 @@ export class AdminOperationsService {
     const notification = await this.prisma.notification.findFirst({
       where: {
         id: notificationId,
-        eventKey: { startsWith: 'reservation:', endsWith: ':created' },
+        OR: [{ eventKey: { startsWith: 'reservation:', endsWith: ':created' } }, { eventKey: { startsWith: 'loan:', endsWith: ':lost-report' } }],
       },
       select: { id: true },
     });

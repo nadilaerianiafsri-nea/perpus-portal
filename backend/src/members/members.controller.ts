@@ -110,6 +110,17 @@ export class MembersController {
     };
   }
 
+  @Get('loans/:id')
+  loanDetail(@Req() req: AuthenticatedRequest, @Param('id') id: string) {
+    return this.members.memberLoanDetail(req.user!.sub, positiveId(id));
+  }
+
+  @Post('loans/:id/lost-report')
+  reportLostLoan(@Req() req: AuthenticatedRequest, @Param('id') id: string, @Body() body: unknown) {
+    emptyInput(body);
+    return this.members.reportLostLoan(req.user!.sub, positiveId(id));
+  }
+
   @Post('loans/:id/extend') extend(
     @Req() req: AuthenticatedRequest,
     @Param('id') id: string,
@@ -316,5 +327,11 @@ export class MemberCirculationController {
   lost(@Param('id') id: string, @Body() body: unknown) {
     emptyInput(body);
     return this.members.finishLoan(positiveId(id), true);
+  }
+
+  @Post('loans/:id/lost/complete')
+  completeLostLoan(@Param('id') id: string, @Body() body: unknown) {
+    emptyInput(body);
+    return this.members.completeLostLoan(positiveId(id));
   }
 }

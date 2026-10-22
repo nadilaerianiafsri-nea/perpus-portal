@@ -42,6 +42,7 @@ export type ReservationsResponse = {
 };
 
 export type LoanRow = {
+  lostReport?: import("../members/lostReport").LostReport | null;
   id: number;
   status: "AKTIF";
   borrowedAt: string;
@@ -93,6 +94,7 @@ export type ReturnsResponse = {
 };
 
 export type LostLoanRow = {
+  lostReport: import("../members/lostReport").LostReport;
   id: number;
   borrowedAt: string;
   dueAt: string;

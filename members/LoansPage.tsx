@@ -27,11 +27,18 @@ export default function LoansPage() {
   const { refresh } = useMember();
   const [busy, setBusy] = useState<number | null>(null);
   const pending = useRef(false);
+  const focusAfterReport = useRef<number | null>(null);
   const [selection, setSelection] = useState<LoanDialogSelection | null>(null);
   const [notice, setNotice] = useState("");
   const [actionError, setActionError] = useState("");
   const [now, setNow] = useState<number | null>(null);
   const [view, setView] = useState<LoanView>("current");
+
+  useEffect(() => {
+    if (resource.loading || focusAfterReport.current === null) return;
+    document.querySelector<HTMLAnchorElement>(`a[data-loan-detail="${focusAfterReport.current}"]`)?.focus({ preventScroll: true });
+    focusAfterReport.current = null;
+  }, [resource.loading, resource.data]);
 
   useEffect(() => {
     const tick = () => setNow(Date.now());
@@ -65,25 +72,27 @@ export default function LoansPage() {
   }
 
   async function extend() {
-    if (pending.current || selection?.kind !== "extend") return;
+    if (pending.current || !selection || selection.kind === "replacement") return;
     const loan = selection.loan;
+    const reporting = selection.kind === "report";
     pending.current = true;
     setBusy(loan.id);
     setActionError("");
     setNotice("");
     try {
-      await memberRequest(`loans/${loan.id}/extend`, {
+      await memberRequest(`loans/${loan.id}/${reporting ? "lost-report" : "extend"}`, {
         method: "POST",
-        body: JSON.stringify({ expectedDueAt: loan.dueAt }),
+        body: JSON.stringify(reporting ? {} : { expectedDueAt: loan.dueAt }),
       });
+      if (reporting) focusAfterReport.current = loan.id;
       setSelection(null);
-      setNotice("Masa pinjam berhasil diperpanjang 7 hari.");
+      setNotice(reporting ? "Laporan kehilangan diterima dan menunggu verifikasi petugas." : "Masa pinjam berhasil diperpanjang 7 hari.");
       await Promise.all([resource.reload(), refresh()]);
     } catch (error) {
       setActionError(
         error instanceof Error
           ? error.message
-          : "Perpanjangan belum berhasil. Silakan coba lagi.",
+          : "Permintaan belum berhasil. Silakan coba lagi.",
       );
     } finally {
       pending.current = false;
@@ -126,7 +135,7 @@ export default function LoansPage() {
       <PageHeading title="Pinjaman Saya" />
 
       <section className={styles.statsGrid} aria-label="Statistik pinjaman saya">
-        <StatCard label="Sedang Dipinjam" value={resource.loading ? "–" : loans.length} tone="primary" icon={<FiBookOpen />} />
+        <StatCard label="Sedang Dipinjam" value={resource.loading ? "–" : loans.filter(loan => loan.lostReport?.status !== "SELESAI").length} tone="primary" icon={<FiBookOpen />} />
         <StatCard label="Jatuh Tempo" value={resource.loading || now === null ? "–" : overdueCount} tone="danger" icon={<FiAlertTriangle />} />
         <StatCard label="Sudah Dibaca" value={historyResource.loading ? "–" : readBookCount} tone="success" icon={<FiCheckCircle />} />
       </section>
@@ -189,6 +198,7 @@ export default function LoansPage() {
                   extending={busy === loan.id}
                   onExtend={() => open("extend", loan)}
                   onReplacement={() => open("replacement", loan)}
+                  onReport={() => open("report", loan)}
                 />
               ))}
             </div>

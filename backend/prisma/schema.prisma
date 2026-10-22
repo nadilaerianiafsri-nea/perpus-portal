@@ -135,6 +135,17 @@ enum LoanStatus {
   HILANG
 }
 
+enum LostReportStatus {
+  MENUNGGU_VERIFIKASI
+  PROSES_PENGGANTIAN
+  SELESAI
+}
+
+enum LostReportSource {
+  ANGGOTA
+  ADMIN
+}
+
 enum EmailDeliveryStatus {
   NOT_REQUIRED
   PENDING
@@ -180,10 +191,16 @@ model Loan {
   returnedAt     DateTime?
   extensionCount Int             @default(0)
   extensions     LoanExtension[]
+  lostReportStatus LostReportStatus?
+  lostReportSource LostReportSource?
+  lostReportedAt   DateTime?
+  lostVerifiedAt   DateTime?
+  lostResolvedAt   DateTime?
 
   @@index([userId, status, dueAt])
   @@index([status, dueAt])
   @@index([copyId])
+  @@index([lostReportStatus, lostReportedAt])
   @@map("loans")
 }
 

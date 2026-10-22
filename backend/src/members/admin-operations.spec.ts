@@ -253,7 +253,7 @@ describe('AdminOperationsService', () => {
     await expect(service.unreadNotificationCount(77)).resolves.toEqual({ unread: 4 });
     expect(prisma.notification.count).toHaveBeenCalledWith({
       where: {
-        eventKey: { startsWith: 'reservation:', endsWith: ':created' },
+        OR: [{ eventKey: { startsWith: 'reservation:', endsWith: ':created' } }, { eventKey: { startsWith: 'loan:', endsWith: ':lost-report' } }],
         adminReads: { none: { adminId: 77 } },
       },
     });
@@ -366,6 +366,7 @@ describe('AdminOperationsService', () => {
     expect(prisma.loan.count).toHaveBeenNthCalledWith(6, {
       where: {
         status: 'HILANG', returnedAt: null,
+        lostResolvedAt: null,
         book: { is: { type: 'FISIK' } }, user: { is: { role: 'PENGUNJUNG' } },
       },
     });

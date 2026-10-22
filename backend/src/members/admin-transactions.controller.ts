@@ -50,6 +50,12 @@ export class AdminTransactionsController {
 
   @Get('lost-books')
   lostBooks(@Query() query: unknown) {
-    return this.transactions.lostBooks(memberQuery(query, ['search', 'memberType', 'extension', 'page', 'limit']));
+    return this.transactions.lostBooks(memberQuery(query, ['search', 'status', 'memberType', 'extension', 'page', 'limit']));
+  }
+
+  @Get('lost-books/:id')
+  lostBookDetail(@Param('id') id: string, @Query() query: unknown) {
+    memberQuery(query, []);
+    return this.transactions.lostBookDetail(id);
   }
 }

@@ -8,9 +8,9 @@ import { NextResponse } from 'next/server';
 import { API_URL } from '@/catalog/serverApi';
 
 const allowed: Record<string, RegExp> = {
-  GET: /^(?:me\/(dashboard|profile|reservations|loans(?:\/history)?|notifications|ebooks(?:\/\d+\/(?:status|file\.pdf))?|books\/\d+\/borrowing-status|catalog(?:\/filters|\/\d+)?)|admin\/members(?:\/\d+)?|admin\/transactions\/(reservations|loans(?:\/\d+)?|ebook-access\/\d+|returns|lost-books)|admin\/operations\/(dashboard|notifications(?:\/unread-count)?|reports|settings)|admin\/public-content|public\/(?:content|summary))$/,
+  GET: /^(?:me\/(dashboard|profile|reservations|loans(?:\/(?:history|\d+))?|notifications|ebooks(?:\/\d+\/(?:status|file\.pdf))?|books\/\d+\/borrowing-status|catalog(?:\/filters|\/\d+)?)|admin\/members(?:\/\d+)?|admin\/transactions\/(reservations|loans(?:\/\d+)?|ebook-access\/\d+|returns|lost-books(?:\/\d+)?)|admin\/operations\/(dashboard|notifications(?:\/unread-count)?|reports|settings)|admin\/public-content|public\/(?:content|summary))$/,
 
-  POST: /^(?:me\/(reservations|loans\/\d+\/extend|ebooks(?:\/\d+\/(?:borrow|return|queue(?:\/cancel)?|open))?)|admin\/(?:reservations\/\d+\/pickup|loans\/\d+\/(?:return|lost)))$/,
+  POST: /^(?:me\/(reservations|loans\/\d+\/(?:extend|lost-report)|ebooks(?:\/\d+\/(?:borrow|return|queue(?:\/cancel)?|open))?)|admin\/(?:reservations\/\d+\/pickup|loans\/\d+\/(?:return|lost(?:\/complete)?)))$/,
 
   PATCH:
     /^(?:me\/(profile|reservations\/\d+\/cancel|notifications\/(read-all|\d+\/read)|ebooks\/\d+\/progress)|admin\/members\/\d+(?:\/status)?|admin\/operations\/(settings|notifications\/\d+\/read)|admin\/public-content)$/,

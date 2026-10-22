@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   Logger,
   NotFoundException,
@@ -14,6 +15,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { MailService } from '../mail/mail.service';
 import { Prisma } from '../generated/prisma/client';
 import { AdminOperationsService } from './admin-operations.service';
+import { lostReportView } from './lost-loan-state';
 import {
   bookInput,
   extensionInput,
@@ -30,10 +32,11 @@ const bookSelect = {
   code: true,
   coverUrl: true,
   author: true,
+  type: true,
 } as const;
 const circulationInclude = {
   book: { select: bookSelect },
-  copy: { select: { id: true, code: true, status: true } },
+  copy: { select: { id: true, code: true, status: true, bookId: true } },
 } as const;
 const ebookInclude = {
   book: { select: { ...bookSelect, format: true } },
@@ -185,6 +188,7 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
       dueAt: row.dueAt,
       returnedAt: row.returnedAt,
       extensionCount: row.extensionCount,
+      lostReport: lostReportView(row),
       book: row.book,
       copy: row.copy,
     };
@@ -553,6 +557,57 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
     return { history };
   }
 
+  async memberLoanDetail(userId: number, id: number) {
+    const loan = await this.prisma.loan.findUnique({ where: { id }, include: circulationInclude });
+    if (!loan) throw new NotFoundException('Pinjaman tidak ditemukan.');
+    if (loan.userId !== userId) throw new ForbiddenException('Pinjaman ini bukan milik Anda.');
+    if (loan.book.type !== 'FISIK') throw new NotFoundException('Pinjaman fisik tidak ditemukan.');
+    return { loan: this.loanView(loan) };
+  }
+
+  async reportLostLoan(userId: number, id: number) {
+    const row = await this.transaction(async tx => {
+      await tx.$queryRaw`SELECT id FROM loans WHERE id = ${id} FOR UPDATE`;
+      const loan = await tx.loan.findUnique({ where: { id }, include: circulationInclude });
+      if (!loan) throw new NotFoundException('Pinjaman tidak ditemukan.');
+      if (loan.userId !== userId) throw new ForbiddenException('Pinjaman ini bukan milik Anda.');
+      if (loan.status !== 'AKTIF' || loan.returnedAt || loan.book.type !== 'FISIK'
+        || loan.copy.status !== 'DIPINJAM' || loan.copy.bookId !== loan.bookId) {
+        throw new ConflictException('Hanya pinjaman fisik aktif dengan eksemplar yang valid yang dapat dilaporkan.');
+      }
+      if (loan.lostReportStatus) return loan;
+      const reported = await tx.loan.update({ where: { id }, data: {
+        lostReportStatus: 'MENUNGGU_VERIFIKASI', lostReportSource: 'ANGGOTA', lostReportedAt: new Date(),
+      }, include: circulationInclude });
+      await this.event(tx, userId, `loan:${id}:lost-report`, 'Laporan buku hilang diterima',
+        `Laporan kehilangan ${loan.book.title} menunggu verifikasi petugas.`, `/dashboard/pinjaman/${id}`);
+      return reported;
+    });
+    return { loan: this.loanView(row) };
+  }
+
+  async completeLostLoan(id: number) {
+    const row = await this.transaction(async tx => {
+      await tx.$queryRaw`SELECT id FROM loans WHERE id = ${id} FOR UPDATE`;
+      const loan = await tx.loan.findUnique({ where: { id }, include: circulationInclude });
+      if (!loan) throw new NotFoundException('Kasus buku hilang tidak ditemukan.');
+      if (loan.status !== 'HILANG' || loan.book.type !== 'FISIK' || loan.copy.status !== 'HILANG') {
+        throw new ConflictException('Kehilangan harus diverifikasi terlebih dahulu.');
+      }
+      if (loan.lostReportStatus === 'SELESAI') return loan;
+      if (loan.lostReportStatus && loan.lostReportStatus !== 'PROSES_PENGGANTIAN') {
+        throw new ConflictException('Kasus belum berada dalam proses penggantian.');
+      }
+      const completed = await tx.loan.update({ where: { id }, data: {
+        lostReportStatus: 'SELESAI', lostResolvedAt: new Date(), lostReportSource: loan.lostReportSource ?? 'ADMIN',
+      }, include: circulationInclude });
+      await this.event(tx, loan.userId, `loan:${id}:lost-completed`, 'Penggantian buku selesai',
+        `Petugas telah mencatat penyelesaian penggantian ${loan.book.title}.`, `/dashboard/pinjaman/${id}`);
+      return completed;
+    });
+    return { loan: this.loanView(row) };
+  }
+
   async extend(userId: number, id: number, body: unknown) {
     const expectedDueAt = extensionInput(body);
     const settings = await this.circulationSettings();
@@ -563,6 +618,7 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
         include: circulationInclude,
       });
       if (!loan) throw new NotFoundException('Pinjaman tidak ditemukan.');
+      if (lostReportView(loan)) throw new ConflictException('Pinjaman dengan laporan kehilangan tidak dapat diperpanjang.');
       if (loan.status !== 'AKTIF')
         throw new ConflictException(
           'Hanya pinjaman aktif yang dapat diperpanjang.',
@@ -619,6 +675,7 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
         include: circulationInclude,
       });
       if (!loan) throw new NotFoundException('Pinjaman tidak ditemukan.');
+      if (!lost && lostReportView(loan)) throw new ConflictException('Laporan kehilangan harus ditindaklanjuti petugas terlebih dahulu.');
       if (loan.status !== 'AKTIF')
         throw new ConflictException('Pinjaman ini sudah selesai.');
       const copy = await tx.bookCopy.updateMany({
@@ -632,6 +689,8 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
         data: {
           status: lost ? 'HILANG' : 'DIKEMBALIKAN',
           returnedAt: lost ? null : new Date(),
+          ...(lost ? { lostReportStatus: 'PROSES_PENGGANTIAN', lostReportSource: loan.lostReportSource ?? 'ADMIN',
+            lostReportedAt: loan.lostReportedAt ?? new Date(), lostVerifiedAt: new Date() } as const : {}),
         },
         include: circulationInclude,
       });
@@ -643,7 +702,7 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
         lost
           ? `${loan.book.title} dinyatakan hilang. Silakan menghubungi petugas perpustakaan untuk penanganan sesuai kebijakan perpustakaan.`
           : `${loan.book.title} telah dikonfirmasi dikembalikan petugas. Terima kasih.`,
-        '/dashboard/riwayat',
+        lost ? `/dashboard/pinjaman/${id}` : '/dashboard/riwayat',
       );
       await this.invalidateReminders(tx, loan.userId, id);
       return finished;
@@ -959,7 +1018,7 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
           orderBy: { dueAt: 'asc' },
         }),
         this.prisma.loan.findMany({
-          where: { userId, status: 'HILANG' },
+          where: { userId, status: 'HILANG', lostResolvedAt: null },
           include: circulationInclude,
         }),
         this.prisma.userEBook.count({

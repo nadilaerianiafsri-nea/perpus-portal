@@ -26,7 +26,7 @@ function channelLabel(channel: AdminNotificationRow["channel"]) {
 }
 
 function statusLabel(row: AdminNotificationRow) {
-  if (row.channel === "SYSTEM") return "Menunggu Pengambilan";
+  if (row.channel === "SYSTEM") return row.href?.startsWith("/admin/transaksi/buku-hilang-penggantian/") ? "Laporan Diterima" : "Menunggu Pengambilan";
 
   switch (row.status) {
     case "TERKIRIM":

@@ -10,6 +10,7 @@ import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import { plainTextMessage } from "../members/inputSecurity";
 
 import Link from "next/link";
+import { lostReportLabel } from "../members/lostReport";
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { FiSearch, FiEye } from "react-icons/fi";
@@ -24,10 +25,10 @@ import styles from "./AdminTransactions.module.css";
 
 type MemberFilter = "ALL" | "UMUM" | "MAHASISWA" | "PEGAWAI";
 type ExtensionFilter = "ALL" | "EXTENDED" | "NOT_EXTENDED";
-type StatusFilter = "ALL" | "PROCESS";
+type StatusFilter = "ALL" | "PENDING" | "PROCESS" | "COMPLETED";
 
 function readStatus(value: string | null): StatusFilter {
-  return value === "PROCESS" ? "PROCESS" : "ALL";
+  return value === "PROCESS" || value === "PENDING" || value === "COMPLETED" ? value : "ALL";
 }
 
 const emptyResult: LostBooksResponse = {
@@ -76,7 +77,7 @@ export default function AdminLostBooksPage() {
     setPage(1);
   }, [params]);
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (signal: AbortSignal) => {
     void revision;
 
     setLoading(true);
@@ -84,6 +85,7 @@ export default function AdminLostBooksPage() {
 
     const query = new URLSearchParams({
       memberType,
+      status,
       extension,
       page: String(page),
       limit: "20",
@@ -98,6 +100,7 @@ export default function AdminLostBooksPage() {
         `/api/members/admin/transactions/lost-books?${query}`,
         {
           cache: "no-store",
+          signal,
         },
       );
 
@@ -111,6 +114,7 @@ export default function AdminLostBooksPage() {
       }
 
       const payload = (await response.json()) as LostBooksResponse;
+      if (signal.aborted) return;
 
       if (page > payload.meta.totalPages) {
         setPage(payload.meta.totalPages);
@@ -119,19 +123,22 @@ export default function AdminLostBooksPage() {
 
       setResult(payload);
     } catch (reason) {
+      if (signal.aborted) return;
       setError(
         reason instanceof Error
           ? reason.message
           : "Data buku hilang belum dapat dimuat.",
       );
     } finally {
-      setLoading(false);
+      if (!signal.aborted) setLoading(false);
     }
-  }, [extension, memberType, page, revision, search]);
+  }, [extension, memberType, page, revision, search, status]);
 
   useEffect(() => {
+    const controller = new AbortController();
     // eslint-disable-next-line react-hooks/set-state-in-effect -- Existing fetch lifecycle starts the loading state before requesting data.
-    void load();
+    void load(controller.signal);
+    return () => controller.abort();
   }, [load]);
 
   return (
@@ -141,7 +148,7 @@ export default function AdminLostBooksPage() {
       </header>
 
       <section className={styles.statsThree} aria-label="Ringkasan buku hilang">
-        <AdminStatCard label="TOTAL BUKU HILANG" value={result.stats.total} tone="coral" icon={<CardBox />}
+        <AdminStatCard label="TOTAL KASUS" value={result.stats.total} tone="coral" icon={<CardBox />}
           detail="kasus tercatat" />
 
         <AdminStatCard label="ANGGOTA TERDAMPAK" value={result.stats.affectedMembers} tone="slate" icon={<CardUsers />}
@@ -155,8 +162,7 @@ export default function AdminLostBooksPage() {
         <header className={styles.panelHeader}>
           <h2>Daftar Buku Hilang</h2>
           <p>
-            Status penggantian lanjutan dapat ditindaklanjuti berdasarkan
-            kebijakan perpustakaan.
+            Verifikasi laporan anggota dan pantau penggantian sesuai kebijakan perpustakaan.
           </p>
         </header>
 
@@ -186,7 +192,9 @@ export default function AdminLostBooksPage() {
               }}
             >
               <option value="ALL">Semua Status Proses</option>
-              <option value="PROCESS">Proses</option>
+              <option value="PENDING">Menunggu Verifikasi</option>
+              <option value="PROCESS">Proses Penggantian</option>
+              <option value="COMPLETED">Selesai</option>
             </AppSelect>
           </label>
 
@@ -286,16 +294,16 @@ export default function AdminLostBooksPage() {
                     </td>
 
                     <td>
-                      <span data-record-badge className={`${styles.pill} ${styles.dangerPill}`}>
-                        Buku Hilang
+                      <span data-record-badge className={`${styles.pill} ${loan.lostReport?.status === "SELESAI" ? styles.activePill : loan.lostReport?.status === "MENUNGGU_VERIFIKASI" ? styles.warningPill : styles.dangerPill}`}>
+                        {lostReportLabel(loan.lostReport?.status ?? "PROSES_PENGGANTIAN")}
                       </span>
                     </td>
 
                     <td>
-                      <Link data-button-shape="square" title="Lihat detail anggota" aria-label={`Lihat detail anggota ${loan.member.name}`} data-row-action="neutral"
+                      <Link data-button-shape="square" title="Detail kasus buku hilang" aria-label={`Lihat detail kasus ${loan.book.title} milik ${loan.member.name}`} data-row-action="neutral"
                         data-button="secondary"
                         data-button-size="sm"
-                        href={`/admin/keanggotaan/${loan.member.id}`}
+                        href={`/admin/transaksi/buku-hilang-penggantian/${loan.id}`}
                         className={styles.linkAction}
                       >
                         <FiEye aria-hidden="true" />

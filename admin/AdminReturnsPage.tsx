@@ -1,6 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import Link from "next/link";
+
 import AppSelect from "@/components/AppSelect";
 import PeriodSelector from "@/components/PeriodSelector";
 import { createTransactionPeriod, inTransactionPeriod } from "@/shared/transactionPeriod";
@@ -340,7 +342,7 @@ export default function AdminReturnsPage() {
                       </td>
 
                       <td className={styles.returnsActionsCell}>
-                        <div data-record-action-group="text" className={`${styles.actionGroup} ${styles.returnsActions}`}>
+                        {loan.lostReport ? <Link data-button="secondary" href={`/admin/transaksi/buku-hilang-penggantian/${loan.id}`} aria-label={`Lihat laporan kehilangan ${loan.book.title}`}>Detail Laporan</Link> : <div data-record-action-group="text" className={`${styles.actionGroup} ${styles.returnsActions}`}>
                           <button aria-label={`Konfirmasi pengembalian ${loan.book.title} oleh ${loan.member.name}`} data-row-action="success" aria-busy={processingId === loan.id}
                             data-button="success"
                             data-button-size="sm"
@@ -380,7 +382,7 @@ export default function AdminReturnsPage() {
                           >
                             <ButtonLabel loading={processingId === loan.id} pending="Memproses...">Buku Hilang</ButtonLabel>
                           </button>
-                        </div>
+                        </div>}
                       </td>
                     </tr>
                   );

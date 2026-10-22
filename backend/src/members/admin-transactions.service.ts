@@ -3,6 +3,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { MemberType, Prisma, Role } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { MembersService } from './members.service';
+import { lostReportView } from './lost-loan-state';
 import { memberQuery, positiveId } from './member.validation';
 
 const DAY = 86_400_000;
@@ -38,7 +39,10 @@ type ReturnInput = CommonInput & {
 
 type LostInput = CommonInput & {
   extension?: string;
+  status?: string;
 };
+
+const lostFields = { status: true, lostReportStatus: true, lostReportSource: true, lostReportedAt: true, lostVerifiedAt: true, lostResolvedAt: true } as const;
 
 @Injectable()
 export class AdminTransactionsService {
@@ -1042,7 +1046,7 @@ export class AdminTransactionsService {
       take: meta.limit,
       select: {
         id: true,
-        status: true,
+        ...lostFields,
         borrowedAt: true,
         dueAt: true,
         extensionCount: true,
@@ -1086,6 +1090,7 @@ export class AdminTransactionsService {
       data: rows.map((row) => ({
         id: row.id,
         status: row.status,
+        lostReport: lostReportView(row),
         borrowedAt: row.borrowedAt,
         dueAt: row.dueAt,
         extensionCount: row.extensionCount,
@@ -1098,18 +1103,20 @@ export class AdminTransactionsService {
   }
 
   async lostBooks(input: LostInput) {
-    input = memberQuery(input, ['search', 'memberType', 'extension', 'page', 'limit']);
+    input = memberQuery(input, ['search', 'status', 'memberType', 'extension', 'page', 'limit']);
     const search = this.searchValue(input.search);
     const memberType = this.memberType(input.memberType);
 
     const extension = input.extension?.trim() || 'ALL';
+    const status = input.status || 'ALL';
+    if (!['ALL', 'PENDING', 'PROCESS', 'COMPLETED'].includes(status)) throw new BadRequestException('Status laporan tidak valid.');
 
     if (!['ALL', 'EXTENDED', 'NOT_EXTENDED'].includes(extension)) {
       throw new BadRequestException('Filter perpanjangan tidak valid.');
     }
 
     const baseWhere: Prisma.LoanWhereInput = {
-      status: 'HILANG',
+      AND: [{ OR: [{ status: 'HILANG' }, { lostReportStatus: { not: null } }] }],
       book: {
         is: {
           type: 'FISIK',
@@ -1121,8 +1128,12 @@ export class AdminTransactionsService {
       ...this.loanSearch(search),
     };
 
+    const reportWhere: Prisma.LoanWhereInput = status === 'PENDING' ? { lostReportStatus: 'MENUNGGU_VERIFIKASI' }
+      : status === 'COMPLETED' ? { lostReportStatus: 'SELESAI' }
+        : status === 'PROCESS' ? { OR: [{ lostReportStatus: 'PROSES_PENGGANTIAN' }, { status: 'HILANG', lostReportStatus: null }] } : {};
     const dataWhere: Prisma.LoanWhereInput = {
       ...baseWhere,
+      AND: [...(baseWhere.AND as Prisma.LoanWhereInput[]), reportWhere],
       ...(extension === 'EXTENDED'
         ? {
             extensionCount: {
@@ -1168,6 +1179,7 @@ export class AdminTransactionsService {
       take: meta.limit,
       select: {
         id: true,
+        ...lostFields,
         borrowedAt: true,
         dueAt: true,
         extensionCount: true,
@@ -1209,6 +1221,7 @@ export class AdminTransactionsService {
       },
       data: rows.map((row) => ({
         id: row.id,
+        lostReport: lostReportView(row),
         borrowedAt: row.borrowedAt,
         dueAt: row.dueAt,
         extensionCount: row.extensionCount,
@@ -1218,5 +1231,20 @@ export class AdminTransactionsService {
       })),
       meta,
     };
+  }
+
+  async lostBookDetail(rawId: string) {
+    const id = positiveId(rawId);
+    const row = await this.prisma.loan.findFirst({
+      where: { id, book: { type: 'FISIK' }, OR: [{ status: 'HILANG' }, { lostReportStatus: { not: null } }] },
+      select: { id: true, ...lostFields, borrowedAt: true, dueAt: true, extensionCount: true,
+        user: { select: transactionMemberSelect },
+        book: { select: { id: true, title: true, code: true, coverUrl: true, author: true, shelf: true } },
+        copy: { select: { id: true, code: true, status: true, location: true } },
+      },
+    });
+    if (!row) throw new NotFoundException('Kasus buku hilang tidak ditemukan.');
+    return { loan: { id: row.id, status: row.status, borrowedAt: row.borrowedAt, dueAt: row.dueAt,
+      extensionCount: row.extensionCount, lostReport: lostReportView(row), member: this.reservationMember(row), book: row.book, copy: row.copy } };
   }
 }
