@@ -1,0 +1,74 @@
+.tools {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 12px;
+  margin: 14px 14px 10px;
+  padding: 12px;
+  border: 1px solid #ececef;
+  border-radius: 11px;
+  background: var(--white);
+}
+
+.filters {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  min-width: 0;
+}
+
+.tools > label {
+  grid-column: auto;
+}
+
+:root .tools .exportButton[data-button][data-button] {
+  --button-height: var(--select-control-height);
+}
+
+.processLink {
+  white-space: nowrap;
+}
+
+.table {
+  --record-scroll-width: 980px;
+}
+
+.table th:nth-child(1) {
+  width: 20%;
+}
+
+.table th:nth-child(2) {
+  width: 22%;
+}
+
+.table th:nth-child(3) {
+  width: 15%;
+}
+
+.table th:nth-child(4) {
+  width: 18%;
+}
+
+.table .processColumn {
+  width: 120px;
+}
+
+.scopeNote {
+  margin: 0;
+  padding: 0 26px 14px;
+  color: var(--text-secondary-color);
+  font-size: var(--text-helper);
+  line-height: var(--leading-helper);
+}
+
+@media (max-width: 700px) {
+  .tools,
+  .filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .exportButton {
+    width: 100%;
+  }
+}

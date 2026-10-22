@@ -127,7 +127,7 @@ export function normalizePhoneClient(value: string) {
   return `+${digits}`;
 }
 
-function csvCell(value: string | number) {
+export function csvCell(value: string | number) {
   let text = String(value ?? "");
   if (/^[=+\-@]/.test(text)) text = `'${text}`;
   return `"${text.replace(/"/g, '""')}"`;
