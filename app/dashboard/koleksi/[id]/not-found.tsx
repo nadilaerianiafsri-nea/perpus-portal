@@ -1,14 +1,7 @@
-import Link from "next/link";
-import styles from "@/catalog/BookDetail.module.css";
+import NotFoundState from "@/components/NotFoundState";
 
 export default function NotFound() {
-  return (
-    <section className={`${styles.page} ${styles.memberPage} ${styles.error}`}>
-      <h1 data-page-title>Koleksi tidak ditemukan.</h1>
-      <p>Koleksi mungkin sudah tidak tersedia.</p>
-      <Link data-button="back" className={styles.primaryLink} href="/dashboard/koleksi">
-        Kembali ke Katalog
-      </Link>
-    </section>
-  );
+  return <NotFoundState context="member" title="Koleksi Tidak Ditemukan"
+    description="Koleksi yang Anda cari tidak tersedia. Silakan kembali ke katalog untuk menemukan koleksi lainnya."
+    primaryHref="/dashboard/koleksi" primaryLabel="Kembali ke Katalog" />;
 }

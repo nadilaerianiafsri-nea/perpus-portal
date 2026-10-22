@@ -1,15 +1,7 @@
-import Link from "next/link";
-import CatalogShell from "@/catalog/CatalogShell";
-import styles from "@/catalog/Catalog.module.css";
+import NotFoundState from "@/components/NotFoundState";
+
 export default function NotFound() {
-  return (
-    <CatalogShell>
-      <main className={styles.main}>
-        <div className={styles.state}>
-          <h1 data-page-title>Koleksi tidak ditemukan.</h1>
-          <Link data-button="ghost" data-button-size="md" href="/koleksi">Kembali ke Koleksi</Link>
-        </div>
-      </main>
-    </CatalogShell>
-  );
+  return <NotFoundState title="Koleksi Tidak Ditemukan"
+    description="Koleksi yang Anda cari tidak tersedia. Silakan kembali ke katalog untuk menemukan koleksi lainnya."
+    primaryHref="/koleksi" primaryLabel="Kembali ke Koleksi" />;
 }
