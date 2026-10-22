@@ -1,0 +1,37 @@
+.root { position: relative; display: inline-flex; min-width: 0; }
+:root .root .trigger[data-button][data-button] { --button-height: 48px; white-space: nowrap; }
+.trigger svg { flex-shrink: 0; width: 18px; height: 18px; vertical-align: middle; }
+.menu {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  padding: 6px;
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--button-border);
+  border-radius: 16px;
+  background: var(--white);
+  color: var(--navy);
+  box-shadow: 0 12px 36px #00063326;
+  font-family: var(--font-outfit), Outfit, sans-serif;
+}
+.menu button {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  padding: 11px 12px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--navy);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+}
+.menu button:hover:not(:disabled) { background: color-mix(in srgb, var(--yellow) 12%, white); }
+.menu button:focus-visible { outline: 1px solid var(--button-primary); outline-offset: -1px; background: var(--button-soft); }
+.menu button:disabled { opacity: .5; cursor: not-allowed; }
+@media (max-width: 700px) { .trigger { width: 100%; } }
