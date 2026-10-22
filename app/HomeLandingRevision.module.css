@@ -1597,10 +1597,24 @@
     line-height: 1.02;
   }
 
+  .heroBlend :global(.hero-search) {
+    box-sizing: border-box;
+    width: calc(100% - 12px);
+    max-width: calc(100% - 12px);
+    margin-left: 0;
+    margin-right: 12px;
+    transform: translateX(-6px);
+  }
+
   .heroBlend :global(.hero-actions) {
-    width: 100%;
+    box-sizing: border-box;
+    width: calc(100% - 12px);
+    max-width: calc(100% - 12px);
+    margin-left: 0;
+    margin-right: 12px;
     flex-wrap: nowrap;
     gap: 8px;
+    transform: translateX(-6px);
   }
 
   .heroBlend :global(.hero-actions > a) {
@@ -1712,9 +1726,11 @@
   .latestBookCard,
   .collectionContinueCard {
     width: 100%;
-    height: 100%;
     min-height: 0;
     margin-inline: 0;
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
     border-radius: 14px;
   }
 
@@ -1724,13 +1740,21 @@
 
   .latestBookCover,
   .collectionContinueMedia {
-    aspect-ratio: 4 / 5;
+    width: 100%;
+    height: clamp(148px, 43vw, 168px);
+    min-height: 0;
+    aspect-ratio: auto;
+    flex: 0 0 auto;
   }
 
   .latestBookInfo {
-    min-height: 0;
-    flex: 1 1 auto;
-    padding: 10px 11px 11px;
+    box-sizing: border-box;
+    min-height: 80px;
+    height: 80px;
+    flex: 0 0 80px;
+    justify-content: flex-start;
+    overflow: hidden;
+    padding: 8px 10px;
   }
 
   .latestBookSubject {
@@ -1739,14 +1763,15 @@
   }
 
   .latestBookInfo h3 {
-    margin: 4px 0 3px;
+    margin: 3px 0 2px;
     font-size: 12px;
-    line-height: 1.24;
+    line-height: 1.2;
   }
 
   .latestBookInfo p {
+    margin: 0;
     font-size: 10px;
-    line-height: 1.22;
+    line-height: 1.15;
   }
 
   .latestBookType {
@@ -1774,10 +1799,14 @@
   }
 
   .collectionContinueBody {
-    min-height: 0;
-    flex: 1 1 auto;
-    padding: 12px 12px 14px;
-    gap: 5px;
+    box-sizing: border-box;
+    min-height: 80px;
+    height: 80px;
+    flex: 0 0 80px;
+    justify-content: center;
+    overflow: hidden;
+    padding: 8px 10px;
+    gap: 4px;
   }
 
   .collectionContinueBody span {
@@ -1789,6 +1818,19 @@
     max-width: none;
     font-size: 14px;
     line-height: 1.12;
+  }
+
+  /* Keep every collection card on the same grid baseline on mobile.
+     The reveal animation may still fade cards in, but it must not move
+     the last CTA vertically relative to the fifth book card. */
+  .latestCollectionGrid :global(.landing-reveal-item) {
+    transform: translate3d(0, 0, 0) scale(1) !important;
+  }
+
+  .latestCollectionGrid > :nth-last-child(-n + 2) {
+    align-self: stretch;
+    height: 100%;
+    margin-top: 0;
   }
 
   .subjectBlend :global(.subject-grid) {
@@ -1807,6 +1849,18 @@
     width: 100%;
     max-width: 100%;
     min-width: 0;
+  }
+
+  .ebookBlend :global(.ebook-copy) {
+    box-sizing: border-box;
+    padding-left: 10px;
+    padding-right: 4px;
+  }
+
+  .ebookBlend :global(.hero-actions) {
+    width: calc(100% - 10px);
+    max-width: calc(100% - 10px);
+    margin-left: 0;
   }
 
   .subjectBlend :global(.subject-list) {

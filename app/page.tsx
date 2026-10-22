@@ -19,7 +19,6 @@ import LandingFooter from "../components/LandingFooter";
 import LandingRevealObserver from "@/components/LandingRevealObserver";
 import styles from "./HomeLandingRevision.module.css";
 import StatCard from "@/components/StatCard";
-import type { CatalogResponse } from "@/catalog/types";
 import { safeCoverUrl } from "@/shared/displayUrls.cjs";
 import { getHomeData } from "@/information/homeData";
 import {
@@ -31,57 +30,16 @@ import {
   renderPublicText,
 } from "@/information/publicContent";
 import { serviceInfo } from "@/shared/serviceInfo.cjs";
-import { API_URL } from "@/catalog/serverApi";
 
 function formatCount(value: number | null) {
   return value === null ? "—" : value.toLocaleString("id-ID");
 }
 
-async function fetchCatalogPage(page: number): Promise<CatalogResponse> {
-  const response = await fetch(
-    `${API_URL}/collections?limit=6&sort=newest&page=${page}`,
-    {
-      cache: "no-store",
-      signal: AbortSignal.timeout(9000),
-    },
-  );
-
-  if (!response.ok) {
-    throw new Error(`Public collection data unavailable: page ${page}`);
-  }
-
-  return response.json() as Promise<CatalogResponse>;
-}
-
-async function getFirstUploadedBooks() {
-  try {
-    const firstPage = await fetchCatalogPage(1);
-
-    if (firstPage.meta.totalPages <= 1) {
-      return [...firstPage.data].reverse();
-    }
-
-    const lastPage = firstPage.meta.totalPages;
-    const previousPage = Math.max(1, lastPage - 1);
-    const pageNumbers =
-      previousPage === lastPage ? [lastPage] : [previousPage, lastPage];
-    const pages = await Promise.all(pageNumbers.map(fetchCatalogPage));
-
-    return pages
-      .flatMap((page) => page.data)
-      .reverse()
-      .slice(0, 6);
-  } catch {
-    return [];
-  }
-}
-
 export default async function Home() {
-  const [settings, content, homeData, firstUploadedBooks] = await Promise.all([
+  const [settings, content, homeData] = await Promise.all([
     getLibrarySettings(),
     getPublicContent(),
     getHomeData(),
-    getFirstUploadedBooks(),
   ]);
 
   const steps = content.guide.steps.map((step, index) => ({
@@ -89,11 +47,9 @@ export default async function Home() {
     title: renderPublicText(step.title.replace(/^\d+\.\s*/, ""), settings),
     description: renderPublicText(step.description, settings),
   }));
-  const orderedCollectionBooks = firstUploadedBooks.length
-    ? firstUploadedBooks
-    : [...homeData.latestBooks].reverse();
-  const displayedCollectionBooks = orderedCollectionBooks.slice(0, 5);
-  const continuationPreview = orderedCollectionBooks[5] ?? null;
+  const displayedCollectionBooks = homeData.latestBooks.slice(0, 5);
+  const continuationPreview =
+    homeData.latestBooks[5] ?? homeData.latestBooks[4] ?? null;
 
   return (
     <>
