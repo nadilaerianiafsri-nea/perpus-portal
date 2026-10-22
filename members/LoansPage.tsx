@@ -122,7 +122,7 @@ export default function LoansPage() {
       : loans.filter(
           (loan) => loan.status === "AKTIF" && Date.parse(loan.dueAt) <= now,
         ).length;
-  const readBookCount = new Set(
+  const returnedBookCount = new Set(
     history
       .filter(
         (item) => item.sourceType === "LOAN" && item.status === "DIKEMBALIKAN",
@@ -137,26 +137,26 @@ export default function LoansPage() {
       <section className={styles.statsGrid} aria-label="Statistik pinjaman saya">
         <StatCard label="Sedang Dipinjam" value={resource.loading ? "–" : loans.filter(loan => loan.lostReport?.status !== "SELESAI").length} tone="primary" icon={<FiBookOpen />} />
         <StatCard label="Jatuh Tempo" value={resource.loading || now === null ? "–" : overdueCount} tone="danger" icon={<FiAlertTriangle />} />
-        <StatCard label="Sudah Dibaca" value={historyResource.loading ? "–" : readBookCount} tone="success" icon={<FiCheckCircle />} />
+        <StatCard label="Buku Dikembalikan" value={historyResource.loading ? "–" : returnedBookCount} tone="success" icon={<FiCheckCircle />} />
       </section>
 
       <div className={styles.viewTabs} role="tablist" aria-label="Tampilan pinjaman">
         <button
-          data-button="ghost"
+          data-button={view === "current" ? "primary" : "secondary"}
           type="button"
           role="tab"
           aria-selected={view === "current"}
-          className={`${styles.viewTab} ${view === "current" ? styles.viewTabActive : ""}`}
+          className={styles.viewTab}
           onClick={() => selectView("current")}
         >
           Pinjaman Saya
         </button>
         <button
-          data-button="ghost"
+          data-button={view === "history" ? "primary" : "secondary"}
           type="button"
           role="tab"
           aria-selected={view === "history"}
-          className={`${styles.viewTab} ${view === "history" ? styles.viewTabActive : ""}`}
+          className={styles.viewTab}
           onClick={() => selectView("history")}
         >
           Riwayat Pinjaman

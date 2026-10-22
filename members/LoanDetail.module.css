@@ -1,0 +1,18 @@
+/* Presentation overrides are scoped to member loan details; admin details reuse their own styles. */
+.page { min-width: 0; }
+.page .card h2 { font-size: var(--text-section); margin-bottom: 20px; }
+.page .fields dt { font-size: var(--text-detail-label); }
+.page .fields dd { font-size: var(--text-detail-value); }
+.page .fields dd[class] { font-size: 16px; }
+.loanFields { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 24px; }
+.card > p { margin: 20px 0 0; color: var(--text-secondary-color); font-size: 14px; line-height: 1.65; }
+.page .overdue dd { color: var(--stat-danger); }
+.overdueHint { display: block; margin-top: 4px; font-size: 13px; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; padding-top: 4px; }
+:root body .actions [data-button][data-button] { --button-height: 44px; font-size: 14px; }
+.card:focus-visible { outline: 3px solid var(--button-primary); outline-offset: 4px; }
+
+@media (max-width: 540px) {
+  .loanFields { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .actions { flex-direction: column; align-items: stretch; gap: 10px; }
+}
