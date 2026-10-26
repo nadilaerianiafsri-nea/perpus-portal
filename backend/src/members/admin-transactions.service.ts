@@ -5,6 +5,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { MembersService } from './members.service';
 import { lostReportView } from './lost-loan-state';
 import { memberQuery, positiveId } from './member.validation';
+import { ADMIN_LOAN_QUERY_FIELDS, overdueBucketWhere, overdueLoanOptions, type OverdueQuery } from './admin-overdue-query';
+import { overdueDays } from '../../../shared/loanOverdue.cjs';
 
 const DAY = 86_400_000;
 const JAKARTA_OFFSET = 7 * 60 * 60 * 1000;
@@ -28,7 +30,7 @@ type ReservationInput = CommonInput & {
   status?: string;
 };
 
-type LoanInput = CommonInput & {
+type LoanInput = CommonInput & OverdueQuery & {
   status?: string;
   due?: string;
 };
@@ -598,9 +600,8 @@ export class AdminTransactionsService {
     };
   }
 
-  private loanStatusWhere(value?: string): Prisma.LoanWhereInput {
+  private loanStatusWhere(value?: string, now = new Date()): Prisma.LoanWhereInput {
     const status = value?.trim() || 'ALL';
-    const now = new Date();
 
     switch (status) {
       case 'ALL':
@@ -679,21 +680,23 @@ export class AdminTransactionsService {
   }
 
   async loans(input: LoanInput) {
-    input = memberQuery(input, ['search', 'status', 'memberType', 'due', 'page', 'limit']);
+    input = memberQuery(input, ADMIN_LOAN_QUERY_FIELDS);
+    const now = new Date();
+    const monitoring = input.status === 'OVERDUE';
+    const options = overdueLoanOptions(input, now);
     const search = this.searchValue(input.search);
     const memberType = this.memberType(input.memberType);
 
     const baseWhere = this.baseActiveLoanWhere(search, memberType);
 
-    const statusWhere = this.loanStatusWhere(input.status);
+    const statusWhere = this.loanStatusWhere(input.status, now);
 
     const dueWhere = this.loanDueWhere(input.due);
 
     const dataWhere: Prisma.LoanWhereInput = {
-      AND: [baseWhere, statusWhere, dueWhere],
+      AND: [baseWhere, statusWhere, dueWhere, ...options.where],
     };
 
-    const now = new Date();
     const dayLater = new Date(now.getTime() + DAY);
 
     const [physicalActive, dueSoon, overdue, total] = await Promise.all([
@@ -732,11 +735,18 @@ export class AdminTransactionsService {
 
     const meta = await this.pageMeta(total, input.page, input.limit);
 
+    const overdueStats = monitoring ? await (async () => {
+      const base = this.baseActiveLoanWhere('', null);
+      const counts = await Promise.all((['ALL', 'ONE_TO_THREE', 'FOUR_TO_FOURTEEN', 'OVER_FOURTEEN'] as const)
+        .map(bucket => this.prisma.loan.count({ where: { AND: [base, overdueBucketWhere(bucket, now)] } })));
+      return { total: counts[0], oneToThree: counts[1], fourToFourteen: counts[2], overFourteen: counts[3] };
+    })() : undefined;
+
     const rows = await this.prisma.loan.findMany({
       where: dataWhere,
       orderBy: [
         {
-          dueAt: 'asc',
+          dueAt: options.direction,
         },
         {
           id: 'desc',
@@ -890,6 +900,7 @@ export class AdminTransactionsService {
       .filter((row) => row.endsAt === null || row.endsAt > now);
 
     return {
+      ...(overdueStats ? { overdueStats } : {}),
       stats: {
         physicalActive,
         ebookActive: activeEbooks.length,
@@ -897,6 +908,7 @@ export class AdminTransactionsService {
         overdue,
       },
       data: rows.map((row) => ({
+        ...(monitoring ? { overdueDays: overdueDays(row.dueAt, now) } : {}),
         id: row.id,
         status: row.status,
         borrowedAt: row.borrowedAt,

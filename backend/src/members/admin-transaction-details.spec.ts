@@ -116,6 +116,19 @@ describe('admin transaction detail HTTP contract', () => {
     expect(prisma.userEBook.findFirst).not.toHaveBeenCalled();
   });
 
+  it('keeps overdue monitoring admin-only under the existing loans endpoint', async () => {
+    const path = url('loans?status=OVERDUE&bucket=ONE_TO_THREE&sort=OLDEST');
+    await request(app.getHttpServer()).get(path).expect(401);
+    await request(app.getHttpServer()).get(path).set('Cookie', session(1)).expect(403);
+    expect(prisma.loan.findFirst).not.toHaveBeenCalled();
+  });
+
+  it('rejects invalid overdue query values before database work', async () => {
+    for (const query of ['status=OVERDUE&bucket=invalid', 'status=OVERDUE&sort=invalid', 'status=OVERDUE&from=2026-02-30&to=2026-03-01', 'status=OVERDUE&bucket=ALL&bucket=OVER_FOURTEEN']) {
+      await request(app.getHttpServer()).get(url('loans?' + query)).set('Cookie', session()).expect(400);
+    }
+  });
+
   it.each(['loans', 'ebook-access'])('rejects malformed IDs before reading %s', async (resource) => {
     for (const id of ['0', '-1', '1.5', 'abc', '2147483648', '31suffix']) {
       await request(app.getHttpServer()).get(url(`${resource}/${id}`)).set('Cookie', session()).expect(400);

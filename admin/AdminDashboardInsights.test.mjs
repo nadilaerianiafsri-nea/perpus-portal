@@ -65,7 +65,7 @@ test('each action uses a specific supported destination, with no invented failur
   const items = dashboardActionItems(actions);
   assert.deepEqual(items.map(item => item.href), [
     '/admin/transaksi/reservasi?status=MENUNGGU_PENGAMBILAN',
-    '/admin/transaksi/peminjaman?status=OVERDUE',
+    '/admin/transaksi/terlambat',
     '/admin/transaksi/buku-hilang-penggantian?status=PROCESS',
     '/admin/notifikasi',
   ]);

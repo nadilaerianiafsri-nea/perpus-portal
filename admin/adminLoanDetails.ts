@@ -27,6 +27,10 @@ export function parseLoanDetailId(value: string): number | null {
   return /^\d+$/.test(value) && Number.isSafeInteger(id) && id > 0 && id <= 2147483647 ? id : null;
 }
 
+export function loanDetailBackHref(source?: string | string[]) {
+  return source === 'terlambat' ? '/admin/transaksi/terlambat' : '/admin/transaksi/peminjaman';
+}
+
 type DetailRecord = PhysicalLoanDetail | EbookAccessDetail;
 type JsonObject = Record<string, unknown>;
 const isObject = (value: unknown): value is JsonObject => typeof value === "object" && value !== null;

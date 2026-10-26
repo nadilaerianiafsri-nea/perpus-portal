@@ -32,6 +32,11 @@ const loan = { id: 2, status: "AKTIF", borrowedAt: "2026-10-01T01:00:00Z", dueAt
 const access = { id: 31, addedAt: "2026-10-01T01:00:00Z", lastOpenedAt: null, endsAt: null, progress: 25, member, book: { ...book, author: "Penulis" } };
 const json = (value, status = 200) => new Response(JSON.stringify(value), { status });
 
+test("overdue detail back context is allowlisted and never accepts an arbitrary return destination", () => {
+  assert.equal(api.loanDetailBackHref('terlambat'), '/admin/transaksi/terlambat');
+  for (const value of [undefined, 'https://evil.test', '//evil.test', ['terlambat'], '/admin/transaksi/terlambat']) assert.equal(api.loanDetailBackHref(value), '/admin/transaksi/peminjaman');
+});
+
 test("detail IDs accept only positive database integers", () => {
   for (const id of ["1", "2147483647"]) assert.equal(api.parseLoanDetailId(id), Number(id));
   for (const id of ["0", "-1", "1.2", "1e2", " 2", "2/3", "2147483648", "9007199254740992", ""]) {

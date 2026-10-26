@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
 import AdminLoanDetail from "@/admin/AdminLoanDetail";
-import { parseLoanDetailId } from "@/admin/adminLoanDetails";
+import { loanDetailBackHref, parseLoanDetailId } from "@/admin/adminLoanDetails";
 
-export default async function LoanDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function LoanDetailPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ source?: string | string[] }> }) {
   const { id: rawId } = await params;
   const id = parseLoanDetailId(rawId);
   if (id === null) notFound();
-  return <AdminLoanDetail id={id} kind="physical" />;
+  return <AdminLoanDetail id={id} kind="physical" backHref={loanDetailBackHref((await searchParams).source)} />;
 }

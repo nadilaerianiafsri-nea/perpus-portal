@@ -5,6 +5,7 @@ import type { ComponentType, FormEvent, ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
+  FiAlertTriangle,
   FiBarChart2,
   FiBell,
   FiBookOpen,
@@ -35,6 +36,7 @@ type AdminShellProps = {
 type SubMenuItem = {
   label: string;
   route: string;
+  icon?: ComponentType<{ size?: number }>;
 };
 
 type MenuItem = {
@@ -72,6 +74,7 @@ const menuItems: MenuItem[] = [
     children: [
       { label: "Reservasi", route: "/admin/transaksi/reservasi" },
       { label: "Peminjaman", route: "/admin/transaksi/peminjaman" },
+      { label: "Terlambat", route: "/admin/transaksi/terlambat", icon: FiAlertTriangle },
       { label: "Pengembalian", route: "/admin/transaksi/pengembalian" },
       { label: "Sirkulasi E-Book", route: "/admin/transaksi/e-book" },
       {
@@ -328,6 +331,7 @@ export default function AdminShell({ children, user }: AdminShellProps) {
                   <div className={styles.subMenu}>
                     {item.children?.map((child) => {
                       const active = routeMatches(pathname, child.route);
+                      const ChildIcon = child.icon;
                       return (
                         <Link
                           key={child.route}
@@ -339,6 +343,7 @@ export default function AdminShell({ children, user }: AdminShellProps) {
                             setMobileMenuOpen(false);
                           }}
                         >
+                          {ChildIcon ? <span aria-hidden="true" style={{ display: 'inline-flex', marginRight: 6, flexShrink: 0 }}><ChildIcon size={14} /></span> : null}
                           {child.label}
                         </Link>
                       );

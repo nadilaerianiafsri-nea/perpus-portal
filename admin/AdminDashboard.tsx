@@ -218,7 +218,7 @@ export default function AdminDashboard() {
           value: dashboard.stats.overdue.toLocaleString("id-ID"),
           icon: FiAlertTriangle,
           tone: "danger",
-          href: "/admin/transaksi/peminjaman?status=OVERDUE",
+          href: "/admin/transaksi/terlambat",
         },
         {
           label: "BUKU HILANG (PROSES)",

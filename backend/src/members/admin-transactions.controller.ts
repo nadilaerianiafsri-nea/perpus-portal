@@ -13,6 +13,7 @@ import { AdminTransactionsService } from './admin-transactions.service';
 import { MemberCacheInterceptor } from './members-cache.interceptor';
 import { MemberRoleGuard } from './member-role.guard';
 import { memberQuery } from './member.validation';
+import { ADMIN_LOAN_QUERY_FIELDS } from './admin-overdue-query';
 
 @Controller('members/admin/transactions')
 @UseGuards(JwtAuthGuard, MemberRoleGuard)
@@ -28,7 +29,7 @@ export class AdminTransactionsController {
 
   @Get('loans')
   loans(@Query() query: unknown) {
-    return this.transactions.loans(memberQuery(query, ['search', 'status', 'memberType', 'due', 'page', 'limit']));
+    return this.transactions.loans(memberQuery(query, ADMIN_LOAN_QUERY_FIELDS));
   }
 
   @Get('loans/:id')

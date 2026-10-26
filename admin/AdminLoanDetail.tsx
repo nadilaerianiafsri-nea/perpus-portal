@@ -9,10 +9,10 @@ import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import { formatTransactionDateTime, memberTypeLabel } from "./adminTransactions";
 import { ebookDetailStatus, loadEbookAccess, loadPhysicalLoan, loanDetailStatus, type EbookAccessDetail, type PhysicalLoanDetail } from "./adminLoanDetails";
 import styles from "./AdminLoanDetail.module.css";
+import { overdueDays } from '../shared/loanOverdue.cjs';
 
 type Detail = { kind: "physical"; row: PhysicalLoanDetail } | { kind: "ebook"; row: EbookAccessDetail };
 type LoadState = { key: string; loading: boolean; detail: Detail | null; error: string };
-const backHref = "/admin/transaksi/peminjaman";
 
 export function LoanDetailCards({ detail }: { detail: Detail }) {
   const { member, book } = detail.row;
@@ -28,6 +28,7 @@ export function LoanDetailCards({ detail }: { detail: Detail }) {
             <>
               <div><dt>Waktu peminjaman</dt><dd>{formatTransactionDateTime(detail.row.borrowedAt)} WIB</dd></div>
               <div><dt>Jatuh tempo</dt><dd>{formatTransactionDateTime(detail.row.dueAt)} WIB</dd></div>
+              {detail.row.status === 'AKTIF' && overdueDays(detail.row.dueAt) > 0 ? <div><dt>Jumlah hari terlambat</dt><dd>{overdueDays(detail.row.dueAt)} hari</dd></div> : null}
               <div><dt>Jumlah perpanjangan</dt><dd>{detail.row.extensionCount} kali</dd></div>
               {detail.row.returnedAt ? <div><dt>Waktu pengembalian</dt><dd>{formatTransactionDateTime(detail.row.returnedAt)} WIB</dd></div> : null}
             </>
@@ -75,7 +76,7 @@ export function LoanDetailCards({ detail }: { detail: Detail }) {
   );
 }
 
-export default function AdminLoanDetail({ id, kind }: { id: number; kind: Detail["kind"] }) {
+export default function AdminLoanDetail({ id, kind, backHref = '/admin/transaksi/peminjaman' }: { id: number; kind: Detail["kind"]; backHref?: string }) {
   const [revision, setRevision] = useState(0);
   const requestKey = `${kind}:${id}:${revision}`;
   const [state, setState] = useState<LoadState>({ key: "", loading: true, detail: null, error: "" });
@@ -106,7 +107,7 @@ export default function AdminLoanDetail({ id, kind }: { id: number; kind: Detail
       <header className={styles.heading}>
         <div className={styles.headingText}>
           <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-            <Link href={backHref}>Peminjaman</Link><span aria-hidden="true">/</span><span aria-current="page">{title}</span>
+            <Link href={backHref}>{backHref === '/admin/transaksi/terlambat' ? 'Terlambat' : 'Peminjaman'}</Link><span aria-hidden="true">/</span><span aria-current="page">{title}</span>
           </nav>
           <h1 data-page-title>{title}</h1>
         </div>
