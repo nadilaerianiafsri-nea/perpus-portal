@@ -386,19 +386,22 @@ export default function AdminShell({ children, user }: AdminShellProps) {
             >
               <FiMenu size={20} />
             </button>
+            <div className={styles.pageContext}>
             <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
               <Link href="/">Beranda</Link>
               <span>/</span>
-              <Link href="/admin" onClick={() => setOpenMenu(null)}>
+              <Link href="/admin" aria-current={pathname === "/admin" ? "page" : undefined} onClick={() => setOpenMenu(null)}>
                 Dashboard
               </Link>
               {pathname !== "/admin" ? (
                 <>
                   <span>/</span>
-                  <strong>{currentTitle}</strong>
+                  <strong aria-current="page" title={currentTitle}>{currentTitle}</strong>
                 </>
               ) : null}
             </nav>
+            <span className={styles.pageContextTitle}>{currentTitle}</span>
+            </div>
           </div>
 
           <div className={styles.topbarActions}>

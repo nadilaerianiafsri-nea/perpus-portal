@@ -287,27 +287,42 @@
 }
 
 .topbar {
-  min-height: 42px;
+  position: sticky;
+  top: 14px;
+  z-index: 30;
+  min-height: 76px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 25px;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 12px 18px;
+  border: 1px solid #e7e9f0;
+  border-radius: 20px;
+  background: var(--white);
+  box-shadow: 0 6px 24px #0006330d;
 }
 
 .topbarLeft {
+  flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
+.pageContext { display: grid; gap: 3px; min-width: 0; }
+.pageContextTitle { overflow: hidden; color: var(--navy); font-size: 18px; font-weight: 600; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
+
 .breadcrumb {
   display: flex;
   align-items: center;
   gap: 7px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  min-width: 0;
+  overflow: hidden;
   color: var(--text-secondary-color);
-  font-size: var(--text-breadcrumb);
+  font-size: 12px;
 
   font-weight: 500;
 
@@ -315,6 +330,7 @@
 }
 
 .breadcrumb a {
+  flex-shrink: 0;
   color: inherit;
   text-decoration: none;
 }
@@ -328,9 +344,14 @@
 }
 
 .breadcrumb strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: var(--navy);
   font-weight: 600;
 }
+
+.breadcrumb a:focus-visible { outline: 2px solid var(--navy-soft); outline-offset: -2px; border-radius: 3px; }
 
 .adminPage .mobileMenuButton {
   display: none;
@@ -339,40 +360,57 @@
 .topbarActions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  flex-shrink: 0;
+  gap: 11px;
 }
 
 .searchBox {
-  height: 42px;
-  max-width: 180px;
+  height: 44px;
+  width: 248px;
+  max-width: 280px;
   display: flex;
   align-items: center;
-  padding: 0 12px;
-  border: 1px solid #ececef;
-  border-radius: 99px;
-  background: var(--white);
+  padding: 0 12px 0 0;
+  border: 1px solid #e7e9f0;
+  border-radius: 14px;
+  background: #f7f8fb;
+  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 }
 
-.searchBox button {
+:root body .topbar .searchBox > button[data-button] {
+  --button-height: 42px;
+  --button-bg: transparent;
+  --button-fg: var(--navy);
+  --button-hover-bg: var(--button-soft);
+  --button-hover-fg: var(--navy);
   display: grid;
   place-items: center;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
   padding: 0;
   border: 0;
   background: transparent;
-  color: #666;
+  color: var(--navy);
   cursor: pointer;
 }
 
 .searchBox input {
-  width: 116px;
+  flex: 1;
+  width: 100%;
+  min-width: 0;
   height: 100%;
-  margin-left: 8px;
+  margin-left: 0;
   border: 0;
   outline: 0;
   background: transparent;
   color: var(--navy);
-  font-size: var(--text-input);
+  font-size: 14px;
 }
+
+.searchBox:hover { background: var(--white); border-color: var(--button-border); }
+.searchBox:focus-within { background: var(--white); border-color: var(--navy-soft); box-shadow: 0 0 0 3px #2b30561a; }
+:root body .topbar .searchBox > button[data-button]:focus-visible { outline-offset: -4px; }
 
 .searchBox input::placeholder {
   color: #777;
@@ -398,6 +436,20 @@
   display: grid;
 }
 
+:root body .topbar :is(.iconButton, .mobileMenuButton)[data-button][data-button] {
+  --button-height: 44px;
+  --button-bg: #f7f8fb;
+  --button-fg: var(--navy);
+  --button-hover-bg: var(--button-soft);
+  --button-hover-fg: var(--navy);
+  --button-hover-stroke: var(--button-border);
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 14px;
+}
+.topbar .iconButton > b { min-width: 20px; height: 20px; top: -4px; right: -3px; font-size: 11px; font-weight: 700; box-shadow: 0 0 0 2px var(--white); }
+
 .avatar {
   width: 44px;
   height: 44px;
@@ -408,8 +460,13 @@
   background: var(--navy-soft);
   color: var(--white);
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
 }
+
+.topbar .avatar:is(:hover, :focus-visible, [aria-current="page"]) { background: var(--navy); transform: none; box-shadow: 0 0 0 3px #2b30561a; }
+.topbar .avatar:focus-visible { outline: 2px solid var(--navy-soft); outline-offset: 3px; box-shadow: none; }
+
+@media (prefers-reduced-motion: reduce) { .searchBox { transition: none; } }
 
 .emptyPage {
   min-height: calc(100dvh - 131px);
@@ -636,6 +693,7 @@
 }
 
 @media (max-width: 1120px) {
+  .searchBox { width: 220px; }
   .adminPage {
     grid-template-columns: 235px minmax(0, 1fr);
     gap: 18px;
@@ -729,34 +787,26 @@
   }
 
   .topbar {
+    position: relative;
+    top: auto;
+    min-height: 72px;
+    padding: 10px 12px;
+    border-radius: 18px;
+    gap: 10px;
     align-items: center;
   }
 
-  .breadcrumb {
-    font-size: var(--text-breadcrumb);
-
-  font-weight: 500;
-
-  color: var(--text-secondary-color);
-
-  line-height: var(--leading-body);
-}
-
-  .searchBox {
-    display: none;
-  }
-
-  .iconButton,
-  .mobileMenuButton,
-  .avatar {
-    width: 40px;
-    height: 40px;
-  }
-
-  .avatar {
-    flex-basis: 40px;
-    font-size: 13px;
-  }
+  .topbarLeft { gap: 8px; }
+  .pageContextTitle { display: none; }
+  .breadcrumb { font-size: 14px; }
+  .breadcrumb > :not([aria-current="page"]) { display: none; }
+  .breadcrumb a[aria-current="page"] { min-width: 0; overflow: hidden; color: var(--navy); font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+  .topbarActions { gap: 10px; }
+  .searchBox { width: 92px; padding-right: 4px; }
+  /* Expand the existing form while editing; keep its handler and submit control. */
+  .topbar:has(.searchBox:focus-within) .topbarLeft { display: none; }
+  .topbar:has(.searchBox:focus-within) .topbarActions { flex: 1; min-width: 0; }
+  .searchBox:focus-within { flex: 1; width: auto; max-width: none; }
 
   .statsGrid {
     grid-template-columns: 1fr;
