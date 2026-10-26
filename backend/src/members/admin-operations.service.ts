@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, ServiceUnavailableException } from '@nes
 import { serviceInfo } from '../../../shared/serviceInfo.cjs';
 import { buildTransactionTrend } from '../../../shared/chartTime.cjs';
 import { PrismaService } from '../prisma/prisma.service';
+import { adminNotificationTarget, notificationEntity, type NotificationEntityType } from '../../../shared/adminNotificationTarget.cjs';
 import {
   type LibrarySettings,
   parseLibrarySettingsInput,
@@ -49,7 +50,15 @@ type AdminNotificationRow = {
   status: 'TERKIRIM' | 'GAGAL' | 'MENUNGGU' | 'MENGIRIM' | 'MANUAL';
   readAt: Date | null;
   href: string | null;
+  description: string;
+  entityType: NotificationEntityType | null;
+  entityId: number | null;
 };
+
+const SYSTEM_NOTIFICATIONS = [
+  { eventKey: { startsWith: 'reservation:', endsWith: ':created' } },
+  { eventKey: { startsWith: 'loan:', endsWith: ':lost-report' } },
+];
 
 function transactionCode(eventKey: string) {
   const match = /^(?:loan|reservation):(\d+):/.exec(eventKey);
@@ -435,12 +444,7 @@ export class AdminOperationsService {
 
   async notifications(
     adminId: number,
-    query: {
-      search?: unknown;
-      channel?: unknown;
-      page?: unknown;
-      limit?: unknown;
-    },
+    query: Parameters<typeof parseNotificationQuery>[0],
   ) {
     const filter = parseNotificationQuery(query);
     const notices = await this.prisma.notification.findMany({
@@ -448,8 +452,7 @@ export class AdminOperationsService {
         OR: [
           { emailDelivery: { not: 'NOT_REQUIRED' } },
           { whatsappDelivery: { not: 'NOT_REQUIRED' } },
-          { eventKey: { startsWith: 'reservation:', endsWith: ':created' } },
-          { eventKey: { startsWith: 'loan:', endsWith: ':lost-report' } },
+          ...SYSTEM_NOTIFICATIONS,
         ],
       },
       select: {
@@ -457,6 +460,7 @@ export class AdminOperationsService {
         eventKey: true,
         title: true,
         message: true,
+        href: true,
         createdAt: true,
         emailDelivery: true,
         emailAttemptedAt: true,
@@ -511,6 +515,8 @@ export class AdminOperationsService {
       const createdReservationId = reservationCreatedId(notice.eventKey);
       const lostReportId = /^loan:(\d+):lost-report$/.exec(notice.eventKey)?.[1];
       const base = {
+        ...notificationEntity(notice.eventKey),
+        description: notice.message,
         sourceNotificationId: notice.id,
         memberName: notice.user.name,
         memberEmail: notice.user.email,
@@ -531,14 +537,14 @@ export class AdminOperationsService {
           time: notice.createdAt,
           status: 'MENUNGGU',
           readAt: readByNotification.get(notice.id) ?? null,
-          href: '/admin/transaksi/reservasi',
+          href: adminNotificationTarget(base),
         });
       }
 
       if (lostReportId) projected.push({
         ...base, id: `${notice.id}:SYSTEM`, channel: 'SYSTEM', reminderType: 'Laporan Buku Hilang Baru',
         time: notice.createdAt, status: 'MENUNGGU', readAt: readByNotification.get(notice.id) ?? null,
-        href: `/admin/transaksi/buku-hilang-penggantian/${lostReportId}`,
+        href: adminNotificationTarget(base),
       });
 
       if (notice.emailDelivery !== 'NOT_REQUIRED') {
@@ -549,7 +555,7 @@ export class AdminOperationsService {
           time: notice.emailSentAt ?? notice.emailAttemptedAt ?? notice.createdAt,
           status: emailStatus(notice.emailDelivery),
           readAt: null,
-          href: null,
+          href: adminNotificationTarget({ ...base, href: notice.href }),
         });
       }
       if (notice.whatsappDelivery !== 'NOT_REQUIRED') {
@@ -560,7 +566,7 @@ export class AdminOperationsService {
           time: notice.createdAt,
           status: whatsappStatus(notice.whatsappDelivery),
           readAt: null,
-          href: null,
+          href: adminNotificationTarget({ ...base, href: notice.href }),
         });
       }
     }
@@ -581,6 +587,7 @@ export class AdminOperationsService {
             row.transactionCode,
             row.reminderType,
             row.bookTitle ?? '',
+            row.description,
           ]
             .join(' ')
             .toLocaleLowerCase('id-ID')
@@ -588,25 +595,29 @@ export class AdminOperationsService {
         )
       : projected;
 
-    const counts = {
-      all: searched.length,
-      email: searched.filter((row) => row.channel === 'EMAIL').length,
-      whatsapp: searched.filter((row) => row.channel === 'WHATSAPP').length,
-      failed: searched.filter((row) => row.status === 'GAGAL').length,
-      unread: searched.filter(
+    const countRows = (rows: AdminNotificationRow[]) => ({
+      all: rows.length,
+      system: rows.filter((row) => row.channel === 'SYSTEM').length,
+      email: rows.filter((row) => row.channel === 'EMAIL').length,
+      whatsapp: rows.filter((row) => row.channel === 'WHATSAPP').length,
+      failed: rows.filter((row) => row.status === 'GAGAL').length,
+      unread: rows.filter(
         (row) => row.channel === 'SYSTEM' && row.readAt === null,
       ).length,
-    };
+    });
+    const dated = searched.filter(row => (!filter.start || row.time >= filter.start) && (!filter.endExclusive || row.time < filter.endExclusive));
     const channelRows =
       filter.channel === 'ALL'
-        ? searched
-        : searched.filter((row) => row.channel === filter.channel);
+        ? dated
+        : dated.filter((row) => filter.channel === 'UNREAD' ? row.channel === 'SYSTEM' && row.readAt === null : row.channel === filter.channel);
     const totalPages = Math.max(1, Math.ceil(channelRows.length / filter.limit));
     const page = Math.min(filter.page, totalPages);
     const start = (page - 1) * filter.limit;
 
     return {
-      counts,
+      capabilities: { markAllRead: true },
+      counts: countRows(dated),
+      summaryCounts: countRows(projected),
       data: channelRows.slice(start, start + filter.limit),
       meta: {
         page,
@@ -620,7 +631,7 @@ export class AdminOperationsService {
   async unreadNotificationCount(adminId: number) {
     const unread = await this.prisma.notification.count({
       where: {
-        OR: [{ eventKey: { startsWith: 'reservation:', endsWith: ':created' } }, { eventKey: { startsWith: 'loan:', endsWith: ':lost-report' } }],
+        OR: SYSTEM_NOTIFICATIONS,
         adminReads: { none: { adminId } },
       },
     });
@@ -631,7 +642,7 @@ export class AdminOperationsService {
     const notification = await this.prisma.notification.findFirst({
       where: {
         id: notificationId,
-        OR: [{ eventKey: { startsWith: 'reservation:', endsWith: ':created' } }, { eventKey: { startsWith: 'loan:', endsWith: ':lost-report' } }],
+        OR: SYSTEM_NOTIFICATIONS,
       },
       select: { id: true },
     });
@@ -650,6 +661,23 @@ export class AdminOperationsService {
     });
 
     return { readAt: read.readAt };
+  }
+
+  async markAllNotificationsRead(adminId: number) {
+    const cutoff = new Date();
+    const notices = await this.prisma.notification.findMany({
+      where: { OR: SYSTEM_NOTIFICATIONS, createdAt: { lte: cutoff }, adminReads: { none: { adminId } } },
+      select: { id: true },
+    });
+    let count = 0;
+    for (let offset = 0; offset < notices.length; offset += 500) {
+      const result = await this.prisma.adminNotificationRead.createMany({
+        data: notices.slice(offset, offset + 500).map(notice => ({ adminId, notificationId: notice.id })),
+        skipDuplicates: true,
+      });
+      count += result.count;
+    }
+    return { count };
   }
 
   async reports(query: { from?: unknown; to?: unknown; granularity?: unknown }) {

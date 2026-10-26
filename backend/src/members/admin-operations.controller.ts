@@ -34,17 +34,15 @@ export class AdminOperationsController {
   @Get('notifications')
   notifications(
     @Req() req: AuthenticatedRequest,
-    @Query('search') search?: string,
-    @Query('channel') channel?: string,
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
+    @Query() query: Record<string, unknown>,
   ) {
-    return this.operations.notifications(req.user!.sub, {
-      search,
-      channel,
-      page,
-      limit,
-    });
+    return this.operations.notifications(req.user!.sub, query);
+  }
+
+  @Patch('notifications/read-all')
+  readAllNotifications(@Req() req: AuthenticatedRequest, @Body() body: unknown) {
+    emptyInput(body);
+    return this.operations.markAllNotificationsRead(req.user!.sub);
   }
 
   @Patch('notifications/:id/read')

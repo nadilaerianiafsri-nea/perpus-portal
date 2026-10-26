@@ -155,7 +155,7 @@ describe('AdminOperationsService', () => {
     ]);
 
     const result = await service.notifications(99, { channel: 'ALL', page: '1', limit: '10' });
-    expect(result.counts).toEqual({ all: 2, email: 1, whatsapp: 1, failed: 0, unread: 0 });
+    expect(result.counts).toEqual({ all: 2, system: 0, email: 1, whatsapp: 1, failed: 0, unread: 0 });
     expect(result.data.map((row) => row.channel)).toEqual(['EMAIL', 'WHATSAPP']);
     expect(result.data[0].transactionCode).toBe('TRX-00015');
     expect(result.data[0].reminderType).toBe('H-1 Jatuh Tempo');
@@ -191,7 +191,7 @@ describe('AdminOperationsService', () => {
 
     const result = await service.notifications(99, { channel: 'ALL', page: '1', limit: '10' });
 
-    expect(result.counts).toEqual({ all: 1, email: 0, whatsapp: 0, failed: 0, unread: 1 });
+    expect(result.counts).toEqual({ all: 1, system: 1, email: 0, whatsapp: 0, failed: 0, unread: 1 });
     expect(result.data[0]).toMatchObject({
       channel: 'SYSTEM',
       transactionCode: 'RSV-00023',
@@ -199,7 +199,7 @@ describe('AdminOperationsService', () => {
       bookTitle: 'Laskar Pelangi',
       status: 'MENUNGGU',
       readAt: null,
-      href: '/admin/transaksi/reservasi',
+      href: '/admin/transaksi/reservasi/23',
     });
   });
 

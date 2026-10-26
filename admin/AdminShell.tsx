@@ -23,6 +23,7 @@ import {
 
 import styles from "./Admin.module.css";
 import enhancements from "./AdminEnhancements.module.css";
+import { ADMIN_NOTIFICATION_READ_EVENT } from './adminNotifications';
 
 type AdminShellProps = {
   children: ReactNode;
@@ -167,8 +168,10 @@ export default function AdminShell({ children, user }: AdminShellProps) {
 
   useEffect(() => {
     const controller = new AbortController();
+    let unreadRequest = 0;
 
     const loadUnreadNotifications = () => {
+      const request = ++unreadRequest;
       fetch("/api/members/admin/operations/notifications/unread-count", {
         cache: "no-store",
         signal: controller.signal,
@@ -178,6 +181,7 @@ export default function AdminShell({ children, user }: AdminShellProps) {
           return (await response.json()) as { unread?: number };
         })
         .then((payload) => {
+          if (controller.signal.aborted || request !== unreadRequest) return;
           if (!controller.signal.aborted) {
             setUnreadNotifications(
               Number.isSafeInteger(payload.unread) && (payload.unread ?? 0) > 0
@@ -187,18 +191,20 @@ export default function AdminShell({ children, user }: AdminShellProps) {
           }
         })
         .catch(() => {
-          if (!controller.signal.aborted) setUnreadNotifications(0);
+          if (!controller.signal.aborted && request === unreadRequest) setUnreadNotifications(0);
         });
     };
 
     loadUnreadNotifications();
     const interval = window.setInterval(loadUnreadNotifications, 15000);
     window.addEventListener("focus", loadUnreadNotifications);
+    window.addEventListener(ADMIN_NOTIFICATION_READ_EVENT, loadUnreadNotifications);
 
     return () => {
       controller.abort();
       window.clearInterval(interval);
       window.removeEventListener("focus", loadUnreadNotifications);
+      window.removeEventListener(ADMIN_NOTIFICATION_READ_EVENT, loadUnreadNotifications);
     };
   }, [pathname]);
 

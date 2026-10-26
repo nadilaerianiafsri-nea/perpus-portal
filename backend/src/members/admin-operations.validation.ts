@@ -1,5 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import { getChartGranularity, type ChartGranularity } from '../../../shared/chartTime.cjs';
+import { memberQuery } from './member.validation';
 
 export type LibrarySettings = {
   libraryName: string;
@@ -12,7 +13,7 @@ export type LibrarySettings = {
   maxExtensions: number | null;
 };
 
-export type NotificationChannel = 'ALL' | 'EMAIL' | 'WHATSAPP';
+export type NotificationChannel = 'ALL' | 'UNREAD' | 'SYSTEM' | 'EMAIL' | 'WHATSAPP';
 
 const HTML_TOKEN = /[<>]/;
 const DATE_ONLY = /^(\d{4})-(\d{2})-(\d{2})$/;
@@ -201,19 +202,22 @@ export function parseNotificationQuery(query: {
   channel?: unknown;
   page?: unknown;
   limit?: unknown;
+  from?: unknown;
+  to?: unknown;
 }) {
-  const rawSearch = query.search == null ? '' : String(query.search).trim();
+  const input = memberQuery(query, ['search', 'channel', 'page', 'limit', 'from', 'to']);
+  const rawSearch = input.search ?? '';
   if (rawSearch.length > 120 || HTML_TOKEN.test(rawSearch)) {
     throw new BadRequestException('Pencarian notifikasi tidak valid.');
   }
 
-  const channel = String(query.channel ?? 'ALL').toUpperCase();
-  if (!['ALL', 'EMAIL', 'WHATSAPP'].includes(channel)) {
+  const channel = (input.channel ?? 'ALL').toUpperCase();
+  if (!['ALL', 'UNREAD', 'SYSTEM', 'EMAIL', 'WHATSAPP'].includes(channel)) {
     throw new BadRequestException('Filter kanal notifikasi tidak valid.');
   }
 
-  const page = Number(query.page ?? 1);
-  const limit = Number(query.limit ?? 10);
+  const page = Number(input.page ?? 1);
+  const limit = Number(input.limit ?? 10);
   if (!Number.isSafeInteger(page) || page < 1 || page > 100000) {
     throw new BadRequestException('Halaman notifikasi tidak valid.');
   }
@@ -221,10 +225,20 @@ export function parseNotificationQuery(query: {
     throw new BadRequestException('Jumlah data per halaman tidak valid.');
   }
 
+  let start: Date | undefined, endExclusive: Date | undefined;
+  if (input.from !== undefined || input.to !== undefined) {
+    const from = parseDateOnly(input.from, 'Tanggal awal');
+    const to = parseDateOnly(input.to, 'Tanggal akhir');
+    if (from.utc > to.utc) throw new BadRequestException('Tanggal awal tidak boleh melewati tanggal akhir.');
+    start = new Date(from.utc.getTime() - JAKARTA_OFFSET_MS);
+    endExclusive = new Date(to.utc.getTime() + DAY_MS - JAKARTA_OFFSET_MS);
+  }
   return {
     search: rawSearch,
     channel: channel as NotificationChannel,
     page,
     limit,
+    start,
+    endExclusive,
   };
 }

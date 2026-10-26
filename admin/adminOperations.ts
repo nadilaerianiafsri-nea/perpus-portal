@@ -13,7 +13,7 @@ export type LibrarySettings = {
   maxExtensions: number | null;
 };
 
-export type NotificationChannel = "ALL" | "EMAIL" | "WHATSAPP";
+export type NotificationChannel = "ALL" | "UNREAD" | "SYSTEM" | "EMAIL" | "WHATSAPP";
 export type NotificationStatus =
   | "TERKIRIM"
   | "GAGAL"
@@ -35,6 +35,9 @@ export type AdminNotificationRow = {
   status: NotificationStatus;
   readAt: string | null;
   href: string | null;
+  description?: string;
+  entityType?: string | null;
+  entityId?: number | null;
 };
 
 export type PageMeta = {
@@ -45,12 +48,15 @@ export type PageMeta = {
 };
 
 export type AdminNotificationsResponse = {
+  capabilities?: { markAllRead: boolean };
+  summaryCounts?: AdminNotificationsResponse['counts'];
   counts: {
     all: number;
     email: number;
     whatsapp: number;
     failed: number;
     unread: number;
+    system?: number;
   };
   data: AdminNotificationRow[];
   meta: PageMeta;
