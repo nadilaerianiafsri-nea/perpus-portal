@@ -111,8 +111,8 @@ export default function AdminNotificationsPage() {
       </div>
       {searchError ? <p className={styles.feedback} role="alert" id="notification-search-error">{searchError}</p> : null}
       <div className={styles.categoryBar}>
-        <div className={styles.tabs} role="group" aria-label="Kategori notifikasi">{tabs.map(([value,label,count])=><Button key={value} size="sm" variant={channel===value?'primary':'ghost'} aria-pressed={channel===value} data-notification-filter={value} onClick={()=>{setChannel(value);setPage(1);setFeedback('');}}>{label}<span className={styles.count}>{count ?? '—'}</span></Button>)}</div>
-        {state.result?.capabilities?.markAllRead ? <Button size="sm" variant="secondary" icon={<FiCheck />} disabled={loading || Boolean(pending) || !counts?.unread} loading={pending==='all'} onClick={()=>void readAll()}>Tandai Semua Dibaca</Button> : null}
+        <div className={styles.tabs} role="group" aria-label="Kategori notifikasi">{tabs.map(([value,label,count])=><Button key={value} className={styles.categoryChip} variant={channel===value?'primary':'secondary'} aria-pressed={channel===value} data-notification-filter={value} onClick={()=>{setChannel(value);setPage(1);setFeedback('');}}>{label}<span className={styles.count}>{count ?? '—'}</span></Button>)}</div>
+        {state.result?.capabilities?.markAllRead ? <Button className={styles.markAll} variant="secondary" icon={<FiCheck />} disabled={loading || Boolean(pending) || !counts?.unread} loading={pending==='all'} onClick={()=>void readAll()}>Tandai Semua Dibaca</Button> : null}
       </div>
     </section>
     {feedback ? <p className={styles.feedback} role="alert">{feedback}</p> : null}
