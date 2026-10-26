@@ -206,25 +206,27 @@ export default function MemberShell({
 
         <div className={styles.workspace}>
           <header className={styles.topbar}>
-            <button
-              data-button="icon"
-              data-button-shape="square"
-              ref={menuButton}
-              className={`${styles.iconButton} ${styles.menuButton}`}
-              aria-label="Buka menu anggota"
-              aria-expanded={drawer}
-              onClick={() => setDrawer(true)}
-            >
-              <FiMenu />
-            </button>
+            <div className={styles.topbarLeft}>
+              <button
+                data-button="icon"
+                data-button-shape="square"
+                ref={menuButton}
+                className={`${styles.iconButton} ${styles.menuButton}`}
+                aria-label="Buka menu anggota"
+                aria-expanded={drawer}
+                onClick={() => setDrawer(true)}
+              >
+                <FiMenu />
+              </button>
 
-            <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
-              <Link href="/">Beranda</Link>
-              <span>/</span>
-              <Link href="/dashboard">Dashboard</Link>
-              <span>/</span>
-              <strong>{current.label}</strong>
-            </nav>
+              <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
+                <Link href="/">Beranda</Link>
+                <span>/</span>
+                <Link href="/dashboard">Dashboard</Link>
+                <span>/</span>
+                <strong aria-current="page" title={current.label}>{current.label}</strong>
+              </nav>
+            </div>
 
             <div className={styles.topActions}>
               <form
@@ -253,7 +255,7 @@ export default function MemberShell({
               >
                 <FiBell />
                 {unread !== undefined && unread > 0 ? (
-                  <span className={styles.bellDot} />
+                  <span className={styles.bellBadge} aria-hidden="true">{unread}</span>
                 ) : null}
               </Link>
               <Link className={styles.avatar} href="/dashboard/profil" aria-label="Profil saya">
