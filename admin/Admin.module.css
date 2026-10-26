@@ -39,7 +39,7 @@
   z-index: 40;
   display: flex;
   flex-direction: column;
-  padding: 22px 20px;
+  padding: 22px 20px 20px;
   overflow-y: auto;
   border-radius: 25px;
   background: var(--white);
@@ -111,9 +111,7 @@
 }
 
 .menu > a,
-.menuGroup > button,
-.sidebarBottom > a,
-.sidebarBottom > button {
+.menuGroup > button {
   width: 100%;
   min-height: 44px;
   display: grid;
@@ -135,18 +133,14 @@
 }
 
 .menu > a svg,
-.menuGroup > button svg,
-.sidebarBottom > a svg,
-.sidebarBottom > button svg {
+.menuGroup > button svg {
   width: 17px;
   height: 17px;
   flex: 0 0 17px;
 }
 
 .menu > a:hover,
-.menuGroup > button:hover,
-.sidebarBottom > a:hover,
-.sidebarBottom > button:hover {
+.menuGroup > button:hover {
   background: #f4f4f7;
 }
 
@@ -216,22 +210,72 @@
 
 .sidebarBottom {
   margin-top: auto;
-  padding: 18px 8px 2px;
+  flex-shrink: 0;
+  padding: 18px 0 0;
   display: grid;
-  gap: 4px;
+  gap: 10px;
 }
 
 .sidebarBottom > a,
-.sidebarBottom > button {
+:root body .sidebarBottom > button[data-button][data-button] {
+  --button-height: 50px;
+  --button-radius: 15px;
+  display: grid;
   grid-template-columns: 18px minmax(0, 1fr);
-  padding: 12px 6px;
-  border-radius: 10px;
-  color: #555;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  min-height: 50px;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: 15px;
+  background: var(--button-bg, transparent);
+  color: var(--button-fg, var(--navy-soft));
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
+}
+
+:root body .sidebarBottom > button[data-button][data-button] {
+  --button-fg: var(--yellow);
+  --button-pressed-bg: var(--button-accent-hover);
+}
+
+.sidebarBottom > a > svg,
+:root body .sidebarBottom > button[data-button][data-button] > svg {
+  width: 20px;
+  height: 20px;
+  justify-self: center;
+  color: inherit;
+}
+
+.sidebarBottom > a:hover {
+  background: var(--button-soft);
+  color: var(--navy);
+}
+
+.sidebarBottom > a:active {
+  background: var(--button-border);
+}
+
+.sidebarBottom > a:focus-visible {
+  outline: 2px solid var(--navy-soft);
+  outline-offset: 3px;
 }
 
 .sidebarBottom > button:disabled {
   opacity: 0.55;
   cursor: wait;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebarBottom > a,
+  :root body .sidebarBottom > button[data-button][data-button] { transition: none; }
 }
 
 .sidebarOverlay {

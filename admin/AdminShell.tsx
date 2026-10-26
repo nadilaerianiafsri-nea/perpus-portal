@@ -359,11 +359,11 @@ export default function AdminShell({ children, user }: AdminShellProps) {
 
         <div className={styles.sidebarBottom}>
           <Link href="/" onClick={() => setMobileMenuOpen(false)}>
-            <FiHome size={18} />
+            <FiHome size={20} />
             <span>Lihat Situs Publik</span>
           </Link>
-          <button data-button="ghost" data-button-size="md" data-button-loading={loggingOut} type="button" onClick={handleLogout} disabled={loggingOut}>
-            <FiLogOut size={18} />
+          <button data-button="primary" data-button-hover="accent" data-button-size="md" data-button-loading={loggingOut} type="button" onClick={handleLogout} disabled={loggingOut}>
+            <FiLogOut size={20} />
             <span>{loggingOut ? "Keluar..." : "Keluar"}</span>
           </button>
         </div>
