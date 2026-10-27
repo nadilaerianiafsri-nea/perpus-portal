@@ -1,0 +1,92 @@
+.controller {
+  display: none;
+}
+
+:global(
+  html[data-public-page-animate="true"][data-public-page-transition="forward"]
+)
+  main {
+  animation: publicPageFromRight 0.28s
+    cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+:global(
+  html[data-public-page-animate="true"][data-public-page-transition="backward"]
+)
+  main {
+  animation: publicPageFromLeft 0.28s
+    cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes publicPageFromRight {
+  from {
+    opacity: 0.55;
+    transform: translateX(32px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes publicPageFromLeft {
+  from {
+    opacity: 0.55;
+    transform: translateX(-32px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (max-width: 760px) {
+  :global(
+    html[data-public-page-animate="true"][data-public-page-transition="forward"]
+  )
+    main {
+    animation-name: publicPageFromRightMobile;
+  }
+
+  :global(
+    html[data-public-page-animate="true"][data-public-page-transition="backward"]
+  )
+    main {
+    animation-name: publicPageFromLeftMobile;
+  }
+
+  @keyframes publicPageFromRightMobile {
+    from {
+      opacity: 0.6;
+      transform: translateX(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes publicPageFromLeftMobile {
+    from {
+      opacity: 0.6;
+      transform: translateX(-20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :global(
+    html[data-public-page-animate="true"]
+  )
+    main {
+    animation: none !important;
+  }
+}

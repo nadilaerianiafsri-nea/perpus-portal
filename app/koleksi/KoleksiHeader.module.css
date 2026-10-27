@@ -1,0 +1,136 @@
+.headerArea {
+  position: relative;
+  isolation: isolate;
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding-top: 132px;
+  padding-bottom: 24px;
+}
+
+.headerArea::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 96px;
+  right: -110px;
+  width: 250px;
+  height: 250px;
+  border: 1px solid color-mix(in srgb, var(--sky) 62%, transparent);
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 42px color-mix(in srgb, var(--sky) 8%, transparent);
+  pointer-events: none;
+}
+
+.headerCard {
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  padding: 26px 28px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background:
+    linear-gradient(
+      135deg,
+      var(--white) 0%,
+      color-mix(in srgb, var(--sky) 22%, var(--white)) 100%
+    );
+  box-shadow:
+    0 2px 5px color-mix(in srgb, var(--navy) 6%, transparent),
+    0 18px 42px color-mix(in srgb, var(--navy) 7%, transparent);
+  animation: collectionHeaderEnter 0.42s ease both;
+}
+
+.headerCard::after {
+  content: "";
+  position: absolute;
+  width: 110px;
+  height: 110px;
+  right: -36px;
+  top: -48px;
+  border: 18px solid color-mix(in srgb, var(--yellow) 22%, transparent);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.headerCard h1 {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: var(--navy);
+  font-size: clamp(32px, 3vw, 46px);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.headerArea + :global(main) {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+.headerArea + :global(main) > :global(h1[data-page-title]) {
+  display: none;
+}
+
+@keyframes collectionHeaderEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 900px) {
+  .headerArea::before {
+    right: 0;
+    opacity: 0.52;
+  }
+}
+
+@media (max-width: 760px) {
+  .headerArea {
+    padding-bottom: 18px;
+  }
+
+  .headerCard {
+    padding: 22px;
+    border-radius: 18px;
+  }
+}
+
+@media (max-width: 600px) {
+  .headerArea {
+    padding-top: 104px;
+  }
+}
+
+@media (max-width: 560px) {
+  .headerArea {
+    width: calc(100% - 24px);
+    padding-bottom: 18px;
+  }
+
+  .headerArea::before {
+    display: none;
+  }
+
+  .headerCard {
+    padding: 18px;
+    border-radius: 16px;
+  }
+
+  .headerCard h1 {
+    font-size: 30px;
+    line-height: 1.08;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .headerCard {
+    animation: none;
+  }
+}

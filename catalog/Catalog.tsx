@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+
 import Link from "next/link";
+
 import {
   FiGrid,
   FiList,
@@ -11,32 +14,51 @@ import {
   FiTrash2,
   FiX,
 } from "react-icons/fi";
+
 import BookCard from "./BookCard";
+
 import SearchInput from "@/components/SearchField";
+
 import AppSelect from "@/components/AppSelect";
+
 import Filters from "./Filters";
+
 import MemberFilterDrawer from "./MemberFilterDrawer";
+
 import {
   catalogFilterKeys,
   memberFilterChips,
   type FilterChip,
 } from "./filterOptions";
+
 import {
   type CatalogResponse,
   type FilterOptions,
   availabilityLabels,
   typeLabels,
 } from "./types";
+
 import styles from "./Catalog.module.css";
+
+import headerStyles from "./CatalogHeader.module.css";
+
+import motionStyles from "./CatalogMotion.module.css";
+
 import memberStyles from "./MemberCatalogEnhancements.module.css";
+
 import presentation from "./MemberCatalogPresentation.module.css";
 
 const sorts = [
   ["relevance", "Relevansi"],
+
   ["newest", "Terbaru"],
+
   ["titleAsc", "Judul A-Z"],
+
   ["titleDesc", "Judul Z-A"],
+
   ["yearDesc", "Tahun Terbaru"],
+
   ["yearAsc", "Tahun Terlama"],
 ];
 
@@ -46,123 +68,192 @@ type CatalogView = "grid" | "list";
 
 const publicClearKeys = [
   "search",
+
   "type",
+
   "availability",
+
   "subject",
+
   "language",
+
   "yearFrom",
+
   "yearTo",
+
   "page",
 ];
 
 export default function Catalog({
   ebook = false,
+
   member = false,
 }: {
   ebook?: boolean;
+
   member?: boolean;
 }) {
   const router = useRouter();
+
   const pathname = usePathname();
+
   const params = useSearchParams();
+
   const [queryText, setQueryText] = useState(() => params.toString());
+
   const query = new URLSearchParams(member ? params.toString() : queryText);
+  const publicDefaultSort = query.get("search")?.trim()
+    ? "relevance"
+    : "newest";
   const [memberView, setMemberView] = useState<CatalogView>("grid");
-  const view: CatalogView = member ? memberView : query.get("view") === "list" ? "list" : "grid";
+  const view: CatalogView = member
+    ? memberView
+    : query.get("view") === "list"
+      ? "list"
+      : "grid";
+
   const [options, setOptions] = useState<FilterOptions>(emptyOptions);
+
   const [filtersError, setFiltersError] = useState(false);
+
   const [retry, setRetry] = useState(0);
+
   const [searchRevision, setSearchRevision] = useState(0);
+
   const [result, setResult] = useState<{
     key: string;
+
     data?: CatalogResponse;
+
     error?: string;
   } | null>(null);
+
   const dialog = useRef<HTMLDialogElement>(null);
+
   const filterButton = useRef<HTMLButtonElement>(null);
+
   const [filterOpen, setFilterOpen] = useState(false);
+
   const [expandedChips, setExpandedChips] = useState(false);
 
   useEffect(() => {
     if (member) return;
+
     const syncFromHistory = () => {
       const nextText = window.location.search.replace(/^\?/, "");
+
       setQueryText(nextText);
     };
+
     window.addEventListener("popstate", syncFromHistory);
+
     return () => window.removeEventListener("popstate", syncFromHistory);
   }, [member]);
 
   const apiQuery = new URLSearchParams(query);
+
   apiQuery.delete("view");
+
   if (!member) {
     apiQuery.set(
       "limit",
+
       view === "list" ? "5" : query.get("limit") === "4" ? "4" : "8",
     );
+
+    if (!apiQuery.has("sort")) {
+      apiQuery.set("sort", publicDefaultSort);
+    }
   }
+
   if (ebook) {
     apiQuery.delete("type");
+
     apiQuery.delete("availability");
   }
+
   const queryString = apiQuery.toString();
+
   const apiBase = member
     ? "/api/members/me/catalog"
     : `/api/${ebook ? "ebooks" : "collections"}`;
+
   const filterBase = member
     ? "/api/members/me/catalog/filters"
     : "/api/collections/filters";
+
   const filterQuery = ebook ? "?type=EBOOK" : "";
+
   const detailBasePath = member ? "/dashboard/koleksi" : "/koleksi";
+
   const key = `${member}:${ebook}:${queryString}:${retry}`;
+
   const loading = result?.key !== key;
-  // Keep the previous page visible while the next request is in flight.
-  // This avoids the catalog flashing back to a full skeleton on every
-  // public filter, sort, view, or pagination interaction.
+
   const response = result?.data;
+
   const error = !loading ? result?.error : undefined;
 
   useEffect(() => {
     const controller = new AbortController();
-    fetch(`${filterBase}${filterQuery}`, { signal: controller.signal })
+
+    fetch(`${filterBase}${filterQuery}`, {
+      signal: controller.signal,
+    })
       .then(async (response) => {
         if (!response.ok) throw new Error();
+
         return response.json();
       })
+
       .then((data) => {
         setOptions(data);
+
         setFiltersError(false);
       })
+
       .catch(() => {
-        if (!controller.signal.aborted) setFiltersError(true);
+        if (!controller.signal.aborted) {
+          setFiltersError(true);
+        }
       });
+
     return () => controller.abort();
   }, [filterBase, filterQuery, retry]);
 
   useEffect(() => {
     const controller = new AbortController();
+
     fetch(`${apiBase}${queryString ? `?${queryString}` : ""}`, {
       signal: AbortSignal.any([controller.signal, AbortSignal.timeout(12000)]),
+
       cache: "no-store",
     })
       .then(async (response) => {
         if (!response.ok) {
           const body = await response.json();
+
           throw new Error(
             response.status === 400 && typeof body.message === "string"
               ? body.message
               : "Data koleksi belum dapat dimuat. Silakan coba lagi.",
           );
         }
+
         return response.json();
       })
+
       .then((data) => {
-        if (!controller.signal.aborted) setResult({ key, data });
+        if (!controller.signal.aborted) {
+          setResult({ key, data });
+        }
       })
+
       .catch((reason) => {
         if (!controller.signal.aborted) {
           setResult({
             key,
+
             error:
               reason instanceof Error && reason.message !== "signal timed out"
                 ? reason.message
@@ -170,52 +261,92 @@ export default function Catalog({
           });
         }
       });
+
     return () => controller.abort();
   }, [apiBase, queryString, key]);
 
   function commitPublicQuery(next: URLSearchParams) {
     const nextText = next.toString();
+
     setQueryText(nextText);
+
     const href = `${pathname}${nextText ? `?${nextText}` : ""}`;
-    window.history.replaceState(window.history.state, "", href);
+
+    window.history.replaceState(
+      window.history.state,
+
+      "",
+
+      href,
+    );
   }
 
   function update(updates: Record<string, string | null>) {
     if (member) {
       const next = new URLSearchParams(window.location.search);
+
       for (const [name, value] of Object.entries(updates)) {
-        if (value) next.set(name, value);
-        else next.delete(name);
+        if (value) {
+          next.set(name, value);
+        } else {
+          next.delete(name);
+        }
       }
-      if (!("page" in updates) && !("view" in updates)) next.delete("page");
-      router.push(`${pathname}${next.size ? `?${next}` : ""}`, {
-        scroll: false,
-      });
+
+      if (!("page" in updates) && !("view" in updates)) {
+        next.delete("page");
+      }
+
+      router.push(
+        `${pathname}${next.size ? `?${next}` : ""}`,
+
+        {
+          scroll: false,
+        },
+      );
+
       return;
     }
 
     const next = new URLSearchParams(queryText);
+
     for (const [name, value] of Object.entries(updates)) {
-      if (value) next.set(name, value);
-      else next.delete(name);
+      if (value) {
+        next.set(name, value);
+      } else {
+        next.delete(name);
+      }
     }
-    if (!("page" in updates) && !("view" in updates)) next.delete("page");
+
+    if (!("page" in updates) && !("view" in updates)) {
+      next.delete("page");
+    }
+
     commitPublicQuery(next);
   }
 
   function changeView(nextView: CatalogView) {
-    if (member) { setMemberView(nextView); return; }
+    if (member) {
+      setMemberView(nextView);
+      return;
+    }
+
     if (nextView === view) return;
 
     const next = new URLSearchParams(queryText);
+
     next.delete("page");
 
     if (nextView === "list") {
       next.set("view", "list");
+
       next.set("limit", "5");
     } else {
       next.delete("view");
-      if (next.get("limit") !== "4") next.set("limit", "8");
+
+      if (next.get("limit") !== "4") {
+        next.set("limit", "8");
+      }
     }
 
     commitPublicQuery(next);
@@ -224,17 +355,33 @@ export default function Catalog({
   function clear() {
     if (member) {
       update(Object.fromEntries(catalogFilterKeys.map((key) => [key, null])));
+
       return;
     }
 
     const next = new URLSearchParams(queryText);
-    for (const key of publicClearKeys) next.delete(key);
+
+    for (const key of publicClearKeys) {
+      next.delete(key);
+    }
 
     setSearchRevision((value) => value + 1);
+
     commitPublicQuery(next);
   }
 
-  const filterProps = { query, options, ebook, update, clear };
+  const filterProps = {
+    query,
+
+    options,
+
+    ebook,
+
+    update,
+
+    clear,
+  };
+
   const chips: FilterChip[] = member
     ? memberFilterChips(query, options, ebook)
     : (ebook
@@ -242,11 +389,16 @@ export default function Catalog({
         : ["type", "availability", "subject", "language"]
       ).flatMap((name) =>
         (query.get(name) ?? "")
+
           .split(",")
+
           .filter(Boolean)
+
           .map((value) => ({
             name,
+
             value,
+
             label:
               name === "type"
                 ? (typeLabels[value as keyof typeof typeLabels] ?? value)
@@ -262,37 +414,91 @@ export default function Catalog({
     if (query.get(name)) {
       chips.push({
         name,
+
         value: query.get(name)!,
+
         label: `${name === "yearFrom" ? "Dari" : "Sampai"} ${query.get(name)}`,
       });
     }
   }
 
   const requestedPage = Number(query.get("page") || 1);
+
   const currentPage =
     !member && loading ? requestedPage : (response?.meta.page ?? requestedPage);
+
   const totalPages = response?.meta.totalPages ?? 0;
-  const pageStart = Math.max(1, Math.min(currentPage - 2, totalPages - 4));
+
+  const pageStart = Math.max(
+    1,
+
+    Math.min(currentPage - 2, totalPages - 4),
+  );
+
   const pages = Array.from(
-    { length: Math.min(5, totalPages) },
+    {
+      length: Math.min(5, totalPages),
+    },
+
     (_, index) => pageStart + index,
   );
 
+  const catalogPageKey = response
+    ? `${view}:${response.meta.page}:${response.data
+
+        .map((book) => book.id)
+
+        .join("-")}`
+    : `${view}:empty`;
+
   const content = (
     <>
-      <h1 data-page-title>{ebook ? "Katalog E-Book" : "Katalog Koleksi"}</h1>
+      {member ? (
+        <h1 data-page-title>{ebook ? "Katalog E-Book" : "Katalog Koleksi"}</h1>
+      ) : (
+        <section
+          className={headerStyles.pageIntro}
+          aria-label="Pengantar halaman koleksi"
+        >
+          <nav className={headerStyles.breadcrumb} aria-label="Breadcrumb">
+            <Link href="/">Beranda</Link>
+
+            <span aria-hidden="true">/</span>
+
+            <span aria-current="page">{ebook ? "E-Book" : "Koleksi"}</span>
+          </nav>
+
+          <div className={headerStyles.heroCard}>
+            <div className={headerStyles.heroContent}>
+              <h1 data-page-title>
+                {ebook ? "Katalog E-Book" : "Katalog Koleksi"}
+              </h1>
+            </div>
+
+            <div className={headerStyles.heroOrnament} aria-hidden="true" />
+          </div>
+        </section>
+      )}
 
       <div
-        className={`${styles.searchRow} ${member ? memberStyles.memberSearchRow : ""}`}
+        className={`${styles.searchRow} ${
+          member ? memberStyles.memberSearchRow : ""
+        }`}
       >
         <SearchInput
           key={searchRevision}
           initialValue={query.get("search") ?? ""}
-          onSearch={(value) => update({ search: value.trim() || null })}
+          onSearch={(value) =>
+            update({
+              search: value.trim() || null,
+            })
+          }
         />
+
         {!member ? (
           <label>
             <span className={styles.srOnly}>Kategori pencarian</span>
+
             <AppSelect
               className={styles.catalogSelect}
               aria-label="Kategori pencarian"
@@ -302,10 +508,13 @@ export default function Catalog({
                   : (query.get("subject") ?? "")
               }
               onChange={(event) =>
-                update({ subject: event.target.value || null })
+                update({
+                  subject: event.target.value || null,
+                })
               }
             >
               <option value="">Semua</option>
+
               {options.subjects.map((subject) => (
                 <option key={subject}>{subject}</option>
               ))}
@@ -322,6 +531,7 @@ export default function Catalog({
         {!member ? (
           <aside className={styles.sidebar}>
             <Filters {...filterProps} />
+
             {filtersError ? (
               <p className={styles.inlineError}>Filter belum dapat dimuat.</p>
             ) : null}
@@ -333,7 +543,9 @@ export default function Catalog({
           aria-label="Hasil pencarian"
           aria-busy={loading}
         >
-          <div className={`${styles.toolbar} ${member ? presentation.toolbar : ""}`}>
+          <div
+            className={`${styles.toolbar} ${member ? presentation.toolbar : ""}`}
+          >
             {!member ? (
               <button
                 data-button="secondary"
@@ -341,9 +553,11 @@ export default function Catalog({
                 className={styles.mobileFilter}
                 onClick={() => dialog.current?.showModal()}
               >
-                <FiSliders /> Filter
+                <FiSliders />
+                Filter
               </button>
             ) : null}
+
             <p aria-live="polite">
               {loading ? (
                 "Memuat koleksi..."
@@ -356,7 +570,9 @@ export default function Catalog({
               )}
             </p>
 
-            <div className={`${styles.sortTools} ${member ? presentation.tools : ""}`}>
+            <div
+              className={`${styles.sortTools} ${member ? presentation.tools : ""}`}
+            >
               {member ? (
                 <button
                   data-button="secondary"
@@ -371,26 +587,36 @@ export default function Catalog({
                   title="Filter koleksi"
                   onClick={() => setFilterOpen(true)}
                 >
-                  <FiSliders aria-hidden="true" /> Filter
+                  <FiSliders aria-hidden="true" />
+                  Filter
                   {chips.length > 0 ? <span>{chips.length}</span> : null}
                 </button>
               ) : null}
+
               {!member ? (
                 <label className={styles.pageSize}>
                   <span className={styles.srOnly}>
                     Jumlah koleksi per halaman
                   </span>
+
                   <AppSelect
                     className={styles.pageSizeSelect}
                     aria-label="Jumlah koleksi per halaman"
                     value={query.get("limit") ?? (ebook ? "8" : "20")}
-                    onChange={(event) => update({ limit: event.target.value })}
+                    onChange={(event) =>
+                      update({
+                        limit: event.target.value,
+                      })
+                    }
                   >
                     {[
                       ...new Set([
                         8,
+
                         12,
+
                         20,
+
                         ...(query.get("limit")
                           ? [Number(query.get("limit"))]
                           : []),
@@ -404,13 +630,28 @@ export default function Catalog({
                 </label>
               ) : null}
 
-              <label className={member ? presentation.sortField : undefined}>
+              <label
+                className={
+                  member
+                    ? `${styles.memberSort} ${presentation.sortField}`
+                    : undefined
+                }
+              >
+                {member ? <span aria-hidden="true">Urutkan:</span> : null}
                 <span className={styles.srOnly}>Urutkan koleksi</span>
+
                 <AppSelect
                   aria-label="Urutkan koleksi"
                   className={styles.sortSelect}
-                  value={query.get("sort") ?? "relevance"}
-                  onChange={(event) => update({ sort: event.target.value })}
+                  value={
+                    query.get("sort") ??
+                    (member ? "relevance" : publicDefaultSort)
+                  }
+                  onChange={(event) =>
+                    update({
+                      sort: event.target.value,
+                    })
+                  }
                 >
                   {sorts.map(([value, label]) => (
                     <option key={value} value={value}>
@@ -420,28 +661,33 @@ export default function Catalog({
                 </AppSelect>
               </label>
 
-                <div className={`${styles.viewToggle} ${member ? presentation.viewToggle : ""}`} role={member ? "group" : undefined} aria-label={member ? "Tampilan koleksi" : undefined}>
-                  <button
-                    data-button="icon"
-                    data-button-size="sm"
-                    data-button-shape="square"
-                    aria-label="Tampilan grid"
-                    aria-pressed={view === "grid"}
-                    onClick={() => changeView("grid")}
-                  >
-                    <FiGrid />
-                  </button>
-                  <button
-                    data-button="icon"
-                    data-button-size="sm"
-                    data-button-shape="square"
-                    aria-label="Tampilan list"
-                    aria-pressed={view === "list"}
-                    onClick={() => changeView("list")}
-                  >
-                    <FiList />
-                  </button>
-                </div>
+              <div
+                className={`${styles.viewToggle} ${member ? presentation.viewToggle : ""}`}
+                role={member ? "group" : undefined}
+                aria-label={member ? "Tampilan koleksi" : undefined}
+              >
+                <button
+                  data-button="icon"
+                  data-button-size="sm"
+                  data-button-shape="square"
+                  aria-label="Tampilan grid"
+                  aria-pressed={view === "grid"}
+                  onClick={() => changeView("grid")}
+                >
+                  <FiGrid />
+                </button>
+
+                <button
+                  data-button="icon"
+                  data-button-size="sm"
+                  data-button-shape="square"
+                  aria-label="Tampilan list"
+                  aria-pressed={view === "list"}
+                  onClick={() => changeView("list")}
+                >
+                  <FiList />
+                </button>
+              </div>
             </div>
           </div>
 
@@ -454,7 +700,8 @@ export default function Catalog({
                   href={member ? "/dashboard/koleksi" : "/koleksi"}
                   aria-label="Hapus pembatas E-Book, buka semua koleksi"
                 >
-                  E-Book <FiX />
+                  E-Book
+                  <FiX />
                 </Link>
               ) : null}
 
@@ -472,18 +719,22 @@ export default function Catalog({
                           )
                             ? null
                             : (query.get(chip.name) ?? "")
+
                                 .split(",")
+
                                 .filter(
                                   (value) =>
                                     !(chip.values ?? [chip.value]).includes(
                                       value,
                                     ),
                                 )
+
                                 .join(",") || null,
                         })
                       }
                     >
                       {chip.label}
+
                       <FiX />
                     </button>
                   ))
@@ -493,6 +744,7 @@ export default function Catalog({
                       key={`${chip.name}:${chip.value}`}
                     >
                       <span>{chip.label}</span>
+
                       <button
                         type="button"
                         data-filter-remove
@@ -505,13 +757,16 @@ export default function Catalog({
                             )
                               ? null
                               : (query.get(chip.name) ?? "")
+
                                   .split(",")
+
                                   .filter(
                                     (value) =>
                                       !(chip.values ?? [chip.value]).includes(
                                         value,
                                       ),
                                   )
+
                                   .join(",") || null,
                           })
                         }
@@ -520,6 +775,7 @@ export default function Catalog({
                       </button>
                     </div>
                   ))}
+
               {member && chips.length > 5 ? (
                 <button
                   data-button="ghost"
@@ -541,7 +797,8 @@ export default function Catalog({
                     className={styles.clearChips}
                     onClick={clear}
                   >
-                    <FiX /> Hapus semua
+                    <FiX />
+                    Hapus semua
                   </button>
                 ) : (
                   <button
@@ -564,7 +821,12 @@ export default function Catalog({
               aria-label="Memuat koleksi"
             >
               {Array.from({ length: ebook ? 8 : 12 }, (_, index) => (
-                <div className={styles.skeleton} key={index} data-member-catalog-skeleton={member || undefined} data-catalog-view={view}>
+                <div
+                  className={styles.skeleton}
+                  key={index}
+                  data-member-catalog-skeleton={member || undefined}
+                  data-catalog-view={view}
+                >
                   <div />
                   <span />
                   <span />
@@ -579,7 +841,9 @@ export default function Catalog({
                   ? "Koleksi belum dapat dimuat."
                   : "Data koleksi belum dapat dimuat. Silakan coba lagi."}
               </h2>
+
               {error === "Rentang tahun tidak valid." ? <p>{error}</p> : null}
+
               <button
                 data-button="primary"
                 data-button-size="md"
@@ -587,13 +851,19 @@ export default function Catalog({
               >
                 Coba Lagi
               </button>
+
               <button data-button="ghost" data-button-size="md" onClick={clear}>
                 Bersihkan Filter
               </button>
             </div>
           ) : response?.data.length ? (
             <>
-              <div className={view === "grid" ? styles.grid : styles.list}>
+              <div
+                key={member ? undefined : catalogPageKey}
+                className={`${view === "grid" ? styles.grid : styles.list} ${
+                  !member ? motionStyles.pageContent : ""
+                } ${!member && loading ? motionStyles.updating : ""}`}
+              >
                 {response.data.map((book) => (
                   <BookCard
                     key={book.id}
@@ -611,10 +881,15 @@ export default function Catalog({
                   data-button="secondary"
                   data-button-size="md"
                   disabled={loading || currentPage <= 1}
-                  onClick={() => update({ page: String(currentPage - 1) })}
+                  onClick={() =>
+                    update({
+                      page: String(currentPage - 1),
+                    })
+                  }
                 >
                   Sebelumnya
                 </button>
+
                 {pages.map((page) => (
                   <button
                     data-button={page === currentPage ? "primary" : "ghost"}
@@ -622,16 +897,25 @@ export default function Catalog({
                     key={page}
                     aria-current={page === currentPage ? "page" : undefined}
                     disabled={loading && page !== currentPage}
-                    onClick={() => update({ page: String(page) })}
+                    onClick={() =>
+                      update({
+                        page: String(page),
+                      })
+                    }
                   >
                     {page}
                   </button>
                 ))}
+
                 <button
                   data-button="secondary"
                   data-button-size="md"
                   disabled={loading || currentPage >= totalPages}
-                  onClick={() => update({ page: String(currentPage + 1) })}
+                  onClick={() =>
+                    update({
+                      page: String(currentPage + 1),
+                    })
+                  }
                 >
                   Berikutnya
                 </button>
@@ -640,22 +924,28 @@ export default function Catalog({
           ) : (
             <div className={styles.state}>
               <FiSearch />
-              <h2>
-                Tidak ada koleksi yang sesuai.
-              </h2>
+
+              <h2>Tidak ada koleksi yang sesuai.</h2>
+
               <p>
                 {member
                   ? "Coba ubah atau hapus beberapa filter."
                   : "Coba kata kunci lain atau hapus filter yang dipilih."}
               </p>
+
               <button data-button="ghost" data-button-size="md" onClick={clear}>
                 Bersihkan Filter
               </button>
+
               {totalPages > 0 ? (
                 <button
                   data-button="ghost"
                   data-button-size="md"
-                  onClick={() => update({ page: "1" })}
+                  onClick={() =>
+                    update({
+                      page: "1",
+                    })
+                  }
                 >
                   Kembali ke Halaman Pertama
                 </button>
@@ -680,7 +970,9 @@ export default function Catalog({
       ) : (
         <dialog
           ref={dialog}
-          className={`${styles.filterDialog} ${!ebook ? styles.publicCollectionFilterDialog : ""} ${member ? memberStyles.memberFilterDialog : ""}`}
+          className={`${styles.filterDialog} ${
+            !ebook ? styles.publicCollectionFilterDialog : ""
+          } ${member ? memberStyles.memberFilterDialog : ""}`}
           aria-label="Filter koleksi"
         >
           <button
@@ -693,8 +985,11 @@ export default function Catalog({
           >
             <FiX />
           </button>
+
           <Filters {...filterProps} />
+
           {filtersError ? <p>Filter belum dapat dimuat.</p> : null}
+
           <button
             data-button="primary"
             data-button-size="md"
@@ -709,10 +1004,17 @@ export default function Catalog({
   );
 
   return member ? (
-    <div className={`${styles.main} ${styles.memberCatalog} ${presentation.catalog}`} data-member-catalog>{content}</div>
+    <div
+      className={`${styles.main} ${styles.memberCatalog} ${presentation.catalog}`}
+      data-member-catalog
+    >
+      {content}
+    </div>
   ) : (
     <main
-      className={`${styles.main} ${!ebook ? styles.publicCollectionCatalog : ""}`}
+      className={`${styles.main} ${
+        !ebook ? styles.publicCollectionCatalog : ""
+      }`}
     >
       {content}
     </main>

@@ -2,65 +2,110 @@
   display: grid;
   gap: 12px;
 }
+
 .item {
+  min-width: 0;
+  overflow: hidden;
   border: 1px solid #e7e7e9;
   border-radius: 12px;
   background: #fff;
-  min-width: 0;
 }
+
 .heading {
   margin: 0;
   font-size: 18px;
   font-weight: 500;
 }
+
 .button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 18px;
   width: 100%;
   border: 0;
   border-radius: 12px;
-  padding: 17px 16px;
+  padding: 17px 24px;
   color: #000633;
   background: transparent;
   font: inherit;
   line-height: 1.4;
   text-align: left;
   cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
+
 .button span {
+  min-width: 0;
   overflow-wrap: anywhere;
 }
-.button svg {
+
+.chevron {
   flex-shrink: 0;
-  color: #777;
   width: 18px;
   height: 18px;
+  color: #777;
+  transform: rotate(0deg);
+  transform-origin: center;
+  transition:
+    transform 0.24s ease,
+    color 0.2s ease;
 }
-.button:hover {
-  background: #fafafa;
+
+.button[aria-expanded="true"] .chevron {
+  transform: rotate(180deg);
 }
+
 .button:focus-visible {
   outline: 3px solid #b79a00;
-  outline-offset: 3px;
+  outline-offset: -3px;
 }
+
 .panel {
   border-top: 1px solid #eee;
-  padding: 16px;
+  padding: 16px 24px 18px;
   color: #555;
   font-size: 16px;
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
+
 .panel p {
   margin: 0;
 }
+
+@media (hover: hover) {
+  .list .item .button:hover {
+    background: #fafafa;
+    transform: none;
+  }
+
+  .button:hover .chevron {
+    color: #000633;
+  }
+}
+
 @media (max-width: 450px) {
   .heading {
     font-size: 16px;
   }
+
+  .button {
+    gap: 14px;
+    padding: 15px 16px;
+  }
+
   .panel {
+    padding: 14px 16px 16px;
     font-size: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button,
+  .chevron {
+    transition: none;
   }
 }

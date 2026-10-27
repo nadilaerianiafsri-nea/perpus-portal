@@ -1,0 +1,469 @@
+.tableCard {
+  overflow: visible;
+  font-family: inherit;
+  border: 1px solid color-mix(in srgb, var(--navy) 12%, var(--line));
+  border-radius: 18px;
+  background: var(--white);
+  box-shadow:
+    0 2px 6px color-mix(in srgb, var(--navy) 4%, transparent),
+    0 16px 38px color-mix(in srgb, var(--navy) 7%, transparent);
+  animation: grantTableEnter 0.34s ease both;
+}
+
+.tableCard .filters {
+  gap: 14px;
+  padding: 18px 20px;
+  border-bottom: 1px solid color-mix(in srgb, var(--navy) 9%, var(--line));
+  border-radius: 18px 18px 0 0;
+  background:
+    linear-gradient(
+      180deg,
+      var(--white) 0%,
+      color-mix(in srgb, var(--sky) 8%, var(--white)) 100%
+    );
+}
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--white);
+  color: var(--navy);
+}
+
+.table thead,
+.table thead tr {
+  background: var(--navy);
+}
+
+.table th {
+  position: relative;
+  padding: 17px 20px;
+  border: 0;
+  background: var(--navy);
+  color: var(--white);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.sortHeaderButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--white);
+  font: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    color 0.16s ease,
+    opacity 0.16s ease,
+    transform 0.16s ease;
+}
+
+.sortHeaderButton > span {
+  min-width: 0;
+}
+
+.sortDirectionIcon {
+  flex: 0 0 auto;
+  width: 17px;
+  height: 17px;
+  opacity: 0.58;
+  transition:
+    opacity 0.16s ease,
+    transform 0.2s ease;
+}
+
+.sortHeaderButtonActive .sortDirectionIcon {
+  opacity: 1;
+}
+
+.sortHeaderButton:focus-visible {
+  border-radius: 6px;
+  outline: 2px solid var(--white);
+  outline-offset: 4px;
+}
+
+.table td {
+  padding: 18px 20px;
+  border: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--navy) 8%, var(--line));
+  background: var(--white);
+  color: var(--navy);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.5;
+  vertical-align: middle;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.table td:first-child {
+  font-size: 15.5px;
+  font-weight: 600;
+}
+
+.table th:nth-child(2),
+.table td:nth-child(2) {
+  width: 120px;
+  white-space: nowrap;
+}
+
+.table th:nth-child(4),
+.table td:nth-child(4) {
+  width: 210px;
+  white-space: nowrap;
+}
+
+.table th:nth-child(5),
+.table td:nth-child(5) {
+  width: 220px;
+  white-space: nowrap;
+}
+
+.tableRow {
+  animation: grantRowEnter 0.28s ease both;
+}
+
+.tableRow:nth-child(2) {
+  animation-delay: 0.025s;
+}
+
+.tableRow:nth-child(3) {
+  animation-delay: 0.05s;
+}
+
+.tableRow:nth-child(4) {
+  animation-delay: 0.075s;
+}
+
+.tableRow:nth-child(5) {
+  animation-delay: 0.1s;
+}
+
+.mobileList .grantCard {
+  overflow: hidden;
+  padding: 18px;
+  border: 1px solid color-mix(in srgb, var(--navy) 11%, var(--line));
+  border-radius: 16px;
+  background: var(--white);
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--navy) 6%, transparent);
+  animation: grantCardEnter 0.3s ease both;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+.mobileList .grantCard:nth-child(2) {
+  animation-delay: 0.04s;
+}
+
+.mobileList .grantCard:nth-child(3) {
+  animation-delay: 0.08s;
+}
+
+.mobileList .grantCard:nth-child(4) {
+  animation-delay: 0.12s;
+}
+
+.mobileList .grantCard h2 {
+  margin: 0 0 16px;
+  padding-bottom: 13px;
+  border-bottom: 1px solid color-mix(in srgb, var(--navy) 9%, var(--line));
+  color: var(--navy);
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.mobileList .grantCard dl {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 16px;
+}
+
+.mobileList .grantCard dl > div {
+  display: grid;
+  grid-template-columns: minmax(95px, 0.7fr) minmax(0, 1.3fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.mobileList .grantCard dt {
+  color: color-mix(in srgb, var(--navy) 70%, var(--white));
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.mobileList .grantCard dd {
+  min-width: 0;
+  margin: 0;
+  color: var(--navy);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+@keyframes grantTableEnter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes grantRowEnter {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes grantCardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (hover: hover) {
+  .sortHeaderButton:hover {
+    color: var(--sky);
+    transform: translateY(-1px);
+  }
+
+  .sortHeaderButton:hover .sortDirectionIcon {
+    opacity: 1;
+  }
+
+  .table tbody .tableRow:hover td {
+    background: color-mix(in srgb, var(--sky) 18%, var(--white));
+  }
+
+  .mobileList .grantCard:hover {
+    border-color: color-mix(in srgb, var(--navy) 24%, var(--line));
+    background: color-mix(in srgb, var(--sky) 10%, var(--white));
+    box-shadow: 0 12px 28px color-mix(in srgb, var(--navy) 9%, transparent);
+    transform: translateY(-2px);
+  }
+}
+
+@media (max-width: 1100px) {
+  .table th {
+    padding: 15px 14px;
+    font-size: 15px;
+  }
+
+  .table td {
+    padding: 16px 14px;
+    font-size: 14.5px;
+  }
+
+
+  .table th:nth-child(4),
+  .table td:nth-child(4) {
+    width: 180px;
+  }
+
+  .table th:nth-child(5),
+  .table td:nth-child(5) {
+    width: 195px;
+  }
+}
+
+@media (max-width: 760px) {
+  .tableCard {
+    border-radius: 16px;
+  }
+
+  .tableCard .filters {
+    padding: 16px;
+  }
+
+  .mobileList {
+    gap: 12px;
+  }
+
+  .mobileList .grantCard {
+    padding: 17px;
+  }
+
+  .mobileList .grantCard h2 {
+    font-size: 17px;
+  }
+}
+
+@media (max-width: 450px) {
+  .tableCard {
+    border-radius: 14px;
+  }
+
+  .tableCard .filters {
+    gap: 10px;
+    padding: 14px;
+  }
+
+  .mobileList .grantCard {
+    padding: 15px;
+    border-radius: 14px;
+  }
+
+  .mobileList .grantCard h2 {
+    margin-bottom: 14px;
+    padding-bottom: 11px;
+    font-size: 16px;
+  }
+
+  .mobileList .grantCard dl > div {
+    grid-template-columns: 88px minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .mobileList .grantCard dt,
+  .mobileList .grantCard dd {
+    font-size: 13.5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tableCard,
+  .tableRow,
+  .mobileList .grantCard {
+    animation: none;
+    transition: none;
+  }
+
+  .sortHeaderButton,
+  .sortDirectionIcon {
+    transition: none;
+  }
+}
+
+
+.summaryCardOne {
+  background: #55689b !important;
+  color: var(--white) !important;
+  border: 1px solid color-mix(in srgb, #55689b 72%, var(--white));
+}
+
+.summaryCardTwo {
+  background: #353d72 !important;
+  color: var(--white) !important;
+  border: 1px solid color-mix(in srgb, #353d72 78%, var(--white));
+}
+
+.summaryCardThree {
+  background: #2273a5 !important;
+  color: var(--white) !important;
+  border: 1px solid color-mix(in srgb, #2273a5 78%, var(--white));
+}
+
+.summaryCardOne :is(h2, p, span, strong, svg),
+.summaryCardTwo :is(h2, p, span, strong, svg),
+.summaryCardThree :is(h2, p, span, strong, svg) {
+  color: inherit !important;
+}
+
+.summaryCardOne > div:first-child,
+.summaryCardTwo > div:first-child,
+.summaryCardThree > div:first-child {
+  background: color-mix(in srgb, var(--white) 18%, transparent) !important;
+}
+
+.summaryCardOne:hover,
+.summaryCardTwo:hover,
+.summaryCardThree:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px color-mix(in srgb, var(--navy) 12%, transparent);
+}
+
+@media (max-width: 760px) {
+  .summaryCardOne,
+  .summaryCardTwo,
+  .summaryCardThree {
+    min-height: 100%;
+  }
+}
+
+.summaryUpdating {
+  opacity: 0.72;
+  transition: opacity 0.18s ease;
+}
+
+.resultsUpdating {
+  opacity: 0.58;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+}
+
+.table:not(.resultsUpdating),
+.mobileList:not(.resultsUpdating) {
+  animation: grantFilteredResultsEnter 0.24s
+    ease both;
+}
+
+@keyframes grantFilteredResultsEnter {
+  from {
+    opacity: 0.72;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .summaryUpdating,
+  .resultsUpdating,
+  .table,
+  .mobileList {
+    transition: none;
+    animation: none;
+  }
+
+  .summaryUpdating,
+  .resultsUpdating {
+    opacity: 1;
+  }
+}
+

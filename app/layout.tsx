@@ -7,6 +7,7 @@ import "@/components/buttons.css";
 import "@/components/records.css";
 import "@/components/selects.css";
 import RowActionTooltip from "@/components/RowActionTooltip";
+import PublicPageTransitionController from "@/components/PublicPageTransitionController";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -15,7 +16,8 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Perpustakaan Digital | Kemenkum Riau",
+  title:
+    "Perpustakaan Digital | Kemenkum Riau",
   description:
     "Portal perpustakaan digital untuk menemukan koleksi, layanan, dan informasi perpustakaan.",
 };
@@ -27,7 +29,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id">
-      <body className={outfit.className}>{children}<RowActionTooltip /></body>
+      <body className={outfit.className}>
+        <PublicPageTransitionController />
+        {children}
+        <RowActionTooltip />
+      </body>
     </html>
   );
 }
