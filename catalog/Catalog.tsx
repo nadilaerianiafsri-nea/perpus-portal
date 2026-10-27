@@ -29,6 +29,7 @@ import {
 } from "./types";
 import styles from "./Catalog.module.css";
 import memberStyles from "./MemberCatalogEnhancements.module.css";
+import presentation from "./MemberCatalogPresentation.module.css";
 
 const sorts = [
   ["relevance", "Relevansi"],
@@ -65,10 +66,9 @@ export default function Catalog({
   const pathname = usePathname();
   const params = useSearchParams();
   const [queryText, setQueryText] = useState(() => params.toString());
-  const query = new URLSearchParams(queryText);
-  const [view, setView] = useState<CatalogView>(
-    !member && query.get("view") === "list" ? "list" : "grid",
-  );
+  const query = new URLSearchParams(member ? params.toString() : queryText);
+  const [memberView, setMemberView] = useState<CatalogView>("grid");
+  const view: CatalogView = member ? memberView : query.get("view") === "list" ? "list" : "grid";
   const [options, setOptions] = useState<FilterOptions>(emptyOptions);
   const [filtersError, setFiltersError] = useState(false);
   const [retry, setRetry] = useState(0);
@@ -92,13 +92,6 @@ export default function Catalog({
     window.addEventListener("popstate", syncFromHistory);
     return () => window.removeEventListener("popstate", syncFromHistory);
   }, [member]);
-
-  useEffect(() => {
-    if (member) return;
-    const nextView =
-      new URLSearchParams(queryText).get("view") === "list" ? "list" : "grid";
-    setView(nextView);
-  }, [member, queryText]);
 
   const apiQuery = new URLSearchParams(query);
   apiQuery.delete("view");
@@ -211,7 +204,8 @@ export default function Catalog({
   }
 
   function changeView(nextView: CatalogView) {
-    if (member || nextView === view) return;
+    if (member) { setMemberView(nextView); return; }
+    if (nextView === view) return;
 
     const next = new URLSearchParams(queryText);
     next.delete("page");
@@ -224,7 +218,6 @@ export default function Catalog({
       if (next.get("limit") !== "4") next.set("limit", "8");
     }
 
-    setView(nextView);
     commitPublicQuery(next);
   }
 
@@ -340,7 +333,7 @@ export default function Catalog({
           aria-label="Hasil pencarian"
           aria-busy={loading}
         >
-          <div className={styles.toolbar}>
+          <div className={`${styles.toolbar} ${member ? presentation.toolbar : ""}`}>
             {!member ? (
               <button
                 data-button="secondary"
@@ -363,7 +356,7 @@ export default function Catalog({
               )}
             </p>
 
-            <div className={styles.sortTools}>
+            <div className={`${styles.sortTools} ${member ? presentation.tools : ""}`}>
               {member ? (
                 <button
                   data-button="secondary"
@@ -411,8 +404,7 @@ export default function Catalog({
                 </label>
               ) : null}
 
-              <label className={member ? styles.memberSort : undefined}>
-                {member ? <span aria-hidden="true">Urutkan:</span> : null}
+              <label className={member ? presentation.sortField : undefined}>
                 <span className={styles.srOnly}>Urutkan koleksi</span>
                 <AppSelect
                   aria-label="Urutkan koleksi"
@@ -428,8 +420,7 @@ export default function Catalog({
                 </AppSelect>
               </label>
 
-              {!member ? (
-                <div className={styles.viewToggle}>
+                <div className={`${styles.viewToggle} ${member ? presentation.viewToggle : ""}`} role={member ? "group" : undefined} aria-label={member ? "Tampilan koleksi" : undefined}>
                   <button
                     data-button="icon"
                     data-button-size="sm"
@@ -451,7 +442,6 @@ export default function Catalog({
                     <FiList />
                   </button>
                 </div>
-              ) : null}
             </div>
           </div>
 
@@ -574,10 +564,11 @@ export default function Catalog({
               aria-label="Memuat koleksi"
             >
               {Array.from({ length: ebook ? 8 : 12 }, (_, index) => (
-                <div className={styles.skeleton} key={index}>
+                <div className={styles.skeleton} key={index} data-member-catalog-skeleton={member || undefined} data-catalog-view={view}>
                   <div />
                   <span />
                   <span />
+                  {member ? <span /> : null}
                 </div>
               ))}
             </div>
@@ -610,6 +601,7 @@ export default function Catalog({
                     basePath={detailBasePath}
                     member={member}
                     rowAction={view === "list"}
+                    variant={member ? "member-catalog" : undefined}
                   />
                 ))}
               </div>
@@ -649,9 +641,7 @@ export default function Catalog({
             <div className={styles.state}>
               <FiSearch />
               <h2>
-                {member
-                  ? "Koleksi tidak ditemukan"
-                  : "Tidak ada koleksi yang sesuai."}
+                Tidak ada koleksi yang sesuai.
               </h2>
               <p>
                 {member
@@ -719,7 +709,7 @@ export default function Catalog({
   );
 
   return member ? (
-    <div className={`${styles.main} ${styles.memberCatalog}`}>{content}</div>
+    <div className={`${styles.main} ${styles.memberCatalog} ${presentation.catalog}`} data-member-catalog>{content}</div>
   ) : (
     <main
       className={`${styles.main} ${!ebook ? styles.publicCollectionCatalog : ""}`}

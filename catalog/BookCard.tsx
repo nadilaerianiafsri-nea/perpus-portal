@@ -39,13 +39,16 @@ export default function BookCard({
   member = false,
   compact = false,
   rowAction = false,
+  variant,
 }: {
   book: Book;
   basePath?: string;
   member?: boolean;
   compact?: boolean;
   rowAction?: boolean;
+  variant?: "member-catalog";
 }) {
+  const memberCatalog = member && variant === "member-catalog";
   const detailHref = `${basePath}/${book.id}`;
   const details = (
     <>
@@ -55,7 +58,7 @@ export default function BookCard({
         </Link>
       </h2>
       <p title={member ? book.author : undefined}>{book.author}</p>
-      {member ? (
+      {member && (!memberCatalog || rowAction) ? (
         <small>
           {book.year}
           {book.language ? ` · ${book.language}` : ""}
@@ -72,18 +75,22 @@ export default function BookCard({
   );
   const memberActions = (
     <>
-      <BookStatus book={book} />
+      {!memberCatalog || rowAction ? <BookStatus book={book} /> : null}
       <Link
-        data-button="secondary"
+        data-button={memberCatalog ? "primary" : "secondary"}
+        data-button-hover={memberCatalog ? "accent" : undefined}
         data-button-size="md"
-        data-row-action="neutral"
-        data-button-shape={rowAction ? "square" : undefined}
+        data-row-action={memberCatalog ? undefined : "neutral"}
+        data-button-shape={rowAction && !memberCatalog ? "square" : undefined}
         title={rowAction ? "Lihat detail koleksi" : undefined}
         aria-label={rowAction ? `Lihat detail ${book.title}` : undefined}
         className={styles.detailLink}
         href={detailHref}
+        onKeyDown={memberCatalog ? event => {
+          if (event.key === " ") { event.preventDefault(); if (!event.repeat) event.currentTarget.click(); }
+        } : undefined}
       >
-        {rowAction ? <FiEye aria-hidden="true" /> : "Lihat Detail"}
+        {rowAction && !memberCatalog ? <FiEye aria-hidden="true" /> : "Lihat Detail"}
       </Link>
     </>
   );
@@ -103,6 +110,7 @@ export default function BookCard({
     <article
       className={`${styles.card}${compact ? ` ${styles.relatedCard}` : ""}`}
       data-catalog-view={rowAction ? "list" : "grid"}
+      data-member-catalog-card={memberCatalog || undefined}
     >
       <Link
         href={detailHref}
@@ -111,7 +119,7 @@ export default function BookCard({
       >
         <Image
           src={safeCoverUrl(book.coverUrl)}
-          alt={`Sampul ${book.title}`}
+          alt={memberCatalog ? book.title : `Sampul ${book.title}`}
           fill
           sizes={
             compact
