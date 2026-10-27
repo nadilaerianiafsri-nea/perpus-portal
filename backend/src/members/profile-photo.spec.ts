@@ -7,6 +7,8 @@ import { Logger, type INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
+import type { NestExpressApplication } from '@nestjs/platform-express';
+import { configureHttpSecurity } from '../security/http-security';
 import cookieParser from 'cookie-parser';
 import request from 'supertest';
 import { PrismaService } from '../prisma/prisma.service';
@@ -146,7 +148,8 @@ describe('private member profile photos', () => {
       ],
     }).compile();
     service = module.get(ProfilePhotoService);
-    app = module.createNestApplication();
+    app = module.createNestApplication<NestExpressApplication>();
+    configureHttpSecurity(app as NestExpressApplication, ['http://localhost:3214']);
     app.use(cookieParser());
     app.useLogger(false);
     await app.init();
@@ -185,7 +188,7 @@ describe('private member profile photos', () => {
     await rm(directory, { recursive: true });
   });
   const upload = (
-    buffer = jpg,
+    buffer: Buffer = jpg,
     filename = 'photo.jpg',
     contentType = 'image/jpeg',
     sub = 1,
@@ -350,7 +353,7 @@ describe('private member profile photos', () => {
       .set('Cookie', session())
       .set('Content-Type', 'text/plain')
       .send('userId=2')
-      .expect(400);
+      .expect(415);
     await request(app.getHttpServer())
       .delete(base)
       .set('Cookie', session())

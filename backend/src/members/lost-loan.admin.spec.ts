@@ -1,6 +1,7 @@
 import { AdminTransactionsService } from './admin-transactions.service';
 import { AdminOperationsService } from './admin-operations.service';
 import { lostReportView } from './lost-loan-state';
+import type { Prisma } from '../generated/prisma/client';
 
 describe('lost-case admin monitoring, legacy compatibility and notifications', () => {
   const row = { id: 7, status: 'AKTIF', lostReportStatus: 'MENUNGGU_VERIFIKASI', lostReportSource: 'ANGGOTA',
@@ -8,7 +9,7 @@ describe('lost-case admin monitoring, legacy compatibility and notifications', (
     user: { id: 1, name: 'Anggota', email: 'a@example.test', memberType: 'UMUM', memberProfile: { whatsapp: '0812' } },
     book: { id: 2, title: 'Buku', code: 'BK2', coverUrl: '' }, copy: { id: 3, code: 'COPY3' } };
   it('includes pending member reports as well as legacy HILANG rows in the existing list, with real state filters', async () => {
-    const prisma = { loan: { count: jest.fn(async () => 1), groupBy: jest.fn(async () => [{ userId: 1 }]), findMany: jest.fn(async () => [row]) } };
+    const prisma = { loan: { count: jest.fn(async () => 1), groupBy: jest.fn(async () => [{ userId: 1 }]), findMany: jest.fn(async (_query: Prisma.LoanFindManyArgs) => [row]) } };
     const service = new AdminTransactionsService(prisma as never, {} as never);
     for (const [status, value] of [['PENDING', 'MENUNGGU_VERIFIKASI'], ['PROCESS', 'PROSES_PENGGANTIAN'], ['COMPLETED', 'SELESAI']]) {
       const result = await service.lostBooks({ status });

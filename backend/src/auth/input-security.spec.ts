@@ -6,7 +6,7 @@ import { CollectionsService } from '../collections/collections.service';
 import { GrantsService } from '../grants/grants.service';
 import { ContactDto } from '../contact/contact.dto';
 
-const valid = { name: "O'Connor", email: 'member@example.com', whatsapp: '+6281234', address: 'R&D / Hukum & HAM', identity: "' OR 1=1 --", password: " <A&'bcdef> ", confirmPassword: " <A&'bcdef> ", memberType: 'umum', consent: true };
+const valid = { name: "O'Connor", email: 'member@example.com', whatsapp: '081234567890', address: 'R&D / Hukum & HAM', identity: "' OR 1=1 --", password: " <A&'bcdef> ", confirmPassword: " <A&'bcdef> ", memberType: 'mahasiswa', university: 'Universitas Riau', consent: true };
 describe('Public input security boundaries', () => {
   it.each(['<script>alert(1)</script>', '<img src=x onerror=alert(1)>', '<b>nama</b>', '&lt;svg onload=alert(1)&gt;'])('rejects markup in registration before persistence: %s', (name) => {
     expect(() => RegisterDto.from({ ...valid, name })).toThrow(BadRequestException);

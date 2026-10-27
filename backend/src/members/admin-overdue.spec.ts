@@ -1,6 +1,7 @@
 import { AdminTransactionsService } from './admin-transactions.service';
 import { AdminTransactionsController } from './admin-transactions.controller';
 import { overdueLoanOptions } from './admin-overdue-query';
+import type { Prisma } from '../generated/prisma/client';
 
 const now = new Date('2026-10-26T03:00:00Z');
 describe('existing admin loans overdue monitoring query', () => {
@@ -20,14 +21,14 @@ describe('existing admin loans overdue monitoring query', () => {
     const loan={id:31,status:'AKTIF',borrowedAt:new Date('2026-10-01'),dueAt:new Date('2026-10-22T03:00:00Z'),extensionCount:2,
       user:{id:7,name:'Anggota',email:'member@example.test',memberType:'MAHASISWA',memberProfile:{whatsapp:'081234567890'}},
       book:{id:4,title:'Buku Riau',code:'BK-004',coverUrl:''},copy:{id:5,code:'CP-5'}};
-    const prisma={loan:{count:jest.fn(async()=>21),findMany:jest.fn(async()=>[loan])},userEBook:{findMany:jest.fn(async()=>[])}};
+    const prisma={loan:{count:jest.fn(async(_query:Prisma.LoanCountArgs)=>21),findMany:jest.fn(async(_query:Prisma.LoanFindManyArgs)=>[loan])},userEBook:{findMany:jest.fn(async()=>[])}};
     const service=new AdminTransactionsService(prisma as never,{} as never);
     const result=await service.loans({status:'OVERDUE',search:'Riau',memberType:'MAHASISWA',bucket:'FOUR_TO_FOURTEEN',from:'2026-10-01',to:'2026-10-26',sort:'NEWEST',page:'2',limit:'20'});
     const query=prisma.loan.findMany.mock.calls[0][0];
     expect(query.skip).toBe(20);expect(query.take).toBe(20);
     expect(query.orderBy).toEqual([{dueAt:'desc'},{id:'desc'}]);
-    expect(query.where.AND).toContainEqual({dueAt:{lt:now}});
-    expect(query.where.AND).toContainEqual({dueAt:{gte:new Date(now.getTime()-14*86400000),lt:new Date(now.getTime()-3*86400000)}});
+    expect(query.where?.AND).toContainEqual({dueAt:{lt:now}});
+    expect(query.where?.AND).toContainEqual({dueAt:{gte:new Date(now.getTime()-14*86400000),lt:new Date(now.getTime()-3*86400000)}});
     expect(JSON.stringify(query.where)).toContain('MAHASISWA');expect(JSON.stringify(query.where)).toContain('FISIK');expect(JSON.stringify(query.where)).toContain('AKTIF');
     expect(result.data[0].overdueDays).toBe(4);
     expect(result.overdueStats).toEqual({total:21,oneToThree:21,fourToFourteen:21,overFourteen:21});

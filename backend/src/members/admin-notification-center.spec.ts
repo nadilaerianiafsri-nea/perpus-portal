@@ -45,9 +45,10 @@ describe('admin operational notification center', () => {
   });
   it('bulk-read uses the existing per-admin read table and a captured cutoff, never member read or delivery state', async () => {
     const {service,prisma}=fixture();await expect(service.markAllNotificationsRead(99)).resolves.toEqual({count:1});
-    const query=prisma.notification.findMany.mock.calls[0][0];
-    expect(query.where.adminReads).toEqual({none:{adminId:99}});expect(query.where.createdAt.lte).toBeInstanceOf(Date);
-    expect(query.where.OR).toEqual([{eventKey:{startsWith:'reservation:',endsWith:':created'}},{eventKey:{startsWith:'loan:',endsWith:':lost-report'}}]);
+    expect(prisma.notification.findMany).toHaveBeenCalledWith(expect.objectContaining({where:expect.objectContaining({
+      adminReads:{none:{adminId:99}},createdAt:{lte:expect.any(Date)},
+      OR:[{eventKey:{startsWith:'reservation:',endsWith:':created'}},{eventKey:{startsWith:'loan:',endsWith:':lost-report'}}],
+    })}));
     expect(prisma.adminNotificationRead.createMany).toHaveBeenCalledWith({data:expect.arrayContaining([{adminId:99,notificationId:1}]),skipDuplicates:true});
     expect(prisma.notification.findFirst).not.toHaveBeenCalled();
   });

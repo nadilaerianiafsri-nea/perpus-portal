@@ -11,7 +11,7 @@ const book = {
 const ebook = {
   code: book.code, title: book.title, author: book.author, isbnIssn: '', publisher: book.publisher,
   year: 2026, edition: '', language: 'Indonesia', subject: 'Hukum', description: book.description,
-  coverUrl: book.coverUrl, accessMode: 'BACA_DI_WEBSITE', ebookUrl: 'https://example.com/book.pdf',
+  coverUrl: book.coverUrl, accessMode: 'BACA_DI_WEBSITE', ebookUrl: '/ebooks/security-fixture.pdf',
   accessDurationDays: null, licenseNote: '', isActive: true,
 };
 

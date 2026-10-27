@@ -5,6 +5,7 @@ import type { Request, Response, NextFunction } from 'express';
 const multipartUploadPaths = new Set([
   '/admin/uploads/cover',
   '/admin/uploads/ebook',
+  '/members/me/profile/photo',
 ]);
 
 export function configureHttpSecurity(

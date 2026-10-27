@@ -10,6 +10,7 @@ import { AdminTransactionsService } from './admin-transactions.service';
 import { MemberRoleGuard } from './member-role.guard';
 import { MembersController, MemberCirculationController } from './members.controller';
 import { MembersService } from './members.service';
+import { EBookCirculationService } from './ebook-circulation.service';
 import { positiveId, profileInput } from './member.validation';
 
 describe('member input security', () => {
@@ -41,7 +42,7 @@ describe('member and admin HTTP security boundary', () => {
   beforeAll(async () => {
     const module = await Test.createTestingModule({
       controllers: [MembersController, MemberCirculationController, AdminMembersController, AdminTransactionsController],
-      providers: [MemberRoleGuard, AdminMembersService, AdminTransactionsService, { provide: PrismaService, useValue: prisma }, { provide: MembersService, useValue: circulation }],
+      providers: [MemberRoleGuard, AdminMembersService, AdminTransactionsService, { provide: PrismaService, useValue: prisma }, { provide: MembersService, useValue: circulation }, { provide: EBookCirculationService, useValue: {} }],
     }).overrideGuard(JwtAuthGuard).useValue({ canActivate(context: ExecutionContext) { const req = context.switchToHttp().getRequest(); req.user = { sub: req.headers['x-test-admin'] ? 99 : 1 }; return true; } }).compile();
     app = module.createNestApplication();
     await app.init();

@@ -5,6 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { jest } from '@jest/globals';
 import request from 'supertest';
 import { AuthController } from './auth.controller';
+import { AdminProfileService } from './admin-profile.service';
 import { AuthService } from './auth.service';
 import { PasswordResetService } from './password-reset.service';
 import { RecaptchaService } from './recaptcha.service';
@@ -32,6 +33,7 @@ describe('Login CAPTCHA HTTP contract', () => {
         { provide: ConfigService, useValue: { get: (key: string) => settings[key] } },
         { provide: AuthService, useValue: { login: authenticate } },
         { provide: PasswordResetService, useValue: {} },
+        { provide: AdminProfileService, useValue: {} },
       ],
     }).compile();
     app = module.createNestApplication(); await app.init();

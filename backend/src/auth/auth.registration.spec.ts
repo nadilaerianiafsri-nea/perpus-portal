@@ -7,6 +7,7 @@ import request from 'supertest';
 import bcrypt from 'bcrypt';
 import { jest } from '@jest/globals';
 import { AuthController } from './auth.controller';
+import { AdminProfileService } from './admin-profile.service';
 import { RecaptchaService } from './recaptcha.service';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
@@ -39,7 +40,7 @@ describe('Registration HTTP contract', () => {
     email: 'budi@example.com',
     whatsapp: '08123456789',
     address: 'Pekanbaru',
-    identity: '001234',
+    identity: '1401010101010001',
     password: 'passwordaman',
     memberType: 'umum',
     consent: true,
@@ -54,6 +55,7 @@ describe('Registration HTTP contract', () => {
       providers: [
         RecaptchaService,
         { provide: PasswordResetService, useValue: {} },
+        { provide: AdminProfileService, useValue: {} },
         AuthService,
         {
           provide: EmailVerificationService,
@@ -123,6 +125,7 @@ describe('Registration HTTP contract', () => {
     { whatsapp: '  ' },
     { name: 123 },
     { identity: 123 },
+    { identity: '001234' },
     { email: 'bad@' },
     { consent: false },
     { confirmPassword: 'different' },

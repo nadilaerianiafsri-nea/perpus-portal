@@ -27,7 +27,7 @@ describe('member lost report on existing Loan', () => {
   it('records pending report only, preserving loan, due date and inventory; notifies once', async () => {
     const { service, row, tx } = harness();
     const result = await service.reportLostLoan(1, 7);
-    expect(result.loan.lostReport.status).toBe('MENUNGGU_VERIFIKASI');
+    expect(result.loan.lostReport).toMatchObject({ status: 'MENUNGGU_VERIFIKASI' });
     expect(row.status).toBe('AKTIF'); expect(row.copy.status).toBe('DIPINJAM'); expect(row.returnedAt).toBeNull();
     expect(row.dueAt.toISOString()).toBe('2026-10-08T00:00:00.000Z');
     expect(tx.bookCopy.updateMany).not.toHaveBeenCalled();
