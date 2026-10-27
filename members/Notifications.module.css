@@ -1,26 +1,46 @@
-.clickable {
-  position: relative;
-  cursor: pointer;
-  transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+.page { display: grid; gap: 20px; }
+.controls { display: grid; gap: 16px; padding: 18px; border: 1px solid #e7e9f0; border-radius: 18px; background: white; }
+.toolbar { display: grid; grid-template-columns: minmax(0, 1fr) 230px; align-items: center; gap: 12px; }
+.categoryBar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 10px; }
+:root body .chip[data-button][data-button] { --button-height: 44px; min-height: 44px; gap: 9px; padding: 9px 13px; border-radius: 13px; box-shadow: none; }
+:root body .chip[data-button="secondary"] { --button-bg: #fff; --button-fg: #2b3056; --button-stroke: #e7e9f0; --button-hover-bg: #fffae6; --button-hover-fg: #000633; }
+:root body .chip[aria-pressed="true"] { --button-hover-bg: #2b3056; --button-hover-fg: #fff; }
+.count { margin-left: 8px; display: inline-grid; place-items: center; min-width: 24px; height: 24px; padding: 0 6px; border-radius: 8px; background: #eef0f7; color: #2b3056; font-size: 12px; font-weight: 600; }
+[aria-pressed="true"] .count { background: #ffffff26; color: white; }
+:root body .markAll[data-button][data-button] { --button-height: 44px; min-height: 44px; border-radius: 13px; }
+.list { display: grid; gap: 10px; }
+.row { display: grid; grid-template-columns: 40px minmax(0, 1fr) 18px; align-items: start; gap: 14px; padding: 16px 18px; border: 1px solid #e7e9f0; border-radius: 14px; background: white; color: #000633; text-decoration: none; }
+a.row { cursor: pointer; transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease; }
+a.row:hover { background: #f7f8fb; border-color: #c8cddd; box-shadow: 0 3px 12px #00063308; }
+.row.unread { border-left: 3px solid #1fabff; padding-left: 16px; background: #f4f9fd; }
+a.unread:hover { background: #eef5fb; }
+a.row:focus-visible { outline: 2px solid #2b3056; outline-offset: 3px; }
+.icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 11px; background: #eef0f7; color: #2b3056; }
+.icon svg { width: 20px; height: 20px; }
+.body { min-width: 0; }
+.body h2 { margin: 0 0 4px; font-size: 15px; font-weight: 600; line-height: 1.4; overflow-wrap: anywhere; }
+.unread h2 { font-weight: 700; }
+.body p { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin: 0 0 8px; color: #4b5e8c; font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; }
+.meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; color: #4b5e8c; font-size: 12px; line-height: 1.4; }
+.status { padding: 3px 8px; border-radius: 99px; background: #eef0f7; color: #2b3056; font-size: 12px; line-height: 1.3; }
+.statusUnread { background: #e4f2fc; color: #006cae; }
+.chevron { width: 18px; height: 18px; align-self: center; color: #4b5e8c; }
+.feedback { margin: 0; padding: 14px 18px; border: 1px solid #ffc7c3; border-radius: 12px; background: #fff4f3; color: #a32a24; font-size: 14px; line-height: 1.5; }
+@media (max-width: 760px) {
+ .toolbar { grid-template-columns: minmax(0, 1fr); }
+ .tabs { flex: 1; }
 }
-.clickable.clickable:hover {
-  border-color: #aac9df;
-  background: #eef7ff;
-  box-shadow: 0 3px 10px #00052f0c;
+@media (max-width: 480px) {
+ .page { gap: 16px; }
+ .controls { padding: 14px; gap: 14px; }
+ .categoryBar { align-items: stretch; }
+ .tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; gap: 8px; }
+ :root body .chip[data-button][data-button] { padding-inline: 9px; gap: 6px; }
+ .markAll { width: 100%; }
+ .row { grid-template-columns: 36px minmax(0, 1fr) 16px; gap: 10px; padding: 16px; }
+ .row.unread { padding-left: 14px; }
+ .icon { width: 36px; height: 36px; }
+ .chevron { width: 16px; height: 16px; }
 }
-.cardLink { color: inherit; text-decoration: none; }
-/* Stretch the semantic link while keeping sibling controls independently clickable. */
-.cardLink::after { content: ""; position: absolute; inset: 0; z-index: 1; }
-.clickable:has(.cardLink:focus-visible) { outline: 3px solid #b08800; outline-offset: 4px; }
-.clickable .cardLink:focus-visible { outline: none; }
-.actionButton { position: relative; z-index: 2; cursor: pointer; }
-.actionButton:disabled { cursor: wait; }
-.detail { display: inline-flex; align-items: center; margin-left: auto; color: #086caa; }
-.detail svg { flex-shrink: 0; }
-.message { overflow-wrap: anywhere; }
-.clickable:has(.cardLink:hover) .detail[data-button="secondary"] {
-  background: var(--button-hover-bg);
-  color: var(--button-hover-fg);
-  border-color: var(--button-hover-stroke);
-}
-@media (prefers-reduced-motion: reduce) { .clickable { transition: none; } }
+@media (prefers-reduced-motion: reduce) { a.row { transition: none; } }

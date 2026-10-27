@@ -19,6 +19,7 @@ export interface Loan {
 }
 export interface MemberNotification {
   id: number; title: string; message: string; createdAt: string; readAt: string | null; href: string;
+  targetUrl?: string | null; entityType?: string | null; entityId?: number | null; bookId?: number | null;
 }
 export interface HistoryItem {
   id: number; sourceType: "LOAN" | "RESERVATION";

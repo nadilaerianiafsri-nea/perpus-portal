@@ -11,6 +11,8 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { serviceInfo } from '../../../shared/serviceInfo.cjs';
+import { notificationEntity } from '../../../shared/adminNotificationTarget.cjs';
+import { memberNotificationTarget } from '../../../shared/memberNotificationTarget.cjs';
 import { PrismaService } from '../prisma/prisma.service';
 import { MailService } from '../mail/mail.service';
 import { Prisma } from '../generated/prisma/client';
@@ -43,6 +45,7 @@ const ebookInclude = {
 } as const;
 const notificationSelect = {
   id: true,
+  eventKey: true,
   title: true,
   message: true,
   createdAt: true,
@@ -713,11 +716,35 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
   async notifications(userId: number) {
     await this.expireReservations();
     await this.createReminders();
+    const notices = await this.prisma.notification.findMany({
+      where: { userId },
+      select: notificationSelect,
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+    });
+    const entities = notices.map(notice => notificationEntity(notice.eventKey));
+    const ids = (type: string) => entities.filter(entity => entity.entityType === type).map(entity => entity.entityId!);
+    const extensionIds = notices.flatMap(notice => {
+      const id = /^extension:([1-9]\d*)$/.exec(notice.eventKey)?.[1];
+      return id && Number.isSafeInteger(Number(id)) && Number(id) <= 2147483647 ? [Number(id)] : [];
+    });
+    // Resolve only the member's existing records; no lifecycle or notification writes.
+    const [ebookLoans, ebookQueues, extensions] = await Promise.all([
+      ids('EBOOK_LOAN').length ? this.prisma.eBookLoan.findMany({ where: { id: { in: ids('EBOOK_LOAN') }, userId }, select: { id: true, bookId: true } }) : [],
+      ids('EBOOK_QUEUE').length ? this.prisma.eBookQueue.findMany({ where: { id: { in: ids('EBOOK_QUEUE') }, userId }, select: { id: true, bookId: true } }) : [],
+      extensionIds.length ? this.prisma.loanExtension.findMany({ where: { id: { in: extensionIds }, loan: { userId } }, select: { id: true, loanId: true } }) : [],
+    ]);
+    const loanBooks = new Map(ebookLoans.map(row => [row.id, row.bookId]));
+    const queueBooks = new Map(ebookQueues.map(row => [row.id, row.bookId]));
+    const extendedLoans = new Map(extensions.map(row => [row.id, row.loanId]));
     return {
-      notifications: await this.prisma.notification.findMany({
-        where: { userId },
-        select: notificationSelect,
-        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+      notifications: notices.map(({ eventKey, ...notice }, index) => {
+        let entity = entities[index];
+        const extensionId = /^extension:(\d+)$/.exec(eventKey)?.[1];
+        const loanId = extensionId ? extendedLoans.get(Number(extensionId)) : undefined;
+        if (loanId) entity = { entityType: 'LOAN', entityId: loanId };
+        const bookId = entity.entityType === 'EBOOK_LOAN' ? loanBooks.get(entity.entityId!) : entity.entityType === 'EBOOK_QUEUE' ? queueBooks.get(entity.entityId!) : undefined;
+        const target = { ...entity, bookId: bookId ?? null, href: notice.href };
+        return { ...notice, ...target, targetUrl: memberNotificationTarget(target) };
       }),
     };
   }

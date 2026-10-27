@@ -1,18 +1,25 @@
 "use client";
 
-import { ButtonLabel } from '@/components/Button';
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
-import { FiBell, FiCheck, FiEye } from "react-icons/fi";
+import { FiAlertCircle, FiBell, FiBookOpen, FiCalendar, FiCheck, FiChevronRight, FiMonitor } from "react-icons/fi";
+import { Button } from "@/components/Button";
+import SearchField from "@/components/SearchField";
+import PeriodSelector from "@/components/PeriodSelector";
+import { createTransactionPeriod, inTransactionPeriod } from "@/shared/transactionPeriod";
+import { memberNotificationTarget } from "@/shared/memberNotificationTarget.cjs";
 import { memberRequest, useMemberResource } from "./api";
 import { useMember } from "./MemberContext";
-import { Badge, EmptyState, ErrorState, LoadingCards, PageHeading } from "./MemberUI";
+import { EmptyState, ErrorState, LoadingCards, PageHeading } from "./MemberUI";
 import { memberDate } from "./format";
 import type { MemberNotification } from "./types";
-import styles from "./Members.module.css";
-import interaction from "./Notifications.module.css";
-import { notificationDestination } from "./inputSecurity";
+import styles from "./Notifications.module.css";
+
+function NotificationIcon({ type }: { type?: string | null }) {
+  const Icon = type === "RESERVATION" ? FiCalendar : type === "LOAN" ? FiBookOpen : type === "LOST_BOOK" ? FiAlertCircle : type?.startsWith("EBOOK_") ? FiMonitor : FiBell;
+  return <span className={styles.icon} aria-hidden="true"><Icon /></span>;
+}
 
 export default function NotificationsPage() {
   const router = useRouter();
@@ -21,20 +28,39 @@ export default function NotificationsPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const pending = useRef(false);
   const [actionError, setActionError] = useState("");
-  const [filter, setFilter] = useState("Semua");
-  const notifications = resource.data?.notifications.filter(item => filter === "Semua" || !item.readAt) ?? [];
+  const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
+  const [period, setPeriod] = useState(() => createTransactionPeriod("all"));
+  const all = resource.data?.notifications ?? [];
+  const unread = all.filter(item => !item.readAt).length;
+  const query = search.trim().toLocaleLowerCase("id-ID");
+  const notifications = all.filter(item => (filter === "all" || !item.readAt)
+    && inTransactionPeriod(item.createdAt, period)
+    && (!query || `${item.title} ${item.message}`.toLocaleLowerCase("id-ID").includes(query)));
+  const filtered = Boolean(query) || period.preset !== "all";
+
   async function markRead(id?: number) {
     if (pending.current) return false;
-    pending.current = true; setBusy(id === undefined ? "all" : String(id)); setActionError("");
-    try { await memberRequest(id === undefined ? "notifications/read-all" : `notifications/${id}/read`, { method: "PATCH" }); await Promise.all([resource.reload(), refresh()]); return true; }
-    catch (error) { setActionError(error instanceof Error ? error.message : "Notifikasi belum dapat diperbarui."); return false; }
-    finally { pending.current = false; setBusy(null); }
+    pending.current = true;
+    setBusy(id === undefined ? "all" : String(id));
+    setActionError("");
+    try {
+      await memberRequest(id === undefined ? "notifications/read-all" : `notifications/${id}/read`, { method: "PATCH" });
+      await Promise.all([resource.reload(), refresh()]);
+      return true;
+    } catch (error) {
+      setActionError(error instanceof Error ? error.message : "Notifikasi belum dapat diperbarui.");
+      return false;
+    } finally {
+      pending.current = false;
+      setBusy(null);
+    }
   }
   async function openNotification(item: MemberNotification, newTab = false) {
     if (pending.current) return;
-    const destination = notificationDestination(item.href);
+    const destination = memberNotificationTarget(item);
     if (!destination) return;
-    // Reserve the tab during the user gesture; load its destination only after PATCH succeeds.
+    // Reserve the tab during the gesture; navigate only after persistence succeeds.
     const tab = newTab ? window.open("about:blank", "_blank") : null;
     if (tab) tab.opener = null;
     if (await markRead(item.id)) {
@@ -42,45 +68,50 @@ export default function NotificationsPage() {
       else router.push(destination);
     } else tab?.close();
   }
-  const hasUnread = resource.data?.notifications.some(item => !item.readAt);
-  return <div className={styles.pageStack}><PageHeading title="Notifikasi"><button data-button="ghost" data-button-size="sm" data-button-loading={busy === "all"} aria-busy={busy === "all"} className={styles.outlineButton} disabled={!hasUnread || busy !== null} onClick={() => markRead()}><FiCheck /><ButtonLabel loading={busy === "all"} pending="Memperbarui...">Tandai Semua Dibaca</ButtonLabel></button></PageHeading><div className={styles.filters}>{["Semua", "Belum Dibaca"].map(label => <button data-button="ghost" data-button-size="sm" key={label} className={filter === label ? styles.selectedFilter : ""} aria-pressed={filter === label} onClick={() => setFilter(label)}>{label}</button>)}</div>{actionError && <p className={styles.error} role="alert">{actionError}</p>}
-    {resource.loading ? <LoadingCards /> : resource.error ? <ErrorState message={resource.error} retry={resource.reload} /> : !notifications.length ? <EmptyState message={filter === "Semua" ? "Belum ada notifikasi." : "Semua notifikasi sudah dibaca."} /> : notifications.map(item => {
-      const destination = notificationDestination(item.href);
-      const linked = destination !== null;
-      return <article data-record-card key={item.id} className={`${styles.card} ${styles.notification} ${!item.readAt ? styles.unread : ""} ${linked ? interaction.clickable : ""}`}>
-        <span className={styles.notificationIcon}><FiBell aria-hidden /></span>
-        <div className={styles.bookInfo}>
-          <h2 data-record-primary>{linked ? <Link
-            className={interaction.cardLink}
-            href={destination!}
-            aria-label={`Lihat detail: ${item.title}`}
-            aria-busy={busy === String(item.id)}
-            aria-disabled={!item.readAt && busy !== null}
-            onClick={event => {
-              if (!item.readAt && (event.ctrlKey || event.metaKey || event.shiftKey)) {
-                event.preventDefault(); void openNotification(item, true);
-              }
-            }}
-            onAuxClick={event => {
-              if (!item.readAt && event.button === 1) {
-                event.preventDefault(); void openNotification(item, true);
-              }
-            }}
-            onNavigate={event => {
-              if (!item.readAt) { event.preventDefault(); void openNotification(item); }
-            }}
-            onKeyDown={event => {
-              if (event.key === " ") { event.preventDefault(); if (!event.repeat) event.currentTarget.click(); }
-            }}
-          >{item.title}</Link> : item.title}</h2>
-          <p className={interaction.message}>{item.message}</p><time dateTime={item.createdAt}>{memberDate(item.createdAt, true)}</time>
-          <div className={styles.notificationActions} data-record-action-group>
-            <Badge tone={item.readAt ? "neutral" : "blue"}>{item.readAt ? "Sudah Dibaca" : "Belum Dibaca"}</Badge>
-            {!item.readAt && <button data-button="ghost" data-row-action="neutral" data-button-shape="square" title={`Tandai dibaca: ${item.title}`} aria-label={`Tandai dibaca: ${item.title}`} data-button-size="sm" data-button-loading={busy === String(item.id)} aria-busy={busy === String(item.id)} className={interaction.actionButton} disabled={busy !== null} onClick={event => { event.stopPropagation(); void markRead(item.id); }}><FiCheck aria-hidden="true" /></button>}
-            {linked && <span data-button="secondary" data-button-shape="square" data-button-size="sm" className={interaction.detail} data-notification-detail aria-hidden><FiEye aria-hidden="true" /></span>}
-          </div>
+
+  return <div className={styles.page}>
+    <PageHeading title="Notifikasi" />
+    <section className={styles.controls} aria-label="Filter notifikasi">
+      <div className={styles.toolbar}>
+        <SearchField initialValue="" onSearch={setSearch} label="Cari notifikasi" placeholder="Cari notifikasi, buku, atau transaksi..." />
+        <PeriodSelector mode="transaction" label="Waktu notifikasi" value={period} onChange={setPeriod} />
+      </div>
+      <div className={styles.categoryBar}>
+        <div className={styles.tabs} role="group" aria-label="Status baca notifikasi">
+          {[["all", "Semua", all.length], ["unread", "Belum Dibaca", unread]].map(([value, label, count]) => <Button key={value} className={styles.chip} variant={filter === value ? "primary" : "secondary"} aria-pressed={filter === value} onClick={() => setFilter(String(value))}>
+            {label}<span className={styles.count}>{resource.loading && !resource.data ? "…" : count}</span>
+          </Button>)}
         </div>
-      </article>;
-    })}
+        <Button className={styles.markAll} variant="secondary" icon={<FiCheck />} loading={busy === "all"} loadingLabel="Memperbarui..." disabled={resource.loading || Boolean(resource.error) || unread === 0 || busy !== null} onClick={() => void markRead()}>Tandai Semua Dibaca</Button>
+      </div>
+    </section>
+    {actionError ? <p className={styles.feedback} role="alert">{actionError}</p> : null}
+    <section className={styles.list} aria-label="Daftar notifikasi" aria-busy={resource.loading || busy !== null}>
+      {resource.loading ? <LoadingCards /> : resource.error ? <ErrorState message="Notifikasi belum dapat dimuat." retry={resource.reload} /> : !notifications.length ? <EmptyState message={filtered ? "Tidak ada notifikasi yang sesuai dengan pencarian atau filter." : filter === "all" ? "Belum ada notifikasi." : "Semua notifikasi sudah dibaca."} /> : notifications.map(item => {
+        const destination = memberNotificationTarget(item);
+        const content = <>
+          <NotificationIcon type={item.entityType} />
+          <div className={styles.body}>
+            <h2>{item.title}</h2>
+            <p>{item.message}</p>
+            <div className={styles.meta}><time dateTime={item.createdAt}>{memberDate(item.createdAt, true)}</time><span className={`${styles.status} ${!item.readAt ? styles.statusUnread : ""}`}>{item.readAt ? "Dibaca" : "Belum Dibaca"}</span></div>
+          </div>
+          {destination ? <FiChevronRight className={styles.chevron} aria-hidden="true" /> : null}
+        </>;
+        const className = `${styles.row} ${!item.readAt ? styles.unread : ""}`;
+        return destination ? <Link key={item.id} href={destination} className={className} data-notification-id={item.id}
+          aria-label={`Buka detail: ${item.title}. ${item.message}`}
+          aria-busy={busy === String(item.id)} aria-disabled={!item.readAt && busy !== null}
+          onClick={event => {
+            if (!item.readAt && (event.ctrlKey || event.metaKey || event.shiftKey)) { event.preventDefault(); void openNotification(item, true); }
+          }}
+          onAuxClick={event => {
+            if (!item.readAt && event.button === 1) { event.preventDefault(); void openNotification(item, true); }
+          }}
+          onNavigate={event => { if (!item.readAt) { event.preventDefault(); void openNotification(item); } }}
+          onKeyDown={event => { if (event.key === " ") { event.preventDefault(); if (!event.repeat) event.currentTarget.click(); } }}
+        >{content}</Link> : <article key={item.id} className={className} data-notification-id={item.id}>{content}</article>;
+      })}
+    </section>
   </div>;
 }

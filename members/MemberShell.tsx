@@ -56,6 +56,7 @@ export default function MemberShell({
     "/dashboard/reservasi",
     "/dashboard/pinjaman",
     "/dashboard/e-book",
+    "/dashboard/notifikasi",
   ].includes(pathname) || pathname.startsWith("/dashboard/koleksi") || pathname.startsWith("/dashboard/pinjaman/");
   const router = useRouter();
   const resource = useMemberResource<MemberSummary>("dashboard");
