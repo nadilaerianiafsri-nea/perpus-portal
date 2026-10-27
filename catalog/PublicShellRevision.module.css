@@ -93,7 +93,7 @@
   margin: 0;
 }
 
-.publicShell :global(main article),
+.publicShell :global(main article:not([data-stat-card])),
 .publicShell :global(main aside),
 .publicShell :global(main section[aria-labelledby]) {
   transition:
@@ -103,21 +103,21 @@
     background 0.22s ease;
 }
 
-.publicShell :global(main article) {
+.publicShell :global(main article:not([data-stat-card])) {
   border-radius: 18px;
   box-shadow: 0 10px 28px color-mix(in srgb, var(--navy) 6%, transparent);
   animation: publicCardEnter 0.42s ease both;
 }
 
-.publicShell :global(main article:nth-of-type(2)) {
+.publicShell :global(main article:not([data-stat-card]):nth-of-type(2)) {
   animation-delay: 0.04s;
 }
 
-.publicShell :global(main article:nth-of-type(3)) {
+.publicShell :global(main article:not([data-stat-card]):nth-of-type(3)) {
   animation-delay: 0.08s;
 }
 
-.publicShell :global(main article:nth-of-type(4)) {
+.publicShell :global(main article:not([data-stat-card]):nth-of-type(4)) {
   animation-delay: 0.12s;
 }
 
@@ -344,7 +344,7 @@
 }
 
 /* Information pages */
-.publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) article),
+.publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) article:not([data-stat-card])),
 .publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) > aside),
 .publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) section[aria-labelledby]) {
   border-color: color-mix(in srgb, var(--navy) 10%, var(--line));
@@ -361,7 +361,7 @@
   box-shadow: 0 8px 22px color-mix(in srgb, var(--navy) 5%, transparent);
 }
 
-.publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) article h2),
+.publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) article:not([data-stat-card]) h2),
 .publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) section h2) {
   color: var(--navy);
 }
@@ -457,7 +457,7 @@
     text-decoration: underline;
   }
 
-  .publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) article:hover) {
+  .publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) article:not([data-stat-card]):hover) {
     border-color: color-mix(in srgb, var(--yellow) 54%, var(--line));
     background: color-mix(in srgb, var(--yellow-soft) 28%, var(--white));
     box-shadow: 0 20px 42px color-mix(in srgb, var(--navy) 10%, transparent);
@@ -481,6 +481,10 @@
   .publicShell > :global(main)::before {
     right: -150px;
     opacity: 0.52;
+  }
+
+  .publicShell > :global(main:has(> section[aria-label="Ringkasan seluruh hibah"]))::before {
+    right: 0;
   }
 
   .publicShell :global(main:has(section[aria-label="Hasil pencarian"]) > div:nth-of-type(2)) {
@@ -613,19 +617,19 @@
     padding: 8px;
   }
 
-  .publicShell :global(main article) {
+  .publicShell :global(main article:not([data-stat-card])) {
     animation-duration: 0.32s;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .publicShell :global(main article),
+  .publicShell :global(main article:not([data-stat-card])),
   .publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) > header),
   .publicShell :global(section[aria-label="Hasil pencarian"]) {
     animation: none;
   }
 
-  .publicShell :global(main article),
+  .publicShell :global(main article:not([data-stat-card])),
   .publicShell :global(main button),
   .publicShell :global(main a) {
     transition: none;
@@ -1390,8 +1394,8 @@
     transform: translateY(-5px) scale(1.008);
   }
 
-  .publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) article:hover),
-  .publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) article:focus-within) {
+  .publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) article:not([data-stat-card]):hover),
+  .publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) article:not([data-stat-card]):focus-within) {
     border-color: color-mix(in srgb, var(--sky) 92%, var(--navy));
     background: color-mix(in srgb, var(--sky) 62%, transparent);
     box-shadow: 0 20px 40px color-mix(in srgb, var(--navy) 13%, transparent);

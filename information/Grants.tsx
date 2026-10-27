@@ -109,17 +109,20 @@ export default function Grants() {
           di bawah hanya menampilkan hibah yang sudah diterima.
         </span>
       </div>
-      <section className={styles.stats} aria-label="Ringkasan seluruh hibah">
-        {stats.map(({ label, value, icon: Icon, tone }) => (
-          <StatCard key={label} label={label} tone={tone as StatTone} icon={<Icon />} value={
-                value !== undefined ? (
-                  value.toLocaleString("id-ID")
-                ) : loading ? (
-                  <span className={styles.skeleton} aria-label="Memuat statistik" />
-                ) : (
-                  "—"
-                )
-          } />
+      <section className={styles.stats} aria-label="Ringkasan seluruh hibah" aria-busy={loading}>
+        {loading ? <>
+          <span className={styles.srOnly} role="status">Memuat ringkasan hibah...</span>
+          {stats.map(({ label }) => <div key={label} className={styles.summarySkeleton} aria-hidden="true">
+            <span className={styles.skeleton} />
+            <span className={styles.skeleton} />
+            <span className={styles.skeleton} />
+          </div>)}
+        </> : error || !summary ? (
+          <p className={styles.summaryError} role="status">Ringkasan hibah belum dapat dimuat.</p>
+        ) : stats.map(({ label, value, icon: Icon, tone }) => (
+          <StatCard key={label} label={label} tone={tone as StatTone} icon={<Icon />}
+            className={`${styles.summaryCard} ${tone === "success" ? styles.cataloguedSummary : ""}`}
+            value={value?.toLocaleString("id-ID")} />
         ))}
       </section>
       <section className={styles.tableCard} aria-label="Daftar hibah diterima" aria-busy={loading}>
