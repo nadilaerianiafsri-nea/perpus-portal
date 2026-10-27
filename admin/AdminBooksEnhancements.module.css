@@ -39,7 +39,6 @@
   line-height: var(--leading-helper);
 }
 
-
 .stockRange input {
   width: 100%;
   height: var(--select-control-height);
@@ -115,6 +114,188 @@
   min-width: 0;
 }
 
+.revisedCard {
+  position: relative;
+  z-index: 1;
+  animation: revisedCardIn 220ms ease both;
+}
+
+.revisedCard:focus-within {
+  z-index: 10;
+}
+
+@keyframes revisedCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.subjectSearchSelect {
+  width: 100%;
+  min-width: 0;
+  position: relative;
+  font-family: var(--font-outfit), "Outfit", sans-serif;
+}
+
+.subjectSearchTrigger {
+  width: 100%;
+  min-height: 40px;
+  padding: 9px 11px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--navy);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--text-input);
+  line-height: var(--leading-body);
+  text-align: left;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease,
+    transform 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.subjectSearchTrigger:hover {
+  border-color: var(--navy-soft);
+  background: var(--gray);
+  transform: scale(1.01);
+}
+
+.subjectSearchTrigger:focus-visible {
+  outline: none;
+  border-color: var(--navy-soft);
+  box-shadow: 0 0 0 3px #00063312;
+}
+
+.subjectSearchTrigger > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.subjectSearchTrigger > span[data-placeholder="true"] {
+  color: var(--text-secondary-color);
+}
+
+.subjectSearchChevron {
+  flex: 0 0 auto;
+  transition: transform 150ms ease;
+}
+
+.subjectSearchChevron[data-open="true"] {
+  transform: rotate(180deg);
+}
+
+.subjectSearchPanel {
+  width: 100%;
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 7px);
+  left: 0;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--white);
+  box-shadow: var(--shadow);
+  animation: subjectPanelIn 160ms ease both;
+}
+
+@keyframes subjectPanelIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.subjectSearchInput {
+  width: 100%;
+  min-height: 40px;
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  outline: 0;
+  background: var(--white);
+  color: var(--navy);
+  font: inherit;
+  font-size: var(--text-input);
+  line-height: var(--leading-body);
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.subjectSearchInput:focus {
+  border-color: var(--navy-soft);
+  box-shadow: 0 0 0 3px #00063312;
+}
+
+.subjectOptionList {
+  max-height: 230px;
+  margin-top: 8px;
+  padding: 2px;
+  display: grid;
+  gap: 4px;
+  overflow-y: auto;
+}
+
+.subjectOption {
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--navy);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--text-input);
+  line-height: var(--leading-body);
+  text-align: left;
+  transition:
+    background 150ms ease,
+    color 150ms ease,
+    transform 150ms ease;
+}
+
+.subjectOption:hover,
+.subjectOption[aria-selected="true"] {
+  background: var(--gray);
+  color: var(--navy);
+  transform: scale(1.01);
+}
+
+.subjectOption:focus-visible {
+  outline: none;
+  background: var(--gray);
+  box-shadow: 0 0 0 3px #00063312;
+}
+
+.subjectEmpty {
+  margin: 0;
+  padding: 10px 12px;
+  color: var(--text-secondary-color);
+  font-size: var(--text-helper);
+  line-height: var(--leading-helper);
+}
+
 @media (max-width: 920px) {
   .filterPanel {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -140,12 +321,37 @@
   .stockRange {
     gap: 6px;
   }
+
+  .subjectSearchTrigger,
+  .subjectSearchInput {
+    min-height: 44px;
+  }
+
+  .subjectSearchPanel {
+    padding: 8px;
+    border-radius: 10px;
+  }
+
+  .subjectOptionList {
+    max-height: 200px;
+  }
+
+  .subjectOption {
+    min-height: 42px;
+    padding-inline: 11px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .filterPanel,
   .stockRange input,
-  .applyButton {
+  .applyButton,
+  .revisedCard,
+  .subjectSearchTrigger,
+  .subjectSearchChevron,
+  .subjectSearchPanel,
+  .subjectSearchInput,
+  .subjectOption {
     animation: none;
     transition: none;
   }

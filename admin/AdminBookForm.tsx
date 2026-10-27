@@ -1,10 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import AppSelect from "@/components/AppSelect";
-
 import { adminCoverUrl } from "./adminBooks";
-import { ButtonLabel } from '@/components/Button';
+import { ButtonLabel } from "@/components/Button";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
@@ -16,6 +14,7 @@ import {
   type AdminBookDetailResponse,
   type AdminBookPayload,
 } from "./adminBooks";
+import SubjectCategorySelect from "./SubjectCategorySelect";
 import styles from "./AdminBooks.module.css";
 import enhancements from "./AdminBooksEnhancements.module.css";
 
@@ -36,6 +35,7 @@ const SUBJECT_CATEGORIES = [
   "Sosial",
   "Ekonomi",
   "Politik",
+  "Pemerintahan",
   "Biografi",
   "Sastra",
   "Referensi",
@@ -60,6 +60,10 @@ const emptyForm: FormState = {
   coverUrl: "",
   isActive: true,
 };
+
+function normalizeYearInput(value: string) {
+  return value.replace(/\D/g, "").slice(0, 4);
+}
 
 async function uploadCover(file: File): Promise<string> {
   const body = new FormData();
@@ -159,7 +163,10 @@ export default function AdminBookForm({
     const file = event.target.files?.[0] ?? null;
     if (!file) return;
 
-    if (!COVER_TYPES.includes(file.type) || !/\.(?:jpe?g|png|webp)$/i.test(file.name)) {
+    if (
+      !COVER_TYPES.includes(file.type) ||
+      !/\.(?:jpe?g|png|webp)$/i.test(file.name)
+    ) {
       setError("Format cover harus JPG, PNG, atau WEBP.");
       event.target.value = "";
       return;
@@ -198,7 +205,12 @@ export default function AdminBookForm({
 
     const year = Number(form.year);
     const totalStock = Number(form.totalStock);
-    if (!Number.isInteger(year) || !Number.isInteger(totalStock)) {
+    if (
+      !Number.isInteger(year) ||
+      year < 1000 ||
+      year > 9999 ||
+      !Number.isInteger(totalStock)
+    ) {
       setError("Tahun Terbit dan Jumlah Stok harus berupa angka bulat.");
       return;
     }
@@ -279,9 +291,16 @@ export default function AdminBookForm({
               {mode === "create" ? "Tambah Buku" : "Edit Data Buku"}
             </strong>
           </div>
-          <h1 data-page-title>{mode === "create" ? "Tambah Data Buku" : "Edit Data Buku"}</h1>
+          <h1 data-page-title>
+            {mode === "create" ? "Tambah Data Buku" : "Edit Data Buku"}
+          </h1>
         </div>
-        <Link data-button="back" data-button-size="md" href={backHref} className={styles.backButton}>
+        <Link
+          data-button="back"
+          data-button-size="md"
+          href={backHref}
+          className={styles.backButton}
+        >
           <FiArrowLeft aria-hidden />
           Kembali
         </Link>
@@ -295,7 +314,9 @@ export default function AdminBookForm({
 
       <div className={styles.formLayout}>
         <div className={styles.formMain}>
-          <section className={styles.formSection}>
+          <section
+            className={`${styles.formSection} ${enhancements.revisedCard}`}
+          >
             <div className={styles.sectionIntro}>
               <h2>Identitas Koleksi</h2>
               <p>Data bibliografi yang tampil di katalog publik.</p>
@@ -355,11 +376,22 @@ export default function AdminBookForm({
                   Tahun Terbit <b>*</b>
                 </span>
                 <input
-                  type="number"
-                  min="1000"
-                  max="9999"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]{4}"
+                  maxLength={4}
                   value={form.year}
-                  onChange={(e) => update("year", e.target.value)}
+                  onChange={(e) =>
+                    update("year", normalizeYearInput(e.target.value))
+                  }
+                  onPaste={(event) => {
+                    event.preventDefault();
+                    update(
+                      "year",
+                      normalizeYearInput(event.clipboardData.getData("text")),
+                    );
+                  }}
+                  autoComplete="off"
                   required
                 />
               </label>
@@ -381,26 +413,16 @@ export default function AdminBookForm({
                   maxLength={64}
                 />
               </label>
-              <label className={`${styles.spanTwo} ${styles.selectLabel}`}>
+              <div className={`${styles.spanTwo} ${styles.selectLabel}`}>
                 <span>
                   Subjek / Kategori <b>*</b>
                 </span>
-                <AppSelect
-                  className={enhancements.subjectSelect}
+                <SubjectCategorySelect
                   value={form.subject}
-                  onChange={(e) => update("subject", e.target.value)}
-                  required
-                >
-                  <option value="" disabled>
-                    Pilih Subjek / Kategori
-                  </option>
-                  {subjectCategories.map((subject) => (
-                    <option key={subject} value={subject}>
-                      {subject}
-                    </option>
-                  ))}
-                </AppSelect>
-              </label>
+                  options={subjectCategories}
+                  onChange={(value) => update("subject", value)}
+                />
+              </div>
             </div>
           </section>
 
@@ -540,12 +562,26 @@ export default function AdminBookForm({
       </div>
 
       <footer className={styles.formFooter}>
-        <Link data-button="ghost" data-button-size="md" href={backHref} className={styles.cancelButton}>
+        <Link
+          data-button="ghost"
+          data-button-size="md"
+          href={backHref}
+          className={styles.cancelButton}
+        >
           Batal
         </Link>
-        <button data-button="primary" data-button-size="md" data-button-loading={saving} type="submit" className={styles.saveButton} disabled={saving}>
+        <button
+          data-button="primary"
+          data-button-size="md"
+          data-button-loading={saving}
+          type="submit"
+          className={styles.saveButton}
+          disabled={saving}
+        >
           <FiCheckCircle aria-hidden />
-          <ButtonLabel loading={saving} pending="Menyimpan...">{mode === "create" ? "Simpan Buku" : "Simpan Perubahan"}</ButtonLabel>
+          <ButtonLabel loading={saving} pending="Menyimpan...">
+            {mode === "create" ? "Simpan Buku" : "Simpan Perubahan"}
+          </ButtonLabel>
         </button>
       </footer>
     </form>

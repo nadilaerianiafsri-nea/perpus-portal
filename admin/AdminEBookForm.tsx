@@ -1,10 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import AppSelect from "@/components/AppSelect";
-
 import { adminCoverUrl } from "./adminBooks";
-import { ButtonLabel } from '@/components/Button';
+import { ButtonLabel } from "@/components/Button";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
@@ -12,13 +10,11 @@ import { useRouter } from "next/navigation";
 import { FiArrowLeft, FiCheckCircle } from "react-icons/fi";
 import {
   adminEBookTextError,
-  accessModeLabel,
-  adminEBookSourceUrl,
   ebookApiMessage,
   type AdminEBookDetailResponse,
   type AdminEBookPayload,
-  type EBookAccessMode,
 } from "./adminEBooks";
+import SubjectCategorySelect from "./SubjectCategorySelect";
 import styles from "./AdminBooks.module.css";
 import enhancements from "./AdminBooksEnhancements.module.css";
 
@@ -40,6 +36,7 @@ const SUBJECT_CATEGORIES = [
   "Sosial",
   "Ekonomi",
   "Politik",
+  "Pemerintahan",
   "Biografi",
   "Sastra",
   "Referensi",
@@ -49,7 +46,7 @@ const SUBJECT_CATEGORIES = [
 
 const privateEBookSource =
   /^\/private-ebooks\/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.pdf$/;
-const legacyWebsiteSource = /^\/ebooks\/[A-Za-z0-9_-]+\.(?:html|pdf)$/;
+const legacyPdfSource = /^\/ebooks\/[A-Za-z0-9_-]+\.pdf$/;
 
 const emptyForm: FormState = {
   code: "",
@@ -70,8 +67,12 @@ const emptyForm: FormState = {
   isActive: true,
 };
 
-function isStoredWebsiteSource(value: string) {
-  return privateEBookSource.test(value) || legacyWebsiteSource.test(value);
+function normalizeYearInput(value: string) {
+  return value.replace(/\D/g, "").slice(0, 4);
+}
+
+function isStoredPdfSource(value: string) {
+  return privateEBookSource.test(value) || legacyPdfSource.test(value);
 }
 
 async function uploadCover(file: File): Promise<string> {
@@ -150,6 +151,11 @@ export default function AdminEBookForm({
         return response.json() as Promise<AdminEBookDetailResponse>;
       })
       .then(({ book }) => {
+        const storedPdf =
+          typeof book.ebookUrl === "string" && isStoredPdfSource(book.ebookUrl)
+            ? book.ebookUrl
+            : "";
+
         setForm({
           code: book.code,
           title: book.title,
@@ -162,8 +168,8 @@ export default function AdminEBookForm({
           subject: book.subject,
           description: book.description,
           coverUrl: book.coverUrl,
-          accessMode: book.accessMode,
-          ebookUrl: book.ebookUrl ?? "",
+          accessMode: "BACA_DI_WEBSITE",
+          ebookUrl: storedPdf,
           accessDurationDays: book.accessDurationDays
             ? String(book.accessDurationDays)
             : "",
@@ -186,17 +192,6 @@ export default function AdminEBookForm({
 
   function update<K extends keyof FormState>(name: K, value: FormState[K]) {
     setForm((current) => ({ ...current, [name]: value }));
-  }
-
-  function updateAccessMode(value: EBookAccessMode) {
-    setEbookFile(null);
-    if (ebookInput.current) ebookInput.current.value = "";
-    setForm((current) => ({
-      ...current,
-      accessMode: value,
-      ebookUrl: value === current.accessMode ? current.ebookUrl : "",
-    }));
-    setError("");
   }
 
   function chooseCover(event: ChangeEvent<HTMLInputElement>) {
@@ -267,8 +262,8 @@ export default function AdminEBookForm({
     const accessDurationDays = form.accessDurationDays.trim()
       ? Number(form.accessDurationDays)
       : null;
-    if (!Number.isInteger(year)) {
-      setError("Tahun Terbit harus berupa angka bulat.");
+    if (!Number.isInteger(year) || year < 1000 || year > 9999) {
+      setError("Tahun Terbit harus berupa angka 4 digit yang valid.");
       return;
     }
     if (
@@ -279,25 +274,9 @@ export default function AdminEBookForm({
       return;
     }
 
-    if (
-      form.accessMode === "BACA_DI_WEBSITE" &&
-      !ebookFile &&
-      !isStoredWebsiteSource(form.ebookUrl)
-    ) {
-      setError("Pilih file PDF E-Book untuk mode Baca di Website.");
+    if (!ebookFile && !isStoredPdfSource(form.ebookUrl)) {
+      setError("Pilih file PDF E-Book sebelum menyimpan.");
       return;
-    }
-
-    if (form.accessMode === "PENYEDIA_EKSTERNAL") {
-      const source = form.ebookUrl.trim();
-      if (!source) {
-        setError("URL Penyedia E-Book wajib diisi.");
-        return;
-      }
-      if (!/^https?:\/\//i.test(source) || !adminEBookSourceUrl(source)) {
-        setError("URL Penyedia E-Book tidak valid.");
-        return;
-      }
     }
 
     if (!coverFile && !form.coverUrl) {
@@ -309,20 +288,16 @@ export default function AdminEBookForm({
     setError("");
     try {
       const coverUrl = coverFile ? await uploadCover(coverFile) : form.coverUrl;
-      const ebookUrl =
-        form.accessMode === "BACA_DI_WEBSITE"
-          ? ebookFile
-            ? await uploadEBook(ebookFile)
-            : form.ebookUrl
-          : form.accessMode === "PENYEDIA_EKSTERNAL"
-            ? form.ebookUrl.trim()
-            : "";
+      const ebookUrl = ebookFile
+        ? await uploadEBook(ebookFile)
+        : form.ebookUrl;
 
       const payload: AdminEBookPayload = {
         ...form,
         year,
         accessDurationDays,
         coverUrl,
+        accessMode: "BACA_DI_WEBSITE",
         ebookUrl,
       };
       const response = await fetch(
@@ -360,7 +335,9 @@ export default function AdminEBookForm({
   }
 
   const backHref =
-    mode === "edit" && id ? `/admin/koleksi/e-book/${id}` : "/admin/koleksi/e-book";
+    mode === "edit" && id
+      ? `/admin/koleksi/e-book/${id}`
+      : "/admin/koleksi/e-book";
   const subjectCategories =
     form.subject &&
     !SUBJECT_CATEGORIES.includes(
@@ -380,11 +357,20 @@ export default function AdminEBookForm({
           <div className={styles.localBreadcrumb}>
             <Link href="/admin/koleksi/e-book">E-Book</Link>
             <span>/</span>
-            <strong>{mode === "create" ? "Tambah E-Book" : "Edit E-Book"}</strong>
+            <strong>
+              {mode === "create" ? "Tambah E-Book" : "Edit E-Book"}
+            </strong>
           </div>
-          <h1 data-page-title>{mode === "create" ? "Tambah E-Book" : "Edit E-Book"}</h1>
+          <h1 data-page-title>
+            {mode === "create" ? "Tambah E-Book" : "Edit E-Book"}
+          </h1>
         </div>
-        <Link data-button="back" data-button-size="md" href={backHref} className={styles.backButton}>
+        <Link
+          data-button="back"
+          data-button-size="md"
+          href={backHref}
+          className={styles.backButton}
+        >
           <FiArrowLeft aria-hidden />
           Kembali
         </Link>
@@ -398,78 +384,136 @@ export default function AdminEBookForm({
 
       <div className={styles.formLayout}>
         <div className={styles.formMain}>
-          <section className={styles.formSection}>
+          <section
+            className={`${styles.formSection} ${enhancements.revisedCard}`}
+          >
             <div className={styles.sectionIntro}>
               <h2>Identitas Koleksi</h2>
               <p>Data bibliografi yang tampil di katalog publik.</p>
             </div>
             <div className={styles.fieldsGrid}>
               <label>
-                <span>Kode E-Book <b>*</b></span>
-                <input value={form.code} onChange={(e) => update("code", e.target.value)} required maxLength={64} />
+                <span>
+                  Kode E-Book <b>*</b>
+                </span>
+                <input
+                  value={form.code}
+                  onChange={(e) => update("code", e.target.value)}
+                  required
+                  maxLength={64}
+                />
               </label>
               <label>
-                <span>Judul <b>*</b></span>
-                <input value={form.title} onChange={(e) => update("title", e.target.value)} required />
+                <span>
+                  Judul <b>*</b>
+                </span>
+                <input
+                  value={form.title}
+                  onChange={(e) => update("title", e.target.value)}
+                  required
+                />
               </label>
               <label>
-                <span>Penulis / Pengarang <b>*</b></span>
-                <input value={form.author} onChange={(e) => update("author", e.target.value)} required />
+                <span>
+                  Penulis / Pengarang <b>*</b>
+                </span>
+                <input
+                  value={form.author}
+                  onChange={(e) => update("author", e.target.value)}
+                  required
+                />
               </label>
               <label>
                 <span>ISBN/ISSN</span>
-                <input value={form.isbnIssn} onChange={(e) => update("isbnIssn", e.target.value)} maxLength={64} />
+                <input
+                  value={form.isbnIssn}
+                  onChange={(e) => update("isbnIssn", e.target.value)}
+                  maxLength={64}
+                />
               </label>
               <label>
-                <span>Penerbit <b>*</b></span>
-                <input value={form.publisher} onChange={(e) => update("publisher", e.target.value)} required />
+                <span>
+                  Penerbit <b>*</b>
+                </span>
+                <input
+                  value={form.publisher}
+                  onChange={(e) => update("publisher", e.target.value)}
+                  required
+                />
               </label>
               <label>
-                <span>Tahun Terbit <b>*</b></span>
-                <input type="number" min="1000" max="9999" value={form.year} onChange={(e) => update("year", e.target.value)} required />
+                <span>
+                  Tahun Terbit <b>*</b>
+                </span>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]{4}"
+                  maxLength={4}
+                  value={form.year}
+                  onChange={(e) =>
+                    update("year", normalizeYearInput(e.target.value))
+                  }
+                  onPaste={(event) => {
+                    event.preventDefault();
+                    update(
+                      "year",
+                      normalizeYearInput(event.clipboardData.getData("text")),
+                    );
+                  }}
+                  autoComplete="off"
+                  required
+                />
               </label>
               <label>
                 <span>Edisi</span>
-                <input value={form.edition} onChange={(e) => update("edition", e.target.value)} />
+                <input
+                  value={form.edition}
+                  onChange={(e) => update("edition", e.target.value)}
+                />
               </label>
               <label>
-                <span>Bahasa <b>*</b></span>
-                <input value={form.language} onChange={(e) => update("language", e.target.value)} required maxLength={64} />
-              </label>
-              <label className={`${styles.spanTwo} ${styles.selectLabel}`}>
-                <span>Subjek / Kategori <b>*</b></span>
-                <AppSelect
-                  className={enhancements.subjectSelect}
-                  value={form.subject}
-                  onChange={(e) => update("subject", e.target.value)}
+                <span>
+                  Bahasa <b>*</b>
+                </span>
+                <input
+                  value={form.language}
+                  onChange={(e) => update("language", e.target.value)}
                   required
-                >
-                  <option value="" disabled>Pilih Subjek / Kategori</option>
-                  {subjectCategories.map((subject) => (
-                    <option key={subject} value={subject}>{subject}</option>
-                  ))}
-                </AppSelect>
+                  maxLength={64}
+                />
               </label>
+              <div className={`${styles.spanTwo} ${styles.selectLabel}`}>
+                <span>
+                  Subjek / Kategori <b>*</b>
+                </span>
+                <SubjectCategorySelect
+                  value={form.subject}
+                  options={subjectCategories}
+                  onChange={(value) => update("subject", value)}
+                />
+              </div>
             </div>
           </section>
 
-          <section className={styles.formSection}>
+          <section
+            className={`${styles.formSection} ${enhancements.revisedCard}`}
+          >
             <div className={styles.sectionIntro}>
               <h2>Akses Digital</h2>
-              <p>Atur cara anggota mengakses koleksi digital ini.</p>
+              <p>
+                Admin mengunggah file PDF yang dibaca anggota langsung melalui
+                website.
+              </p>
             </div>
             <div className={styles.fieldsGrid}>
-              <label className={styles.selectLabel}>
-                <span>Mode Akses <b>*</b></span>
-                <AppSelect
-                  value={form.accessMode}
-                  onChange={(e) => updateAccessMode(e.target.value as EBookAccessMode)}
-                  required
-                >
-                  <option value="BACA_DI_WEBSITE">{accessModeLabel("BACA_DI_WEBSITE")}</option>
-                  <option value="PENYEDIA_EKSTERNAL">{accessModeLabel("PENYEDIA_EKSTERNAL")}</option>
-                  <option value="TIDAK_TERSEDIA">{accessModeLabel("TIDAK_TERSEDIA")}</option>
-                </AppSelect>
+              <label>
+                <span>Mode Akses</span>
+                <input value="Baca di Website (PDF)" readOnly disabled />
+                <small>
+                  Mode akses ditetapkan otomatis. Admin tidak memasukkan URL
+                  atau link penyedia eksternal.
+                </small>
               </label>
               <label>
                 <span>Durasi Akses (hari)</span>
@@ -478,46 +522,44 @@ export default function AdminEBookForm({
                   min="1"
                   max="36500"
                   value={form.accessDurationDays}
-                  onChange={(e) => update("accessDurationDays", e.target.value)}
+                  onChange={(e) =>
+                    update("accessDurationDays", e.target.value)
+                  }
                   placeholder="Kosong = tidak dibatasi"
                 />
               </label>
 
-              {form.accessMode === "BACA_DI_WEBSITE" ? (
-                <label className={styles.spanTwo}>
-                  <span>File E-Book PDF <b>*</b></span>
-                  <input
-                    ref={ebookInput}
-                    type="file"
-                    accept="application/pdf,.pdf"
-                    onChange={chooseEBook}
-                    required={!ebookFile && !isStoredWebsiteSource(form.ebookUrl)}
-                  />
-                  <small className={styles.coverHint}>
-                    PDF · Maks. 50 MB. File disimpan oleh sistem dan hanya dapat dibaca saat pinjaman aktif.
+              <label className={styles.spanTwo}>
+                <span>
+                  File E-Book PDF <b>*</b>
+                </span>
+                <input
+                  ref={ebookInput}
+                  type="file"
+                  accept="application/pdf,.pdf"
+                  onChange={chooseEBook}
+                  required={!ebookFile && !isStoredPdfSource(form.ebookUrl)}
+                />
+                <small className={styles.coverHint}>
+                  PDF · Maks. 50 MB. File disimpan oleh sistem dan hanya dapat
+                  dibaca melalui website sesuai aturan akses E-Book.
+                </small>
+                {ebookFile ? (
+                  <small className={styles.coverFileName}>
+                    {ebookFile.name}
                   </small>
-                  {ebookFile ? (
-                    <small className={styles.coverFileName}>{ebookFile.name}</small>
-                  ) : isStoredWebsiteSource(form.ebookUrl) ? (
-                    <small className={styles.coverFileName}>
-                      File E-Book sudah tersimpan. Pilih PDF baru hanya jika ingin menggantinya.
-                    </small>
-                  ) : null}
-                </label>
-              ) : null}
-
-              {form.accessMode === "PENYEDIA_EKSTERNAL" ? (
-                <label className={styles.spanTwo}>
-                  <span>URL Penyedia E-Book <b>*</b></span>
-                  <input
-                    type="url"
-                    value={form.ebookUrl}
-                    onChange={(e) => update("ebookUrl", e.target.value)}
-                    required
-                    placeholder="https://..."
-                  />
-                </label>
-              ) : null}
+                ) : isStoredPdfSource(form.ebookUrl) ? (
+                  <small className={styles.coverFileName}>
+                    File PDF E-Book sudah tersimpan. Pilih PDF baru hanya jika
+                    ingin menggantinya.
+                  </small>
+                ) : mode === "edit" ? (
+                  <small className={styles.coverFileName}>
+                    Data lama belum menggunakan PDF internal. Upload PDF sebelum
+                    menyimpan perubahan.
+                  </small>
+                ) : null}
+              </label>
 
               <label className={styles.spanTwo}>
                 <span>Catatan Lisensi</span>
@@ -537,7 +579,9 @@ export default function AdminEBookForm({
               <p>Ringkasan yang tampil di halaman detail E-Book.</p>
             </div>
             <label className={styles.descriptionField}>
-              <span>Deskripsi <b>*</b></span>
+              <span>
+                Deskripsi <b>*</b>
+              </span>
               <textarea
                 rows={6}
                 value={form.description}
@@ -584,7 +628,8 @@ export default function AdminEBookForm({
               <div>
                 <strong>Tampilkan di katalog</strong>
                 <small>
-                  Menonaktifkan E-Book menyembunyikannya dari katalog tanpa menghapus data.
+                  Menonaktifkan E-Book menyembunyikannya dari katalog tanpa
+                  menghapus data.
                 </small>
               </div>
               <input
@@ -603,10 +648,26 @@ export default function AdminEBookForm({
       </div>
 
       <footer className={styles.formFooter}>
-        <Link data-button="ghost" data-button-size="md" href={backHref} className={styles.cancelButton}>Batal</Link>
-        <button data-button="primary" data-button-size="md" data-button-loading={saving} type="submit" className={styles.saveButton} disabled={saving}>
+        <Link
+          data-button="ghost"
+          data-button-size="md"
+          href={backHref}
+          className={styles.cancelButton}
+        >
+          Batal
+        </Link>
+        <button
+          data-button="primary"
+          data-button-size="md"
+          data-button-loading={saving}
+          type="submit"
+          className={styles.saveButton}
+          disabled={saving}
+        >
           <FiCheckCircle aria-hidden />
-          <ButtonLabel loading={saving} pending="Menyimpan...">{mode === "create" ? "Simpan E-Book" : "Simpan Perubahan"}</ButtonLabel>
+          <ButtonLabel loading={saving} pending="Menyimpan...">
+            {mode === "create" ? "Simpan E-Book" : "Simpan Perubahan"}
+          </ButtonLabel>
         </button>
       </footer>
     </form>
