@@ -36,6 +36,8 @@ const SUBJECT_CATEGORIES = [
   "Ekonomi",
   "Politik",
   "Pemerintahan",
+  "Administrasi Kependudukan",
+  "Kependudukan",
   "Biografi",
   "Sastra",
   "Referensi",

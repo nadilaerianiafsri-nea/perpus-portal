@@ -275,16 +275,21 @@
     transform 150ms ease;
 }
 
-.subjectOption:hover,
 .subjectOption[aria-selected="true"] {
   background: var(--gray);
+  color: var(--navy);
+}
+
+.subjectOption:hover {
+  background: var(--sky);
   color: var(--navy);
   transform: scale(1.01);
 }
 
 .subjectOption:focus-visible {
   outline: none;
-  background: var(--gray);
+  background: var(--sky);
+  color: var(--navy);
   box-shadow: 0 0 0 3px #00063312;
 }
 

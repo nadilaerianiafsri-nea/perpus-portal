@@ -37,6 +37,8 @@ const SUBJECT_CATEGORIES = [
   "Ekonomi",
   "Politik",
   "Pemerintahan",
+  "Administrasi Kependudukan",
+  "Kependudukan",
   "Biografi",
   "Sastra",
   "Referensi",
@@ -510,10 +512,6 @@ export default function AdminEBookForm({
               <label>
                 <span>Mode Akses</span>
                 <input value="Baca di Website (PDF)" readOnly disabled />
-                <small>
-                  Mode akses ditetapkan otomatis. Admin tidak memasukkan URL
-                  atau link penyedia eksternal.
-                </small>
               </label>
               <label>
                 <span>Durasi Akses (hari)</span>
