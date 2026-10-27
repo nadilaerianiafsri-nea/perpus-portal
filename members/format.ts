@@ -5,9 +5,7 @@ export function memberDate(value: string | null, withTime = false) {
   return new Intl.DateTimeFormat("id-ID", { timeZone: "Asia/Jakarta", day: "numeric", month: "short", year: "numeric", ...(withTime ? { hour: "2-digit", minute: "2-digit" } as const : {}) }).format(new Date(value));
 }
 
-export function initials(name: string) {
-  return name.trim().split(/\s+/).slice(0, 2).map(part => part[0] ?? "").join("").toUpperCase();
-}
+export { getInitials as initials } from "../shared/memberAvatar.cjs";
 
 export function historyDate(value: string | null, withTime = false) {
   if (!value) return "—";

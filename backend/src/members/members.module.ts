@@ -18,6 +18,9 @@ import {
   MembersController,
 } from './members.controller';
 import { MembersService } from './members.service';
+import { ProfilePhotoController } from './profile-photo.controller';
+import { ProfilePhotoService } from './profile-photo.service';
+import { ProfilePhotoStorage } from './profile-photo.storage';
 import {
   AdminPublicContentController,
   PublicContentController,
@@ -27,6 +30,7 @@ import { PublicContentService } from './public-content.service';
 @Module({
   imports: [AuthModule],
   controllers: [
+    ProfilePhotoController,
     MembersController,
     MemberCirculationController,
     AdminMembersController,
@@ -37,6 +41,8 @@ import { PublicContentService } from './public-content.service';
     AdminPublicContentController,
   ],
   providers: [
+    ProfilePhotoService,
+    ProfilePhotoStorage,
     MembersService,
     EBookCirculationService,
     AdminMembersService,

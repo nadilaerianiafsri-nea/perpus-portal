@@ -1,0 +1,8 @@
+.avatar { position: relative; display: grid; place-items: center; flex-shrink: 0; width: var(--avatar-size, 44px); height: var(--avatar-size, 44px); overflow: hidden; border-radius: 50%; background: var(--button-primary, #2b3056); color: #fff; font-family: var(--font-outfit), Outfit, sans-serif; font-size: 15px; font-weight: 700; line-height: 1; }
+.topbar { width: 100%; height: 100%; }
+.profile { --avatar-size: 108px; border: 3px solid #fff; box-shadow: 0 4px 16px #00063314; font-size: 32px; }
+.panel { --avatar-size: 80px; font-size: 27px; }
+.initials { grid-area: 1 / 1; }
+.image { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+@media (max-width: 1000px) { .profile { --avatar-size: 96px; } }
+@media (max-width: 600px) { .profile { --avatar-size: 84px; font-size: 28px; } }

@@ -4,6 +4,7 @@ export interface MemberProfile {
   memberType: MemberType; emailVerified: boolean;
   whatsapp: string; address: string; identityNumber: string;
   universityName: string | null; workUnit: string | null;
+  profileImageUrl?: string | null;
 }
 export interface MemberBook { id: number; title: string; code: string; coverUrl: string; author: string; type?: "FISIK" | "EBOOK"; }
 export interface Reservation {

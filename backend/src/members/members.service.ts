@@ -209,8 +209,8 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  async profile(userId: number) {
-    const user = await this.prisma.user.findUnique({
+  async profile(userId: number, client: Pick<Prisma.TransactionClient, 'user'> = this.prisma) {
+    const user = await client.user.findUnique({
       where: { id: userId },
       select: {
         id: true,
@@ -219,6 +219,7 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
         role: true,
         memberType: true,
         emailVerified: true,
+        profileImageUrl: true,
         memberProfile: {
           select: {
             whatsapp: true,

@@ -47,7 +47,7 @@ function buildSummaryFromGrants(grants: BookGrant[]): GrantSummaryNumbers {
   return {
     totalTitles: grants.length,
     totalBooks: grants.reduce((sum, grant) => sum + grant.quantity, 0),
-    catalogued: grants.filter((grant) => grant.status === "CATALOGUED").length,
+    catalogued: grants.filter((grant) => grant.status === "SUDAH_DIKATALOGKAN").length,
   };
 }
 

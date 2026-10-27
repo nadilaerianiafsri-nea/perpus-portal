@@ -29,6 +29,7 @@ model User {
   memberType             MemberType?
   emailVerified          Boolean                 @default(false)
   isActive               Boolean                 @default(true)
+  profileImageUrl        String?                 @db.VarChar(255)
   memberProfile          MemberProfile?
   reservations           Reservation[]
   loans                  Loan[]

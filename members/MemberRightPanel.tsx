@@ -5,15 +5,15 @@ import { FiBell, FiBookOpen, FiClock, FiMail, FiMessageCircle, FiMonitor, FiUser
 import StatCard from "@/components/StatCard";
 import { useMember } from "./MemberContext";
 import { Badge, BookCover, ErrorState, LoadingCards } from "./MemberUI";
-import { initials, loanState, memberDate } from "./format";
+import { loanState, memberDate } from "./format";
+import MemberAvatar from "./MemberAvatar";
 import { memberTypeLabels } from "./types";
 import styles from "./Members.module.css";
 
 export default function MemberRightPanel() {
-  const { summary, user, loading, error, refresh } = useMember();
-  const profile = summary?.currentUser ?? user;
+  const { summary, profile, loading, error, refresh } = useMember();
   return <aside className={styles.rightPanel} aria-label="Profil dan informasi anggota">
-    <section className={`${styles.card} ${styles.profileCard}`} aria-label="Ringkasan profil"><div className={styles.profileBanner} /><div className={styles.profileBody}><span className={styles.profileAvatar}>{initials(profile.name)}</span><h2>{profile.name}</h2><Badge>{profile.memberType ? memberTypeLabels[profile.memberType] : "Anggota"}</Badge>
+    <section className={`${styles.card} ${styles.profileCard}`} aria-label="Ringkasan profil"><div className={styles.profileBanner} /><div className={styles.profileBody}><MemberAvatar variant="panel" className={styles.profileAvatar} name={profile.name} profileImageUrl={profile.profileImageUrl} /><h2>{profile.name}</h2><Badge>{profile.memberType ? memberTypeLabels[profile.memberType] : "Anggota"}</Badge>
       <div className={styles.profileStats}>
         <StatCard label="Dipinjam" value={loading ? "…" : summary?.stats.activeLoans ?? "—"} tone="primary" icon={<FiBookOpen />} density="compact" />
         <StatCard label="E-Book" value={loading ? "…" : summary?.stats.ebooks ?? "—"} tone="yellow" icon={<FiMonitor />} density="compact" />

@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 export async function memberRequest<T>(path: string, options?: RequestInit): Promise<T> {
   const response = await fetch(`/api/members/me/${path}`, {
     ...options, cache: "no-store", credentials: "same-origin",
-    headers: { "Content-Type": "application/json", ...options?.headers },
+    headers: options?.body instanceof FormData ? options.headers : { "Content-Type": "application/json", ...options?.headers },
   });
   const data = await response.json().catch(() => null);
   if (response.status === 401) {

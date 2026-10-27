@@ -3,7 +3,7 @@
 import { ButtonLabel } from '@/components/Button';
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   FiBell,
   FiBookOpen,
@@ -20,8 +20,8 @@ import type { CurrentUser } from "@/auth/serverAuth";
 import { useMemberResource } from "./api";
 import { MemberContext } from "./MemberContext";
 import MemberRightPanel from "./MemberRightPanel";
-import type { MemberSummary } from "./types";
-import { initials } from "./format";
+import type { MemberProfile, MemberSummary } from "./types";
+import MemberAvatar from "./MemberAvatar";
 import styles from "./Members.module.css";
 
 const navigation = [
@@ -53,6 +53,7 @@ export default function MemberShell({
 }) {
   const pathname = usePathname();
   const circulationPage = [
+    "/dashboard/profil",
     "/dashboard/reservasi",
     "/dashboard/pinjaman",
     "/dashboard/e-book",
@@ -60,6 +61,12 @@ export default function MemberShell({
   ].includes(pathname) || pathname.startsWith("/dashboard/koleksi") || pathname.startsWith("/dashboard/pinjaman/");
   const router = useRouter();
   const resource = useMemberResource<MemberSummary>("dashboard");
+  const [profileFallback, setProfileFallback] = useState<MemberProfile | null>(null);
+  const updateSummary = resource.update;
+  const updateProfile = useCallback((profile: MemberProfile) => {
+    setProfileFallback(profile);
+    updateSummary(previous => previous ? { ...previous, currentUser: profile } : previous);
+  }, [updateSummary]);
   const { reload } = resource;
   const [drawer, setDrawer] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
@@ -68,7 +75,8 @@ export default function MemberShell({
   const menuButton = useRef<HTMLButtonElement>(null);
   const previousPath = useRef(pathname);
   const current = currentNavigation(pathname);
-  const name = resource.data?.currentUser.name ?? user.name;
+  const profile: CurrentUser & { profileImageUrl?: string | null } = resource.data?.currentUser ?? profileFallback ?? user;
+  const name = profile.name;
   const unread = resource.data?.unreadNotifications;
 
   useEffect(() => {
@@ -182,6 +190,8 @@ export default function MemberShell({
     <MemberContext.Provider
       value={{
         user,
+        profile,
+        updateProfile,
         summary: resource.data,
         loading: resource.loading,
         error: resource.error,
@@ -260,7 +270,7 @@ export default function MemberShell({
                 ) : null}
               </Link>
               <Link className={styles.avatar} href="/dashboard/profil" aria-label="Profil saya">
-                {initials(name)}
+                <MemberAvatar name={name} profileImageUrl={profile.profileImageUrl} />
               </Link>
             </div>
           </header>
