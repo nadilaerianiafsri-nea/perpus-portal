@@ -422,7 +422,7 @@
     text-decoration: underline;
   }
 
-  .publicShell :global(main button:not(:disabled):hover) {
+  .publicShell :global(main button:not(:disabled):not([data-select-trigger]):hover) {
     transform: scale(1.025);
   }
 
@@ -432,7 +432,7 @@
     color: var(--navy);
   }
 
-  .publicShell :global(main:has(section[aria-label="Hasil pencarian"]) aside > div > div:first-child button:hover) {
+  .publicShell :global(main:has(section[aria-label="Hasil pencarian"]) aside > div > div:first-child button:not([data-select-trigger]):hover) {
     border-color: var(--yellow);
     background: color-mix(in srgb, var(--yellow) 82%, var(--white));
     color: var(--navy);
@@ -464,12 +464,12 @@
     transform: translateY(-4px);
   }
 
-  .publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) button[aria-expanded]:hover) {
+  .publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) button[aria-expanded]:not([data-select-trigger]):hover) {
     background: color-mix(in srgb, var(--sky) 46%, var(--white));
     color: var(--navy);
   }
 
-  .publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) form button:not(:disabled):hover) {
+  .publicShell :global(main:not(:has(section[aria-label="Hasil pencarian"])) form button:not(:disabled):not([data-select-trigger]):hover) {
     background: color-mix(in srgb, var(--navy) 88%, var(--white));
     color: var(--white);
     box-shadow: 0 10px 24px color-mix(in srgb, var(--navy) 16%, transparent);
@@ -698,16 +698,11 @@
 ) {
   width: 100%;
   min-width: 0;
-  min-height: 40px;
   padding-inline: 11px 9px;
-  border: 1px solid color-mix(in srgb, var(--navy) 16%, var(--line));
   border-radius: 12px;
-  background: color-mix(in srgb, var(--sky) 26%, var(--white));
-  color: var(--navy);
   font-family: inherit;
   font-size: 13px;
   font-weight: 650;
-  box-shadow: 0 5px 14px color-mix(in srgb, var(--navy) 5%, transparent);
   transition:
     background 0.18s ease,
     border-color 0.18s ease,
@@ -881,15 +876,6 @@
     background: color-mix(in srgb, var(--yellow-soft) 78%, var(--white));
     box-shadow: 0 9px 20px color-mix(in srgb, var(--navy) 10%, transparent);
     transform: translateY(-1px) scale(1.025);
-  }
-
-  .publicShell :global(
-    main:has(section[aria-label="Hasil pencarian"]) aside fieldset:last-child [data-select-trigger]:hover
-  ) {
-    border-color: color-mix(in srgb, var(--yellow) 72%, var(--navy));
-    background: color-mix(in srgb, var(--yellow-soft) 64%, var(--white));
-    box-shadow: 0 8px 18px color-mix(in srgb, var(--yellow) 18%, transparent);
-    transform: scale(1.02);
   }
 
   .publicShell :global(section[aria-label="Hasil pencarian"] article a[data-public-detail]:hover) {
@@ -1112,33 +1098,6 @@
 
 
 /* Final catalog controls: readable year menus, pagination breathing room, client-only view toggle support. */
-:global([data-select-panel][aria-label="Tahun terbit dari"]),
-:global([data-select-panel][aria-label="Tahun terbit sampai"]) {
-  width: 164px !important;
-  min-width: 164px !important;
-}
-
-:global([data-select-panel][aria-label="Tahun terbit dari"] [role="option"]),
-:global([data-select-panel][aria-label="Tahun terbit sampai"] [role="option"]) {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  min-width: 0;
-  padding-inline: 16px 12px;
-  white-space: nowrap;
-  word-break: keep-all;
-  overflow-wrap: normal;
-}
-
-:global([data-select-panel][aria-label="Tahun terbit dari"] [role="option"] > span:first-child),
-:global([data-select-panel][aria-label="Tahun terbit sampai"] [role="option"] > span:first-child) {
-  min-width: max-content;
-  white-space: nowrap;
-  word-break: keep-all;
-  overflow-wrap: normal;
-}
-
 .publicShell :global(
   section[aria-label="Hasil pencarian"]:has(article[data-catalog-view="list"]) > div:has(> article[data-catalog-view="list"])
 ) {
@@ -1153,33 +1112,11 @@
 }
 
 @media (max-width: 760px) {
-  :global([data-select-panel][aria-label="Tahun terbit dari"]),
-  :global([data-select-panel][aria-label="Tahun terbit sampai"]) {
-    width: 152px !important;
-    min-width: 152px !important;
-  }
-
   .publicShell :global(
     section[aria-label="Hasil pencarian"]:has(article[data-catalog-view="list"]) > div:has(> article[data-catalog-view="list"])
   ) {
     padding-bottom: 18px;
   }
-}
-
-/* Public interaction stability: compact list rows and readable year menus. */
-:global([data-select-panel][aria-label="Tahun terbit dari"]),
-:global([data-select-panel][aria-label="Tahun terbit sampai"]) {
-  width: min(210px, calc(100vw - 16px)) !important;
-  min-width: min(210px, calc(100vw - 16px)) !important;
-}
-
-:global([data-select-panel][aria-label="Tahun terbit dari"] [role="option"]),
-:global([data-select-panel][aria-label="Tahun terbit sampai"] [role="option"]),
-:global([data-select-panel][aria-label="Tahun terbit dari"] [role="option"] *),
-:global([data-select-panel][aria-label="Tahun terbit sampai"] [role="option"] *) {
-  white-space: nowrap !important;
-  word-break: normal !important;
-  overflow-wrap: normal !important;
 }
 
 @media (min-width: 761px) {
@@ -1292,44 +1229,6 @@
   height: 18px;
 }
 
-/* Year-range select controls use the existing public palette instead of gray. */
-.publicShell :global([data-select-trigger][aria-label="Tahun terbit dari"]),
-.publicShell :global([data-select-trigger][aria-label="Tahun terbit sampai"]),
-.publicShell :global(dialog[aria-label="Filter koleksi"] [data-select-trigger][aria-label="Tahun terbit dari"]),
-.publicShell :global(dialog[aria-label="Filter koleksi"] [data-select-trigger][aria-label="Tahun terbit sampai"]) {
-  border-color: color-mix(in srgb, var(--navy) 22%, var(--sky));
-  background: var(--sky);
-  color: var(--navy);
-  box-shadow: 0 5px 14px color-mix(in srgb, var(--navy) 6%, transparent);
-  transition:
-    transform 0.18s ease,
-    background 0.18s ease,
-    border-color 0.18s ease,
-    box-shadow 0.18s ease;
-}
-
-:global([data-select-panel][aria-label="Tahun terbit dari"]),
-:global([data-select-panel][aria-label="Tahun terbit sampai"]) {
-  border-color: color-mix(in srgb, var(--navy) 15%, var(--line)) !important;
-  background: var(--white) !important;
-  box-shadow: 0 16px 34px color-mix(in srgb, var(--navy) 13%, transparent) !important;
-}
-
-:global([data-select-panel][aria-label="Tahun terbit dari"] [role="option"]),
-:global([data-select-panel][aria-label="Tahun terbit sampai"] [role="option"]) {
-  border-radius: 12px;
-  transition:
-    background 0.16s ease,
-    color 0.16s ease,
-    transform 0.16s ease;
-}
-
-:global([data-select-panel][aria-label="Tahun terbit dari"] [role="option"][aria-selected="true"]),
-:global([data-select-panel][aria-label="Tahun terbit sampai"] [role="option"][aria-selected="true"]) {
-  background: var(--yellow-soft) !important;
-  color: var(--navy) !important;
-}
-
 @media (hover: hover) {
   .publicShell :global(section[aria-label="Hasil pencarian"] [data-filter-remove]:hover) {
     background: color-mix(in srgb, var(--sky) 72%, var(--white));
@@ -1347,24 +1246,6 @@
     transform: scale(1.08);
   }
 
-  .publicShell :global([data-select-trigger][aria-label="Tahun terbit dari"]:hover),
-  .publicShell :global([data-select-trigger][aria-label="Tahun terbit sampai"]:hover),
-  .publicShell :global(dialog[aria-label="Filter koleksi"] [data-select-trigger][aria-label="Tahun terbit dari"]:hover),
-  .publicShell :global(dialog[aria-label="Filter koleksi"] [data-select-trigger][aria-label="Tahun terbit sampai"]:hover) {
-    border-color: color-mix(in srgb, var(--yellow) 72%, var(--navy));
-    background: color-mix(in srgb, var(--sky) 72%, var(--yellow-soft));
-    box-shadow: 0 9px 20px color-mix(in srgb, var(--navy) 10%, transparent);
-    transform: scale(1.025);
-  }
-
-  :global([data-select-panel][aria-label="Tahun terbit dari"] [role="option"]:hover),
-  :global([data-select-panel][aria-label="Tahun terbit sampai"] [role="option"]:hover),
-  :global([data-select-panel][aria-label="Tahun terbit dari"] [role="option"][data-active="true"]),
-  :global([data-select-panel][aria-label="Tahun terbit sampai"] [role="option"][data-active="true"]) {
-    background: var(--sky) !important;
-    color: var(--navy) !important;
-    transform: translateX(2px);
-  }
 }
 
 @media (max-width: 560px) {

@@ -145,16 +145,16 @@
 
 .subjectSearchTrigger {
   width: 100%;
-  min-height: 40px;
+  min-height: var(--select-control-height);
   padding: 9px 11px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--white);
-  color: var(--navy);
+  border: 1px solid var(--select-border);
+  border-radius: var(--select-control-radius);
+  background: var(--select-surface);
+  color: var(--select-option-text);
   cursor: pointer;
   font: inherit;
   font-size: var(--text-input);
@@ -168,15 +168,20 @@
 }
 
 .subjectSearchTrigger:hover {
-  border-color: var(--navy-soft);
-  background: var(--gray);
-  transform: scale(1.01);
+  border-color: var(--select-trigger-hover-border);
+  background: var(--select-trigger-hover-bg);
 }
 
-.subjectSearchTrigger:focus-visible {
-  outline: none;
-  border-color: var(--navy-soft);
-  box-shadow: 0 0 0 3px #00063312;
+.subjectSearchTrigger[aria-expanded="true"] {
+  border-color: var(--select-primary);
+  background: var(--select-surface);
+  box-shadow: var(--select-open-ring);
+}
+
+.subjectSearchSelect .subjectSearchTrigger:focus-visible {
+  outline: 2px solid var(--select-focus);
+  outline-offset: 2px;
+  border-color: var(--select-primary);
 }
 
 .subjectSearchTrigger > span {
@@ -206,10 +211,11 @@
   top: calc(100% + 7px);
   left: 0;
   padding: 10px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--white);
-  box-shadow: var(--shadow);
+  border: 1px solid var(--select-panel-border);
+  border-radius: 18px;
+  background: var(--select-surface);
+  color: var(--select-option-text);
+  box-shadow: var(--select-panel-shadow);
   animation: subjectPanelIn 160ms ease both;
 }
 
@@ -243,8 +249,13 @@
 }
 
 .subjectSearchInput:focus {
-  border-color: var(--navy-soft);
-  box-shadow: 0 0 0 3px #00063312;
+  border-color: var(--select-primary);
+  box-shadow: var(--select-open-ring);
+}
+
+.subjectSearchSelect .subjectSearchInput:focus-visible {
+  outline: 2px solid var(--select-focus);
+  outline-offset: 2px;
 }
 
 .subjectOptionList {
@@ -258,12 +269,12 @@
 
 .subjectOption {
   width: 100%;
-  min-height: 38px;
+  min-height: 44px;
   padding: 8px 12px;
   border: 0;
-  border-radius: 999px;
-  background: transparent;
-  color: var(--navy);
+  border-radius: 11px;
+  background: var(--select-surface);
+  color: var(--select-option-text);
   cursor: pointer;
   font: inherit;
   font-size: var(--text-input);
@@ -276,21 +287,22 @@
 }
 
 .subjectOption[aria-selected="true"] {
-  background: var(--gray);
-  color: var(--navy);
+  background: var(--select-option-selected-bg);
+  font-weight: 600;
 }
 
 .subjectOption:hover {
-  background: var(--sky);
-  color: var(--navy);
-  transform: scale(1.01);
+  background: var(--select-option-hover-bg);
 }
 
-.subjectOption:focus-visible {
-  outline: none;
-  background: var(--sky);
-  color: var(--navy);
-  box-shadow: 0 0 0 3px #00063312;
+.subjectSearchSelect .subjectOption:focus-visible {
+  outline: 2px solid var(--select-focus);
+  outline-offset: -2px;
+  background: var(--select-option-hover-bg);
+}
+
+.subjectSearchSelect .subjectOption[aria-selected="true"]:is(:hover, :focus-visible) {
+  background: var(--select-option-selected-hover-bg);
 }
 
 .subjectEmpty {
@@ -327,14 +339,12 @@
     gap: 6px;
   }
 
-  .subjectSearchTrigger,
   .subjectSearchInput {
     min-height: 44px;
   }
 
   .subjectSearchPanel {
     padding: 8px;
-    border-radius: 10px;
   }
 
   .subjectOptionList {
@@ -342,7 +352,7 @@
   }
 
   .subjectOption {
-    min-height: 42px;
+    min-height: 44px;
     padding-inline: 11px;
   }
 }

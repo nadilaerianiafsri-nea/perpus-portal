@@ -9,11 +9,11 @@
   max-height: calc(100dvh - 32px);
   overflow-y: auto;
   overscroll-behavior: contain;
-  border: 1px solid var(--button-border);
+  border: 1px solid var(--select-panel-border);
   border-radius: 16px;
-  background: var(--white);
-  color: var(--navy);
-  box-shadow: 0 12px 36px #00063326;
+  background: var(--select-surface);
+  color: var(--select-option-text);
+  box-shadow: var(--select-panel-shadow);
   font-family: var(--font-outfit), Outfit, sans-serif;
 }
 .menu button {
@@ -23,15 +23,15 @@
   padding: 11px 12px;
   border: 0;
   border-radius: 9px;
-  background: transparent;
-  color: var(--navy);
+  background: var(--select-surface);
+  color: var(--select-option-text);
   font: inherit;
   font-size: 14px;
   font-weight: 500;
   text-align: left;
   cursor: pointer;
 }
-.menu button:hover:not(:disabled) { background: color-mix(in srgb, var(--yellow) 12%, white); }
-.menu button:focus-visible { outline: 1px solid var(--button-primary); outline-offset: -1px; background: var(--button-soft); }
-.menu button:disabled { opacity: .5; cursor: not-allowed; }
+.menu button:hover:not(:disabled) { background: var(--select-option-hover-bg); }
+.menu button:focus-visible { outline: 2px solid var(--select-focus); outline-offset: -2px; background: var(--select-option-hover-bg); }
+.menu button:disabled { color: var(--select-option-disabled-text); opacity: .5; cursor: not-allowed; }
 @media (max-width: 700px) { .trigger { width: 100%; } }

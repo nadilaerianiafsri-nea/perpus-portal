@@ -184,8 +184,8 @@ test("AppSelect real browser interaction and form contract", { timeout: 90000 },
       await pause(180);
       const styles = await ev("(()=>{const t=document.querySelector('#picker'),s=document.querySelector('[aria-selected=true]'),a=document.querySelector('[data-active=true]');return{height:t.getBoundingClientRect().height,font:getComputedStyle(t).fontSize,label:getComputedStyle(document.querySelector('[data-select-label]')).fontSize,selected:getComputedStyle(s).backgroundColor,hover:getComputedStyle(a).backgroundColor}})()");
       assert.ok(styles.height >= 46); assert.equal(styles.font, "14px"); assert.equal(styles.label, "12px");
-      assert.match(styles.selected, /rgba\(43, 48, 86, 0\.0\d+\)/);
-      assert.match(styles.hover, /rgba\(255, 208, 0, 0\.1\d+\)/);
+      assert.equal(styles.selected, "rgb(228, 232, 243)");
+      assert.equal(styles.hover, "rgb(238, 240, 247)");
     });
     await suite.test("selection dispatches a genuine select ChangeEvent and restores focus", async () => {
       await click(selected("Charlie"));
@@ -327,6 +327,38 @@ test("AppSelect real browser interaction and form contract", { timeout: 90000 },
       assert.equal(geometry.placement, "top"); assert.equal(geometry.popover, true); assert.equal(geometry.parent, "BODY");
       assert.ok(geometry.left >= 0 && geometry.right <= 390); assert.ok(geometry.top >= 0 && geometry.bottom <= geometry.anchorTop);
     });
+    for (const width of [1440, 768, 390]) {
+      await suite.test(`navy/soft option and trigger states preserve geometry at ${width}`, async () => {
+        await command("Emulation.setDeviceMetricsOverride", { width, height: 700, deviceScaleFactor: 1, mobile: false });
+        await mount();
+        await command("Input.dispatchMouseEvent", { type: "mouseMoved", x: 1, y: 1 }); await pause(190);
+        const style = selector => ev(`(()=>{const e=document.querySelector(${JSON.stringify(selector)}),s=getComputedStyle(e),r=e.getBoundingClientRect();return {bg:s.backgroundColor,fg:s.color,border:s.borderColor,outline:s.outlineColor,width:r.width,height:r.height}})()`);
+        const hover = async selector => {
+          const point = await ev(`(()=>{const r=document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()`);
+          await command("Input.dispatchMouseEvent", { type: "mouseMoved", ...point }); await pause(190);
+        };
+        const before = await style("#picker");
+        assert.equal(before.bg, "rgb(255, 255, 255)"); assert.equal(before.fg, "rgb(0, 6, 51)"); assert.equal(before.border, "rgb(216, 220, 232)");
+        await hover("#picker"); const hovered = await style("#picker");
+        assert.equal(hovered.bg, "rgb(248, 249, 252)"); assert.equal(hovered.border, "rgb(174, 182, 204)");
+        assert.equal(hovered.width, before.width); assert.equal(hovered.height, before.height);
+        await click("#picker"); await key("ArrowDown"); await pause(190);
+        const opened = await style("#picker"); assert.equal(opened.bg, "rgb(255, 255, 255)"); assert.equal(opened.border, "rgb(43, 48, 86)");
+        assert.equal(opened.width, before.width); assert.equal(opened.height, before.height);
+        assert.equal((await style('[role="listbox"]')).bg, "rgb(255, 255, 255)");
+        assert.equal((await style(selected("Alpha"))).bg, "rgb(255, 255, 255)");
+        assert.equal((await style(selected("Beta"))).bg, "rgb(228, 232, 243)");
+        assert.equal((await style(selected("Charlie"))).bg, "rgb(238, 240, 247)");
+        await hover(selected("Beta"));
+        assert.equal((await style(selected("Beta"))).bg, "rgb(217, 223, 238)");
+        assert.equal((await style('[data-select-check]')).fg, "rgb(0, 6, 51)");
+        await hover('[role="option"][aria-disabled="true"]'); const disabled = await style('[role="option"][aria-disabled="true"]');
+        assert.equal(disabled.fg, "rgb(154, 161, 181)"); assert.equal(disabled.bg, "rgba(0, 0, 0, 0)");
+        await key("Escape"); await click("#before"); await key("Tab");
+        assert.equal(await ev("document.querySelector('#picker').matches(':focus-visible')"), true);
+        assert.equal((await style("#picker")).outline, "rgb(31, 171, 255)");
+      });
+    }
     assert.deepEqual(browser.errors, [], "fixture must not emit browser runtime exceptions");
   } finally {
     browser?.socket.close();
