@@ -54,11 +54,11 @@
 }
 /* Legacy native submit keeps its layout and uses shared interaction tokens. */
 .actions button:not([data-button]) { transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease; }
-.actions button:hover:not(:disabled) { background: var(--button-primary-hover); border-color: var(--button-primary-hover); }
-.actions button:active:not(:disabled) { background: var(--button-primary-pressed); border-color: var(--button-primary-pressed); }
+.actions button:hover:not(:disabled) { background: var(--button-primary-hover); color: var(--button-navy); border-color: var(--button-primary-hover-border); }
+.actions button:active:not(:disabled) { background: var(--button-primary-pressed); color: var(--button-navy); border-color: var(--button-primary-hover-border); }
 .actions button:disabled { opacity: .5; cursor: not-allowed; }
 .actions button:focus-visible, .errorBox button:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
-.actions button:focus-visible { outline-color: var(--button-primary); }
+.actions button:focus-visible { outline-color: var(--button-primary-focus); }
 .errorBox, .successBox, .loadingBox { border-radius: 12px; padding: 14px 16px; font-size: 14px; }
 .errorBox { background: #ffebea; color: #bc241c; border: 1px solid #ff5c59; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .errorBox button { min-height: 34px; padding: 0 12px; background: #fff; color: #bc241c; border-color: #bc241c; }

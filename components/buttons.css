@@ -5,8 +5,10 @@
 :root {
   --button-navy: #000633;
   --button-primary: #2b3056;
-  --button-primary-hover: var(--button-primary);
-  --button-primary-pressed: #202648;
+  --button-primary-hover: var(--button-soft);
+  --button-primary-hover-border: var(--button-border);
+  --button-primary-pressed: #e5e7ef;
+  --button-primary-focus: #1fabff;
   --button-soft: #eef0f7;
   --button-border: #d5d9e7;
   --button-accent: #ffd000;
@@ -27,7 +29,7 @@
   --button-bg: var(--button-navy);
   --button-fg: #fff;
   --button-stroke: transparent;
-  --button-hover-bg: var(--button-primary-hover);
+  --button-hover-bg: var(--button-primary);
   --button-hover-fg: #fff;
   --button-hover-stroke: transparent;
   --button-height: 42px;
@@ -59,8 +61,12 @@
     transform 160ms ease;
 }
 
-:root body [data-button="primary"][data-button] {
+:root body [data-button="primary"][data-button]:where(:not([aria-pressed], [aria-selected], [aria-current], [data-button-active])) {
+  --button-hover-bg: var(--button-primary-hover);
+  --button-hover-fg: var(--button-navy);
+  --button-hover-stroke: var(--button-primary-hover-border);
   --button-pressed-bg: var(--button-primary-pressed);
+  --button-focus: var(--button-primary-focus);
 }
 
 /* Reset legacy individual scaling on CTAs, preserving navigation controls. */
@@ -232,7 +238,7 @@
   box-shadow: none;
 }
 :root body [data-button][data-button]:focus-visible {
-  outline: 2px solid var(--button-primary);
+  outline: 2px solid var(--button-focus, var(--button-primary));
   outline-offset: 3px;
   box-shadow: 0 0 0 2px #fff;
 }
@@ -243,7 +249,7 @@
   box-shadow: none;
 }
 :root body :is([data-button="primary"], [data-button="back"])[data-button][data-button-inverse]:not([data-button-inverse="false"]):focus-visible {
-  outline-color: #1fabff;
+  outline-color: var(--button-primary-focus);
 }
 
 :root body [data-button][data-button]:is(:disabled, [aria-disabled="true"]) {
@@ -303,6 +309,7 @@
   --button-hover-fg: var(--button-navy);
   --button-hover-stroke: var(--button-accent);
   --button-pressed-bg: var(--button-accent);
+  --button-focus: var(--button-primary);
 }
 
 /* Back navigation opts in independently of cancel and other secondary actions. */
@@ -311,9 +318,10 @@
   --button-fg: #fff;
   --button-stroke: var(--button-navy);
   --button-hover-bg: var(--button-primary-hover);
-  --button-hover-fg: #fff;
-  --button-hover-stroke: var(--button-primary-hover);
+  --button-hover-fg: var(--button-navy);
+  --button-hover-stroke: var(--button-primary-hover-border);
   --button-pressed-bg: var(--button-primary-pressed);
+  --button-focus: var(--button-primary-focus);
   --button-height: 44px;
   padding: 10px 20px;
   gap: 8px;
@@ -359,9 +367,10 @@
   --button-fg: white;
   --button-stroke: transparent;
   --button-hover-bg: var(--button-primary-hover);
-  --button-hover-fg: white;
-  --button-hover-stroke: var(--button-primary-hover);
+  --button-hover-fg: var(--button-navy);
+  --button-hover-stroke: var(--button-primary-hover-border);
   --button-pressed-bg: var(--button-primary-pressed);
+  --row-focus: var(--button-primary-focus);
 }
 :root body [data-button][data-button][data-row-action="warning"] {
   --button-bg: var(--action-warning-bg);
