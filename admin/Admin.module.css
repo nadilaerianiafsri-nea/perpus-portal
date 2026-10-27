@@ -227,10 +227,7 @@
   width: 100%;
   min-height: 50px;
   padding: 12px 14px;
-  border: 0;
   border-radius: 15px;
-  background: var(--button-bg, transparent);
-  color: var(--button-fg, var(--navy-soft));
   font: inherit;
   font-size: 14px;
   font-weight: 600;
@@ -238,12 +235,18 @@
   text-align: left;
   text-decoration: none;
   cursor: pointer;
+}
+
+.sidebarBottom > a {
+  border: 0;
+  background: transparent;
+  color: var(--navy-soft);
   transition: background-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
 }
 
+/* Reserve the shared border without moving the established icon/text inset. */
 :root body .sidebarBottom > button[data-button][data-button] {
-  --button-fg: var(--yellow);
-  --button-pressed-bg: var(--button-accent-hover);
+  padding: 11px 13px;
 }
 
 .sidebarBottom > a > svg,
@@ -274,8 +277,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sidebarBottom > a,
-  :root body .sidebarBottom > button[data-button][data-button] { transition: none; }
+  .sidebarBottom > a { transition: none; }
 }
 
 .sidebarOverlay {

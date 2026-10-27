@@ -301,17 +301,6 @@
   }
 }
 
-/* Only intentional sidebar logout actions retain navy/yellow interaction.
-   Legacy accentHover callers otherwise follow the shared primary tokens. */
-:root body [data-button="primary"][data-button-hover="logout"] {
-  --button-fg: var(--button-accent);
-  --button-hover-bg: var(--button-accent);
-  --button-hover-fg: var(--button-navy);
-  --button-hover-stroke: var(--button-accent);
-  --button-pressed-bg: var(--button-accent);
-  --button-focus: var(--button-primary);
-}
-
 /* Back navigation opts in independently of cancel and other secondary actions. */
 :root body [data-button="back"][data-button] {
   --button-bg: var(--button-navy);

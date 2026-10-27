@@ -49,7 +49,7 @@ test('shared navy interactions preserve semantic variants, logout, navigation an
     for (const width of [1440, 768, 390]) {
       await command('Emulation.setDeviceMetricsOverride', { width, height: 1100, deviceScaleFactor: 1, mobile: false });
       await suite.test(`primary/back colors, icon contrast and stable dimensions at ${width}`, async () => {
-        for (const id of ['primary', 'legacy', 'back', 'row', 'inverse', 'row-secondary']) {
+        for (const id of ['primary', 'legacy', 'back', 'row', 'inverse', 'row-secondary', 'logout']) {
           await command('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 1, y: 1 }); await pause(210);
           const before = await measure(id), after = await hover(id);
           assert.equal(before.bg, 'rgb(0, 6, 51)'); assert.equal(before.fg, 'rgb(255, 255, 255)');
@@ -75,11 +75,13 @@ test('shared navy interactions preserve semantic variants, logout, navigation an
       await evaluate(`document.getElementById('inverse').focus()`);
       assert.equal(await evaluate(`getComputedStyle(document.getElementById('inverse')).outlineColor`), 'rgb(31, 171, 255)');
     });
-    await suite.test('logout keeps its explicit yellow interaction', async () => {
+    // The obsolete marker must have no styling effect, even on legacy markup.
+    await suite.test('logout uses shared primary interaction with no accent exception', async () => {
       await command('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 1, y: 1 }); await pause(210);
       const before = await measure('logout'), after = await hover('logout');
-      assert.equal(before.bg, 'rgb(0, 6, 51)'); assert.equal(before.fg, 'rgb(255, 208, 0)');
-      assert.equal(after.bg, 'rgb(255, 208, 0)'); assert.equal(after.fg, 'rgb(0, 6, 51)');
+      assert.equal(before.bg, 'rgb(0, 6, 51)'); assert.equal(before.fg, 'rgb(255, 255, 255)');
+      assert.equal(after.bg, 'rgb(238, 240, 247)'); assert.equal(after.fg, 'rgb(0, 6, 51)');
+      assert.equal(after.icon, after.fg); assert.equal(after.border, 'rgb(213, 217, 231)');
     });
     await suite.test('semantic, accent, secondary and ghost variants retain their colors', async () => {
       for (const [id, bg] of [['danger', 'rgb(255, 59, 47)'], ['success', 'rgb(85, 190, 36)'], ['warning', 'rgb(255, 149, 0)'], ['accent', 'rgb(255, 208, 0)'], ['secondary', 'rgb(238, 240, 247)'], ['ghost', 'rgba(0, 0, 0, 0)']]) {

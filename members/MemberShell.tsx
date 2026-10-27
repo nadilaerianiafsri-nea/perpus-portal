@@ -169,7 +169,7 @@ export default function MemberShell({
               {logoutError}
             </p>
           ) : null}
-          <button data-button="primary" data-button-hover="logout" data-button-size="md" data-button-loading={loggingOut} aria-busy={loggingOut} type="button" onClick={logout} disabled={loggingOut}>
+          <button data-button="primary" data-button-size="md" data-button-loading={loggingOut} aria-busy={loggingOut} type="button" onClick={logout} disabled={loggingOut}>
             <FiLogOut aria-hidden />
             <ButtonLabel loading={loggingOut} pending="Sedang keluar...">Keluar</ButtonLabel>
           </button>
