@@ -1,30 +1,16 @@
 .headerArea {
-  position: relative;
-  isolation: isolate;
   width: min(1180px, calc(100% - 32px));
-  margin: 0 auto;
-  padding-top: 132px;
-  padding-bottom: 24px;
+  margin: 24px auto 0;
 }
 
-.headerArea::before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  top: 96px;
-  right: -110px;
-  width: 250px;
-  height: 250px;
-  border: 1px solid color-mix(in srgb, var(--sky) 62%, transparent);
-  border-radius: 50%;
-  box-shadow: inset 0 0 0 42px color-mix(in srgb, var(--sky) 8%, transparent);
-  pointer-events: none;
-}
-
-.headerCard {
+/*
+ * Nilai di bawah disalin dari pola header publik yang dipakai
+ * Hibah Buku / Tentang / Panduan / FAQ / Kontak.
+ */
+.pageHeader {
   position: relative;
   overflow: hidden;
-  margin: 0;
+  margin-bottom: 24px;
   padding: 26px 28px;
   border: 1px solid var(--line);
   border-radius: 20px;
@@ -37,10 +23,10 @@
   box-shadow:
     0 2px 5px color-mix(in srgb, var(--navy) 6%, transparent),
     0 18px 42px color-mix(in srgb, var(--navy) 7%, transparent);
-  animation: collectionHeaderEnter 0.42s ease both;
+  animation: publicHeaderEnter 0.42s ease both;
 }
 
-.headerCard::after {
+.pageHeader::after {
   content: "";
   position: absolute;
   width: 110px;
@@ -52,7 +38,7 @@
   pointer-events: none;
 }
 
-.headerCard h1 {
+.pageHeader h1 {
   position: relative;
   z-index: 1;
   margin: 0;
@@ -60,19 +46,20 @@
   font-size: clamp(32px, 3vw, 46px);
   line-height: 1.08;
   letter-spacing: -0.035em;
-  text-wrap: balance;
 }
 
-.headerArea + :global(main) {
-  margin-top: 0 !important;
-  padding-top: 0 !important;
+/*
+ * Catalog memiliki header/judul lama sendiri.
+ * Sembunyikan seluruh header lama yang berada langsung di dalam main Catalog
+ * supaya yang tampil hanya header publik di atas.
+ */
+.catalogHost :global(main > nav[aria-label="Jejak navigasi"]),
+.catalogHost :global(main > header),
+.catalogHost :global(main > h1[data-page-title]) {
+  display: none !important;
 }
 
-.headerArea + :global(main) > :global(h1[data-page-title]) {
-  display: none;
-}
-
-@keyframes collectionHeaderEnter {
+@keyframes publicHeaderEnter {
   from {
     opacity: 0;
     transform: translateY(10px);
@@ -84,53 +71,37 @@
   }
 }
 
-@media (max-width: 900px) {
-  .headerArea::before {
-    right: 0;
-    opacity: 0.52;
-  }
-}
-
 @media (max-width: 760px) {
   .headerArea {
-    padding-bottom: 18px;
+    width: calc(100% - 32px);
+    margin-top: 18px;
   }
 
-  .headerCard {
+  .pageHeader {
+    margin-bottom: 18px;
     padding: 22px;
     border-radius: 18px;
-  }
-}
-
-@media (max-width: 600px) {
-  .headerArea {
-    padding-top: 104px;
   }
 }
 
 @media (max-width: 560px) {
   .headerArea {
     width: calc(100% - 24px);
-    padding-bottom: 18px;
   }
 
-  .headerArea::before {
-    display: none;
-  }
-
-  .headerCard {
+  .pageHeader {
     padding: 18px;
     border-radius: 16px;
   }
 
-  .headerCard h1 {
+  .pageHeader h1 {
     font-size: 30px;
     line-height: 1.08;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .headerCard {
+  .pageHeader {
     animation: none;
   }
 }
