@@ -8,11 +8,14 @@
 .card > p { margin: 20px 0 0; color: var(--text-secondary-color); font-size: 14px; line-height: 1.65; }
 .page .overdue dd { color: var(--stat-danger); }
 .overdueHint { display: block; margin-top: 4px; font-size: 13px; }
-.actions { display: flex; flex-wrap: wrap; gap: 12px; padding-top: 4px; }
-:root body .actions [data-button][data-button] { --button-height: 44px; font-size: 14px; }
+.informationCard { display: flex; flex-direction: column; }
+.actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px; margin-top: 24px; padding-top: 18px; border-top: 1px solid #e7e9f0; }
+:root body .actions button[data-button][data-button] { --button-height: 46px; min-height: 46px; min-width: 144px; padding: 11px 20px; border-radius: 13px; font-size: 14px; font-weight: 600; }
+:root body .actions .reportAction[data-button][data-button] { --button-bg: var(--action-danger-soft-bg); --button-fg: var(--action-danger-fg); --button-stroke: color-mix(in srgb, var(--button-error) 25%, transparent); --button-hover-bg: var(--button-error); --button-hover-fg: #fff; --button-hover-stroke: var(--button-error); --button-pressed-bg: var(--button-error); min-width: 190px; }
 .card:focus-visible { outline: 3px solid var(--button-primary); outline-offset: 4px; }
 
 @media (max-width: 540px) {
   .loanFields { grid-template-columns: minmax(0, 1fr); gap: 18px; }
   .actions { flex-direction: column; align-items: stretch; gap: 10px; }
+  :root body .actions button[data-button][data-button] { width: 100%; min-width: 0; }
 }

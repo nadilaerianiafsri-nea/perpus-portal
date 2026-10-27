@@ -61,7 +61,7 @@ export default function LoanDetail({ id }: { id: number }) {
             </dl>
           </div>
         </section>
-        <section ref={loan.lostReport ? undefined : reportHeading} tabIndex={-1} className={`${styles.card} ${ui.card}`} aria-labelledby="member-loan-information-title">
+        <section ref={loan.lostReport ? undefined : reportHeading} tabIndex={-1} className={`${styles.card} ${ui.card} ${ui.informationCard}`} aria-labelledby="member-loan-information-title">
           <h2 id="member-loan-information-title"><FiClock aria-hidden="true" />Informasi Pinjaman</h2>
           <dl className={`${styles.fields} ${ui.fields} ${ui.loanFields}`}>
             <div><dt>Status</dt><dd><span className={`${styles.status} ${loan.status === "HILANG" ? styles.warning : overdue ? styles.danger : styles.success}`}>{loan.status === "AKTIF" ? "Pinjaman Aktif" : loan.status === "DIKEMBALIKAN" ? "Dikembalikan" : "Buku Hilang"}</span></dd></div>
@@ -70,6 +70,10 @@ export default function LoanDetail({ id }: { id: number }) {
             <div><dt>Jumlah perpanjangan</dt><dd>{loan.extensionCount} kali</dd></div>
             {loan.returnedAt ? <div><dt>Dikembalikan</dt><dd><time dateTime={loan.returnedAt}>{memberDate(loan.returnedAt, true)}</time></dd></div> : null}
           </dl>
+          {canExtendReportedLoan(loan) || canReportLost(loan) ? <div className={ui.actions} role="group" aria-label="Aksi pinjaman">
+            {canExtendReportedLoan(loan) ? <Button accentHover icon={<FiRefreshCw />} disabled={pending} onClick={() => open("extend")} aria-label={`Perpanjang pinjaman ${loan.book.title} 7 hari`}>Perpanjang</Button> : null}
+            {canReportLost(loan) ? <Button className={ui.reportAction} variant="secondary" rowAction="danger-soft" disabled={pending} onClick={() => open("report")} aria-label={`Laporkan buku ${loan.book.title} sebagai hilang`}>Laporkan Buku Hilang</Button> : null}
+          </div> : null}
         </section>
       </div>
       {loan.lostReport ? <section ref={reportHeading} tabIndex={-1} className={`${styles.card} ${ui.card}`} id="member-loan-report" aria-labelledby="member-report-title">
@@ -82,10 +86,6 @@ export default function LoanDetail({ id }: { id: number }) {
         </dl>
         {loan.lostReport?.status === "MENUNGGU_VERIFIKASI" ? <p>Laporan Anda sedang menunggu verifikasi petugas.</p> : loan.lostReport?.status === "PROSES_PENGGANTIAN" ? <p>Hubungi petugas untuk penggantian dengan buku yang sama atau sesuai kebijakan perpustakaan. Tidak ada denda uang.</p> : null}
       </section> : null}
-      {canExtendReportedLoan(loan) || canReportLost(loan) ? <div className={ui.actions} role="group" aria-label="Aksi pinjaman">
-        {canExtendReportedLoan(loan) ? <Button accentHover icon={<FiRefreshCw />} disabled={pending} onClick={() => open("extend")} aria-label={`Perpanjang pinjaman ${loan.book.title} 7 hari`}>Perpanjang</Button> : null}
-        {canReportLost(loan) ? <Button variant="secondary" rowAction="danger-soft" disabled={pending} onClick={() => open("report")} aria-label={`Laporkan buku ${loan.book.title} sebagai hilang`}>Laporkan Buku Hilang</Button> : null}
-      </div> : null}
     </>}
     <LoanDialog selection={selection} pending={pending} error={error} onDismiss={() => { if (!locked.current) setSelection(null); }} onConfirm={confirm} />
   </div>;
