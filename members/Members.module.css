@@ -20,8 +20,10 @@
 .navigation a.activeNav, .navigation a.activeNav:hover, .navigation a.activeNav:focus-visible { background: #000633; color: white; box-shadow: 0 7px 12px #00063330; }
 .activeNav svg { color: #FFD000; }
 .notificationBadge { margin-left: auto; min-width: 20px; height: 20px; display: grid; place-items: center; border-radius: 99px; background: #ff3b32; color: white; font-size: var(--text-badge); font-weight: 600; }
-.sidebarBottom { margin-top: auto; padding: 18px 8px 2px; }
-.sidebarBottom button { display: flex; align-items: center; gap: 13px; padding: 12px 6px; border: 0; background: transparent; color: #555; font-weight: 500; }
+.sidebarBottom { margin-top: auto; flex-shrink: 0; padding: 18px 0 0; }
+:root body .sidebarBottom > button[data-button][data-button] { --button-height: 50px; --button-radius: 15px; --button-fg: var(--button-accent); --button-pressed-bg: var(--button-accent-hover); display: grid; grid-template-columns: 20px minmax(0, 1fr); align-items: center; gap: 13px; width: 100%; height: 50px; min-height: 50px; padding: 12px 14px; border: 0; border-radius: 15px; background: var(--button-bg); color: var(--button-fg); font-family: inherit; font-size: 14px; font-weight: 600; line-height: 1.25; text-align: left; transition: background-color 160ms ease, color 160ms ease, box-shadow 160ms ease; }
+:root body .sidebarBottom > button[data-button][data-button] > svg { width: 20px; height: 20px; color: inherit; }
+@media (prefers-reduced-motion: reduce) { :root body .sidebarBottom > button[data-button][data-button] { transition: none; } }
 .workspace { min-width: 0; }
 .topbar { position: sticky; top: 14px; z-index: 30; min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; padding: 12px 18px; border: 1px solid #e7e9f0; border-radius: 20px; background: white; box-shadow: 0 6px 24px #0006330d; }
 .topbarLeft { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; }
