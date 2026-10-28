@@ -1,5 +1,5 @@
 .page { display: grid; gap: 22px; color: #000633; }
-.heading h1 { margin: 0 0 8px; font-size: var(--text-page); line-height: var(--leading-title);  font-weight: 700;  overflow-wrap: anywhere; }
+.heading h1 { margin: 0 0 8px; font-size: var(--text-page); line-height: var(--leading-title); font-weight: 700; overflow-wrap: anywhere; }
 .heading p { margin: 0; max-width: 800px; color: #5d5d5d; font-size: 14px; line-height: 1.65; }
 .summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; grid-auto-rows: 1fr; }
 .panel { overflow: hidden; background: #fff; border: 1px solid #dfdfdf; border-radius: 16px; }
@@ -33,8 +33,8 @@
 .pagination span { font-size: 12px; color: #6c6c6c; }
 .note { margin: -4px 0 0; padding: 14px 16px; border-left: 4px solid #FFD000; background: #fffae6; color: #515151; font-size: var(--text-base); line-height: 1.6; }
 @media (max-width: 900px) { .summary { grid-template-columns: 1fr; }.toolbar { align-items: stretch; flex-direction: column; }.search { width: 100%; } }
-@media (max-width: 600px) { .page { gap: 16px; }.toolbar { padding: 12px; }.tabs { display: grid; grid-template-columns: 1fr; }.tabs button { min-height: 44px;  font-size: var(--text-button); }.pagination { justify-content: space-between; flex-wrap: wrap; }.pagination button { min-height: 44px; }.note { font-size: var(--text-base); } }
-@media (max-width: 360px) { .heading h1 { font-size: var(--text-page);  font-weight: 700;  line-height: var(--leading-title);  overflow-wrap: anywhere; }.table th, .table td { padding-inline: 12px; } }
+@media (max-width: 600px) { .page { gap: 16px; }.toolbar { padding: 12px; }.tabs { display: grid; grid-template-columns: 1fr; }.tabs button { min-height: 44px; font-size: var(--text-button); }.pagination { justify-content: space-between; flex-wrap: wrap; }.pagination button { min-height: 44px; }.note { font-size: var(--text-base); } }
+@media (max-width: 360px) { .heading h1 { font-size: var(--text-page); font-weight: 700; line-height: var(--leading-title); overflow-wrap: anywhere; }.table th, .table td { padding-inline: 12px; } }
 
 .table[data-record-list] th:nth-child(1) { width: 24%; }
 .table[data-record-list] th:nth-child(2) { width: 28%; }
@@ -63,8 +63,7 @@
   .exportButton { width: 100%; }
 }
 
-
-/* Match the transaction table visual system and keep columns stable on narrower desktop layouts. */
+/* Match the Anggota table visual system and keep columns stable on narrower desktop layouts. */
 .page {
   font-family: var(--font-outfit), "Outfit", sans-serif;
 }
@@ -72,6 +71,107 @@
 .table th {
   background: var(--navy);
   color: var(--white);
+}
+
+@media (min-width: 701px) {
+  .panel {
+    border: 1px solid var(--line);
+    border-radius: 15px;
+    background: var(--white);
+    box-shadow: 0 2px 8px #00063306;
+  }
+
+  .tabs button {
+    transition: transform 0.16s ease, background 0.16s ease, color 0.16s ease, border-color 0.16s ease;
+  }
+
+  .tabs button:hover {
+    transform: scale(1.02);
+  }
+
+  .tableScroller {
+    overflow-y: hidden;
+    scrollbar-gutter: stable;
+  }
+
+  .table {
+    font-size: 11px;
+  }
+
+  .table th,
+  .table td {
+    padding: 12px 13px;
+    border-bottom-color: #ececef;
+    vertical-align: middle;
+  }
+
+  .table th,
+  .table[data-record-list] th {
+    height: 45px;
+    background: var(--navy);
+    color: var(--white);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: .05em;
+  }
+
+  .table td,
+  .table[data-record-list] td,
+  .cellStack strong {
+    font-size: 11px;
+    color: #565656;
+  }
+
+  .cellStack strong {
+    color: var(--navy);
+  }
+
+  .cellStack small {
+    font-size: 9px;
+  }
+
+  .activePill,
+  .offerPill,
+  .waitPill,
+  .returnedPill,
+  .expiredPill {
+    min-height: 0;
+    padding: 4px 8px;
+    font-size: var(--text-badge);
+    font-weight: 600;
+  }
+
+  :root .table .detailButton[data-button][data-button] {
+    --button-height: 32px;
+    font-size: 13px;
+  }
+
+  .pagination {
+    min-height: 57px;
+    padding: 10px 14px;
+    gap: 10px;
+    border-top: 1px solid #ececef;
+  }
+
+  .pagination button {
+    min-height: 32px;
+    padding: 7px 11px;
+    border-color: var(--line);
+    background: var(--white);
+    color: var(--navy);
+    transition: transform 0.16s ease, background 0.16s ease, color 0.16s ease;
+  }
+
+  .pagination button:hover:not(:disabled) {
+    background: #f4f4f7;
+    color: var(--navy);
+    transform: scale(1.03);
+  }
+
+  .pagination span {
+    font-size: var(--text-xs);
+    color: var(--text-secondary-color);
+  }
 }
 
 .table[data-record-list] {
@@ -91,14 +191,25 @@
 
 @media (max-width: 700px) {
   .tableScroller {
-    overflow-x: visible;
+    width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
     padding: 10px;
+  }
+
+  .table[data-record-list] {
+    display: block;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100%;
+    table-layout: auto;
   }
 
   .table.mobileCardTable {
     display: block;
     width: 100%;
     min-width: 0;
+    max-width: 100%;
     border-collapse: separate;
   }
 
@@ -109,12 +220,16 @@
   .mobileCardTable tbody {
     display: grid;
     width: 100%;
+    min-width: 0;
     gap: 10px;
   }
 
   .mobileCardTable tbody tr {
-    display: block;
+    display: grid;
     width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     overflow: hidden;
     border: 1px solid var(--line);
     border-radius: 11px;
@@ -123,47 +238,84 @@
   }
 
   .mobileCardTable tbody td {
-    display: grid;
-    width: 100% !important;
+    display: block;
+    width: auto !important;
     min-width: 0 !important;
-    grid-template-columns: minmax(105px, 0.42fr) minmax(0, 1fr);
-    align-items: start;
-    gap: 12px;
-    padding: 10px 14px;
-    border-bottom: 1px solid #ebebeb;
+    max-width: 100%;
+    padding: 8px 14px;
+    border-bottom: 0;
+    color: var(--navy);
+    font-size: 10px;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
   }
 
   .mobileCardTable tbody td[data-label]::before {
     content: attr(data-label);
+    display: block;
+    margin-bottom: 3px;
     color: var(--text-secondary-color);
-    font-size: var(--text-helper);
+    font-size: 8px;
     font-weight: 500;
     line-height: 1.45;
   }
 
   .mobileCardTable tbody td[data-mobile-header="true"] {
     display: block;
+    grid-column: 1 / -1;
     padding: 13px 14px;
     border-bottom: 0;
     background: var(--navy);
     color: var(--white);
   }
 
-  .mobileCardTable tbody td[data-mobile-header="true"] .cellStack strong,
-  .mobileCardTable tbody td[data-mobile-header="true"] .cellStack small {
+  .mobileCardTable tbody td[data-mobile-header="true"] .cellStack strong {
     color: var(--white);
+    font-size: 12px;
+    line-height: 1.35;
   }
 
   .mobileCardTable tbody td[data-mobile-header="true"] .cellStack small {
+    margin-top: 4px;
+    color: var(--white);
+    font-size: 9px;
+    line-height: 1.35;
     opacity: 0.78;
   }
 
-  .mobileCardTable tbody td:last-child {
-    border-bottom: 0;
+  .mobileCardTable tbody td:nth-child(2),
+  .mobileCardTable tbody td:nth-child(5),
+  .mobileCardTable tbody td:nth-child(6) {
+    grid-column: 1 / -1;
+  }
+
+  .mobileCardTable tbody td > * {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .mobileCardTable .cellStack {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .mobileCardTable .cellStack strong {
+    font-size: 10px;
+  }
+
+  .mobileCardTable .cellStack small {
+    font-size: 9px;
+  }
+
+  .mobileCardTable .cellStack > [data-record-badge] {
+    white-space: normal;
   }
 
   .mobileCardTable .state {
     display: block !important;
+    grid-column: 1 / -1;
     padding: 24px 16px !important;
     border-bottom: 0;
     background: var(--white);
@@ -175,7 +327,11 @@
   }
 
   :root .mobileCardTable .detailButton[data-button][data-button] {
+    --button-height: 32px;
     width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    font-size: 13px;
   }
 }
 
@@ -194,4 +350,9 @@
   .mobileCardTable tbody tr {
     animation: none;
   }
+}
+
+:root body .page button,
+:root body .page [data-button][data-button] {
+  font-size: 13px;
 }

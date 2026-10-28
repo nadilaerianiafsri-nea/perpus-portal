@@ -278,7 +278,6 @@ export default function AdminReservationsPage() {
             </AppSelect>
           </div>
         </div>
-        <p className={ui.scopeNote}>Waktu berdasarkan tanggal reservasi (WIB). Filter waktu, urutan, dan ekspor berlaku untuk data pada halaman ini.</p>
 
         {error ? (
           <div className={styles.errorBox} role="alert">

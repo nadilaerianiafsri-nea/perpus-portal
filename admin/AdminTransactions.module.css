@@ -21,9 +21,7 @@
   color: var(--navy);
   font-size: var(--text-page);
   line-height: var(--leading-title);
-
   font-weight: 700;
-
   overflow-wrap: anywhere;
 }
 
@@ -72,7 +70,6 @@
   color: var(--navy);
   font-size: var(--text-section);
   line-height: var(--leading-section);
-
   font-weight: 600;
 }
 
@@ -80,7 +77,6 @@
   margin: 5px 0 0;
   color: var(--text-secondary-color);
   font-size: var(--text-secondary);
-
   line-height: var(--leading-body);
 }
 
@@ -165,7 +161,6 @@
   gap: 0;
   min-width: 0;
 }
-
 
 .tableScroller {
   overflow-x: auto;
@@ -363,10 +358,7 @@
   line-height: 1.5;
 }
 
-.transactionTable .memberCell {
-  min-width: 0;
-}
-
+.transactionTable .memberCell,
 .transactionTable .bookCell {
   min-width: 0;
 }
@@ -390,10 +382,10 @@
 }
 
 .returnsTable .returnsActionsCell .returnsActions > button[data-row-action][data-button] {
-  --button-height: 42px;
+  --button-height: 32px;
   width: 100%;
-  padding-inline: 16px;
-  font-size: var(--transaction-body-size);
+  padding-inline: 10px;
+  font-size: 13px;
   font-weight: 600;
   line-height: 1.3;
 }
@@ -408,7 +400,7 @@
   justify-content: center;
   padding: 7px 10px;
   border-radius: 7px;
-  font-size: 8px;
+  font-size: 13px;
   font-weight: 600;
   line-height: 1.2;
   text-decoration: none;
@@ -474,7 +466,6 @@
   background: #ffebea;
   color: #bc241c;
   font-size: var(--text-base);
-
   line-height: var(--leading-body);
 }
 
@@ -625,6 +616,119 @@
   font-size: var(--text-button);
 }
 
+@media (min-width: 701px) {
+  .panel {
+    box-shadow: 0 2px 8px #00063306;
+  }
+
+  .tableScroller {
+    width: 100%;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-gutter: stable;
+  }
+
+  .table {
+    font-size: 11px;
+  }
+
+  .table th {
+    height: 45px;
+    padding: 0 13px;
+    font-size: 9px;
+  }
+
+  .table td {
+    padding: 12px 13px;
+  }
+
+  .table.transactionTable {
+    --transaction-body-size: 11px;
+    --transaction-header-size: 9px;
+    --transaction-meta-size: 9px;
+    font-size: var(--transaction-body-size);
+    line-height: 1.45;
+  }
+
+  .transactionTable th {
+    height: 45px;
+    padding: 0 13px;
+    font-size: var(--transaction-header-size);
+  }
+
+  .transactionTable td {
+    padding: 12px 13px;
+  }
+
+  .transactionTable .memberCell strong,
+  .transactionTable .bookCell strong {
+    font-size: var(--transaction-body-size);
+    line-height: 1.35;
+  }
+
+  .transactionTable .memberCell small,
+  .transactionTable .bookCell small {
+    font-size: var(--transaction-meta-size);
+    line-height: 1.4;
+  }
+
+  .transactionTable .pill {
+    padding: 4px 8px;
+    font-size: var(--text-badge);
+    line-height: 1.3;
+  }
+
+  .primaryAction,
+  .secondaryAction,
+  .dangerAction,
+  .linkAction {
+    min-height: 32px;
+    font-size: 13px;
+  }
+
+  .dangerAction,
+  .linkAction {
+    transition: transform 0.16s ease, background 0.16s ease, color 0.16s ease, border-color 0.16s ease;
+  }
+
+  .linkAction:hover {
+    background: #f4f4f7;
+    transform: scale(1.03);
+  }
+
+  .dangerAction:hover:not(:disabled) {
+    background: #ffebea;
+    border-color: #ff3e39;
+    color: #bc241c;
+    transform: scale(1.03);
+  }
+
+  .returnsTable .returnsActionsCell .returnsActions > button[data-row-action][data-button] {
+    --button-height: 32px;
+    padding-inline: 10px;
+    font-size: 13px;
+  }
+
+  .pagination {
+    min-height: 57px;
+    font-size: var(--text-xs);
+    line-height: var(--leading-body);
+  }
+
+  .pagination button {
+    min-height: 32px;
+    padding: 7px 11px;
+    border-radius: 8px;
+    transition: transform 0.16s ease, background 0.16s ease, color 0.16s ease;
+  }
+
+  .pagination button:hover:not(:disabled) {
+    background: #f4f4f7;
+    color: var(--navy);
+    transform: scale(1.03);
+  }
+}
+
 @media (max-width: 1320px) {
   .filterBar:where(:not(.filterBarThree)) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -662,13 +766,10 @@
 
   .pageHeading h1 {
     font-size: var(--text-page);
-
-  font-weight: 700;
-
-  line-height: var(--leading-title);
-
-  overflow-wrap: anywhere;
-}
+    font-weight: 700;
+    line-height: var(--leading-title);
+    overflow-wrap: anywhere;
+  }
 
   .statsFour,
   .statsThree {
@@ -690,30 +791,23 @@
 
   .panelHeader h2 {
     font-size: var(--text-section);
-
-  font-weight: 600;
-
-  line-height: var(--leading-section);
-}
-
+    font-weight: 600;
+    line-height: var(--leading-section);
+  }
 
   .pagination {
     justify-content: space-between;
     flex-wrap: wrap;
-
-  font-size: var(--text-helper);
-
-  color: var(--text-secondary-color);
-}
+    font-size: var(--text-helper);
+    color: var(--text-secondary-color);
+  }
 
   .errorBox {
     align-items: flex-start;
     flex-direction: column;
-
-  font-size: var(--text-base);
-
-  line-height: var(--leading-body);
-}
+    font-size: var(--text-base);
+    line-height: var(--leading-body);
+  }
 
   .modalBackdrop {
     padding: 14px;
@@ -733,9 +827,8 @@
   .confirmModalActions .primaryAction,
   .confirmModalActions .secondaryAction {
     width: 100%;
-
-  font-size: var(--text-button);
-}
+    font-size: var(--text-button);
+  }
 }
 
 /* Keep name and book content flexible instead of reserving hidden metadata widths. */
@@ -775,8 +868,7 @@
   width: 32%;
 }
 
-
-/* Mobile transaction cards used only by Reservasi and Peminjaman tables. */
+/* Mobile transaction cards used by transaction list tables. */
 .mobileCardScroller {
   -webkit-overflow-scrolling: touch;
 }
@@ -786,7 +878,23 @@
     overflow-x: visible;
   }
 
-  .table.mobileCardTable {
+  .table.returnsTable {
+    --transaction-body-size: 12px;
+    --transaction-header-size: 10px;
+    --transaction-meta-size: 10px;
+    font-size: var(--transaction-body-size);
+  }
+
+  .table.lostTable {
+    --transaction-body-size: 11px;
+    --transaction-header-size: 9px;
+    --transaction-meta-size: 9px;
+    font-size: var(--transaction-body-size);
+  }
+
+  .table.mobileCardTable,
+  .table.returnsTable,
+  .table.lostTable {
     display: block;
     width: 100%;
     min-width: 0 !important;
@@ -794,18 +902,24 @@
     font-family: var(--font-outfit), "Outfit", sans-serif;
   }
 
-  .mobileCardTable thead {
+  .mobileCardTable thead,
+  .returnsTable thead,
+  .lostTable thead {
     display: none;
   }
 
-  .mobileCardTable tbody {
+  .mobileCardTable tbody,
+  .returnsTable tbody,
+  .lostTable tbody {
     display: grid;
     width: 100%;
     gap: 10px;
     padding: 10px;
   }
 
-  .mobileCardTable tbody tr {
+  .mobileCardTable tbody tr,
+  .returnsTable tbody tr,
+  .lostTable tbody tr {
     display: block;
     width: 100%;
     overflow: hidden;
@@ -815,11 +929,15 @@
     animation: transactionCardEnter 220ms ease-out both;
   }
 
-  .mobileCardTable tbody tr:hover {
+  .mobileCardTable tbody tr:hover,
+  .returnsTable tbody tr:hover,
+  .lostTable tbody tr:hover {
     background: var(--white);
   }
 
-  .mobileCardTable tbody td {
+  .mobileCardTable tbody td,
+  .returnsTable tbody td,
+  .lostTable tbody td {
     width: 100% !important;
     min-width: 0 !important;
     padding: 10px 14px;
@@ -827,7 +945,9 @@
     vertical-align: top;
   }
 
-  .mobileCardTable tbody td[data-label] {
+  .mobileCardTable tbody td[data-label],
+  .returnsTable tbody td:not(:first-child),
+  .lostTable tbody td:not(:first-child) {
     display: grid;
     grid-template-columns: minmax(105px, 0.42fr) minmax(0, 1fr);
     align-items: start;
@@ -835,14 +955,53 @@
   }
 
   .mobileCardTable tbody td[data-label]::before {
-    content: attr(data-label);
     color: var(--text-secondary-color);
     font-size: var(--text-helper);
     font-weight: 500;
     line-height: 1.45;
   }
 
-  .mobileCardTable tbody td[data-mobile-header="true"] {
+  .returnsTable tbody td:not(:first-child)::before {
+    color: var(--text-secondary-color);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.45;
+  }
+
+  .lostTable tbody td:not(:first-child)::before {
+    color: var(--text-secondary-color);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.45;
+  }
+
+  .mobileCardTable tbody td[data-label]::before {
+    content: attr(data-label);
+  }
+
+  .returnsTable tbody td:nth-child(2)::before,
+  .lostTable tbody td:nth-child(2)::before {
+    content: "Buku";
+  }
+
+  .returnsTable tbody td:nth-child(3)::before,
+  .lostTable tbody td:nth-child(3)::before {
+    content: "Jatuh Tempo";
+  }
+
+  .returnsTable tbody td:nth-child(4)::before,
+  .lostTable tbody td:nth-child(4)::before {
+    content: "Status";
+  }
+
+  .returnsTable tbody td:nth-child(5)::before,
+  .lostTable tbody td:nth-child(5)::before {
+    content: "Aksi";
+  }
+
+  .mobileCardTable tbody td[data-mobile-header="true"],
+  .returnsTable tbody td:first-child,
+  .lostTable tbody td:first-child {
     display: block;
     padding: 13px 14px;
     border-bottom: 0;
@@ -850,36 +1009,133 @@
     color: var(--white);
   }
 
-  .mobileCardTable tbody td[data-mobile-header="true"]::before {
+  .mobileCardTable tbody td[data-mobile-header="true"]::before,
+  .returnsTable tbody td:first-child::before,
+  .lostTable tbody td:first-child::before {
     display: none;
   }
 
   .mobileCardTable tbody td[data-mobile-header="true"] .memberCell strong,
-  .mobileCardTable tbody td[data-mobile-header="true"] .memberCell small {
+  .mobileCardTable tbody td[data-mobile-header="true"] .memberCell small,
+  .returnsTable tbody td:first-child .memberCell strong,
+  .returnsTable tbody td:first-child .memberCell small,
+  .lostTable tbody td:first-child .memberCell strong,
+  .lostTable tbody td:first-child .memberCell small {
     color: var(--white);
   }
 
-  .mobileCardTable tbody td[data-mobile-header="true"] .memberCell small {
+  .mobileCardTable tbody td[data-mobile-header="true"] .memberCell small,
+  .returnsTable tbody td:first-child .memberCell small,
+  .lostTable tbody td:first-child .memberCell small {
     opacity: 0.78;
   }
 
-  .mobileCardTable tbody td:last-child {
+  .mobileCardTable tbody td:last-child,
+  .returnsTable tbody td:last-child,
+  .lostTable tbody td:last-child {
     border-bottom: 0;
   }
 
   .mobileCardTable .bookCell,
-  .mobileCardTable .memberCell {
+  .mobileCardTable .memberCell,
+  .returnsTable .bookCell,
+  .returnsTable .memberCell,
+  .lostTable .bookCell,
+  .lostTable .memberCell {
     min-width: 0;
   }
 
   .mobileCardTable .bookCell strong,
   .mobileCardTable .bookCell small,
   .mobileCardTable .memberCell strong,
-  .mobileCardTable .memberCell small {
+  .mobileCardTable .memberCell small,
+  .returnsTable .bookCell strong,
+  .returnsTable .bookCell small,
+  .returnsTable .memberCell strong,
+  .returnsTable .memberCell small,
+  .lostTable .bookCell strong,
+  .lostTable .bookCell small,
+  .lostTable .memberCell strong,
+  .lostTable .memberCell small {
     overflow-wrap: anywhere;
   }
 
-  .mobileCardTable .stateCell {
+  .returnsTable tbody td {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .returnsTable tbody td:first-child .memberCell strong {
+    font-size: 15px;
+    line-height: 1.35;
+  }
+
+  .returnsTable tbody td:first-child .memberCell small {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .returnsTable .bookCell strong {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .returnsTable .bookCell small {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .returnsTable .pill {
+    font-size: 12px;
+    line-height: 1.3;
+  }
+
+  .returnsTable .returnsActionsCell {
+    width: 100%;
+  }
+
+  .returnsTable .returnsActionsCell .returnsActions > button[data-row-action][data-button] {
+    font-size: 13px;
+  }
+
+
+  .lostTable tbody td {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .lostTable tbody td:first-child .memberCell strong {
+    font-size: 15px;
+    line-height: 1.35;
+  }
+
+  .lostTable tbody td:first-child .memberCell small {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .lostTable .bookCell strong {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .lostTable .bookCell small {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .lostTable .pill {
+    font-size: 12px;
+    line-height: 1.3;
+  }
+
+  .lostTable .linkAction {
+    justify-self: start;
+  }
+
+  .mobileCardTable .stateCell,
+  .returnsTable .stateCell,
+  .lostTable .stateCell {
     display: block !important;
     padding: 24px 16px !important;
     border-bottom: 0;
@@ -887,7 +1143,9 @@
     text-align: center !important;
   }
 
-  .mobileCardTable .stateCell::before {
+  .mobileCardTable .stateCell::before,
+  .returnsTable .stateCell::before,
+  .lostTable .stateCell::before {
     content: none;
   }
 }
@@ -905,7 +1163,14 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mobileCardTable tbody tr {
+  .mobileCardTable tbody tr,
+  .returnsTable tbody tr,
+  .lostTable tbody tr {
     animation: none;
   }
+}
+
+:root body .page button,
+:root body .page [data-button][data-button] {
+  font-size: 13px;
 }

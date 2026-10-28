@@ -41,6 +41,13 @@
   white-space: nowrap;
 }
 
+@media (min-width: 701px) {
+  :root .table .actionStack [data-button][data-button] {
+    --button-height: 32px;
+    font-size: 13px;
+  }
+}
+
 .table {
   --record-scroll-width: 980px;
 }
@@ -88,7 +95,6 @@
   }
 }
 
-
 /* Keep STATUS readable on full and half-width layouts; scroll the table before squeezing it. */
 .table {
   --record-scroll-width: 1160px;
@@ -112,5 +118,6 @@
 
   :root .table .actionStack [data-button][data-button] {
     width: 100%;
+    font-size: 13px;
   }
 }

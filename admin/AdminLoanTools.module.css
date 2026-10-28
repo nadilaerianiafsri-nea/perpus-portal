@@ -25,6 +25,10 @@
 .period > [data-period-selector] > div:first-child { min-width: 0; }
 .rowActions { display: flex; align-items: center; gap: 8px; }
 .rowActions > * { flex-shrink: 0; white-space: nowrap; }
+@media (min-width: 701px) {
+  :root .physicalTable .rowActions [data-button][data-button],
+  :root .accessTable [data-button][data-button] { --button-height: 32px; font-size: 13px; }
+}
 .physicalTable { --record-scroll-width: 1040px; }
 .physicalTable th:nth-child(1) { width: 19%; }
 .physicalTable th:nth-child(2) { width: 23%; }
@@ -37,4 +41,6 @@
   .tools { display: flex; flex-direction: column; align-items: stretch; }
   .filters { grid-template-columns: minmax(0, 1fr); order: 1; }
   .exportControl { order: 2; }
+  :root .physicalTable .rowActions [data-button][data-button],
+  :root .accessTable [data-button][data-button] { font-size: 13px; }
 }

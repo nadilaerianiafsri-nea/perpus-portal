@@ -10,8 +10,9 @@
 .table th:nth-child(4) { width: 12%; }
 .table th:nth-child(5) { width: 180px; }
 .actions { display: flex; flex-direction: column; align-items: stretch; gap: 8px; }
-:root body .actions [data-button][data-button] { --button-height: 44px; font-size: 14px; white-space: nowrap; }
-.days { display: inline-flex; padding: 5px 10px; border-radius: 8px; font-weight: 600; }
+:root body .actions [data-button][data-button] { --button-height: 32px; font-size: 13px; white-space: nowrap; }
+:root body .actions > :first-child[data-button][data-button] { font-size: 13px; line-height: 1.3; }
+.days { display: inline-flex; padding: 4px 8px; border-radius: 99px; font-size: var(--text-badge); font-weight: 600; }
 .mild { background: var(--yellow-soft); color: #805400; }
 .warning { background: #fff1dd; color: #925600; }
 .danger { background: var(--red-soft); color: var(--stat-danger); }
@@ -19,5 +20,145 @@
 .state h2 { margin: 0; font-size: 18px; line-height: 1.5; }
 .state p { margin: 0; color: var(--text-secondary-color); font-size: 14px; line-height: 1.6; }
 .state > svg { color: var(--text-secondary-color); font-size: 28px; }
-.resultCount { margin: 16px; font-size: 13px; color: var(--text-secondary-color); }
+.resultCount { margin: 16px; font-size: var(--text-xs); color: var(--text-secondary-color); }
 @media (max-width: 1100px) { .table { min-width: 840px; } }
+
+@media (max-width: 700px) {
+  .table {
+    display: block;
+    width: 100%;
+    min-width: 0 !important;
+    border-collapse: separate;
+    font-family: var(--font-outfit), "Outfit", sans-serif;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table tbody {
+    display: grid;
+    width: 100%;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .table tbody tr {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    background: var(--white);
+    animation: overdueCardEnter 220ms ease-out both;
+  }
+
+  .table tbody tr:hover {
+    background: var(--white);
+  }
+
+  .table tbody td {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 11px 14px;
+    border-bottom: 1px solid #ececef;
+    font-size: 14px;
+    line-height: 1.5;
+    vertical-align: top;
+  }
+
+  .table tbody td:not(:first-child) {
+    display: grid;
+    grid-template-columns: minmax(105px, 0.42fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 12px;
+  }
+
+  .table tbody td:not(:first-child)::before {
+    color: var(--text-secondary-color);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.45;
+  }
+
+  .table tbody td:nth-child(2)::before { content: "Buku"; }
+  .table tbody td:nth-child(3)::before { content: "Jatuh Tempo"; }
+  .table tbody td:nth-child(4)::before { content: "Terlambat"; }
+  .table tbody td:nth-child(5)::before { content: "Aksi"; }
+
+  .table tbody td:first-child {
+    display: block;
+    padding: 13px 14px;
+    border-bottom: 0;
+    background: var(--navy);
+    color: var(--white);
+  }
+
+  .table tbody td:first-child strong {
+    color: var(--white);
+    font-size: 15px;
+    line-height: 1.35;
+  }
+
+  .table tbody td:first-child small {
+    margin-top: 4px;
+    color: var(--white);
+    font-size: 12px;
+    line-height: 1.4;
+    opacity: 0.78;
+  }
+
+  .table tbody td:nth-child(2) strong {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .table tbody td:nth-child(2) small {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .table tbody td:last-child {
+    border-bottom: 0;
+  }
+
+  .days {
+    padding: 4px 8px;
+    font-size: 12px;
+    line-height: 1.3;
+  }
+
+  .actions {
+    width: 100%;
+    gap: 8px;
+  }
+
+  :root body .actions [data-button][data-button] {
+    width: 100%;
+    font-size: 13px;
+  }
+
+  :root body .actions > :first-child[data-button][data-button] {
+    font-size: 13px;
+  }
+
+}
+
+@keyframes overdueCardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .table tbody tr {
+    animation: none;
+  }
+}
