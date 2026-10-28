@@ -8,6 +8,7 @@ import { FiBookOpen as CardBookOpen, FiCheckCircle as CardCheckCircle, FiXCircle
 import { useEffect, useState } from "react";
 import PeriodSelector from "@/components/PeriodSelector";
 import { createPeriod, formatPeriodRange, type PeriodValue } from "@/shared/period";
+import { csvToRows, downloadExcelWorkbook } from "@/shared/excelExport";
 import {
   adminOperationsApiMessage,
   reportCsv,
@@ -81,15 +82,15 @@ export default function AdminReportsPage() {
 
   function exportReport() {
     if (!report || loading || error || previousPeriod) return;
-    const blob = new Blob([reportCsv(report)], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `laporan-perpustakaan-${report.range.from}-sampai-${report.range.to}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
+    downloadExcelWorkbook({
+      filename: `laporan-perpustakaan-${report.range.from}-sampai-${report.range.to}.xlsx`,
+      sheetName: "Laporan Perpustakaan",
+      rows: csvToRows(reportCsv(report)),
+      titleRows: [0],
+      headerRows: [4, 15],
+      freezeRows: 0,
+      autoFilter: false,
+    });
   }
 
   const hasTrend = report?.trend.some((row) => row.borrowings > 0 || row.returns > 0);

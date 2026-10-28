@@ -1,4 +1,5 @@
 import { csvCell } from "./adminOperations";
+import { csvToRows, downloadExcelWorkbook } from "../shared/excelExport";
 
 /** Same encoder for reservation, physical-loan and access exports. */
 export function transactionCsv(rows: ReadonlyArray<ReadonlyArray<string | number>>) {
@@ -17,18 +18,17 @@ export function excelTransactionCsv(csv: string) {
   return `\uFEFF${excelReady}`;
 }
 
+/**
+ * Existing callers keep this name for compatibility, but human-facing exports are
+ * downloaded as styled XLSX workbooks because CSV cannot retain table styling.
+ */
 export function downloadTransactionCsv(csv: string, filename: string) {
-  const url = URL.createObjectURL(
-    new Blob([excelTransactionCsv(csv)], { type: "text/csv;charset=utf-8" }),
-  );
-  const link = document.createElement("a");
-  try {
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-  } finally {
-    link.remove();
-    URL.revokeObjectURL(url);
-  }
+  downloadExcelWorkbook({
+    filename,
+    sheetName: "Data",
+    rows: csvToRows(csv),
+    headerRows: [0],
+    freezeRows: 1,
+    autoFilter: true,
+  });
 }
