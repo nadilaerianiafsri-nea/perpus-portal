@@ -22,3 +22,13 @@
   .control { min-width: 180px; }
   .popover { padding: 20px; }
 }
+
+.root[data-applied-range="true"] [data-select-value] {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}

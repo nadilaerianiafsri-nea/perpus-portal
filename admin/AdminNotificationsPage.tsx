@@ -107,7 +107,7 @@ export default function AdminNotificationsPage() {
     <section className={styles.controls} aria-label="Filter notifikasi">
       <div className={styles.toolbar}>
         <label className={styles.searchBox}><FiSearch aria-hidden="true" /><input type="search" aria-label="Cari notifikasi" placeholder="Cari notifikasi, anggota, buku, atau transaksi..." maxLength={100} value={searchInput} aria-invalid={Boolean(searchError)} aria-describedby={searchError ? 'notification-search-error' : undefined} onChange={event=>setSearchInput(event.target.value)} /></label>
-        <div className={styles.period}><PeriodSelector mode="transaction" label="Waktu notifikasi" value={period} onChange={value=>{setPeriod(value);setPage(1);}} /></div>
+        <div className={styles.period}><PeriodSelector mode="transaction" label="Waktu notifikasi" showAppliedRange value={period} onChange={value=>{setPeriod(value);setPage(1);}} /></div>
       </div>
       {searchError ? <p className={styles.feedback} role="alert" id="notification-search-error">{searchError}</p> : null}
       <div className={styles.categoryBar}>
