@@ -18,6 +18,7 @@ import {
   type AdminMembersResponse,
 } from "./adminMembers";
 import styles from "./AdminMembers.module.css";
+import responsiveStyles from "./AdminMembersResponsiveFix.module.css";
 
 type MemberTypeFilter = "ALL" | "UMUM" | "MAHASISWA" | "PEGAWAI";
 type VerificationFilter = "ALL" | "VERIFIED" | "UNVERIFIED";
@@ -253,9 +254,17 @@ export default function AdminMembersPage() {
         </div>
       ) : null}
 
-      <section className={styles.tableCard} aria-busy={loading}>
-        <div className={styles.tableScroller}>
-          <table className={styles.table} data-record-list>
+      <section
+        className={`${styles.tableCard} ${responsiveStyles.memberTableCard}`}
+        aria-busy={loading}
+      >
+        <div
+          className={`${styles.tableScroller} ${responsiveStyles.memberTableScroller}`}
+        >
+          <table
+            className={`${styles.table} ${responsiveStyles.memberTable}`}
+            data-record-list
+          >
             <thead>
               <tr>
                 <th>NAMA</th>
@@ -290,7 +299,9 @@ export default function AdminMembersPage() {
                     </td>
 
                     <td>
-                      <div className={styles.contactCell}>
+                      <div
+                        className={`${styles.contactCell} ${responsiveStyles.desktopContactCell}`}
+                      >
                         <strong>{member.email}</strong>
                         <small>{member.whatsapp || "-"}</small>
                       </div>
@@ -364,25 +375,36 @@ export default function AdminMembersPage() {
           </table>
         </div>
 
-        <div className={styles.mobileList}>
+        <div
+          className={`${styles.mobileList} ${responsiveStyles.mobileMemberList}`}
+        >
           {loading ? (
             <div className={styles.mobileState}>Memuat data keanggotaan...</div>
           ) : result.data.length ? (
             result.data.map((member) => (
-              <article key={member.id} className={styles.mobileMemberCard} data-record-card>
-                <div className={styles.mobileCardHeading}>
+              <article
+                key={member.id}
+                className={`${styles.mobileMemberCard} ${responsiveStyles.mobileMemberCard}`}
+                data-record-card
+              >
+                <div
+                  className={`${styles.mobileCardHeading} ${responsiveStyles.mobileCardHeading}`}
+                >
                   <div>
                     <strong data-record-primary>{member.name}</strong>
                     <small>{memberTypeLabel(member.memberType)}</small>
                   </div>
-
                 </div>
 
-                <dl className={styles.mobileInfo}>
+                <dl
+                  className={`${styles.mobileInfo} ${responsiveStyles.mobileInfo}`}
+                >
                   <div>
                     <dt>Kontak</dt>
                     <dd>
-                      <div className={styles.contactCell}>
+                      <div
+                        className={`${styles.contactCell} ${responsiveStyles.mobileContactCell}`}
+                      >
                         <strong data-record-primary>{member.email}</strong>
                         <small>{member.whatsapp || "-"}</small>
                       </div>
@@ -398,7 +420,10 @@ export default function AdminMembersPage() {
                   </div>
                 </dl>
 
-                <div className={styles.mobileActions} data-record-action-group>
+                <div
+                  className={`${styles.mobileActions} ${responsiveStyles.mobileActions}`}
+                  data-record-action-group
+                >
                   <Link data-button-shape="square" title="Lihat detail anggota" aria-label={`Lihat detail anggota ${member.name}`} data-row-action="neutral"
                     data-button="secondary"
                     data-button-size="sm"

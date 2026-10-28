@@ -1,0 +1,58 @@
+.transactionLink {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  font-family: var(--font-outfit), "Outfit", sans-serif;
+  transition:
+    background-color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+  animation: memberTransactionEnter 220ms ease-out both;
+}
+
+.transactionLink:hover {
+  background: var(--sky);
+  transform: translateY(-1px);
+}
+
+.transactionLink:hover [data-record-primary] {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.transactionLink:focus-visible {
+  outline: 2px solid var(--navy);
+  outline-offset: 2px;
+  background: var(--sky);
+}
+
+@keyframes memberTransactionEnter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 700px) {
+  .transactionLink {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .transactionLink > div:last-child {
+    width: 100%;
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .transactionLink {
+    animation: none;
+    transition: none;
+  }
+}

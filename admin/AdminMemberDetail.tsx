@@ -1,7 +1,12 @@
 "use client";
 
 import AdminStatCard from "./AdminStatCard";
-import { FiBookOpen as CardBookOpen, FiAlertTriangle as CardAlertTriangle, FiClock as CardClock, FiCheckCircle as CardCheckCircle } from "react-icons/fi";
+import {
+  FiBookOpen as CardBookOpen,
+  FiAlertTriangle as CardAlertTriangle,
+  FiClock as CardClock,
+  FiCheckCircle as CardCheckCircle,
+} from "react-icons/fi";
 
 import Link from "next/link";
 import ConfirmDialog from "@/components/ConfirmDialog";
@@ -15,6 +20,7 @@ import {
   type AdminMemberDetailResponse,
 } from "./adminMembers";
 import styles from "./AdminMembers.module.css";
+import detailStyles from "./AdminMemberDetailEnhancements.module.css";
 
 type Props = {
   id: string;
@@ -120,19 +126,51 @@ export default function AdminMemberDetail({ id }: Props) {
     return (
       <div className={styles.statePanel}>
         <p>{error || "Anggota tidak ditemukan."}</p>
-        <Link data-button="back" data-button-size="md" href="/admin/keanggotaan">Kembali ke Keanggotaan</Link>
+        <Link
+          data-button="back"
+          data-button-size="md"
+          href="/admin/keanggotaan"
+        >
+          Kembali ke Keanggotaan
+        </Link>
       </div>
     );
   }
 
   const { member, summary } = data;
 
+  const activeTransactionParts: string[] = [];
+
+  if (summary.activeLoans > 0) {
+    activeTransactionParts.push(
+      `${summary.activeLoans} pinjaman aktif`,
+    );
+  }
+
+  if (summary.activeReservations > 0) {
+    activeTransactionParts.push(
+      `${summary.activeReservations} reservasi aktif`,
+    );
+  }
+
+  const hasActiveTransactions = activeTransactionParts.length > 0;
+
+  const statusDialogDescription = member.isActive
+    ? hasActiveTransactions
+      ? `Peringatan: ${member.name} masih memiliki ${activeTransactionParts.join(
+          " dan ",
+        )}. Menonaktifkan akun tidak membatalkan atau menyelesaikan transaksi tersebut. Anggota tidak akan dapat masuk sampai akun diaktifkan kembali.`
+      : `Akun ${member.name} akan dinonaktifkan. Anggota tidak akan dapat masuk sampai akun diaktifkan kembali.`
+    : `Akun ${member.name} akan diaktifkan kembali.`;
+
   return (
     <div className={styles.detailPage}>
       <header className={styles.detailHeading}>
         <div>
           <div className={styles.localBreadcrumb}>
-            <Link href="/admin/keanggotaan">Keanggotaan</Link>
+            <Link href="/admin/keanggotaan">
+              Keanggotaan
+            </Link>
             <span>/</span>
             <strong>Detail Anggota</strong>
           </div>
@@ -182,13 +220,33 @@ export default function AdminMemberDetail({ id }: Props) {
       ) : null}
 
       <section className={styles.detailSummary}>
-        <AdminStatCard label="PINJAMAN AKTIF" value={summary.activeLoans} tone="teal" icon={<CardBookOpen />} />
+        <AdminStatCard
+          label="PINJAMAN AKTIF"
+          value={summary.activeLoans}
+          tone="teal"
+          icon={<CardBookOpen />}
+        />
 
-        <AdminStatCard label="OVERDUE" value={summary.overdue} tone="danger" icon={<CardAlertTriangle />} />
+        <AdminStatCard
+          label="OVERDUE"
+          value={summary.overdue}
+          tone="danger"
+          icon={<CardAlertTriangle />}
+        />
 
-        <AdminStatCard label="RESERVASI AKTIF" value={summary.activeReservations} tone="info" icon={<CardClock />} />
+        <AdminStatCard
+          label="RESERVASI AKTIF"
+          value={summary.activeReservations}
+          tone="info"
+          icon={<CardClock />}
+        />
 
-        <AdminStatCard label="RIWAYAT SELESAI" value={summary.completedLoans} tone="success" icon={<CardCheckCircle />} />
+        <AdminStatCard
+          label="RIWAYAT SELESAI"
+          value={summary.completedLoans}
+          tone="success"
+          icon={<CardCheckCircle />}
+        />
       </section>
 
       <section className={styles.detailGrid}>
@@ -290,9 +348,17 @@ export default function AdminMemberDetail({ id }: Props) {
                 new Date(loan.dueAt).getTime() < Date.now();
 
               return (
-                <article key={loan.id} className={styles.transactionRow} data-record-card>
+                <Link
+                  key={loan.id}
+                  href={`/admin/transaksi/peminjaman/${loan.id}`}
+                  className={`${styles.transactionRow} ${detailStyles.transactionLink}`}
+                  data-record-card
+                  aria-label={`Buka detail peminjaman ${loan.book.title}`}
+                >
                   <div>
-                    <strong data-record-primary>{loan.book.title}</strong>
+                    <strong data-record-primary>
+                      {loan.book.title}
+                    </strong>
                     <small>
                       {loan.book.code} · Eksemplar {loan.copy.code}
                     </small>
@@ -302,7 +368,10 @@ export default function AdminMemberDetail({ id }: Props) {
                     <span data-record-secondary>
                       Dipinjam {formatAdminMemberDate(loan.borrowedAt)}
                     </span>
-                    <strong data-record-primary className={overdue ? styles.overdueText : ""}>
+                    <strong
+                      data-record-primary
+                      className={overdue ? styles.overdueText : ""}
+                    >
                       {loan.status === "HILANG"
                         ? "Buku Hilang"
                         : `Jatuh tempo ${formatAdminMemberDateTime(
@@ -310,7 +379,7 @@ export default function AdminMemberDetail({ id }: Props) {
                           )}`}
                     </strong>
                   </div>
-                </article>
+                </Link>
               );
             })}
           </div>
@@ -327,13 +396,17 @@ export default function AdminMemberDetail({ id }: Props) {
         {data.activeReservations.length ? (
           <div className={styles.transactionList}>
             {data.activeReservations.map((reservation) => (
-              <article
+              <Link
                 key={reservation.id}
-                className={styles.transactionRow}
+                href={`/admin/transaksi/reservasi/${reservation.id}?anggota=${member.id}`}
+                className={`${styles.transactionRow} ${detailStyles.transactionLink}`}
                 data-record-card
+                aria-label={`Buka detail reservasi ${reservation.book.title}`}
               >
                 <div>
-                  <strong data-record-primary>{reservation.book.title}</strong>
+                  <strong data-record-primary>
+                    {reservation.book.title}
+                  </strong>
                   <small>
                     {reservation.book.code} · Eksemplar{" "}
                     {reservation.copy.code}
@@ -350,7 +423,7 @@ export default function AdminMemberDetail({ id }: Props) {
                     {formatAdminMemberDateTime(reservation.expiresAt)}
                   </strong>
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
         ) : (
@@ -366,9 +439,17 @@ export default function AdminMemberDetail({ id }: Props) {
         {data.history.length ? (
           <div className={styles.transactionList}>
             {data.history.map((loan) => (
-              <article key={loan.id} className={styles.transactionRow} data-record-card>
+              <Link
+                key={loan.id}
+                href={`/admin/transaksi/peminjaman/${loan.id}`}
+                className={`${styles.transactionRow} ${detailStyles.transactionLink}`}
+                data-record-card
+                aria-label={`Buka detail riwayat peminjaman ${loan.book.title}`}
+              >
                 <div>
-                  <strong data-record-primary>{loan.book.title}</strong>
+                  <strong data-record-primary>
+                    {loan.book.title}
+                  </strong>
                   <small>
                     {loan.book.code} · Eksemplar {loan.copy.code}
                   </small>
@@ -383,7 +464,7 @@ export default function AdminMemberDetail({ id }: Props) {
                     {formatAdminMemberDate(loan.returnedAt)}
                   </strong>
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
         ) : (
@@ -392,14 +473,17 @@ export default function AdminMemberDetail({ id }: Props) {
           </p>
         )}
       </section>
+
       <ConfirmDialog
         open={statusDialogOpen}
-        title={member.isActive ? "Nonaktifkan Anggota?" : "Aktifkan Anggota?"}
-        description={
+        title={
           member.isActive
-            ? `Akun ${member.name} akan dinonaktifkan. Anggota tidak akan dapat masuk sampai akun diaktifkan kembali.`
-            : `Akun ${member.name} akan diaktifkan kembali.`
+            ? hasActiveTransactions
+              ? "Peringatan: Transaksi Masih Aktif"
+              : "Nonaktifkan Anggota?"
+            : "Aktifkan Anggota?"
         }
+        description={statusDialogDescription}
         variant={member.isActive ? "danger" : "primary"}
         confirmLabel={member.isActive ? "Nonaktifkan" : "Aktifkan"}
         pending={changingStatus}

@@ -1,0 +1,177 @@
+.memberTableCard {
+  font-family: var(--font-outfit), "Outfit", sans-serif;
+}
+
+.memberTableScroller {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+}
+
+.memberTable.memberTable {
+  width: 100%;
+  min-width: 1120px;
+  table-layout: fixed;
+}
+
+.memberTable.memberTable th,
+.memberTable.memberTable td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.memberTable.memberTable th:nth-child(1),
+.memberTable.memberTable td:nth-child(1) {
+  width: 220px;
+  min-width: 220px;
+}
+
+.memberTable.memberTable th:nth-child(2),
+.memberTable.memberTable td:nth-child(2) {
+  width: 170px;
+  min-width: 170px;
+}
+
+.memberTable.memberTable th:nth-child(3),
+.memberTable.memberTable td:nth-child(3) {
+  width: 300px;
+  min-width: 300px;
+}
+
+.memberTable.memberTable th:nth-child(4),
+.memberTable.memberTable td:nth-child(4),
+.memberTable.memberTable th:nth-child(5),
+.memberTable.memberTable td:nth-child(5) {
+  width: 110px;
+  min-width: 110px;
+  text-align: left;
+}
+
+.memberTable.memberTable th:nth-child(6),
+.memberTable.memberTable td:nth-child(6) {
+  width: 190px;
+  min-width: 190px;
+}
+
+.memberTable.memberTable th {
+  white-space: nowrap;
+}
+
+.memberTable.memberTable td:nth-child(1) strong,
+.memberTable.memberTable td:nth-child(2),
+.memberTable.memberTable td:nth-child(4),
+.memberTable.memberTable td:nth-child(5),
+.memberTable.memberTable td:nth-child(6) {
+  white-space: nowrap;
+}
+
+.desktopContactCell.desktopContactCell {
+  min-width: 0;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.desktopContactCell.desktopContactCell strong,
+.desktopContactCell.desktopContactCell small {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  overflow-wrap: normal;
+  word-break: normal;
+  white-space: nowrap;
+}
+
+.mobileMemberList,
+.mobileMemberCard,
+.mobileCardHeading,
+.mobileInfo,
+.mobileActions,
+.mobileContactCell {
+  font-family: var(--font-outfit), "Outfit", sans-serif;
+}
+
+@media (min-width: 701px) and (max-width: 1180px) {
+  .memberTable.memberTable {
+    min-width: 1120px;
+  }
+}
+
+@media (max-width: 700px) {
+  .memberTableScroller {
+    display: none;
+  }
+
+  .mobileMemberList {
+    display: grid;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .mobileMemberCard.mobileMemberCard {
+    padding: 0;
+    overflow: hidden;
+    border-radius: 11px;
+    background: var(--white);
+    animation: memberCardEnter 220ms ease-out both;
+  }
+
+  .mobileCardHeading.mobileCardHeading {
+    margin: 0;
+    padding: 13px 14px;
+    border-bottom: 0;
+    background: var(--navy);
+    color: var(--white);
+  }
+
+  .mobileCardHeading.mobileCardHeading strong {
+    color: var(--white);
+    line-height: 1.35;
+  }
+
+  .mobileCardHeading.mobileCardHeading small {
+    margin-top: 4px;
+    color: var(--white);
+    opacity: 0.78;
+    line-height: 1.35;
+  }
+
+  .mobileInfo.mobileInfo {
+    margin: 0;
+    padding: 8px 14px 0;
+  }
+
+  .mobileContactCell {
+    min-width: 0;
+  }
+
+  .mobileContactCell strong,
+  .mobileContactCell small {
+    overflow-wrap: anywhere;
+  }
+
+  .mobileActions.mobileActions {
+    margin-top: 0;
+    padding: 4px 14px 14px;
+  }
+}
+
+@keyframes memberCardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobileMemberCard.mobileMemberCard {
+    animation: none;
+  }
+}
