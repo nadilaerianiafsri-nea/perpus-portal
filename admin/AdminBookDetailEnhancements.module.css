@@ -1,0 +1,46 @@
+.stockCard[data-stat-card] {
+  height: auto;
+  align-self: start;
+  font-family: var(--font-outfit), "Outfit", sans-serif;
+  animation: detailCardEnter 220ms ease-out both;
+}
+
+.transactionCard {
+  font-family: var(--font-outfit), "Outfit", sans-serif;
+  animation: detailCardEnter 220ms ease-out both;
+}
+
+.lostBadge[data-record-badge] {
+  background: var(--red-soft);
+  color: #bc241c;
+}
+
+@keyframes detailCardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 600px) {
+  .stockCard[data-stat-card] {
+    width: 100%;
+  }
+
+  .lostBadge[data-record-badge] {
+    align-self: flex-start;
+    white-space: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stockCard[data-stat-card],
+  .transactionCard {
+    animation: none;
+  }
+}
