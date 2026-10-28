@@ -292,8 +292,8 @@ export default function AdminLoansPage() {
 
         <p className={`${styles.sectionCount} ${styles.transactionCount}`}>{result.meta.total} transaksi</p>
 
-        <div className={styles.tableScroller} data-record-scroll>
-          <table data-record-list data-record-scroll className={`${styles.table} ${styles.tableWide} ${styles.transactionTable} ${styles.loansTable} ${ui.physicalTable}`}>
+        <div className={`${styles.tableScroller} ${styles.mobileCardScroller}`} data-record-scroll>
+          <table data-record-list data-record-scroll className={`${styles.table} ${styles.tableWide} ${styles.transactionTable} ${styles.loansTable} ${styles.mobileCardTable} ${ui.physicalTable}`}>
             <thead>
               <tr>
                 <th scope="col">ANGGOTA</th>
@@ -324,7 +324,7 @@ export default function AdminLoansPage() {
 
                   return (
                     <tr key={loan.id}>
-                      <td>
+                      <td data-mobile-header="true">
                         <div className={styles.memberCell}>
                           <strong data-record-primary>{loan.member.name}</strong>
                           <small>
@@ -333,7 +333,7 @@ export default function AdminLoansPage() {
                         </div>
                       </td>
 
-                      <td>
+                      <td data-label="Buku">
                         <div className={styles.bookCell}>
                           <img
                             src={safeCoverUrl(loan.book.coverUrl)}
@@ -346,16 +346,16 @@ export default function AdminLoansPage() {
                         </div>
                       </td>
 
-                      <td>{formatTransactionDate(loan.borrowedAt)}</td>
+                      <td data-label="Dipinjam">{formatTransactionDate(loan.borrowedAt)}</td>
 
-                      <td>
+                      <td data-label="Jatuh Tempo">
                         <div className={styles.memberCell}>
                           <span>{formatTransactionDate(loan.dueAt)}</span>
                           {loan.extensionCount > 0 ? <small data-record-secondary>Perpanjangan {loan.extensionCount} kali</small> : null}
                         </div>
                       </td>
 
-                      <td>
+                      <td data-label="Status">
                         <span data-record-badge
                           className={`${styles.pill} ${
                             loanStatus === "TERLAMBAT"
@@ -373,7 +373,7 @@ export default function AdminLoansPage() {
                         </span>
                       </td>
 
-                      <td>
+                      <td data-label="Aksi">
                         <div className={ui.rowActions}>
                         <ButtonLink variant="primary" accentHover href={`/admin/transaksi/peminjaman/${loan.id}`}
                           aria-label={`Lihat detail peminjaman ${loan.book.title} oleh ${loan.member.name}`}>Detail</ButtonLink>
@@ -441,8 +441,8 @@ export default function AdminLoansPage() {
           <h2>Akses E-Book yang Sedang Berjalan</h2>
         </header>
 
-        <div className={styles.tableScroller} data-record-scroll>
-          <table data-record-list data-record-scroll className={`${styles.table} ${styles.transactionTable} ${styles.ebookAccessTable} ${ui.accessTable}`}>
+        <div className={`${styles.tableScroller} ${styles.mobileCardScroller}`} data-record-scroll>
+          <table data-record-list data-record-scroll className={`${styles.table} ${styles.transactionTable} ${styles.ebookAccessTable} ${styles.mobileCardTable} ${ui.accessTable}`}>
             <thead>
               <tr>
                 <th scope="col">ANGGOTA</th>
@@ -463,7 +463,7 @@ export default function AdminLoansPage() {
               ) : visibleEbooks.length ? (
                 visibleEbooks.map((ebook) => (
                   <tr key={ebook.id}>
-                    <td>
+                    <td data-mobile-header="true">
                       <div className={styles.memberCell}>
                         <strong>{ebook.member.name}</strong>
                         <small>
@@ -472,17 +472,17 @@ export default function AdminLoansPage() {
                       </div>
                     </td>
 
-                    <td><div className={styles.memberCell}><strong data-record-primary>{ebook.book.title}</strong><small>{ebook.book.code}</small></div></td>
+                    <td data-label="E-Book"><div className={styles.memberCell}><strong data-record-primary>{ebook.book.title}</strong><small>{ebook.book.code}</small></div></td>
 
-                    <td>{formatTransactionDate(ebook.addedAt)}</td>
+                    <td data-label="Mulai Akses">{formatTransactionDate(ebook.addedAt)}</td>
 
-                    <td>
+                    <td data-label="Berakhir">
                       {ebook.endsAt
                         ? formatTransactionDate(ebook.endsAt)
                         : "Tanpa Batas"}
                     </td>
 
-                    <td>
+                    <td data-label="Aksi">
                       <ButtonLink variant="primary" accentHover href={`/admin/transaksi/peminjaman/e-book/${ebook.id}`}
                         aria-label={`Lihat detail akses E-Book ${ebook.book.title} oleh ${ebook.member.name}`}>Detail</ButtonLink>
                     </td>

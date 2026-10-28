@@ -9,8 +9,18 @@ export function transactionCsv(rows: ReadonlyArray<ReadonlyArray<string | number
   return `\uFEFF${rows.map(row => row.map(encode).join(",")).join("\r\n")}`;
 }
 
+export function excelTransactionCsv(csv: string) {
+  const content = csv.startsWith("\uFEFF") ? csv.slice(1) : csv;
+  const excelReady = content.startsWith("sep=,\r\n")
+    ? content
+    : `sep=,\r\n${content}`;
+  return `\uFEFF${excelReady}`;
+}
+
 export function downloadTransactionCsv(csv: string, filename: string) {
-  const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+  const url = URL.createObjectURL(
+    new Blob([excelTransactionCsv(csv)], { type: "text/csv;charset=utf-8" }),
+  );
   const link = document.createElement("a");
   try {
     link.href = url;

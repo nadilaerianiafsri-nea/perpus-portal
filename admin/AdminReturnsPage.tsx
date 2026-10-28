@@ -253,11 +253,6 @@ export default function AdminReturnsPage() {
             <PeriodSelector mode="transaction" label="Filter waktu tanggal pinjam untuk pengembalian" value={period} onChange={setPeriod} />
           </div>
         </div>
-        <p className={periodStyles.scope}>
-          Waktu berdasarkan tanggal pinjam (WIB), hanya untuk pinjaman yang menunggu pengembalian pada halaman ini.
-          Ringkasan dan jumlah halaman tidak mengikuti filter waktu.
-        </p>
-
         {error ? (
           <div className={styles.errorBox} role="alert">
             <p>{error}</p>

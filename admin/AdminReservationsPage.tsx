@@ -294,15 +294,15 @@ export default function AdminReservationsPage() {
           </div>
         ) : null}
 
-        <div className={styles.tableScroller} data-record-scroll>
-          <table data-record-list data-record-scroll className={`${styles.table} ${styles.tableWide} ${styles.transactionTable} ${styles.reservationsTable} ${ui.table}`}>
+        <div className={`${styles.tableScroller} ${styles.mobileCardScroller}`} data-record-scroll>
+          <table data-record-list data-record-scroll className={`${styles.table} ${styles.tableWide} ${styles.transactionTable} ${styles.reservationsTable} ${styles.mobileCardTable} ${ui.table}`}>
             <thead>
               <tr>
                 <th scope="col">ANGGOTA</th>
                 <th scope="col">BUKU</th>
                 <th scope="col">DIAJUKAN</th>
                 <th scope="col">BATAS PENGAMBILAN</th>
-                <th scope="col">STATUS</th>
+                <th scope="col" className={ui.statusColumn}>STATUS</th>
                 <th scope="col" className={ui.actionsColumn}>AKSI</th>
               </tr>
             </thead>
@@ -317,7 +317,7 @@ export default function AdminReservationsPage() {
               ) : orderedRows.length ? (
                 orderedRows.map((reservation) => (
                   <tr key={reservation.id}>
-                    <td>
+                    <td data-mobile-header="true">
                       <div className={styles.memberCell}>
                         <strong data-record-primary>{reservation.member.name}</strong>
                         <small>
@@ -326,7 +326,7 @@ export default function AdminReservationsPage() {
                       </div>
                     </td>
 
-                    <td>
+                    <td data-label="Buku">
                       <div className={styles.bookCell}>
                         <img
                           src={safeCoverUrl(reservation.book.coverUrl)}
@@ -339,11 +339,11 @@ export default function AdminReservationsPage() {
                       </div>
                     </td>
 
-                    <td>{formatTransactionDateTime(reservation.createdAt)}</td>
+                    <td data-label="Diajukan">{formatTransactionDateTime(reservation.createdAt)}</td>
 
-                    <td>{formatTransactionDateTime(reservation.expiresAt)}</td>
+                    <td data-label="Batas Pengambilan">{formatTransactionDateTime(reservation.expiresAt)}</td>
 
-                    <td>
+                    <td data-label="Status" className={ui.statusColumn}>
                       <span data-record-badge
                         className={`${styles.pill} ${
                           reservation.status === "MENUNGGU_PENGAMBILAN"
@@ -359,7 +359,7 @@ export default function AdminReservationsPage() {
                       </span>
                     </td>
 
-                    <td>
+                    <td data-label="Aksi">
                       <div className={ui.actionStack}>
                       {reservationActionLabel(reservation.status) === "Sudah Diambil" ? (
                         <Button variant="primary" accentHover disabled={pickup.pending || loading || Boolean(error)}

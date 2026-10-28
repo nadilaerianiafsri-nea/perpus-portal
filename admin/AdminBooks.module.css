@@ -609,6 +609,25 @@
   border-color: #565656;
 }
 
+:root body .darkAction.darkAction[data-button="danger"] {
+  --button-bg: var(--stat-danger);
+  --button-fg: var(--white);
+  --button-stroke: var(--stat-danger);
+  --button-hover-bg: color-mix(in srgb, var(--stat-danger) 88%, var(--navy));
+  --button-hover-fg: var(--white);
+  --button-hover-stroke: color-mix(in srgb, var(--stat-danger) 88%, var(--navy));
+  background: var(--stat-danger);
+  border-color: var(--stat-danger);
+  color: var(--white);
+}
+
+:root body .darkAction.darkAction[data-button="danger"]:not(:disabled):hover {
+  background: color-mix(in srgb, var(--stat-danger) 88%, var(--navy));
+  border-color: color-mix(in srgb, var(--stat-danger) 88%, var(--navy));
+  color: var(--white);
+  transform: translateY(-1px) scale(1.02);
+}
+
 .darkAction:disabled,
 .saveButton:disabled {
   opacity: 0.55;

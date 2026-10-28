@@ -300,11 +300,35 @@
   color: var(--navy);
 }
 
-.disableAction,
-.dangerButton {
+.disableAction {
   border: 1px solid #ff3e39;
   background: var(--white);
   color: #bc241c;
+}
+
+.disableAction:hover {
+  background: #ffebea;
+  border-color: #ff3e39;
+  color: #bc241c;
+}
+
+:root body .dangerButton.dangerButton[data-button="danger"] {
+  --button-bg: var(--stat-danger);
+  --button-fg: var(--white);
+  --button-stroke: var(--stat-danger);
+  --button-hover-bg: color-mix(in srgb, var(--stat-danger) 88%, var(--navy));
+  --button-hover-fg: var(--white);
+  --button-hover-stroke: color-mix(in srgb, var(--stat-danger) 88%, var(--navy));
+  border: 1px solid var(--stat-danger);
+  background: var(--stat-danger);
+  color: var(--white);
+}
+
+:root body .dangerButton.dangerButton[data-button="danger"]:not(:disabled):hover {
+  background: color-mix(in srgb, var(--stat-danger) 88%, var(--navy));
+  border-color: color-mix(in srgb, var(--stat-danger) 88%, var(--navy));
+  color: var(--white);
+  transform: scale(1.02);
 }
 
 .enableAction,

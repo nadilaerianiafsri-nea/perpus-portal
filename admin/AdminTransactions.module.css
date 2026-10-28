@@ -774,3 +774,138 @@
 .lostTable th:nth-child(2) {
   width: 32%;
 }
+
+
+/* Mobile transaction cards used only by Reservasi and Peminjaman tables. */
+.mobileCardScroller {
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 700px) {
+  .mobileCardScroller {
+    overflow-x: visible;
+  }
+
+  .table.mobileCardTable {
+    display: block;
+    width: 100%;
+    min-width: 0 !important;
+    border-collapse: separate;
+    font-family: var(--font-outfit), "Outfit", sans-serif;
+  }
+
+  .mobileCardTable thead {
+    display: none;
+  }
+
+  .mobileCardTable tbody {
+    display: grid;
+    width: 100%;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .mobileCardTable tbody tr {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    background: var(--white);
+    animation: transactionCardEnter 220ms ease-out both;
+  }
+
+  .mobileCardTable tbody tr:hover {
+    background: var(--white);
+  }
+
+  .mobileCardTable tbody td {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 10px 14px;
+    border-bottom: 1px solid #ececef;
+    vertical-align: top;
+  }
+
+  .mobileCardTable tbody td[data-label] {
+    display: grid;
+    grid-template-columns: minmax(105px, 0.42fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 12px;
+  }
+
+  .mobileCardTable tbody td[data-label]::before {
+    content: attr(data-label);
+    color: var(--text-secondary-color);
+    font-size: var(--text-helper);
+    font-weight: 500;
+    line-height: 1.45;
+  }
+
+  .mobileCardTable tbody td[data-mobile-header="true"] {
+    display: block;
+    padding: 13px 14px;
+    border-bottom: 0;
+    background: var(--navy);
+    color: var(--white);
+  }
+
+  .mobileCardTable tbody td[data-mobile-header="true"]::before {
+    display: none;
+  }
+
+  .mobileCardTable tbody td[data-mobile-header="true"] .memberCell strong,
+  .mobileCardTable tbody td[data-mobile-header="true"] .memberCell small {
+    color: var(--white);
+  }
+
+  .mobileCardTable tbody td[data-mobile-header="true"] .memberCell small {
+    opacity: 0.78;
+  }
+
+  .mobileCardTable tbody td:last-child {
+    border-bottom: 0;
+  }
+
+  .mobileCardTable .bookCell,
+  .mobileCardTable .memberCell {
+    min-width: 0;
+  }
+
+  .mobileCardTable .bookCell strong,
+  .mobileCardTable .bookCell small,
+  .mobileCardTable .memberCell strong,
+  .mobileCardTable .memberCell small {
+    overflow-wrap: anywhere;
+  }
+
+  .mobileCardTable .stateCell {
+    display: block !important;
+    padding: 24px 16px !important;
+    border-bottom: 0;
+    background: var(--white);
+    text-align: center !important;
+  }
+
+  .mobileCardTable .stateCell::before {
+    content: none;
+  }
+}
+
+@keyframes transactionCardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobileCardTable tbody tr {
+    animation: none;
+  }
+}

@@ -178,52 +178,52 @@ export default function AdminEBookCirculationPage() {
 
         <div id="circulation-records" role="tabpanel" aria-labelledby={`circulation-tab-${section}`} aria-busy={busy} className={styles.tableScroller} data-record-scroll>
           {section === "ACTIVE" ? (
-            <table data-record-list data-record-scroll className={styles.table}>
+            <table data-record-list data-record-scroll className={`${styles.table} ${styles.mobileCardTable}`}>
               <thead><tr><th scope="col">ANGGOTA</th><th scope="col">E-BOOK</th><th scope="col">MULAI</th><th scope="col">BATAS AKSES</th><th scope="col">STATUS</th><th className={styles.actionsColumn} scope="col">AKSI</th></tr></thead>
               <tbody>
                 {busy ? <StateRow colSpan={6} text="Memuat pinjaman aktif..." /> : error ? <StateRow colSpan={6} text="Data belum tersedia." /> : activeLoans.length ? activeLoans.map((loan) => (
                   <tr key={loan.id}>
-                    <td><PersonCell person={loan.user} /></td>
-                    <td><BookCell book={loan.book} /></td>
-                    <td>{dateTime(loan.borrowedAt)}</td>
-                    <td>{dateTime(loan.dueAt)}</td>
-                    <td><span data-record-badge className={styles.activePill}>Aktif</span></td>
-                    <td><DetailLink section="ACTIVE" id={loan.id} person={loan.user} book={loan.book} /></td>
+                    <td data-mobile-header="true"><PersonCell person={loan.user} /></td>
+                    <td data-label="E-Book"><BookCell book={loan.book} /></td>
+                    <td data-label="Mulai">{dateTime(loan.borrowedAt)}</td>
+                    <td data-label="Batas Akses">{dateTime(loan.dueAt)}</td>
+                    <td data-label="Status"><span data-record-badge className={styles.activePill}>Aktif</span></td>
+                    <td data-label="Aksi"><DetailLink section="ACTIVE" id={loan.id} person={loan.user} book={loan.book} /></td>
                   </tr>
                 )) : <StateRow colSpan={6} text="Tidak ada pinjaman E-Book aktif yang sesuai dengan filter pada halaman ini." />}
               </tbody>
             </table>
           ) : section === "QUEUE" ? (
-            <table data-record-list data-record-scroll className={styles.table}>
+            <table data-record-list data-record-scroll className={`${styles.table} ${styles.mobileCardTable}`}>
               <thead><tr><th scope="col">ANGGOTA</th><th scope="col">E-BOOK</th><th scope="col">POSISI</th><th scope="col">MASUK ANTREAN</th><th scope="col">STATUS</th><th className={styles.actionsColumn} scope="col">AKSI</th></tr></thead>
               <tbody>
                 {busy ? <StateRow colSpan={6} text="Memuat antrean..." /> : error ? <StateRow colSpan={6} text="Data belum tersedia." /> : queues.length ? queues.map((queue) => (
                   <tr key={queue.id}>
-                    <td><PersonCell person={queue.user} /></td>
-                    <td><BookCell book={queue.book} /></td>
-                    <td className={styles.position}>{queue.position === null ? "—" : `#${queue.position}`}</td>
-                    <td>{dateTime(queue.queuedAt)}</td>
-                    <td><div className={styles.cellStack}>
+                    <td data-mobile-header="true"><PersonCell person={queue.user} /></td>
+                    <td data-label="E-Book"><BookCell book={queue.book} /></td>
+                    <td data-label="Posisi" className={styles.position}>{queue.position === null ? "—" : `#${queue.position}`}</td>
+                    <td data-label="Masuk Antrean">{dateTime(queue.queuedAt)}</td>
+                    <td data-label="Status"><div className={styles.cellStack}>
                       <span data-record-badge className={queue.status === "DITAWARKAN" ? styles.offerPill : styles.waitPill}>{circulationStatusLabel(queue.status, "queue")}</span>
                       {queue.status === "DITAWARKAN" && queue.claimExpiresAt ? <small>Sampai {dateTime(queue.claimExpiresAt)}</small> : null}
                     </div></td>
-                    <td><DetailLink section="QUEUE" id={queue.id} person={queue.user} book={queue.book} /></td>
+                    <td data-label="Aksi"><DetailLink section="QUEUE" id={queue.id} person={queue.user} book={queue.book} /></td>
                   </tr>
                 )) : <StateRow colSpan={6} text="Tidak ada antrean E-Book yang sesuai dengan filter pada halaman ini." />}
               </tbody>
             </table>
           ) : (
-            <table data-record-list data-record-scroll className={styles.table}>
+            <table data-record-list data-record-scroll className={`${styles.table} ${styles.mobileCardTable}`}>
               <thead><tr><th scope="col">ANGGOTA</th><th scope="col">E-BOOK</th><th scope="col">PERIODE AKSES</th><th scope="col">SELESAI</th><th scope="col">STATUS AKHIR</th><th className={styles.actionsColumn} scope="col">AKSI</th></tr></thead>
               <tbody>
                 {busy ? <StateRow colSpan={6} text="Memuat riwayat..." /> : error ? <StateRow colSpan={6} text="Data belum tersedia." /> : history.length ? history.map((loan) => (
                   <tr key={loan.id}>
-                    <td><PersonCell person={loan.user} /></td>
-                    <td><BookCell book={loan.book} /></td>
-                    <td><div className={styles.cellStack}><span>{dateTime(loan.borrowedAt)}</span><small>Batas {dateTime(loan.dueAt)}</small></div></td>
-                    <td>{dateTime(loan.endedAt)}</td>
-                    <td><span data-record-badge className={loan.status === "DIKEMBALIKAN" ? styles.returnedPill : styles.expiredPill}>{circulationStatusLabel(loan.status)}</span></td>
-                    <td><DetailLink section="HISTORY" id={loan.id} person={loan.user} book={loan.book} /></td>
+                    <td data-mobile-header="true"><PersonCell person={loan.user} /></td>
+                    <td data-label="E-Book"><BookCell book={loan.book} /></td>
+                    <td data-label="Periode Akses"><div className={styles.cellStack}><span>{dateTime(loan.borrowedAt)}</span><small>Batas {dateTime(loan.dueAt)}</small></div></td>
+                    <td data-label="Selesai">{dateTime(loan.endedAt)}</td>
+                    <td data-label="Status Akhir"><span data-record-badge className={loan.status === "DIKEMBALIKAN" ? styles.returnedPill : styles.expiredPill}>{circulationStatusLabel(loan.status)}</span></td>
+                    <td data-label="Aksi"><DetailLink section="HISTORY" id={loan.id} person={loan.user} book={loan.book} /></td>
                   </tr>
                 )) : <StateRow colSpan={6} text="Tidak ada riwayat akses E-Book yang sesuai dengan filter pada halaman ini." />}
               </tbody>
