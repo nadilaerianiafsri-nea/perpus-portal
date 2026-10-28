@@ -1,0 +1,101 @@
+.searchBox {
+  transition: border-color 160ms ease;
+}
+
+.searchBox input:focus,
+.searchBox input:focus-visible {
+  outline: none !important;
+  outline-offset: 0 !important;
+}
+
+.stockField {
+  grid-template-rows: auto minmax(40px, auto) minmax(38px, auto);
+  align-content: start;
+}
+
+.stockField > input {
+  min-height: 40px;
+  height: 40px;
+}
+
+.ebookFilterBar {
+  min-width: 0;
+  margin: 13px 0 12px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-outfit), "Outfit", sans-serif;
+  animation: collectionFilterEnter 200ms ease-out both;
+}
+
+.ebookFilterField {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  flex: none;
+}
+
+.ebookFilterField > :global([data-app-select]),
+.ebookFilterField:global([data-period-selector]) {
+  width: 100%;
+}
+
+.ebookFilterField :global([data-select-trigger]) {
+  width: 100%;
+  min-height: 52px;
+  transition: transform 150ms ease, border-color 150ms ease, background 150ms ease;
+}
+
+.ebookFilterField :global([data-select-trigger]):hover {
+  transform: scale(1.02);
+}
+
+.yearPopover {
+  font-family: var(--font-outfit), "Outfit", sans-serif;
+  animation: collectionFilterEnter 180ms ease-out both;
+}
+
+.yearInput {
+  appearance: textfield;
+}
+
+.yearInput::-webkit-outer-spin-button,
+.yearInput::-webkit-inner-spin-button {
+  margin: 0;
+  appearance: none;
+}
+
+@keyframes collectionFilterEnter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 720px) {
+  .ebookFilterBar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .ebookFilterBar {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ebookFilterBar,
+  .yearPopover {
+    animation: none;
+  }
+
+  .ebookFilterField :global([data-select-trigger]):hover {
+    transform: none;
+  }
+}

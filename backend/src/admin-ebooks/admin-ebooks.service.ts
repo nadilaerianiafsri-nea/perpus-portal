@@ -46,6 +46,18 @@ function queryInteger(
   return result;
 }
 
+function optionalYear(value: unknown, label: string): number | null {
+  if (value === undefined || value === null || value === '') return null;
+  if (typeof value !== 'string' || !/^\d{4}$/.test(value)) {
+    throw new BadRequestException(`${label} tidak valid.`);
+  }
+  const result = Number(value);
+  if (!Number.isSafeInteger(result) || result < 1000 || result > 9999) {
+    throw new BadRequestException(`${label} tidak valid.`);
+  }
+  return result;
+}
+
 function parseInput(body: unknown): AdminEBookInput {
   try {
     return parseAdminEBookInput(body);
@@ -80,16 +92,31 @@ export class AdminEBooksService {
   constructor(private readonly prisma: PrismaService) {}
 
   async list(query: AdminEBooksQuery) {
-    if (Object.keys(query).some((key) => !['search', 'status', 'page', 'limit'].includes(key))) {
+    if (
+      Object.keys(query).some(
+        (key) =>
+          !['search', 'status', 'subject', 'yearMin', 'yearMax', 'page', 'limit'].includes(
+            key,
+          ),
+      )
+    ) {
       throw new BadRequestException('Parameter tidak diizinkan.');
     }
     const search = queryText(query.search, 'Pencarian');
     const status = queryText(query.status, 'Status', 16).toUpperCase() || 'ALL';
+    const subject = queryText(query.subject, 'Subjek / kategori');
+    const yearMin = optionalYear(query.yearMin, 'Tahun terbit minimum');
+    const yearMax = optionalYear(query.yearMax, 'Tahun terbit maksimum');
     const page = queryInteger(query.page, 1, 1, 100000);
     const limit = queryInteger(query.limit, 20, 1, 100);
 
     if (!['ALL', 'ACTIVE', 'INACTIVE'].includes(status)) {
       throw new BadRequestException('Status tidak valid.');
+    }
+    if (yearMin !== null && yearMax !== null && yearMin > yearMax) {
+      throw new BadRequestException(
+        'Tahun terbit minimum tidak boleh lebih besar dari tahun terbit maksimum.',
+      );
     }
 
     const where: Prisma.BookWhereInput = {
@@ -109,15 +136,22 @@ export class AdminEBooksService {
             ],
           }
         : {}),
+      ...(subject ? { subject } : {}),
+      ...(yearMin !== null || yearMax !== null
+        ? {
+            year: {
+              ...(yearMin !== null ? { gte: yearMin } : {}),
+              ...(yearMax !== null ? { lte: yearMax } : {}),
+            },
+          }
+        : {}),
     };
 
-    const baseWhere: Prisma.BookWhereInput = { type: 'EBOOK' };
-    const [totalEBooks, activeEBooks, inactiveEBooks, total, books] =
+    const [totalEBooks, activeEBooks, inactiveEBooks, books] =
       await this.prisma.$transaction([
-        this.prisma.book.count({ where: baseWhere }),
-        this.prisma.book.count({ where: { ...baseWhere, isActive: true } }),
-        this.prisma.book.count({ where: { ...baseWhere, isActive: false } }),
         this.prisma.book.count({ where }),
+        this.prisma.book.count({ where: { AND: [where, { isActive: true }] } }),
+        this.prisma.book.count({ where: { AND: [where, { isActive: false }] } }),
         this.prisma.book.findMany({
           where,
           orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
@@ -125,6 +159,7 @@ export class AdminEBooksService {
           take: limit,
         }),
       ]);
+    const total = totalEBooks;
 
     return {
       stats: {

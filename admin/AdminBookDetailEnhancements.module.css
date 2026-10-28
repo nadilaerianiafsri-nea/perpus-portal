@@ -44,3 +44,33 @@
     animation: none;
   }
 }
+
+.transactionLink {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+}
+
+.transactionLink:hover {
+  background: var(--sky);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+.transactionLink:hover [data-record-primary] {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.transactionLink:focus-visible {
+  outline: 2px solid var(--navy);
+  outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+  .transactionLink:hover {
+    transform: none;
+  }
+}
+

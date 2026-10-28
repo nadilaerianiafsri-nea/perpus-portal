@@ -66,9 +66,10 @@ const emptyResult: ReservationsResponse = {
 
 export default function AdminReservationsPage() {
   const params = useSearchParams();
-  const [searchInput, setSearchInput] = useState("");
+  const initialSearch = params.get("search")?.trim() ?? "";
+  const [searchInput, setSearchInput] = useState(initialSearch);
   const searchError = plainTextMessage(searchInput, 100);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(initialSearch);
   const [status, setStatus] = useState<StatusFilter>(readStatus(params.get("status")));
   const [memberType, setMemberType] = useState<MemberFilter>("ALL");
   const [page, setPage] = useState(1);
@@ -94,8 +95,11 @@ export default function AdminReservationsPage() {
   }, [searchInput, searchError]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- Synchronize dashboard deep-link filter with existing controls.
+    const nextSearch = params.get("search")?.trim() ?? "";
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Synchronize dashboard/detail deep-link filters with existing controls.
     setStatus(readStatus(params.get("status")));
+    setSearchInput(nextSearch);
+    setSearch(nextSearch);
     setPage(1);
   }, [params]);
 

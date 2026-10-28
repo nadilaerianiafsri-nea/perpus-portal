@@ -69,9 +69,10 @@ const emptyResult: LoansResponse = {
 
 export default function AdminLoansPage() {
   const params = useSearchParams();
-  const [searchInput, setSearchInput] = useState("");
+  const initialSearch = params.get("search")?.trim() ?? "";
+  const [searchInput, setSearchInput] = useState(initialSearch);
   const searchError = plainTextMessage(searchInput, 100);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(initialSearch);
   const [status, setStatus] = useState<StatusFilter>(readStatus(params.get("status")));
   const [memberType, setMemberType] = useState<MemberFilter>("ALL");
   const [due, setDue] = useState<DueFilter>(readDue(params.get("due")));
@@ -94,9 +95,12 @@ export default function AdminLoansPage() {
   }, [searchInput, searchError]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- Synchronize dashboard deep-link filters with existing controls.
+    const nextSearch = params.get("search")?.trim() ?? "";
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Synchronize dashboard/detail deep-link filters with existing controls.
     setStatus(readStatus(params.get("status")));
     setDue(readDue(params.get("due")));
+    setSearchInput(nextSearch);
+    setSearch(nextSearch);
     setPage(1);
   }, [params]);
 

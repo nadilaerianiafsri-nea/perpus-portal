@@ -15,6 +15,7 @@ import { useSearchParams } from "next/navigation";
 import { FiEdit2, FiEye, FiPlus, FiPower, FiSearch } from "react-icons/fi";
 import { apiMessage, type AdminBooksResponse } from "./adminBooks";
 import styles from "./AdminBooks.module.css";
+import fixes from "./AdminCollectionFixes.module.css";
 import enhancements from "./AdminBooksEnhancements.module.css";
 
 type StatusFilter = "ALL" | "ACTIVE" | "INACTIVE";
@@ -227,7 +228,7 @@ export default function AdminBooksPage() {
       </section>
 
       <section className={styles.toolbar}>
-        <form className={styles.searchBox} onSubmit={submitSearch}>
+        <form className={`${styles.searchBox} ${fixes.searchBox}`} onSubmit={submitSearch}>
           <FiSearch aria-hidden />
           <input
             type="search"

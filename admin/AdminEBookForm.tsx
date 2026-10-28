@@ -28,6 +28,7 @@ const MAX_EBOOK_BYTES = 50 * 1024 * 1024;
 const COVER_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const SUBJECT_CATEGORIES = [
   "Hukum",
+  "Perundang-undangan",
   "Novel",
   "Pendidikan",
   "Sejarah",

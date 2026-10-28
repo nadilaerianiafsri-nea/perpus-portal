@@ -17,6 +17,7 @@ import {
 import SubjectCategorySelect from "./SubjectCategorySelect";
 import styles from "./AdminBooks.module.css";
 import enhancements from "./AdminBooksEnhancements.module.css";
+import fixes from "./AdminCollectionFixes.module.css";
 
 type FormState = Omit<AdminBookPayload, "year" | "totalStock"> & {
   year: string;
@@ -27,6 +28,7 @@ const MAX_COVER_BYTES = 5 * 1024 * 1024;
 const COVER_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const SUBJECT_CATEGORIES = [
   "Hukum",
+  "Perundang-undangan",
   "Novel",
   "Pendidikan",
   "Sejarah",
@@ -57,7 +59,7 @@ const emptyForm: FormState = {
   subject: "",
   location: "",
   shelf: "",
-  totalStock: "0",
+  totalStock: "",
   description: "",
   coverUrl: "",
   isActive: true,
@@ -211,9 +213,12 @@ export default function AdminBookForm({
       !Number.isInteger(year) ||
       year < 1000 ||
       year > 9999 ||
-      !Number.isInteger(totalStock)
+      !form.totalStock.trim() ||
+      !Number.isInteger(totalStock) ||
+      totalStock < 0 ||
+      totalStock > 9999
     ) {
-      setError("Tahun Terbit dan Jumlah Stok harus berupa angka bulat.");
+      setError("Tahun Terbit dan Jumlah Stok harus berupa angka bulat yang valid.");
       return;
     }
     if (!coverFile && !form.coverUrl) {
@@ -456,7 +461,7 @@ export default function AdminBookForm({
                   required
                 />
               </label>
-              <label>
+              <label className={fixes.stockField}>
                 <span>
                   Jumlah Stok <b>*</b>
                 </span>
@@ -473,7 +478,7 @@ export default function AdminBookForm({
                   direservasi.
                 </small>
               </label>
-              <label>
+              <label className={fixes.stockField}>
                 <span>Stok Tersedia</span>
                 <input
                   value={mode === "create" ? "0" : String(availableStock)}

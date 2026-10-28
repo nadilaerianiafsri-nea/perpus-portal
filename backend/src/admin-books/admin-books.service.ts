@@ -149,20 +149,13 @@ export class AdminBooksService {
         : {}),
     };
 
-    const baseWhere: Prisma.BookWhereInput = { type: 'FISIK' };
-    const [totalBooks, activeBooks, inactiveBooks, books] =
-      await this.prisma.$transaction([
-        this.prisma.book.count({ where: baseWhere }),
-        this.prisma.book.count({ where: { ...baseWhere, isActive: true } }),
-        this.prisma.book.count({ where: { ...baseWhere, isActive: false } }),
-        this.prisma.book.findMany({
-          where,
-          include: {
-            copies: { select: { status: true } },
-          },
-          orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
-        }),
-      ]);
+    const books = await this.prisma.book.findMany({
+      where,
+      include: {
+        copies: { select: { status: true } },
+      },
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+    });
 
     const filteredBooks = books
       .map((book) => {
@@ -192,7 +185,10 @@ export class AdminBooksService {
         return true;
       });
 
-    const total = filteredBooks.length;
+    const totalBooks = filteredBooks.length;
+    const activeBooks = filteredBooks.filter((book) => book.isActive).length;
+    const inactiveBooks = totalBooks - activeBooks;
+    const total = totalBooks;
     const totalPages = Math.max(1, Math.ceil(total / limit));
     const resolvedPage = Math.min(page, totalPages);
     const data = filteredBooks.slice(
@@ -231,7 +227,7 @@ export class AdminBooksService {
           orderBy: { expiresAt: 'asc' },
         },
         loans: {
-          where: { status: 'AKTIF' },
+          where: { status: { in: ['AKTIF', 'HILANG'] } },
           include: {
             user: { select: { id: true, name: true, email: true } },
             copy: { select: { code: true } },

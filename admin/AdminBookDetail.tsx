@@ -16,6 +16,30 @@ import {
 import styles from "./AdminBooks.module.css";
 import detailStyles from "./AdminBookDetailEnhancements.module.css";
 
+function relatedTransactionHref(
+  transaction: AdminBookDetail["transactions"][number],
+) {
+  if (transaction.status === "HILANG") {
+    const loanId = transaction.id.startsWith("loan-")
+      ? transaction.id.slice("loan-".length)
+      : transaction.id;
+
+    return `/admin/transaksi/buku-hilang-penggantian/${encodeURIComponent(loanId)}`;
+  }
+
+  const query = new URLSearchParams({
+    search: transaction.copyCode,
+    status:
+      transaction.type === "PEMINJAMAN"
+        ? "ACTIVE"
+        : "MENUNGGU_PENGAMBILAN",
+  });
+
+  return transaction.type === "PEMINJAMAN"
+    ? `/admin/transaksi/peminjaman?${query.toString()}`
+    : `/admin/transaksi/reservasi?${query.toString()}`;
+}
+
 export default function AdminBookDetailPage({ id }: { id: string }) {
   const [book, setBook] = useState<AdminBookDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -398,10 +422,18 @@ export default function AdminBookDetailPage({ id }: { id: string }) {
                 transaction.status === "HILANG";
 
               return (
-                <article
+                <Link
                   key={transaction.id}
-                  className={`${styles.transactionRow} ${detailStyles.transactionCard}`}
+                  href={relatedTransactionHref(transaction)}
+                  className={`${styles.transactionRow} ${detailStyles.transactionCard} ${detailStyles.transactionLink}`}
                   data-record-card
+                  aria-label={`Buka ${
+                    transactionIsLost
+                      ? "kasus buku hilang"
+                      : transaction.type === "PEMINJAMAN"
+                        ? "peminjaman"
+                        : "reservasi"
+                  } ${transaction.code} untuk eksemplar ${transaction.copyCode}`}
                 >
                   <div>
                     <strong data-record-primary>
@@ -433,15 +465,17 @@ export default function AdminBookDetailPage({ id }: { id: string }) {
                         ? "Pinjaman Aktif"
                         : "Reservasi Aktif"}
                   </span>
-                </article>
+                </Link>
               );
             })}
 
             {lostCopiesWithoutTransaction.map((copy) => (
-              <article
+              <Link
                 key={`lost-copy-${copy.id}`}
-                className={`${styles.transactionRow} ${detailStyles.transactionCard}`}
+                href="/admin/transaksi/buku-hilang-penggantian"
+                className={`${styles.transactionRow} ${detailStyles.transactionCard} ${detailStyles.transactionLink}`}
                 data-record-card
+                aria-label={`Lihat buku hilang untuk eksemplar ${copy.code}`}
               >
                 <div>
                   <strong data-record-primary>
@@ -460,7 +494,7 @@ export default function AdminBookDetailPage({ id }: { id: string }) {
                 >
                   Buku Hilang
                 </span>
-              </article>
+              </Link>
             ))}
           </div>
         ) : (

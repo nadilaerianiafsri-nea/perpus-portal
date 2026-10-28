@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import AppSelect from "@/components/AppSelect";
 import AdminStatCard from "./AdminStatCard";
 import { FiMonitor as CardMonitor, FiCheckCircle as CardCheckCircle, FiArchive as CardArchive } from "react-icons/fi";
 
@@ -17,8 +18,26 @@ import {
   type AdminEBooksResponse,
 } from "./adminEBooks";
 import styles from "./AdminBooks.module.css";
+import fixes from "./AdminCollectionFixes.module.css";
+import EBookYearFilter, { createEBookYearRange } from "./EBookYearFilter";
 
 type StatusFilter = "ALL" | "ACTIVE" | "INACTIVE";
+type SubjectFilter = "ALL" | string;
+
+const SUBJECT_CATEGORIES = [
+  "Hukum",
+  "Perundang-undangan",
+  "Novel",
+  "Pendidikan",
+  "Sejarah",
+  "Agama",
+  "Teknologi",
+  "Sosial",
+  "Ekonomi",
+  "Politik",
+  "Biografi",
+  "Referensi",
+] as const;
 
 const emptyData: AdminEBooksResponse = {
   stats: { total: 0, active: 0, inactive: 0 },
@@ -32,6 +51,8 @@ export default function AdminEBooksPage() {
   const [searchInput, setSearchInput] = useState(initialSearch);
   const [search, setSearch] = useState(initialSearch);
   const [status, setStatus] = useState<StatusFilter>("ALL");
+  const [subject, setSubject] = useState<SubjectFilter>("ALL");
+  const [yearRange, setYearRange] = useState(() => createEBookYearRange("all"));
   const [page, setPage] = useState(1);
   const [result, setResult] = useState<AdminEBooksResponse>(emptyData);
   const [loading, setLoading] = useState(true);
@@ -57,6 +78,9 @@ export default function AdminEBooksPage() {
       limit: "20",
     });
     if (search) query.set("search", search);
+    if (subject !== "ALL") query.set("subject", subject);
+    if (yearRange.from) query.set("yearMin", yearRange.from);
+    if (yearRange.to) query.set("yearMax", yearRange.to);
 
     try {
       const response = await fetch(`/api/admin/ebooks?${query}`, {
@@ -80,7 +104,7 @@ export default function AdminEBooksPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, status, revision]);
+  }, [page, search, status, subject, yearRange, revision]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- Existing fetch lifecycle starts the loading state before requesting data.
@@ -136,12 +160,6 @@ export default function AdminEBooksPage() {
     }
   }
 
-  const filters: Array<{ value: StatusFilter; label: string }> = [
-    { value: "ALL", label: "Semua" },
-    { value: "ACTIVE", label: "Aktif" },
-    { value: "INACTIVE", label: "Nonaktif" },
-  ];
-
   return (
     <div className={styles.page}>
       <section className={styles.stats} aria-label="Ringkasan E-Book">
@@ -154,7 +172,7 @@ export default function AdminEBooksPage() {
       </section>
 
       <section className={styles.toolbar}>
-        <form className={styles.searchBox} onSubmit={submitSearch}>
+        <form className={`${styles.searchBox} ${fixes.searchBox}`} onSubmit={submitSearch}>
           <FiSearch aria-hidden />
           <input
             type="search"
@@ -170,23 +188,52 @@ export default function AdminEBooksPage() {
         </Link>
       </section>
 
-      <div className={styles.filters} role="group" aria-label="Filter status E-Book">
-        {filters.map((filter) => (
-          <button
-            data-button="secondary"
-            data-button-size="md"
-            data-button-active={status === filter.value}
-            key={filter.value}
-            type="button"
-            className={status === filter.value ? styles.filterActive : ""}
-            onClick={() => {
-              setStatus(filter.value);
+      <div
+        className={fixes.ebookFilterBar}
+        role="group"
+        aria-label="Filter katalog E-Book"
+      >
+        <div className={fixes.ebookFilterField}>
+          <AppSelect
+            aria-label="Filter status E-Book"
+            value={status}
+            onChange={(event) => {
+              setStatus(event.target.value as StatusFilter);
               setPage(1);
             }}
           >
-            {filter.label}
-          </button>
-        ))}
+            <option value="ALL">Semua Status</option>
+            <option value="ACTIVE">Aktif</option>
+            <option value="INACTIVE">Nonaktif</option>
+          </AppSelect>
+        </div>
+
+        <div className={fixes.ebookFilterField}>
+          <AppSelect
+            aria-label="Filter subjek atau kategori E-Book"
+            value={subject}
+            onChange={(event) => {
+              setSubject(event.target.value as SubjectFilter);
+              setPage(1);
+            }}
+          >
+            <option value="ALL">Semua Subjek / Kategori</option>
+            {SUBJECT_CATEGORIES.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </AppSelect>
+        </div>
+
+        <EBookYearFilter
+          value={yearRange}
+          disabled={loading}
+          onChange={(next) => {
+            setYearRange(next);
+            setPage(1);
+          }}
+        />
       </div>
 
       {error ? (
