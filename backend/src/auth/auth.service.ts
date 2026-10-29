@@ -77,9 +77,7 @@ export class AuthService {
     const email = emailInput.trim().toLowerCase();
 
     const user = await this.prisma.user.findUnique({
-      where: {
-        email,
-      },
+      where: { email },
     });
 
     if (!user) {
@@ -114,16 +112,32 @@ export class AuthService {
     const input = RegisterDto.from(body);
 
     const existingUser = await this.prisma.user.findUnique({
-      where: {
-        email: input.email,
-      },
-      select: {
-        id: true,
-      },
+      where: { email: input.email },
+      select: { id: true },
     });
 
     if (existingUser) {
       throw new ConflictException('Email sudah terdaftar.');
+    }
+
+    const whatsappVariants = new Set([input.whatsapp]);
+    if (input.whatsapp.startsWith('+62')) {
+      const subscriber = input.whatsapp.slice(3);
+      whatsappVariants.add(`62${subscriber}`);
+      whatsappVariants.add(`0${subscriber}`);
+    }
+
+    const existingWhatsapp = await this.prisma.memberProfile.findFirst({
+      where: {
+        whatsapp: {
+          in: [...whatsappVariants],
+        },
+      },
+      select: { id: true },
+    });
+
+    if (existingWhatsapp) {
+      throw new ConflictException('Nomor WhatsApp sudah terdaftar.');
     }
 
     const passwordHash = await bcrypt.hash(input.password, 12);
@@ -203,9 +217,7 @@ export class AuthService {
 
   async getUserById(id: number) {
     const user = await this.prisma.user.findUnique({
-      where: {
-        id,
-      },
+      where: { id },
       select: {
         id: true,
         name: true,

@@ -24,7 +24,7 @@
 .icon svg { width: 30px; height: 30px; }
 .dialog[data-dialog-variant="info"] .icon { background: #e9f7ff; color: #086ca3; }
 .dialog[data-dialog-variant="warning"] .icon { background: #fff4e5; color: #965600; }
-.dialog[data-dialog-variant="danger"] .icon { background: #fff0ef; color: #c52b23; }
+.dialog[data-dialog-variant="danger"] .icon { background: var(--red-soft); color: var(--stat-danger); }
 .dialog[data-dialog-variant="success"] .icon { background: #eef9e9; color: #3b8519; }
 .dialog .title { margin: 0; color: var(--dialog-navy); font-size: 26px; font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; }
 .dialog .description { margin-top: 12px; color: var(--dialog-muted); font-size: 15px; line-height: 1.7; overflow-wrap: anywhere; }
@@ -45,12 +45,42 @@
 .actions { margin-top: 28px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
 .actions > button { width: 100%; }
 .singleAction { grid-template-columns: minmax(0, 1fr); }
+
+/* Compact alerts are used for short registration conflicts only. */
+.dialog[data-dialog-size="compact"] {
+  width: min(460px, calc(100vw - 32px));
+  padding: 28px 30px;
+  border-radius: 20px;
+}
+.dialog[data-dialog-size="compact"] .icon { width: 56px; height: 56px; margin-bottom: 16px; }
+.dialog[data-dialog-size="compact"] .icon svg { width: 24px; height: 24px; }
+.dialog[data-dialog-size="compact"] .title { font-size: 22px; line-height: 1.3; }
+.dialog[data-dialog-size="compact"] .description { margin-top: 9px; font-size: 14px; line-height: 1.6; }
+.dialog[data-dialog-size="compact"] .actions { margin-top: 22px; }
+
 /* Use existing button variants; darker semantic shades keep modal action text white and legible. */
 .dialog .actions [data-dialog-confirm][data-button="danger"] { --button-bg: #c52b23; --button-fg: #fff; --button-hover-bg: #a8231b; --button-hover-fg: #fff; }
 .dialog .actions [data-dialog-confirm][data-button="success"] { --button-bg: #3b8519; --button-fg: #fff; --button-hover-bg: #286713; --button-hover-fg: #fff; }
+
+@media (max-width: 720px) {
+  .dialog[data-dialog-size="compact"] { width: min(440px, calc(100vw - 28px)); padding: 26px; }
+}
+
 @media (max-width: 480px) {
   .dialog { padding: 24px; }
   .icon { width: 64px; height: 64px; margin-bottom: 18px; }
   .dialog .title { font-size: 23px; }
   .actions { grid-template-columns: minmax(0, 1fr); margin-top: 24px; }
+
+  .dialog[data-dialog-size="compact"] {
+    width: calc(100vw - 24px);
+    max-height: calc(100dvh - 24px);
+    padding: 20px;
+    border-radius: 18px;
+  }
+  .dialog[data-dialog-size="compact"] .icon { width: 52px; height: 52px; margin-bottom: 14px; }
+  .dialog[data-dialog-size="compact"] .icon svg { width: 23px; height: 23px; }
+  .dialog[data-dialog-size="compact"] .title { font-size: 20px; }
+  .dialog[data-dialog-size="compact"] .description { font-size: 13px; line-height: 1.55; }
+  .dialog[data-dialog-size="compact"] .actions { margin-top: 18px; }
 }

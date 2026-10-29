@@ -19,6 +19,20 @@ export function memberText(value: unknown, max: number, required = false, multil
   return (value as string).trim();
 }
 
+export function normalizeWhatsapp(value: unknown): string {
+  const compact = memberText(value, 32, true).replace(/[\s-]/g, '');
+
+  if (!/^(?:\+?62|0)8\d{7,12}$/.test(compact)) {
+    throw new BadRequestException(
+      'Nomor WhatsApp tidak valid. Gunakan nomor Indonesia, misalnya +6281234567890.',
+    );
+  }
+
+  if (compact.startsWith('+62')) return compact;
+  if (compact.startsWith('62')) return `+${compact}`;
+  return `+62${compact.slice(1)}`;
+}
+
 // Express can supply repeated query parameters as arrays. Validate before any
 // parsing or Prisma work, and preserve search punctuation as ordinary data.
 export function memberQuery(body: unknown, allowed: readonly string[]): Record<string, string> {
@@ -130,14 +144,7 @@ export function profileInput(body: unknown, memberType: string | null) {
       );
     result[key] = value.trim();
   }
-  if (
-    result.whatsapp &&
-    !/^(?:\+?62|0)8\d{7,12}$/.test(result.whatsapp.replace(/[\s-]/g, ''))
-  )
-    throw new BadRequestException(
-      'Nomor WhatsApp tidak valid. Gunakan nomor Indonesia, misalnya 081234567890.',
-    );
-  if (result.whatsapp) result.whatsapp = result.whatsapp.replace(/[\s-]/g, '');
+  if (result.whatsapp) result.whatsapp = normalizeWhatsapp(result.whatsapp);
   return result;
 }
 

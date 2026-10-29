@@ -2,18 +2,76 @@
 div.catalog[data-member-catalog] { max-width: none; margin: 0; padding: 0 0 32px; }
 .catalog[data-member-catalog] :global(input[placeholder^="Cari judul"]) { height: 48px; }
 .catalog[data-member-catalog] .toolbar { min-height: 76px; margin-bottom: 22px; padding: 12px 16px; border: 1px solid #e7e9f0; border-radius: 18px; background: #fff; }
-.catalog[data-member-catalog] .toolbar p { width: auto; color: #000633; font-size: 14px; }
-.catalog[data-member-catalog] .tools { display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 8px; min-width: 0; }
-.catalog[data-member-catalog] .sortField { flex: 0 1 180px; width: 180px; min-width: 140px; }
-.catalog[data-member-catalog] .sortField :global([data-select-trigger]) { height: 48px; min-height: 48px; border-radius: 13px; font-size: 14px; }
-.catalog[data-member-catalog] .viewToggle { height: 48px; padding: 4px; gap: 2px; border: 1px solid #e7e9f0; border-radius: 13px; background: #f7f8fb; }
+.catalog[data-member-catalog] .toolbar p { flex: 1 1 auto; width: auto; min-width: 0; color: #000633; font-size: 14px; }
+.catalog[data-member-catalog] .tools { display: flex; align-items: center; flex: 0 0 auto; flex-wrap: nowrap; justify-content: flex-end; gap: 10px; min-width: 0; }
+
+/* Remove the legacy outer sort box from Catalog.module.css. The AppSelect trigger is the only visible control. */
+.catalog[data-member-catalog] .tools label.sortField {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 10px;
+  width: auto;
+  min-width: 0;
+  height: 48px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #737787;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.catalog[data-member-catalog] .tools label.sortField:hover,
+.catalog[data-member-catalog] .tools label.sortField:focus-within {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+.catalog[data-member-catalog] .sortField > span[aria-hidden="true"] { flex: 0 0 auto; }
+.catalog[data-member-catalog] .sortField :global([data-app-select]) { flex: 0 0 180px; width: 180px; min-width: 180px; }
+.catalog[data-member-catalog] .sortField :global([data-select-trigger]) {
+  width: 100%;
+  height: 48px;
+  min-height: 48px;
+  border-radius: 13px;
+  font-size: 14px;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+.catalog[data-member-catalog] .sortField :global([data-select-value]) { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.catalog[data-member-catalog] .viewToggle { flex: 0 0 auto; height: 48px; padding: 4px; gap: 2px; border: 1px solid #e7e9f0; border-radius: 13px; background: #f7f8fb; }
 :root body .catalog[data-member-catalog] .viewToggle :global(button[data-button]) { --button-height: 38px; --button-bg: transparent; --button-fg: #4b5e8c; --button-hover-bg: #eef0f7; --button-hover-fg: #000633; width: 38px; height: 38px; min-height: 38px; padding: 0; border: 0; border-radius: 9px; }
 :root body .catalog[data-member-catalog] .viewToggle :global(button[aria-pressed="true"]) { --button-bg: #000633; --button-fg: #fff; --button-hover-bg: #2b3056; --button-hover-fg: #fff; background: #000633; color: #fff; }
-:root body .catalog[data-member-catalog] .tools > :global(button[data-button]) { --button-height: 48px; height: 48px; min-height: 48px; border-radius: 13px; }
+:root body .catalog[data-member-catalog] .tools > :global(button[data-button]) { --button-height: 48px; --button-hover-bg: #eef0f7; --button-hover-fg: #000633; height: 48px; min-height: 48px; flex: 0 0 auto; border-radius: 13px; transition: transform 0.18s ease; }
+
+:global(body:has([data-member-catalog]) [data-select-panel][aria-label="Urutkan koleksi"] [role="option"]) {
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+:global(body:has([data-member-catalog]) [data-select-panel][aria-label="Urutkan koleksi"] [role="option"]:hover),
+:global(body:has([data-member-catalog]) [data-select-panel][aria-label="Urutkan koleksi"] [role="option"][data-active="true"]) {
+  background: #eef0f7;
+  color: #000633;
+}
+
 .catalog[data-member-catalog] :global(div:has(> [data-member-catalog-card][data-catalog-view="grid"])),
 .catalog[data-member-catalog] :global(div:has(> [data-member-catalog-skeleton][data-catalog-view="grid"])) { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px; align-items: stretch; }
-.catalog[data-member-catalog] :global([data-member-catalog-card]) { border: 1px solid #dfe2e9; border-radius: 19px; background: #fff; overflow: hidden; box-shadow: 0 4px 14px #00063312; }
-.catalog[data-member-catalog] :global([data-member-catalog-card]:hover) { transform: none; box-shadow: 0 6px 18px #00063316; }
+.catalog[data-member-catalog] :global([data-member-catalog-card]) {
+  border: 1px solid #dfe2e9;
+  border-radius: 19px;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 4px 14px #00063312;
+  animation: memberCatalogCardEnter 0.38s ease both;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+@keyframes memberCatalogCardEnter {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.catalog[data-member-catalog] :global([data-member-catalog-card]:hover) { transform: translateY(-5px); box-shadow: 0 6px 18px #00063316; }
 .catalog[data-member-catalog] :global([data-member-catalog-card] > a:first-child) { height: 330px; max-height: none; aspect-ratio: auto; flex-shrink: 0; background: #f3f4f7; border-bottom: 1px solid #e7e9f0; }
 .catalog[data-member-catalog] :global([data-member-catalog-card] img) { object-fit: contain; object-position: center; padding: 8px; transform: none; }
 .catalog[data-member-catalog] :global([data-member-catalog-card] > a > span) { top: 12px; left: 12px; min-height: 28px; padding: 5px 8px; border-radius: 7px; background: #000633; color: #fff; font-size: 12px; line-height: 1.3; }
@@ -34,27 +92,53 @@ div.catalog[data-member-catalog] { max-width: none; margin: 0; padding: 0 0 32px
 .catalog[data-member-catalog] :global([data-member-catalog-skeleton][data-catalog-view="list"]) { display: grid; grid-template-columns: 110px minmax(0, 1fr); grid-template-rows: 20px 20px 48px; gap: 8px 16px; align-content: center; min-height: 164px; padding: 16px; }
 .catalog[data-member-catalog] :global([data-member-catalog-skeleton][data-catalog-view="list"] > div) { grid-row: 1 / 4; width: 110px; height: 124px; }
 .catalog[data-member-catalog] :global([data-member-catalog-skeleton][data-catalog-view="list"] > span) { margin: 0; }
+
+@media (hover: hover) {
+  :root body .catalog[data-member-catalog] .tools > :global(button[data-button]):hover:not(:disabled) { transform: scale(1.03); }
+  .catalog[data-member-catalog] .sortField :global([data-select-trigger]):hover:not(:disabled) { background: #eef0f7; color: #000633; transform: scale(1.02); }
+}
+
 @media (max-width: 1200px) and (min-width: 1101px) {
- .catalog[data-member-catalog] :global(div:has(> [data-member-catalog-card][data-catalog-view="grid"])),
- .catalog[data-member-catalog] :global(div:has(> [data-member-catalog-skeleton][data-catalog-view="grid"])) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .catalog[data-member-catalog] :global(div:has(> [data-member-catalog-card][data-catalog-view="grid"])),
+  .catalog[data-member-catalog] :global(div:has(> [data-member-catalog-skeleton][data-catalog-view="grid"])) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 @media (max-width: 1100px) {
- .catalog[data-member-catalog] :global(div:has(> [data-member-catalog-card][data-catalog-view="grid"])),
- .catalog[data-member-catalog] :global(div:has(> [data-member-catalog-skeleton][data-catalog-view="grid"])) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .catalog[data-member-catalog] :global(div:has(> [data-member-catalog-card][data-catalog-view="grid"])),
+  .catalog[data-member-catalog] :global(div:has(> [data-member-catalog-skeleton][data-catalog-view="grid"])) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 900px) {
+  .catalog[data-member-catalog] .toolbar { flex-wrap: wrap; }
+  .catalog[data-member-catalog] .toolbar p { flex: 1 1 100%; width: 100%; }
+  .catalog[data-member-catalog] .tools { display: grid; grid-template-columns: auto minmax(250px, 1fr) auto; width: 100%; justify-content: stretch; }
+  .catalog[data-member-catalog] .tools label.sortField { width: 100%; }
+  .catalog[data-member-catalog] .sortField :global([data-app-select]) { flex: 1 1 auto; width: auto; min-width: 150px; }
 }
 @media (max-width: 600px) {
- .catalog[data-member-catalog] .toolbar { padding: 12px; gap: 12px; }
- .catalog[data-member-catalog] .toolbar p { width: 100%; }
- .catalog[data-member-catalog] .tools { width: 100%; }
- .catalog[data-member-catalog] .sortField { flex: 1; }
- .catalog[data-member-catalog] .viewToggle { margin-left: auto; }
- .catalog[data-member-catalog] :global(div:has(> [data-member-catalog-card][data-catalog-view="grid"])),
- .catalog[data-member-catalog] :global(div:has(> [data-member-catalog-skeleton][data-catalog-view="grid"])) { grid-template-columns: minmax(0, 1fr); gap: 18px; }
- .catalog[data-member-catalog] :global([data-member-catalog-card] > a:first-child),
- .catalog[data-member-catalog] :global([data-member-catalog-skeleton] > div) { height: 300px; }
- .catalog[data-member-catalog] :global([data-member-catalog-skeleton]) { min-height: 466px; }
- .catalog[data-member-catalog] :global([data-member-catalog-card][data-catalog-view="list"] > a:first-child) { width: 92px; height: auto; }
- .catalog[data-member-catalog] :global([data-member-catalog-card][data-catalog-view="list"] > div) { grid-template-columns: minmax(0, 1fr); padding: 14px; gap: 12px; }
- .catalog[data-member-catalog] :global([data-member-catalog-skeleton][data-catalog-view="list"]) { grid-template-columns: 80px minmax(0, 1fr); min-height: 164px; }
- .catalog[data-member-catalog] :global([data-member-catalog-skeleton][data-catalog-view="list"] > div) { width: 80px; height: 124px; }
+  .catalog[data-member-catalog] .toolbar { padding: 12px; gap: 12px; }
+  .catalog[data-member-catalog] .toolbar p { width: 100%; }
+  .catalog[data-member-catalog] .tools { grid-template-columns: auto minmax(180px, 1fr) auto; gap: 8px; }
+  .catalog[data-member-catalog] .tools label.sortField { gap: 7px; }
+  .catalog[data-member-catalog] .sortField :global([data-app-select]) { min-width: 130px; }
+  .catalog[data-member-catalog] :global(div:has(> [data-member-catalog-card][data-catalog-view="grid"])),
+  .catalog[data-member-catalog] :global(div:has(> [data-member-catalog-skeleton][data-catalog-view="grid"])) { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .catalog[data-member-catalog] :global([data-member-catalog-card] > a:first-child),
+  .catalog[data-member-catalog] :global([data-member-catalog-skeleton] > div) { height: 300px; }
+  .catalog[data-member-catalog] :global([data-member-catalog-skeleton]) { min-height: 466px; }
+  .catalog[data-member-catalog] :global([data-member-catalog-card][data-catalog-view="list"] > a:first-child) { width: 92px; height: auto; }
+  .catalog[data-member-catalog] :global([data-member-catalog-card][data-catalog-view="list"] > div) { grid-template-columns: minmax(0, 1fr); padding: 14px; gap: 12px; }
+  .catalog[data-member-catalog] :global([data-member-catalog-skeleton][data-catalog-view="list"]) { grid-template-columns: 80px minmax(0, 1fr); min-height: 164px; }
+  .catalog[data-member-catalog] :global([data-member-catalog-skeleton][data-catalog-view="list"] > div) { width: 80px; height: 124px; }
+}
+@media (max-width: 520px) {
+  .catalog[data-member-catalog] .tools { grid-template-columns: minmax(0, 1fr) auto; }
+  :root body .catalog[data-member-catalog] .tools > :global(button[data-button]) { grid-column: 1; grid-row: 1; justify-self: start; }
+  .catalog[data-member-catalog] .viewToggle { grid-column: 2; grid-row: 1; justify-self: end; }
+  .catalog[data-member-catalog] .tools label.sortField { grid-column: 1 / -1; grid-row: 2; }
+  .catalog[data-member-catalog] .sortField :global([data-app-select]) { flex: 1 1 auto; width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .catalog[data-member-catalog] :global([data-member-catalog-card]) { animation: none; transition: none; }
+  .catalog[data-member-catalog] :global([data-member-catalog-card]:hover),
+  :root body .catalog[data-member-catalog] .tools > :global(button[data-button]):hover:not(:disabled),
+  .catalog[data-member-catalog] .sortField :global([data-select-trigger]):hover:not(:disabled) { transform: none; }
 }

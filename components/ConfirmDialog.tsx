@@ -10,6 +10,7 @@ export type ConfirmDialogProps = {
   title: string;
   description: ReactNode;
   variant?: "primary" | "info" | "warning" | "danger" | "success";
+  size?: "default" | "compact";
   icon?: ReactNode;
   confirmLabel?: string;
   cancelLabel?: string;
@@ -27,6 +28,7 @@ export default function ConfirmDialog({
   title,
   description,
   variant = "primary",
+  size = "default",
   icon,
   confirmLabel = "Konfirmasi",
   cancelLabel,
@@ -142,6 +144,7 @@ export default function ConfirmDialog({
       className={styles.dialog}
       data-confirm-dialog
       data-dialog-variant={variant}
+      data-dialog-size={size}
       aria-modal="true"
       aria-labelledby={`${id}-title`}
       aria-describedby={`${id}-description`}

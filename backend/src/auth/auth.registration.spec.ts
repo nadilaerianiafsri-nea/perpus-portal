@@ -18,6 +18,8 @@ import { EmailVerificationService } from './email-verification.service';
 describe('Registration HTTP contract', () => {
   let app: INestApplication;
   const users: Record<string, unknown>[] = [];
+  const profiles: Record<string, unknown>[] = [];
+
   const prisma = {
     user: {
       findUnique: jest.fn(
@@ -33,8 +35,21 @@ describe('Registration HTTP contract', () => {
     $transaction: jest.fn(async (callback: (tx: unknown) => Promise<unknown>) =>
       callback(prisma),
     ),
-    memberProfile: { create: jest.fn(async () => ({})) },
+    memberProfile: {
+      findFirst: jest.fn(
+        ({ where }: { where: { whatsapp: { in: string[] } } }) =>
+          profiles.find((profile) =>
+            where.whatsapp.in.includes(String(profile.whatsapp)),
+          ) ?? null,
+      ),
+      create: jest.fn(async ({ data }: { data: Record<string, unknown> }) => {
+        const profile = { id: profiles.length + 1, ...data };
+        profiles.push(profile);
+        return profile;
+      }),
+    },
   };
+
   const valid = {
     name: 'Budi Santoso',
     email: 'budi@example.com',
@@ -48,9 +63,7 @@ describe('Registration HTTP contract', () => {
 
   beforeAll(async () => {
     const module = await Test.createTestingModule({
-      imports: [
-        JwtModule.register({ secret: 'registration-test-only-secret' }),
-      ],
+      imports: [JwtModule.register({ secret: 'registration-test-only-secret' })],
       controllers: [AuthController],
       providers: [
         RecaptchaService,
@@ -65,17 +78,23 @@ describe('Registration HTTP contract', () => {
         { provide: PrismaService, useValue: prisma },
         {
           provide: ConfigService,
-          useValue: { get: () => undefined, getOrThrow: () => 'registration-test-only-secret' },
+          useValue: {
+            get: () => undefined,
+            getOrThrow: () => 'registration-test-only-secret',
+          },
         },
       ],
     }).compile();
     app = module.createNestApplication();
     await app.init();
   });
+
   beforeEach(() => {
     users.length = 0;
+    profiles.length = 0;
     jest.clearAllMocks();
   });
+
   afterAll(async () => {
     await app.close();
   });
@@ -103,8 +122,10 @@ describe('Registration HTTP contract', () => {
         await bcrypt.compare(valid.password, users[0].passwordHash as string),
       ).toBe(true);
       expect(users[0].emailVerified).toBe(false);
+      expect(profiles[0].whatsapp).toBe('+628123456789');
     },
   );
+
   it('normalizes email and rejects duplicates', async () => {
     await request(app.getHttpServer())
       .post('/auth/register')
@@ -116,6 +137,23 @@ describe('Registration HTTP contract', () => {
       .expect(409);
     expect(users).toHaveLength(1);
   });
+
+  it('rejects duplicate WhatsApp numbers stored in legacy 08 format', async () => {
+    profiles.push({ id: 99, whatsapp: valid.whatsapp });
+
+    const response = await request(app.getHttpServer())
+      .post('/auth/register')
+      .send({
+        ...valid,
+        email: 'budi.lain@example.com',
+        whatsapp: '628123456789',
+      })
+      .expect(409);
+
+    expect(response.body.message).toBe('Nomor WhatsApp sudah terdaftar.');
+    expect(users).toHaveLength(0);
+  });
+
   it.each([
     { password: 'short' },
     { memberType: 'mahasiswa' },
@@ -138,6 +176,7 @@ describe('Registration HTTP contract', () => {
       .expect(400);
     expect(users).toHaveLength(0);
   });
+
   it('converts a concurrent unique constraint failure to Conflict', async () => {
     prisma.user.create.mockRejectedValueOnce(
       new Prisma.PrismaClientKnownRequestError('Unique constraint', {
@@ -150,6 +189,7 @@ describe('Registration HTTP contract', () => {
       .send(valid)
       .expect(409);
   });
+
   it('blocks login for pending members without changing verified/admin login', async () => {
     const passwordHash = await bcrypt.hash(valid.password, 4);
     users.push({

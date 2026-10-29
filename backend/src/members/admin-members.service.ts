@@ -12,7 +12,12 @@ import {
   Role,
 } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { objectInput, memberText, memberQuery } from './member.validation';
+import {
+  objectInput,
+  memberText,
+  memberQuery,
+  normalizeWhatsapp,
+} from './member.validation';
 
 type ListInput = {
   search?: string;
@@ -378,8 +383,8 @@ export class AdminMembersService {
       );
     }
 
-    for (const key of ['name', 'whatsapp', 'address', 'identityNumber']) {
-      memberText(input[key], key === 'address' ? 2000 : key === 'whatsapp' ? 32 : 191, true, key === 'address');
+    for (const key of ['name', 'address', 'identityNumber']) {
+      memberText(input[key], key === 'address' ? 2000 : 191, true, key === 'address');
     }
     for (const key of ['universityName', 'workUnit']) {
       if (input[key] !== undefined && input[key] !== null) memberText(input[key], 191);
@@ -401,20 +406,7 @@ export class AdminMembersService {
       throw new BadRequestException('Jenis anggota tidak valid.');
     }
 
-    const whatsapp =
-      typeof input.whatsapp === 'string'
-        ? input.whatsapp.replace(/[\s-]/g, '').trim()
-        : '';
-
-    if (
-      !whatsapp ||
-      whatsapp.length > 32 ||
-      !/^(?:\+?62|0)8\d{7,12}$/.test(whatsapp)
-    ) {
-      throw new BadRequestException(
-        'Nomor WhatsApp tidak valid. Gunakan nomor Indonesia, misalnya 081234567890.',
-      );
-    }
+    const whatsapp = normalizeWhatsapp(input.whatsapp);
 
     const address =
       typeof input.address === 'string' ? input.address.trim() : '';

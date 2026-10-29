@@ -1,7 +1,6 @@
 "use client";
 
 import AppSelect from "@/components/AppSelect";
-
 import { ButtonLabel } from '@/components/Button';
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
@@ -32,12 +31,32 @@ type FormState = {
 const initialForm: FormState = {
   name: "",
   memberType: "UMUM",
-  whatsapp: "",
+  whatsapp: "+62",
   address: "",
   identityNumber: "",
   universityName: "",
   workUnit: "",
 };
+
+function normalizeWhatsappInput(value: string) {
+  const digits = value.replace(/\D/g, "");
+  if (!digits) return "+62";
+
+  let local = digits;
+  if (local.startsWith("62")) local = local.slice(2);
+  if (local.startsWith("0")) local = local.slice(1);
+
+  return `+62${local.slice(0, 13)}`;
+}
+
+function whatsappMessage(value: string) {
+  const textError = plainTextMessage(value, 16, false);
+  if (textError) return textError;
+  if (!/^\+628\d{7,12}$/.test(value)) {
+    return "Nomor WhatsApp tidak valid. Gunakan format +628xxxxxxxxxx.";
+  }
+  return "";
+}
 
 export default function AdminMemberForm({ id }: Props) {
   const router = useRouter();
@@ -81,7 +100,7 @@ export default function AdminMemberForm({ id }: Props) {
         setForm({
           name: payload.member.name,
           memberType: payload.member.memberType ?? "UMUM",
-          whatsapp: payload.member.profile?.whatsapp ?? "",
+          whatsapp: normalizeWhatsappInput(payload.member.profile?.whatsapp ?? "+62"),
           address: payload.member.profile?.address ?? "",
           identityNumber: payload.member.profile?.identityNumber ?? "",
           universityName: payload.member.profile?.universityName ?? "",
@@ -112,7 +131,17 @@ export default function AdminMemberForm({ id }: Props) {
   }, [id]);
 
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
-    if (key !== "memberType") setFieldErrors(current => ({ ...current, [key]: plainTextMessage(value, key === "address" ? 2000 : key === "whatsapp" ? 32 : 191, key === "address") }));
+    if (key !== "memberType") {
+      const message = key === "whatsapp"
+        ? whatsappMessage(String(value))
+        : plainTextMessage(
+            String(value),
+            key === "address" ? 2000 : 191,
+            key === "address",
+          );
+      setFieldErrors((current) => ({ ...current, [key]: message }));
+    }
+
     setForm((current) => ({
       ...current,
       [key]: value,
@@ -126,8 +155,28 @@ export default function AdminMemberForm({ id }: Props) {
       return;
     }
 
-    const fields = ["name", "whatsapp", "address", "identityNumber", ...(form.memberType === "MAHASISWA" ? ["universityName"] : []), ...(form.memberType === "PEGAWAI" ? ["workUnit"] : [])] as (keyof FormState)[];
-    const errors = Object.fromEntries(fields.map(key => [key, plainTextMessage(form[key], key === "address" ? 2000 : key === "whatsapp" ? 32 : 191, key === "address")]));
+    const fields = [
+      "name",
+      "whatsapp",
+      "address",
+      "identityNumber",
+      ...(form.memberType === "MAHASISWA" ? ["universityName"] : []),
+      ...(form.memberType === "PEGAWAI" ? ["workUnit"] : []),
+    ] as (keyof FormState)[];
+
+    const errors = Object.fromEntries(
+      fields.map((key) => [
+        key,
+        key === "whatsapp"
+          ? whatsappMessage(form.whatsapp)
+          : plainTextMessage(
+              form[key],
+              key === "address" ? 2000 : 191,
+              key === "address",
+            ),
+      ]),
+    );
+
     setFieldErrors(errors);
     if (Object.values(errors).some(Boolean)) return;
 
@@ -143,7 +192,7 @@ export default function AdminMemberForm({ id }: Props) {
         body: JSON.stringify({
           name: form.name.trim(),
           memberType: form.memberType,
-          whatsapp: form.whatsapp.trim(),
+          whatsapp: form.whatsapp,
           address: form.address.trim(),
           identityNumber: form.identityNumber.trim(),
           universityName:
@@ -214,15 +263,13 @@ export default function AdminMemberForm({ id }: Props) {
                 required
                 onChange={(event) => update("name", event.target.value)}
               />
-            {fieldErrors.name && <small id="admin-member-name-error" role="alert">{fieldErrors.name}</small>}
+              {fieldErrors.name && <small id="admin-member-name-error" role="alert">{fieldErrors.name}</small>}
             </label>
 
             <label>
               <span>Email</span>
               <input type="email" value={email} disabled />
-              <small>
-                Email tidak dapat diubah melalui administrasi keanggotaan.
-              </small>
+              <small>Email tidak dapat diubah melalui administrasi keanggotaan.</small>
             </label>
 
             <label>
@@ -242,16 +289,24 @@ export default function AdminMemberForm({ id }: Props) {
             <label>
               <span>WhatsApp *</span>
               <input
-                type="text"
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
                 value={form.whatsapp}
                 aria-invalid={Boolean(fieldErrors.whatsapp)}
-                aria-describedby={fieldErrors.whatsapp ? "admin-member-whatsapp-error" : undefined}
-                maxLength={32}
+                aria-describedby={fieldErrors.whatsapp ? "admin-member-whatsapp-error" : "admin-member-whatsapp-helper"}
+                maxLength={16}
                 required
-                placeholder="081234567890"
-                onChange={(event) => update("whatsapp", event.target.value)}
+                placeholder="+6281234567890"
+                onChange={(event) =>
+                  update("whatsapp", normalizeWhatsappInput(event.target.value))
+                }
               />
-            {fieldErrors.whatsapp && <small id="admin-member-whatsapp-error" role="alert">{fieldErrors.whatsapp}</small>}
+              {fieldErrors.whatsapp ? (
+                <small id="admin-member-whatsapp-error" role="alert">{fieldErrors.whatsapp}</small>
+              ) : (
+                <small id="admin-member-whatsapp-helper">Awalan +62 dipertahankan otomatis.</small>
+              )}
             </label>
 
             <label>
@@ -263,11 +318,9 @@ export default function AdminMemberForm({ id }: Props) {
                 aria-describedby={fieldErrors.identityNumber ? "admin-member-identityNumber-error" : undefined}
                 maxLength={191}
                 required
-                onChange={(event) =>
-                  update("identityNumber", event.target.value)
-                }
+                onChange={(event) => update("identityNumber", event.target.value)}
               />
-            {fieldErrors.identityNumber && <small id="admin-member-identityNumber-error" role="alert">{fieldErrors.identityNumber}</small>}
+              {fieldErrors.identityNumber && <small id="admin-member-identityNumber-error" role="alert">{fieldErrors.identityNumber}</small>}
             </label>
 
             {form.memberType === "MAHASISWA" ? (
@@ -276,16 +329,14 @@ export default function AdminMemberForm({ id }: Props) {
                 <input
                   type="text"
                   value={form.universityName}
-                aria-invalid={Boolean(fieldErrors.universityName)}
-                aria-describedby={fieldErrors.universityName ? "admin-member-universityName-error" : undefined}
+                  aria-invalid={Boolean(fieldErrors.universityName)}
+                  aria-describedby={fieldErrors.universityName ? "admin-member-universityName-error" : undefined}
                   maxLength={191}
                   required
-                  onChange={(event) =>
-                    update("universityName", event.target.value)
-                  }
+                  onChange={(event) => update("universityName", event.target.value)}
                 />
-              {fieldErrors.universityName && <small id="admin-member-universityName-error" role="alert">{fieldErrors.universityName}</small>}
-            </label>
+                {fieldErrors.universityName && <small id="admin-member-universityName-error" role="alert">{fieldErrors.universityName}</small>}
+              </label>
             ) : null}
 
             {form.memberType === "PEGAWAI" ? (
@@ -294,14 +345,14 @@ export default function AdminMemberForm({ id }: Props) {
                 <input
                   type="text"
                   value={form.workUnit}
-                aria-invalid={Boolean(fieldErrors.workUnit)}
-                aria-describedby={fieldErrors.workUnit ? "admin-member-workUnit-error" : undefined}
+                  aria-invalid={Boolean(fieldErrors.workUnit)}
+                  aria-describedby={fieldErrors.workUnit ? "admin-member-workUnit-error" : undefined}
                   maxLength={191}
                   required
                   onChange={(event) => update("workUnit", event.target.value)}
                 />
-              {fieldErrors.workUnit && <small id="admin-member-workUnit-error" role="alert">{fieldErrors.workUnit}</small>}
-            </label>
+                {fieldErrors.workUnit && <small id="admin-member-workUnit-error" role="alert">{fieldErrors.workUnit}</small>}
+              </label>
             ) : null}
 
             <label className={styles.fullField}>
@@ -314,7 +365,7 @@ export default function AdminMemberForm({ id }: Props) {
                 required
                 onChange={(event) => update("address", event.target.value)}
               />
-            {fieldErrors.address && <small id="admin-member-address-error" role="alert">{fieldErrors.address}</small>}
+              {fieldErrors.address && <small id="admin-member-address-error" role="alert">{fieldErrors.address}</small>}
             </label>
           </div>
         </section>

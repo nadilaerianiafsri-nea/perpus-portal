@@ -22,10 +22,10 @@
   --button-bg: var(--white);
   --button-fg: var(--button-primary);
   --button-stroke: var(--button-border);
-  --button-hover-bg: var(--yellow-soft);
+  --button-hover-bg: #e9f1fb;
   --button-hover-fg: var(--button-navy);
-  --button-hover-stroke: var(--button-accent);
-  --button-pressed-bg: var(--yellow-soft);
+  --button-hover-stroke: var(--stat-info);
+  --button-pressed-bg: #e9f1fb;
 }
 :root body .categoryChip[data-button][aria-pressed="true"] { box-shadow: 0 2px 6px #00063314; }
 :root body .markAll[data-button][data-button] {
@@ -78,6 +78,9 @@
 .context div { display: grid; gap: 4px; }
 .context dt { color: var(--text-secondary-color); font-size: 12px; }
 .context dd { margin: 0; font-size: 14px; overflow-wrap: anywhere; }
+@media (hover: hover) {
+  :root body .categoryChip[data-button]:hover:not(:disabled) { transform: scale(1.03); }
+}
 @media (max-width: 900px) {
   .table th, .table td { padding: 12px 10px; }
   .table th:nth-child(1) { width: 30%; }
@@ -101,4 +104,7 @@
   .footer { align-items: stretch; flex-direction: column; }
   .pagination { justify-content: space-between; }
 }
-@media (prefers-reduced-motion: reduce) { .table td, .mobileCard { transition: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .table td, .mobileCard { transition: none; }
+  :root body .categoryChip[data-button]:hover:not(:disabled) { transform: none; }
+}
