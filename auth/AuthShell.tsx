@@ -9,12 +9,19 @@ type AuthShellProps = {
   login?: boolean;
 };
 
-export default function AuthShell({ children, registration = false, login = false }: AuthShellProps) {
-  if (login) return (
-    <main className={`${styles.authPage} ${styles.loginPage}`}>
-      <section className={styles.loginSurface} aria-labelledby="login-title">{children}</section>
-    </main>
-  );
+export default function AuthShell({
+  children,
+  registration = false,
+  login = false,
+}: AuthShellProps) {
+  if (login)
+    return (
+      <main className={`${styles.authPage} ${styles.loginPage}`}>
+        <section className={styles.loginSurface} aria-labelledby="login-title">
+          {children}
+        </section>
+      </main>
+    );
 
   if (registration) {
     return (
@@ -35,10 +42,10 @@ export default function AuthShell({ children, registration = false, login = fals
           >
             <span className={enhancements.brandVisual} aria-hidden="true">
               <Image
-                src="/images/ASSET%20PERPUS/asset%20kartu%20anggota.png"
+                src="/images/ASSET%20PERPUS/pengayoman.jpg"
                 alt=""
-                width={96}
-                height={96}
+                width={80}
+                height={80}
                 priority
               />
             </span>
