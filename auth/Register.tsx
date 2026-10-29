@@ -280,8 +280,8 @@ export default function Register() {
   return (
     <>
       <AuthShell registration>
-        <div className={`${styles.formWrap} ${styles.registerWrap}`}>
-          <header className={styles.heading}>
+        <div className={`${styles.formWrap} ${styles.registerWrap} ${enhancements.registrationContent}`}>
+          <header className={`${styles.heading} ${enhancements.registrationHeading}`}>
             <h2 ref={heading} tabIndex={-1} data-page-title>
               {step === 1 ? "Daftar Anggota" : "Formulir Pendaftaran"}
             </h2>
@@ -297,7 +297,7 @@ export default function Register() {
                   return (
                     <label
                       key={option.value}
-                      className={`${styles.memberCard} ${enhancements.memberCardFocusFix} ${active ? styles.memberCardActive : ""}`}
+                      className={`${styles.memberCard} ${enhancements.memberCardFocusFix} ${enhancements.memberCardMotion} ${active ? styles.memberCardActive : ""}`}
                     >
                       <span className={styles.memberIcon}>
                         <Icon aria-hidden="true" />
@@ -327,14 +327,14 @@ export default function Register() {
               <button
                 data-button="primary"
                 data-button-size="lg"
-                className={styles.primaryButton}
+                className={`${styles.primaryButton} ${enhancements.actionButton}`}
                 type="button"
                 onClick={() => changeStep(2)}
               >
                 Lanjutkan
               </button>
               <p className={styles.switchText}>
-                Sudah punya akun? <Link href="/login">Masuk</Link>
+                Sudah punya akun? <Link className={enhancements.textLink} href="/login">Masuk</Link>
               </p>
             </>
           ) : (
@@ -353,7 +353,7 @@ export default function Register() {
 
               <form
                 ref={form}
-                className={`${styles.loginCard} ${styles.registrationCard}`}
+                className={`${styles.loginCard} ${styles.registrationCard} ${enhancements.registrationForm}`}
                 onSubmit={handleRegister}
                 aria-busy={loading}
                 noValidate
@@ -385,7 +385,7 @@ export default function Register() {
                     />
                   </div>
                   <small id="whatsapp-helper" className={styles.fieldHelper}>
-                    Awalan +62 sudah disediakan. Ketik nomor setelah +62, misalnya 81234567890.
+                    Awalan +62 sudah disediakan. Ketik nomor setelah +62.
                   </small>
                   {errors.whatsapp ? (
                     <small id="whatsapp-error" className={styles.fieldError}>
@@ -443,7 +443,7 @@ export default function Register() {
                   aria-busy={loading}
                   data-button="primary"
                   data-button-size="lg"
-                  className={styles.primaryButton}
+                  className={`${styles.primaryButton} ${enhancements.actionButton}`}
                   type="submit"
                   disabled={loading || succeeded}
                 >
