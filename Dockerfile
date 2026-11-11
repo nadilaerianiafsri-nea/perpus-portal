@@ -20,9 +20,16 @@ WORKDIR /app
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# Site Key publik diperlukan saat build Next.js
+ARG NEXT_PUBLIC_RECAPTCHA_SITE_KEY
+ENV NEXT_PUBLIC_RECAPTCHA_SITE_KEY=${NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+
 COPY --from=deps /app/node_modules ./node_modules
 
 COPY . .
+
+# Pastikan Site Key tersedia sebelum build
+RUN test -n "$NEXT_PUBLIC_RECAPTCHA_SITE_KEY"
 
 RUN npm run build
 
