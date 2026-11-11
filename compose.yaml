@@ -1,0 +1,84 @@
+name: perpus-portal
+
+services:
+  database:
+    image: mariadb:11.4
+    restart: unless-stopped
+
+    environment:
+      MARIADB_DATABASE: perpus_portal
+      MARIADB_USER: perpus
+      MARIADB_PASSWORD: ${PERPUS_DB_PASSWORD:?Set PERPUS_DB_PASSWORD in .env}
+      MARIADB_ROOT_PASSWORD: ${PERPUS_DB_ROOT_PASSWORD:?Set PERPUS_DB_ROOT_PASSWORD in .env}
+
+    volumes:
+      - perpus_database:/var/lib/mysql
+
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+    networks:
+      - perpus_network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      additional_contexts:
+        shared: ./shared
+
+    restart: unless-stopped
+
+    env_file:
+      - ./backend/.env.docker
+
+    environment:
+      DATABASE_URL: mysql://perpus:${PERPUS_DB_PASSWORD}@database:3306/perpus_portal
+      PORT: "3001"
+      NODE_ENV: development
+      FRONTEND_URL: http://localhost:3000
+      EMAIL_VERIFICATION_URL: http://localhost:3000/verify-email
+      PASSWORD_RESET_URL: http://localhost:3000/reset-password
+
+    ports:
+      - "127.0.0.1:3001:3001"
+
+    volumes:
+      - ./backend/storage:/app/backend/storage
+
+    depends_on:
+      database:
+        condition: service_healthy
+
+    networks:
+      - perpus_network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    restart: unless-stopped
+
+    environment:
+      API_URL: http://backend:3001
+
+    ports:
+      - "127.0.0.1:3000:3000"
+
+    depends_on:
+      - backend
+
+    networks:
+      - perpus_network
+
+volumes:
+  perpus_database:
+
+networks:
+  perpus_network:
+    driver: bridge

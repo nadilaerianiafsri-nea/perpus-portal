@@ -1,0 +1,40 @@
+
+# Git
+.git
+.gitignore
+
+# Dependencies
+node_modules
+**/node_modules
+
+# Next.js
+.next
+**/.next
+out
+dist
+**/dist
+
+# Environment dan kredensial
+.env
+.env.*
+!.env.example
+*.pem
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor
+.vscode
+.idea
+
+# Testing
+coverage
+**/coverage
+
+# Backend menggunakan build context tersendiri
+backend/
+
+# Sistem operasi
+.DS_Store
+Thumbs.db

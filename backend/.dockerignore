@@ -1,0 +1,34 @@
+
+# Dependencies
+node_modules
+**/node_modules
+
+# Build outputs
+dist
+coverage
+*.tsbuildinfo
+
+# Prisma Client akan dibuat ulang di Docker
+src/generated/prisma
+
+# Environment dan kredensial
+.env
+.env.*
+!.env.example
+*.pem
+
+# Data upload disimpan di luar image
+storage/
+
+# Git dan editor
+.git
+.vscode
+.idea
+
+# Logs
+*.log
+npm-debug.log*
+
+# Sistem operasi
+.DS_Store
+Thumbs.db
