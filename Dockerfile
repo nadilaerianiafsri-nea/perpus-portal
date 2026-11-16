@@ -48,7 +48,10 @@ COPY package.json package-lock.json ./
 
 RUN npm ci --omit=dev --no-audit --no-fund
 
-COPY --from=builder /app/.next ./.next
+# Berikan kepemilikan folder Next.js ke user node
+# agar image optimizer dapat menulis cache.
+COPY --chown=node:node --from=builder /app/.next ./.next
+
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.ts ./next.config.ts
 
