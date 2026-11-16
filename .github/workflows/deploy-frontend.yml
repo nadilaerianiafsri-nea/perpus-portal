@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - name: Check SSH secrets
+      - name: Check deployment secrets
         shell: bash
         env:
           DEPLOY_KEY: ${{ secrets.PERPUS_DEPLOY_KEY }}
@@ -27,7 +27,7 @@ jobs:
           test -n "$DEPLOY_KEY" || { echo "Missing secret: PERPUS_DEPLOY_KEY"; exit 1; }
           test -n "$KNOWN_HOSTS" || { echo "Missing secret: PERPUS_KNOWN_HOSTS"; exit 1; }
 
-      - name: Deploy frontend with existing VPS script
+      - name: Trigger existing VPS frontend deployer
         shell: bash
         env:
           DEPLOY_KEY: ${{ secrets.PERPUS_DEPLOY_KEY }}
@@ -42,7 +42,7 @@ jobs:
           ssh -T -i "$HOME/.ssh/perpus_deploy_key" \
             -o BatchMode=yes -o IdentitiesOnly=yes \
             -o StrictHostKeyChecking=yes -o ConnectTimeout=20 \
-            root@179.197.250.171 | tee /tmp/perpus-deploy.log
+            root@179.197.250.171 deploy-frontend | tee /tmp/perpus-deploy.log
 
           deployed_sha="$(tail -n 1 /tmp/perpus-deploy.log | tr -d '\r')"
           if [[ "$deployed_sha" != "$GITHUB_SHA" ]]; then
