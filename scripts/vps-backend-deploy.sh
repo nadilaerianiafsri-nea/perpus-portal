@@ -63,27 +63,31 @@ FETCHED="$(git -C "$STAGE" rev-parse FETCH_HEAD)"
 }
 git -C "$STAGE" checkout --quiet --detach "$SHA"
 
-# The four previously reviewed VPS hotfixes may still show as git-local
-# differences because the VPS checkout points at an older commit. They are
-# permitted ONLY if their bytes match the exact GitHub commit being deployed.
+# Four previously reviewed production hotfixes are present in the old VPS
+# checkout. Verify their precise Git blob hashes against the reviewed baseline.
+# New GitHub commits may safely evolve these files; new local edits are blocked.
 DRIFT="$(git status --porcelain --untracked-files=all -- backend shared | sed -E 's/^...//' | grep -Ev '^backend/storage/' || true)"
 if [[ -n "$DRIFT" ]]; then
   while IFS= read -r path; do
+    expected=''
     case "$path" in
-      backend/src/members/ebook-circulation.service.ts|\
-      backend/src/members/members.service.ts|\
-      backend/src/prisma/prisma.service.ts|\
+      backend/src/members/ebook-circulation.service.ts)
+        expected=2cc3143dc7ca4ed79a30bc3da1a312d11cf97e28 ;;
+      backend/src/members/members.service.ts)
+        expected=cc39942b0d70749fd998af7a7f864d3cc547e14f ;;
+      backend/src/prisma/prisma.service.ts)
+        expected=d2f3d4dcb0c505d1fae7c7512f35b838c5e40bc3 ;;
       shared/requestSecurity.cjs)
-        if ! cmp -s -- "$ROOT/$path" "$STAGE/$path"; then
-          echo "BLOCKED: local hotfix differs from GitHub: $path" >&2
-          exit 1
-        fi
-        ;;
+        expected=471caa2d0a5c6d83eab835603aba19da3651c60e ;;
       *)
         echo "BLOCKED: unreviewed local backend/shared change: $path" >&2
-        exit 1
-        ;;
+        exit 1 ;;
     esac
+    actual="$(git hash-object -- "$ROOT/$path")"
+    if [[ "$actual" != "$expected" ]]; then
+      echo "BLOCKED: local hotfix changed from reviewed baseline: $path" >&2
+      exit 1
+    fi
   done <<< "$DRIFT"
 fi
 
