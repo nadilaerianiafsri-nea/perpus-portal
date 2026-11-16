@@ -80,13 +80,19 @@ export default function LoansPage() {
     setActionError("");
     setNotice("");
     try {
-      await memberRequest(`loans/${loan.id}/${reporting ? "lost-report" : "extend"}`, {
+      const result = await memberRequest<{ loan: Loan }>(`loans/${loan.id}/${reporting ? "lost-report" : "extend"}`, {
         method: "POST",
         body: JSON.stringify(reporting ? {} : { expectedDueAt: loan.dueAt }),
       });
       if (reporting) focusAfterReport.current = loan.id;
       setSelection(null);
-      setNotice(reporting ? "Laporan kehilangan diterima dan menunggu verifikasi petugas." : "Masa pinjam berhasil diperpanjang 7 hari.");
+      const dueDate = result.loan?.dueAt ? new Date(result.loan.dueAt) : null;
+      const formattedDue = dueDate && Number.isFinite(dueDate.getTime())
+        ? new Intl.DateTimeFormat("id-ID", { timeZone: "Asia/Jakarta", day: "numeric", month: "long", year: "numeric" }).format(dueDate)
+        : null;
+      setNotice(reporting
+        ? "Laporan kehilangan diterima dan menunggu verifikasi petugas."
+        : formattedDue ? `Masa pinjam berhasil diperpanjang hingga ${formattedDue}.` : "Masa pinjam berhasil diperpanjang.");
       await Promise.all([resource.reload(), refresh()]);
     } catch (error) {
       setActionError(

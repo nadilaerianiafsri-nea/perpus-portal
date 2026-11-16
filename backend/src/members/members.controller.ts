@@ -156,6 +156,7 @@ export class MembersController {
 
   // Compatibility endpoint: the old "save" action now means borrowing.
   @Post('ebooks')
+  @UseGuards(ActiveBookGuard)
   borrowEBookLegacy(@Req() req: AuthenticatedRequest, @Body() body: unknown) {
     return this.ebookCirculation.borrow(req.user!.sub, bookInput(body));
   }
@@ -232,6 +233,7 @@ export class MembersController {
   }
 
   @Post('ebooks/:bookId/borrow')
+  @UseGuards(ActiveBookGuard)
   borrowEBook(
     @Req() req: AuthenticatedRequest,
     @Param('bookId') bookId: string,
@@ -255,6 +257,7 @@ export class MembersController {
   }
 
   @Post('ebooks/:bookId/queue')
+  @UseGuards(ActiveBookGuard)
   joinEBookQueue(
     @Req() req: AuthenticatedRequest,
     @Param('bookId') bookId: string,

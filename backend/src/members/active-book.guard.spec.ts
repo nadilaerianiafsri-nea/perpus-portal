@@ -23,7 +23,7 @@ describe('physical borrowing status keeps its existing conflict rule and identif
           .mockResolvedValue({ type: 'FISIK', isActive: true, title: 'Hukum' }),
       },
       reservation: findMany('reservation'),
-      loan: findMany('loan'),
+      loan: { ...findMany('loan'), findFirst: jest.fn().mockResolvedValue(null) },
       userEBook: findMany('userEBook'),
     };
     const guard = new ActiveBookGuard(prisma as unknown as PrismaService);
@@ -46,5 +46,25 @@ describe('physical borrowing status keeps its existing conflict rule and identif
         where: expect.objectContaining({ userId: 7 }),
       }),
     );
+  });
+});
+
+describe('new borrowing is forbidden when an older case remains unresolved', () => {
+  it.each([
+    [{ status: 'AKTIF', dueAt: new Date('2026-11-01'), lostReportStatus: null }, 'OVERDUE_LOAN'],
+    [{ status: 'AKTIF', dueAt: new Date('2026-12-01'), lostReportStatus: 'MENUNGGU_VERIFIKASI' }, 'UNRESOLVED_LOST_BOOK'],
+    [{ status: 'HILANG', dueAt: new Date('2026-11-01'), lostReportStatus: 'PROSES_PENGGANTIAN' }, 'UNRESOLVED_LOST_BOOK'],
+  ])('rejects a member with %p', async (restricted, code) => {
+    const prisma = {
+      book: { findUnique: jest.fn().mockResolvedValue({ title: 'Hukum', type: 'FISIK', isActive: true }) },
+      loan: { findFirst: jest.fn().mockResolvedValue(restricted), findMany: jest.fn() },
+      reservation: { findMany: jest.fn() },
+      userEBook: { findMany: jest.fn() },
+    };
+    const guard = new ActiveBookGuard(prisma as unknown as PrismaService);
+    const context = { switchToHttp: () => ({ getRequest: () => ({ params: { bookId: '9' }, user: { sub: 7 } }) }) } as unknown as ExecutionContext;
+    await expect(guard.canActivate(context)).rejects.toMatchObject({ response: expect.objectContaining({ code }) });
+    expect(prisma.loan.findFirst).toHaveBeenCalledWith(expect.objectContaining({ where: expect.objectContaining({ userId: 7 }) }));
+    expect(prisma.reservation.findMany).not.toHaveBeenCalled();
   });
 });

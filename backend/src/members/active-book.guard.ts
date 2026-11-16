@@ -41,6 +41,33 @@ export class ActiveBookGuard implements CanActivate {
     if (!book || !userId) return true;
 
     const now = new Date();
+
+    // Check on the backend, not only by disabling the button in the frontend.
+    // Unresolved lost reports (including those still awaiting verification)
+    // and overdue physical loans block new physical and E-Book borrowing.
+    const restrictedLoan = await this.prisma.loan.findFirst({
+      where: {
+        userId,
+        OR: [
+          { status: 'AKTIF', dueAt: { lt: now } },
+          { status: 'HILANG', lostResolvedAt: null },
+          { status: 'AKTIF', lostReportStatus: { not: null }, lostResolvedAt: null },
+        ],
+      },
+      select: { status: true, dueAt: true, lostReportStatus: true },
+      orderBy: { dueAt: 'asc' },
+    });
+    if (restrictedLoan) {
+      const lost = restrictedLoan.status === 'HILANG' || restrictedLoan.lostReportStatus !== null;
+      throw new ConflictException({
+        statusCode: 409,
+        code: lost ? 'UNRESOLVED_LOST_BOOK' : 'OVERDUE_LOAN',
+        message: lost
+          ? 'Selesaikan laporan atau penggantian buku hilang bersama petugas sebelum meminjam atau mereservasi buku baru.'
+          : 'Anda masih memiliki pinjaman yang terlambat dikembalikan. Selesaikan pengembalian terlebih dahulu.',
+      });
+    }
+
     const [reservations, loans, ebooks] = await Promise.all([
       this.prisma.reservation.findMany({
         where: {

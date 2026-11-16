@@ -1,6 +1,7 @@
 "use client";
 
 import { ButtonLabel } from '@/components/Button';
+import { showActionToast } from '@/components/ActionToast';
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import {
   adminOperationsApiMessage,
@@ -18,6 +19,7 @@ type FormState = {
   extensionDurationDays: string;
   maxExtensions: string;
 };
+type Panel = "identitas" | "reservasi" | "pinjaman";
 
 function toForm(settings: LibrarySettings): FormState {
   return {
@@ -82,6 +84,7 @@ function payloadFromForm(form: FormState): LibrarySettings {
 
 export default function AdminSettingsPage() {
   const [form, setForm] = useState<FormState | null>(null);
+  const [panel, setPanel] = useState<Panel>("identitas");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -103,7 +106,9 @@ export default function AdminSettingsPage() {
       }
       setForm(toForm((await response.json()) as LibrarySettings));
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "Pengaturan belum dapat dimuat.");
+      const message = reason instanceof Error ? reason.message : "Pengaturan belum dapat dimuat.";
+      setError(message);
+      showActionToast("error", message);
     } finally {
       setLoading(false);
     }
@@ -120,7 +125,7 @@ export default function AdminSettingsPage() {
 
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!form || saving) return;
+    if (!form || saving || loading) return;
     setError("");
     setSuccess("");
 
@@ -128,7 +133,9 @@ export default function AdminSettingsPage() {
     try {
       payload = payloadFromForm(form);
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "Data pengaturan tidak valid.");
+      const message = reason instanceof Error ? reason.message : "Data pengaturan tidak valid.";
+      setError(message);
+      showActionToast("error", message);
       return;
     }
 
@@ -157,15 +164,15 @@ export default function AdminSettingsPage() {
   return (
     <div className={styles.page}>
       <header className={styles.pageHeading}>
-        <div>
-          <h1 data-page-title>Pengaturan Perpustakaan</h1>
-        </div>
+        <h1 data-page-title>Pengaturan Perpustakaan</h1>
+        <p>Pilih bagian yang ingin dikelola. Perubahan hanya tersimpan setelah menekan Simpan Pengaturan.</p>
       </header>
 
       {error ? (
         <div className={styles.errorBox} role="alert">
           <span>{error}</span>
-          {!form ? <button data-button="secondary" data-button-size="md" type="button" onClick={() => setRevision((value) => value + 1)}>Coba Lagi</button> : null}
+          <button data-button="secondary" data-button-size="md" type="button"
+            onClick={() => setRevision((value) => value + 1)} disabled={loading}>Coba Lagi</button>
         </div>
       ) : null}
       {success ? <div className={styles.successBox} role="status">{success}</div> : null}
@@ -174,78 +181,109 @@ export default function AdminSettingsPage() {
         <div className={styles.loadingBox}>Memuat pengaturan...</div>
       ) : form ? (
         <form className={styles.form} onSubmit={save} noValidate>
-          <section className={styles.card}>
-            <div className={styles.cardHeading}>
-              <h2>Informasi Perpustakaan</h2>
-            </div>
-            <div className={styles.formGrid}>
-              <label className={styles.fullField}>
-                <span>Nama Perpustakaan</span>
-                <input value={form.libraryName} maxLength={120} onChange={(event) => update("libraryName", event.target.value)} />
-              </label>
-              <label className={styles.fullField}>
-                <span>Alamat</span>
-                <textarea rows={3} value={form.address} maxLength={500} onChange={(event) => update("address", event.target.value)} />
-              </label>
-              <label>
-                <span>Jam Layanan</span>
-                <input value={form.serviceHours} maxLength={80} onChange={(event) => update("serviceHours", event.target.value)} placeholder="08.00–15.00" />
-              </label>
-              <label>
-                <span>Kontak</span>
-                <div className={styles.phoneField}>
-                  <span aria-hidden="true">+62</span>
-                  <input
-                    type="tel"
-                    inputMode="numeric"
-                    aria-label="Nomor kontak setelah kode negara +62"
-                    value={form.phoneLocal}
-                    onChange={(event) => update("phoneLocal", normalizeLocalPhone(event.target.value))}
-                    onPaste={(event) => {
-                      const pasted = event.clipboardData.getData("text");
-                      if (pasted) {
-                        event.preventDefault();
-                        update("phoneLocal", normalizeLocalPhone(pasted));
-                      }
-                    }}
-                    placeholder="8116904422"
-                  />
-                </div>
-              </label>
-            </div>
-          </section>
+          <nav className={styles.innerTabs} aria-label="Kategori pengaturan layanan">
+            <button type="button" className={styles.innerTab} aria-pressed={panel === "identitas"}
+              onClick={() => setPanel("identitas")}>Informasi Perpustakaan</button>
+            <button type="button" className={styles.innerTab} aria-pressed={panel === "reservasi"}
+              onClick={() => setPanel("reservasi")}>Reservasi</button>
+            <button type="button" className={styles.innerTab} aria-pressed={panel === "pinjaman"}
+              onClick={() => setPanel("pinjaman")}>Peminjaman</button>
+          </nav>
 
-          <section className={styles.card}>
-            <div className={styles.cardHeading}>
-              <h2>Parameter Layanan</h2>
-              <p>Perubahan berlaku untuk reservasi, peminjaman, dan perpanjangan berikutnya.</p>
-            </div>
-            <div className={styles.formGrid}>
-              <label>
-                <span>Durasi Reservasi (jam)</span>
-                <input type="number" min={1} max={168} value={form.reservationDurationHours} onChange={(event) => update("reservationDurationHours", event.target.value)} />
-              </label>
-              <label>
-                <span>Durasi Pinjam (hari)</span>
-                <input type="number" min={1} max={365} value={form.loanDurationDays} onChange={(event) => update("loanDurationDays", event.target.value)} />
-              </label>
-              <label>
-                <span>Perpanjangan (hari)</span>
-                <input type="number" min={1} max={365} value={form.extensionDurationDays} onChange={(event) => update("extensionDurationDays", event.target.value)} />
-              </label>
-              <label>
-                <span>Batas Maksimal Perpanjangan</span>
-                <input value={form.maxExtensions} onChange={(event) => update("maxExtensions", event.target.value)} placeholder="Tanpa batas" />
-                <small>Gunakan “Tanpa batas”, 0 untuk nonaktif, atau angka 1–100.</small>
-              </label>
-            </div>
-            <div className={styles.infoBox}>
-              Peran sistem menggunakan Admin Perpustakaan. Kebijakan denda tidak diaktifkan.
-            </div>
-          </section>
+          {panel === "identitas" ? (
+            <section className={`${styles.card} ${styles.animatedCard}`}>
+              <div className={styles.cardHeading}>
+                <h2>Informasi Perpustakaan</h2>
+                <p>Identitas dan kontak yang ditampilkan kepada pengunjung.</p>
+              </div>
+              <div className={styles.formGrid}>
+                <label className={styles.fullField}>
+                  <span>Nama Perpustakaan</span>
+                  <input value={form.libraryName} maxLength={120} onChange={(event) => update("libraryName", event.target.value)} />
+                </label>
+                <label className={styles.fullField}>
+                  <span>Alamat</span>
+                  <textarea rows={3} value={form.address} maxLength={500} onChange={(event) => update("address", event.target.value)} />
+                </label>
+                <label>
+                  <span>Jam Layanan</span>
+                  <input value={form.serviceHours} maxLength={80} onChange={(event) => update("serviceHours", event.target.value)} placeholder="08.00–15.00" />
+                </label>
+                <label>
+                  <span>Kontak</span>
+                  <div className={styles.phoneField}>
+                    <span aria-hidden="true">+62</span>
+                    <input
+                      type="tel"
+                      inputMode="numeric"
+                      aria-label="Nomor kontak setelah kode negara +62"
+                      value={form.phoneLocal}
+                      onChange={(event) => update("phoneLocal", normalizeLocalPhone(event.target.value))}
+                      onPaste={(event) => {
+                        const pasted = event.clipboardData.getData("text");
+                        if (pasted) {
+                          event.preventDefault();
+                          update("phoneLocal", normalizeLocalPhone(pasted));
+                        }
+                      }}
+                      placeholder="8116904422"
+                    />
+                  </div>
+                </label>
+              </div>
+            </section>
+          ) : null}
+
+          {panel === "reservasi" ? (
+            <section className={`${styles.card} ${styles.animatedCard}`}>
+              <div className={styles.cardHeading}>
+                <h2>Aturan Reservasi</h2>
+                <p>Tenggat pengambilan buku setelah anggota melakukan reservasi.</p>
+              </div>
+              <div className={styles.formGrid}>
+                <label>
+                  <span>Durasi Reservasi (jam)</span>
+                  <input type="number" min={1} max={168} value={form.reservationDurationHours}
+                    onChange={(event) => update("reservationDurationHours", event.target.value)} />
+                  <small>Rentang yang diizinkan 1–168 jam.</small>
+                </label>
+              </div>
+            </section>
+          ) : null}
+
+          {panel === "pinjaman" ? (
+            <section className={`${styles.card} ${styles.animatedCard}`}>
+              <div className={styles.cardHeading}>
+                <h2>Aturan Peminjaman</h2>
+                <p>Durasi dan batas perpanjangan berlaku untuk transaksi berikutnya.</p>
+              </div>
+              <div className={styles.formGrid}>
+                <label>
+                  <span>Durasi Pinjam (hari)</span>
+                  <input type="number" min={1} max={365} value={form.loanDurationDays}
+                    onChange={(event) => update("loanDurationDays", event.target.value)} />
+                </label>
+                <label>
+                  <span>Perpanjangan (hari)</span>
+                  <input type="number" min={1} max={365} value={form.extensionDurationDays}
+                    onChange={(event) => update("extensionDurationDays", event.target.value)} />
+                </label>
+                <label>
+                  <span>Batas Maksimal Perpanjangan</span>
+                  <input value={form.maxExtensions} onChange={(event) => update("maxExtensions", event.target.value)} placeholder="Tanpa batas" />
+                  <small>Gunakan “Tanpa batas”, 0 untuk nonaktif, atau angka 1–100.</small>
+                </label>
+              </div>
+              <div className={styles.infoBox}>
+                Peran sistem menggunakan Admin Perpustakaan. Kebijakan denda tidak diaktifkan.
+              </div>
+            </section>
+          ) : null}
 
           <div className={styles.actions}>
-            <button data-button="primary" data-button-size="md" data-button-loading={saving || loading} type="submit" disabled={saving || loading}>
+            <span className={styles.saveHint}>Seluruh kategori tersimpan bersama dalam satu pengaturan.</span>
+            <button data-button="primary" data-button-size="md" data-button-loading={saving || loading}
+              type="submit" disabled={saving || loading}>
               <ButtonLabel loading={saving} pending="Menyimpan...">Simpan Pengaturan</ButtonLabel>
             </button>
           </div>
