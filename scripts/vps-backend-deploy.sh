@@ -79,6 +79,12 @@ FETCHED="$(git -C "$STAGE" rev-parse FETCH_HEAD)"
 }
 git -C "$STAGE" checkout --quiet --detach "$SHA"
 
+# This script runs with umask 077, so Git checkout creates 0600 files and
+# 0700 directories. Docker COPY preserves those permissions and the image
+# runs as non-root user node. Normalize ONLY the temporary public source
+# tree; never change permissions on the live VPS checkout or upload volume.
+chmod -R a+rX "$STAGE/backend" "$STAGE/shared"
+
 # Four previously reviewed production hotfixes are present in the old VPS
 # checkout. Verify their precise Git blob hashes against the reviewed baseline.
 # New GitHub commits may safely evolve these files; new local edits are blocked.
