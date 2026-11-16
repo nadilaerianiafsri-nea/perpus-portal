@@ -19,6 +19,16 @@ rollback() {
   local code=$?
   trap - ERR
   if [[ "$IMAGE_SWITCHED" == 1 && -n "$OLD_IMAGE" && -n "$TARGET_IMAGE" ]]; then
+    # Store diagnostic logs locally, not in public GitHub Actions output.
+    local failed_container log_file
+    failed_container="$(docker compose -f "$COMPOSE" ps -a -q backend 2>/dev/null || true)"
+    log_file=/root/perpus-backend-deploy-last-failure.log
+    if [[ -n "$failed_container" ]]; then
+      docker logs --tail 200 "$failed_container" > "$log_file" 2>&1 || true
+      chmod 600 "$log_file" || true
+      echo "Startup diagnostics saved privately to $log_file" >&2
+      docker inspect -f 'Failed container exit status: {{.State.ExitCode}}, running: {{.State.Running}}' "$failed_container" >&2 || true
+    fi
     echo "Backend check failed: rolling back old image" >&2
     docker tag "$OLD_IMAGE" "$TARGET_IMAGE" >&2 || true
     (cd "$ROOT" && docker compose -f "$COMPOSE" up -d --no-deps --no-build --force-recreate backend >&2) || true
