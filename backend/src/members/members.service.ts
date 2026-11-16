@@ -90,6 +90,7 @@ export class MembersService implements OnModuleInit, OnModuleDestroy {
   }
 
   onModuleInit() {
+    if (process.env.PERPUS_DISABLE_BACKGROUND_JOBS === 'true') return;
     this.timer = setInterval(() => void this.background(), 30000);
     this.timer.unref();
     void this.background();
