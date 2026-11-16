@@ -29,16 +29,6 @@ export async function memberProxy(request: Request, path: string) {
     );
   }
 
-  if (request.method !== 'GET') {
-    const origin = request.headers.get('origin');
-    if (origin && origin !== new URL(request.url).origin) {
-      return NextResponse.json(
-        { message: 'Permintaan tidak diizinkan.' },
-        { status: 403, headers },
-      );
-    }
-  }
-
   const isEBookFile =
     request.method === 'GET' && /^me\/ebooks\/\d+\/file\.pdf$/.test(path);
 

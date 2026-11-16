@@ -18,14 +18,6 @@ export async function adminCoverUploadProxy(request: Request) {
     );
   }
 
-  const origin = request.headers.get('origin');
-  if (origin && origin !== new URL(request.url).origin) {
-    return NextResponse.json(
-      { message: 'Permintaan tidak diizinkan.' },
-      { status: 403, headers: responseHeaders },
-    );
-  }
-
   const contentType = request.headers.get('content-type') ?? '';
   if (!contentType.toLowerCase().startsWith('multipart/form-data;')) {
     return NextResponse.json(

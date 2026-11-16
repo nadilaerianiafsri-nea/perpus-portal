@@ -29,22 +29,6 @@ export async function adminGrantsProxy(request: Request, path = "") {
     );
   }
 
-  if (request.method !== "GET") {
-    const origin = request.headers.get("origin");
-
-    if (origin && origin !== new URL(request.url).origin) {
-      return NextResponse.json(
-        {
-          message: "Permintaan tidak diizinkan.",
-        },
-        {
-          status: 403,
-          headers,
-        },
-      );
-    }
-  }
-
   try {
     assertSameOrigin(request);
     const body = request.method === "GET" ? undefined : await readLimitedText(request, 65536);
