@@ -87,6 +87,7 @@ model Book {
   description        String         @db.Text
   coverUrl           String
   shelf              String?
+  location           String?        @db.VarChar(191)
   ebookUrl           String?
   accessMode         String?        @db.VarChar(64)
   accessDurationDays Int?
@@ -290,7 +291,7 @@ model EBookLoan {
   user         User            @relation(fields: [userId], references: [id], onDelete: Restrict)
   bookId       Int
   book         Book            @relation(fields: [bookId], references: [id], onDelete: Restrict)
-  activeBookId Int?            @unique
+  activeBookId Int?             @unique
   status       EBookLoanStatus @default(AKTIF)
   borrowedAt   DateTime        @default(now())
   dueAt        DateTime
@@ -351,8 +352,8 @@ model BookGrantItem {
   grant     BookGrant @relation(fields: [grantId], references: [id], onDelete: Cascade)
   title     String
   quantity  Int
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([grantId])
   @@index([title])
