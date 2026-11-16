@@ -5,7 +5,30 @@ class RequestInputError extends Error {
 exports.assertSameOrigin = function assertSameOrigin(request) {
   if (['GET', 'HEAD', 'OPTIONS'].includes(request.method)) return;
   const origin = request.headers.get('origin');
-  if ((origin && origin !== new URL(request.url).origin) || request.headers.get('sec-fetch-site') === 'cross-site') {
+  const allowedOrigins = new Set([new URL(request.url).origin]);
+
+  const configured = process.env.PUBLIC_SITE_ORIGINS ?? '';
+
+  for (const value of configured.split(',').map(v => v.trim()).filter(Boolean)) {
+    let url;
+
+    try {
+      url = new URL(value);
+    } catch {
+      throw new RequestInputError('Konfigurasi origin tidak valid.', 503);
+    }
+
+    if (url.protocol !== 'https:' || url.origin !== value) {
+      throw new RequestInputError('Konfigurasi origin tidak valid.', 503);
+    }
+
+    allowedOrigins.add(url.origin);
+  }
+
+  if (
+    (origin && !allowedOrigins.has(origin)) ||
+    request.headers.get('sec-fetch-site') === 'cross-site'
+  ) {
     throw new RequestInputError('Permintaan tidak diizinkan.', 403);
   }
 };
