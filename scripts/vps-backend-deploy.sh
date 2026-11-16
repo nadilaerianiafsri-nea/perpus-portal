@@ -129,7 +129,7 @@ services:
 CANARY_YAML
 CANARY_ID="$(docker compose -f "$COMPOSE" -f "$STAGE/canary.override.yaml" \
   run --no-deps --no-build -d -e PERPUS_DISABLE_BACKGROUND_JOBS=true backend)"
-if [[ ! "$CANARY_ID" =~ ^[a-f0-9]{64}$ ]]; then
+if [[ ! "$CANARY_ID" =~ ^[a-f0-9]{12,64}$ ]]; then
   echo "BLOCKED: canary did not return container ID" >&2
   exit 1
 fi
