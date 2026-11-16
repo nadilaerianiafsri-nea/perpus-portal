@@ -8,7 +8,7 @@ import { NextResponse } from 'next/server';
 import { API_URL } from '@/catalog/serverApi';
 
 const allowed: Record<string, RegExp> = {
-  GET: /^(?:me\/(dashboard|profile|reservations|loans(?:\/(?:history|\d+))?|notifications|ebooks(?:\/\d+\/(?:status|file\.pdf))?|books\/\d+\/borrowing-status|catalog(?:\/filters|\/\d+)?)|admin\/members(?:\/\d+)?|admin\/transactions\/(reservations|loans(?:\/\d+)?|ebook-access\/\d+|returns|lost-books(?:\/\d+)?)|admin\/operations\/(dashboard|notifications(?:\/unread-count)?|reports|settings)|admin\/public-content|public\/(?:content|summary))$/,
+  GET: /^(?:me\/(dashboard|profile|reservations|loans(?:\/(?:history|\d+))?|notifications|ebooks(?:\/\d+\/(?:status|file\.pdf))?|books\/\d+\/borrowing-status|catalog(?:\/filters|\/\d+)?)|admin\/members(?:\/\d+)?|admin\/transactions\/(reservations|loans(?:\/\d+)?|ebook-access\/\d+|returns|lost-books(?:\/\d+)?)|admin\/operations\/(dashboard|notifications(?:\/unread-count)?|reports|settings)|admin\/public-content|public\/(?:content|summary|settings))$/,
 
   POST: /^(?:me\/(reservations|loans\/\d+\/(?:extend|lost-report)|ebooks(?:\/\d+\/(?:borrow|return|queue(?:\/cancel)?|open))?)|admin\/(?:reservations\/\d+\/pickup|loans\/\d+\/(?:return|lost(?:\/complete)?)))$/,
 
@@ -64,13 +64,27 @@ export async function memberProxy(request: Request, path: string) {
     const requestHeaders: Record<string, string> = { Cookie: cookie };
     if (!isEBookFile) requestHeaders['Content-Type'] = 'application/json';
 
-    const response = await fetch(targetUrl, {
+    // Only safe, read-only settings requests may be retried after a transient
+    // backend interruption. Mutations must never be repeated automatically.
+    const forward = () => fetch(targetUrl, {
       method: request.method,
       headers: requestHeaders,
       body: body || undefined,
       cache: 'no-store',
       signal: AbortSignal.timeout(isEBookFile ? 60000 : 15000),
     });
+    const settingsRead = request.method === 'GET' &&
+      (path === 'admin/operations/settings' || path === 'public/settings');
+    let response: Response;
+    try {
+      response = await forward();
+    } catch (error) {
+      if (!settingsRead) throw error;
+      response = await forward();
+    }
+    if (settingsRead && response.status >= 500) {
+      response = await forward();
+    }
 
     if (response.status >= 500) {
       throw new Error('Backend unavailable');
