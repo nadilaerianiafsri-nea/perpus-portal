@@ -39,14 +39,6 @@ DB_CONTAINER="$(docker compose -f "$COMPOSE" ps -q database)"
   echo "Database not healthy: refusing backend deploy" >&2; exit 1;
 }
 
-# Avoid silently replacing hotfixes or uncommitted backend changes on the VPS.
-DRIFT="$(git status --porcelain --untracked-files=all -- backend shared | sed -E 's/^...//' | grep -Ev '^backend/storage/' || true)"
-[[ -z "$DRIFT" ]] || {
-  echo "BLOCKED: backend/shared files changed on VPS. Review them first:" >&2
-  printf '%s\n' "$DRIFT" >&2
-  exit 1
-}
-
 # User-uploaded covers, ebooks, and avatars must stay on the host bind mount.
 TARGET_IMAGE="$(docker compose -f "$COMPOSE" config --format json | python3 -c '
 import json,sys
@@ -70,6 +62,30 @@ FETCHED="$(git -C "$STAGE" rev-parse FETCH_HEAD)"
   echo "BLOCKED: main moved after this workflow started" >&2; exit 1;
 }
 git -C "$STAGE" checkout --quiet --detach "$SHA"
+
+# The four previously reviewed VPS hotfixes may still show as git-local
+# differences because the VPS checkout points at an older commit. They are
+# permitted ONLY if their bytes match the exact GitHub commit being deployed.
+DRIFT="$(git status --porcelain --untracked-files=all -- backend shared | sed -E 's/^...//' | grep -Ev '^backend/storage/' || true)"
+if [[ -n "$DRIFT" ]]; then
+  while IFS= read -r path; do
+    case "$path" in
+      backend/src/members/ebook-circulation.service.ts|\
+      backend/src/members/members.service.ts|\
+      backend/src/prisma/prisma.service.ts|\
+      shared/requestSecurity.cjs)
+        if ! cmp -s -- "$ROOT/$path" "$STAGE/$path"; then
+          echo "BLOCKED: local hotfix differs from GitHub: $path" >&2
+          exit 1
+        fi
+        ;;
+      *)
+        echo "BLOCKED: unreviewed local backend/shared change: $path" >&2
+        exit 1
+        ;;
+    esac
+  done <<< "$DRIFT"
+fi
 
 # Never deploy schema/migration differences without backup and human review.
 diff -q "$ROOT/backend/prisma/schema.prisma" "$STAGE/backend/prisma/schema.prisma" >/dev/null || {
