@@ -13,6 +13,7 @@ export class PrismaService
     const url = new URL(databaseUrl);
 
     const adapter = new PrismaMariaDb({
+      allowPublicKeyRetrieval: true,
       host: url.hostname,
       port: Number(url.port || 3306),
       user: decodeURIComponent(url.username),

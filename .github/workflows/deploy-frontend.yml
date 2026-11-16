@@ -3,6 +3,11 @@ name: Deploy Perpus Portal Frontend
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - "backend/**"
+      - "scripts/vps-backend-deploy.sh"
+      - "scripts/vps-install-backend-deploy.sh"
+      - ".github/workflows/deploy-backend.yml"
   workflow_dispatch:
 
 permissions:

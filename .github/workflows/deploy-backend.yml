@@ -1,0 +1,55 @@
+name: Deploy Perpus Portal Backend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - "shared/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: perpus-portal-backend-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy NestJS backend (no database migrations)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check SSH secrets
+        shell: bash
+        env:
+          DEPLOY_KEY: ${{ secrets.PERPUS_DEPLOY_KEY }}
+          KNOWN_HOSTS: ${{ secrets.PERPUS_KNOWN_HOSTS }}
+        run: |
+          test -n "$DEPLOY_KEY" || { echo "Missing PERPUS_DEPLOY_KEY"; exit 1; }
+          test -n "$KNOWN_HOSTS" || { echo "Missing PERPUS_KNOWN_HOSTS"; exit 1; }
+
+      - name: Deploy backend from exact main commit
+        shell: bash
+        env:
+          DEPLOY_KEY: ${{ secrets.PERPUS_DEPLOY_KEY }}
+          KNOWN_HOSTS: ${{ secrets.PERPUS_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          install -d -m 700 "$HOME/.ssh"
+          printf '%s\n' "$DEPLOY_KEY" | tr -d '\r' > "$HOME/.ssh/perpus_deploy_key"
+          printf '%s\n' "$KNOWN_HOSTS" | tr -d '\r' > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/perpus_deploy_key" "$HOME/.ssh/known_hosts"
+
+          ssh -T -i "$HOME/.ssh/perpus_deploy_key" \
+            -o BatchMode=yes -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes -o ConnectTimeout=20 \
+            root@179.197.250.171 "deploy-backend $GITHUB_SHA" | tee /tmp/perpus-backend-deploy.log
+
+          deployed_sha="$(tail -n 1 /tmp/perpus-backend-deploy.log | tr -d '\r')"
+          if [[ "$deployed_sha" != "$GITHUB_SHA" ]]; then
+            echo "Backend deployment SHA mismatch: expected $GITHUB_SHA; got $deployed_sha"
+            exit 1
+          fi
+          echo "Backend deployed at commit $deployed_sha"
