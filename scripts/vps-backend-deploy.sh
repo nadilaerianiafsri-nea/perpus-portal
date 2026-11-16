@@ -10,11 +10,17 @@ ROOT=/opt/perpus-portal
 COMPOSE="$ROOT/compose.vps.yaml"
 MARKER_DIR=/var/lib/perpus-portal-backend-deploy
 STAGE=''
+CANARY_ID=''
 IMAGE_SWITCHED=0
 OLD_IMAGE=''
 TARGET_IMAGE=''
 
-cleanup() { [[ -z "$STAGE" ]] || rm -rf -- "$STAGE"; }
+cleanup() {
+  if [[ -n "$CANARY_ID" ]]; then
+    docker rm -f "$CANARY_ID" >/dev/null 2>&1 || true
+  fi
+  [[ -z "$STAGE" ]] || rm -rf -- "$STAGE"
+}
 rollback() {
   local code=$?
   trap - ERR
@@ -113,6 +119,40 @@ docker buildx version >/dev/null
 BUILT_IMAGE="perpus-portal-backend-ci:${SHA:0:12}"
 docker buildx build --load --build-context "shared=$STAGE/shared" \
   -f "$STAGE/backend/Dockerfile" -t "$BUILT_IMAGE" "$STAGE/backend"
+
+# Start the new image as a temporary, unexposed container before touching
+# the running backend. Disable existing scheduled maintenance in the canary.
+cat > "$STAGE/canary.override.yaml" <<CANARY_YAML
+services:
+  backend:
+    image: $BUILT_IMAGE
+CANARY_YAML
+CANARY_ID="$(docker compose -f "$COMPOSE" -f "$STAGE/canary.override.yaml" \
+  run --no-deps --no-build -d -e PERPUS_DISABLE_BACKGROUND_JOBS=true backend)"
+if [[ ! "$CANARY_ID" =~ ^[a-f0-9]{64}$ ]]; then
+  echo "BLOCKED: canary did not return container ID" >&2
+  exit 1
+fi
+CANARY_OK=0
+for attempt in {1..15}; do
+  if docker exec "$CANARY_ID" node -e \
+    'fetch("http://127.0.0.1:3001/").then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))' \
+    >/dev/null 2>&1; then
+    CANARY_OK=1
+    break
+  fi
+  sleep 2
+done
+if [[ "$CANARY_OK" != 1 ]]; then
+  docker logs --tail 200 "$CANARY_ID" \
+    > /root/perpus-backend-deploy-last-failure.log 2>&1 || true
+  chmod 600 /root/perpus-backend-deploy-last-failure.log || true
+  echo "BLOCKED: new backend cannot start. Production backend unchanged." >&2
+  echo "Private diagnostics: /root/perpus-backend-deploy-last-failure.log" >&2
+  exit 1
+fi
+docker rm -f "$CANARY_ID" >/dev/null
+CANARY_ID=''
 
 docker tag "$OLD_IMAGE" "perpus-portal-backend-rollback:$(date -u +%Y%m%d%H%M%S)"
 docker tag "$BUILT_IMAGE" "$TARGET_IMAGE"
