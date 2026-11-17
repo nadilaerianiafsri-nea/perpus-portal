@@ -1,4 +1,3 @@
-
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
@@ -9,6 +8,7 @@ import "@/components/records.css";
 import "@/components/selects.css";
 import RowActionTooltip from "@/components/RowActionTooltip";
 import PublicPageTransitionController from "@/components/PublicPageTransitionController";
+import ActionToast from "@/components/ActionToast";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -33,6 +33,7 @@ export default function RootLayout({
     <html lang="id">
       <body className={outfit.className}>
         <PublicPageTransitionController />
+        <ActionToast />
         {children}
         <RowActionTooltip />
       </body>
