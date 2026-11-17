@@ -59,10 +59,12 @@ export default async function Home() {
         <section className={`hero ${styles.heroBlend}`} id="beranda">
           <div className="landing-shell hero-grid">
             <div className="hero-copy">
+              <div className={styles.heroIdentityRow}>
+                <span className="micro-badge">Perpustakaan Kanwil Kementerian Hukum Riau</span>
+              </div>
               <h1 className="hero-title-cms" data-page-title>
                 {renderPublicText(content.home.heroTitle, settings)}
               </h1>
-              <span className="micro-badge">Perpustakaan Kanwil Kementerian Hukum Riau</span>
               <form className="hero-search" action="/koleksi" method="get">
                 <input
                   name="search"

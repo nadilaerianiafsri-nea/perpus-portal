@@ -2040,3 +2040,22 @@
     margin-inline: auto;
   }
 }
+
+/* Hero Beranda: label identitas berada tepat di atas judul utama. */
+.heroIdentityRow {
+  display: flex;
+  align-items: flex-start;
+  max-width: 100%;
+  margin-bottom: 16px;
+}
+
+.heroIdentityRow :global(.micro-badge) {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+@media (max-width: 560px) {
+  .heroIdentityRow {
+    margin-bottom: 14px;
+  }
+}
