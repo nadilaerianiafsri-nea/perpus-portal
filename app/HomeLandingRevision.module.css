@@ -2031,3 +2031,12 @@
     transform: none;
   }
 }
+
+/* Mobile subjects: keep equal 18px spacing on the left and right. */
+@media (max-width: 560px) {
+  .subjectBlend :global(.subject-grid) {
+    width: calc(100% - 36px);
+    max-width: calc(100% - 36px);
+    margin-inline: auto;
+  }
+}
