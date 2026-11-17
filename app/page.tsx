@@ -62,7 +62,7 @@ export default async function Home() {
               <h1 className="hero-title-cms" data-page-title>
                 {renderPublicText(content.home.heroTitle, settings)}
               </h1>
-              <p>Portal Perpustakaan Kantor Wilayah Kementerian Hukum Riau.</p>
+              <span className="micro-badge">Perpustakaan Kanwil Kementerian Hukum Riau</span>
               <form className="hero-search" action="/koleksi" method="get">
                 <input
                   name="search"
