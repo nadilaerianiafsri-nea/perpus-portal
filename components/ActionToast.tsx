@@ -122,13 +122,17 @@ export default function ActionToast() {
 
   if (!notice) return null;
   return (
-    <div className={`${styles.toast} ${notice.kind === "success" ? styles.success : styles.error}`}
-      role={notice.kind === "error" ? "alert" : "status"} aria-live={notice.kind === "error" ? "assertive" : "polite"}>
+    <div key={notice.id}
+      className={`${styles.toast} ${notice.kind === "success" ? styles.success : styles.error}`}
+      role={notice.kind === "error" ? "alert" : "status"}
+      aria-live={notice.kind === "error" ? "assertive" : "polite"}>
+      <div className={styles.statusMark} aria-hidden="true" />
       <div className={styles.content}>
         <strong>{notice.kind === "success" ? "Berhasil" : "Gagal"}</strong>
         <p>{notice.message}</p>
       </div>
       <button type="button" className={styles.close} onClick={() => setNotice(null)} aria-label="Tutup notifikasi">Tutup</button>
+      <div className={styles.lifetime} aria-hidden="true" />
     </div>
   );
 }

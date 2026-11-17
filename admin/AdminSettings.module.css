@@ -133,3 +133,105 @@
   .animatedCard { animation: none; }
   .sectionTab, .innerTab { transition: none; }
 }
+
+/* The settings workspace uses one compact picker instead of stacked tab bars. */
+.workspaceHeader {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.workspaceIntro { flex: 1 1 320px; min-width: 0; }
+.workspaceIntro h1 {
+  margin: 0;
+  color: #000633;
+  font-size: var(--text-page);
+  font-weight: 700;
+  line-height: var(--leading-title);
+}
+.workspaceIntro p { margin: 7px 0 0; color: #52699e; font-size: 14px; line-height: 1.55; }
+.pickerWrap { position: relative; flex: 0 1 320px; min-width: min(100%, 270px); }
+.pickerLabel { display: block; margin-bottom: 7px; color: #2b3056; font-size: 12px; font-weight: 600; }
+.pickerButton {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 58px;
+  padding: 10px 14px;
+  border: 1px solid #dedfe5;
+  border-radius: 12px;
+  background: #fff;
+  color: #000633;
+  font-family: var(--font-outfit), Outfit, sans-serif;
+  cursor: pointer;
+  text-align: left;
+  box-shadow: 0 3px 10px rgb(0 6 51 / 4%);
+  transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+.pickerButton:hover { background: #f5f5f6; border-color: #2b3056; transform: scale(1.015); box-shadow: 0 6px 18px rgb(0 6 51 / 9%); }
+.pickerButton:focus-visible, .pickerOption:focus-visible { outline: 2px solid #ffd000; outline-offset: 3px; }
+.pickerButtonCopy { display: grid; gap: 1px; min-width: 0; }
+.pickerButtonCopy strong { font-size: 14px; font-weight: 700; overflow-wrap: anywhere; }
+.pickerGroupName { color: #52699e; font-size: 11px; font-weight: 600; }
+.pickerChevron { display: block; width: 9px; height: 9px; flex: 0 0 9px; border-right: 2px solid #000633; border-bottom: 2px solid #000633; transform: translateY(-3px) rotate(45deg); transition: transform 180ms ease; }
+.pickerButton[aria-expanded="true"] .pickerChevron { transform: translateY(3px) rotate(225deg); }
+.pickerMenu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 50;
+  width: min(355px, 100%);
+  max-height: min(480px, 70vh);
+  padding: 8px;
+  overflow-y: auto;
+  border: 1px solid #dedfe5;
+  border-radius: 15px;
+  background: #fff;
+  box-shadow: 0 14px 34px rgb(0 6 51 / 13%);
+  animation: settingsEnter 180ms ease-out both;
+}
+.pickerMenuGroup + .pickerMenuGroup { padding-top: 9px; margin-top: 7px; border-top: 1px solid #dedfe5; }
+.pickerMenuHeading { display: block; padding: 7px 10px 5px; color: #52699e; font-size: 11px; font-weight: 700; }
+.pickerOption {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  margin: 1px 0;
+  padding: 11px 12px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: #fff;
+  color: #000633;
+  text-align: left;
+  font-family: var(--font-outfit), Outfit, sans-serif;
+  cursor: pointer;
+  transition: background-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+.pickerOption:hover { background: #f5f5f6; color: #000633; transform: scale(1.01); }
+.pickerOption[aria-selected="true"] { background: #000633; color: #fff; }
+.pickerOption[aria-selected="true"]:hover { background: #2b3056; }
+.pickerOptionTitle { font-size: 13px; font-weight: 700; }
+.pickerOptionDescription { font-size: 11px; line-height: 1.5; opacity: .85; }
+.currentSection { padding-bottom: 4px; border-bottom: 1px solid #dedfe5; }
+.currentSection > span { color: #52699e; font-size: 12px; font-weight: 600; }
+.currentSection h2 { margin: 3px 0; color: #000633; font-size: var(--text-section); font-weight: 700; }
+.currentSection p { margin: 0 0 9px; color: #52699e; font-size: 13px; line-height: 1.5; }
+.animatedCard { transition: box-shadow 200ms ease, transform 200ms ease, border-color 200ms ease; }
+.animatedCard:hover { transform: translateY(-2px); border-color: #dedfe5; box-shadow: 0 8px 24px rgb(0 6 51 / 8%); }
+@media (max-width: 700px) {
+  .workspaceHeader { align-items: stretch; gap: 12px; }
+  .workspaceIntro { flex-basis: 100%; }
+  .workspaceIntro p { font-size: 13px; }
+  .pickerWrap { flex: 1 1 100%; min-width: 0; }
+  .pickerMenu { width: 100%; max-height: min(420px, 60vh); }
+  .pickerButton { min-height: 55px; }
+  .currentSection h2 { font-size: var(--text-section); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pickerButton, .pickerChevron, .pickerOption, .animatedCard { transition: none; }
+  .pickerMenu { animation: none; }
+  .animatedCard:hover { transform: none; }
+}

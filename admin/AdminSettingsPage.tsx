@@ -19,7 +19,7 @@ type FormState = {
   extensionDurationDays: string;
   maxExtensions: string;
 };
-type Panel = "identitas" | "reservasi" | "pinjaman";
+export type Panel = "identitas" | "reservasi" | "pinjaman";
 
 function toForm(settings: LibrarySettings): FormState {
   return {
@@ -82,13 +82,11 @@ function payloadFromForm(form: FormState): LibrarySettings {
   };
 }
 
-export default function AdminSettingsPage() {
+export default function AdminSettingsPage({ activePanel }: { activePanel: Panel }) {
   const [form, setForm] = useState<FormState | null>(null);
-  const [panel, setPanel] = useState<Panel>("identitas");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [revision, setRevision] = useState(0);
 
   const load = useCallback(async () => {
@@ -120,14 +118,12 @@ export default function AdminSettingsPage() {
 
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((current) => (current ? { ...current, [key]: value } : current));
-    setSuccess("");
   }
 
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!form || saving || loading) return;
     setError("");
-    setSuccess("");
 
     let payload: LibrarySettings;
     try {
@@ -153,7 +149,6 @@ export default function AdminSettingsPage() {
       }
       const saved = (await response.json()) as LibrarySettings;
       setForm(toForm(saved));
-      setSuccess("Pengaturan perpustakaan berhasil disimpan dan berlaku untuk transaksi baru.");
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "Pengaturan gagal disimpan.");
     } finally {
@@ -163,34 +158,19 @@ export default function AdminSettingsPage() {
 
   return (
     <div className={styles.page}>
-      <header className={styles.pageHeading}>
-        <h1 data-page-title>Pengaturan Perpustakaan</h1>
-        <p>Pilih bagian yang ingin dikelola. Perubahan hanya tersimpan setelah menekan Simpan Pengaturan.</p>
-      </header>
-
-      {error ? (
+{error ? (
         <div className={styles.errorBox} role="alert">
           <span>{error}</span>
           <button data-button="secondary" data-button-size="md" type="button"
             onClick={() => setRevision((value) => value + 1)} disabled={loading}>Coba Lagi</button>
         </div>
       ) : null}
-      {success ? <div className={styles.successBox} role="status">{success}</div> : null}
 
       {loading && !form ? (
         <div className={styles.loadingBox}>Memuat pengaturan...</div>
       ) : form ? (
         <form className={styles.form} onSubmit={save} noValidate>
-          <nav className={styles.innerTabs} aria-label="Kategori pengaturan layanan">
-            <button type="button" className={styles.innerTab} aria-pressed={panel === "identitas"}
-              onClick={() => setPanel("identitas")}>Informasi Perpustakaan</button>
-            <button type="button" className={styles.innerTab} aria-pressed={panel === "reservasi"}
-              onClick={() => setPanel("reservasi")}>Reservasi</button>
-            <button type="button" className={styles.innerTab} aria-pressed={panel === "pinjaman"}
-              onClick={() => setPanel("pinjaman")}>Peminjaman</button>
-          </nav>
-
-          {panel === "identitas" ? (
+{activePanel === "identitas" ? (
             <section className={`${styles.card} ${styles.animatedCard}`}>
               <div className={styles.cardHeading}>
                 <h2>Informasi Perpustakaan</h2>
@@ -234,7 +214,7 @@ export default function AdminSettingsPage() {
             </section>
           ) : null}
 
-          {panel === "reservasi" ? (
+          {activePanel === "reservasi" ? (
             <section className={`${styles.card} ${styles.animatedCard}`}>
               <div className={styles.cardHeading}>
                 <h2>Aturan Reservasi</h2>
@@ -251,7 +231,7 @@ export default function AdminSettingsPage() {
             </section>
           ) : null}
 
-          {panel === "pinjaman" ? (
+          {activePanel === "pinjaman" ? (
             <section className={`${styles.card} ${styles.animatedCard}`}>
               <div className={styles.cardHeading}>
                 <h2>Aturan Peminjaman</h2>

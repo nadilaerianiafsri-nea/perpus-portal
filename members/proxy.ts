@@ -86,7 +86,7 @@ export async function memberProxy(request: Request, path: string) {
       response = await forward();
     }
 
-    if (response.status >= 500) {
+    if (response.status >= 500 && path !== 'admin/public-content') {
       throw new Error('Backend unavailable');
     }
 
@@ -115,7 +115,9 @@ export async function memberProxy(request: Request, path: string) {
     const rejected = requestErrorResponse(error);
     if (rejected) return rejected;
     return NextResponse.json(
-      { message: 'Layanan anggota belum dapat dihubungi. Silakan coba lagi.' },
+      { message: path === 'admin/public-content'
+          ? 'Layanan konten publik belum dapat dihubungi. Periksa koneksi backend dan coba lagi.'
+          : 'Layanan anggota belum dapat dihubungi. Silakan coba lagi.' },
       { status: 503, headers },
     );
   }
