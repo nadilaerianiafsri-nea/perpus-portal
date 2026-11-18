@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
+import RecordPagination, { type RecordPageSize } from '@/components/RecordPagination';
 
 import { useEffect, useState } from 'react';
 import { FiAlertTriangle, FiClock, FiDownload, FiMessageCircle, FiSearch } from 'react-icons/fi';
@@ -23,11 +24,11 @@ type State = { key: string; result: OverdueResponse | null; error: string };
 export default function AdminOverduePage() {
   const [searchInput, setSearchInput] = useState(''), [search, setSearch] = useState('');
   const [bucket, setBucket] = useState<OverdueBucket>('ALL'), [memberType, setMemberType] = useState('ALL');
-  const [sort, setSort] = useState<'OLDEST' | 'NEWEST'>('OLDEST'), [page, setPage] = useState(1);
+  const [sort, setSort] = useState<'OLDEST' | 'NEWEST'>('OLDEST'), [page, setPage] = useState(1), [limit, setLimit] = useState<RecordPageSize>(10);
   const [period, setPeriod] = useState(() => createTransactionPeriod('all'));
   const [revision, setRevision] = useState(0), [state, setState] = useState<State>({ key: '', result: null, error: '' });
   const searchError = plainTextMessage(searchInput, 100);
-  const query = overdueQuery({ search, bucket, memberType, sort, page, period });
+  const query = overdueQuery({ search, bucket, memberType, sort, page, limit, period });
   const requestKey = `${query}|${revision}`;
   const loading = state.key !== requestKey || searchInput.trim() !== search || Boolean(searchError);
   const result = state.key === requestKey ? state.result : null;
@@ -91,7 +92,10 @@ export default function AdminOverduePage() {
                 </tr>; })}</tbody></table></div>
               <p className={ui.resultCount}>Menampilkan {(result!.meta.page - 1) * result!.meta.limit + 1}–{Math.min(result!.meta.page * result!.meta.limit, result!.meta.total)} dari {result!.meta.total} pinjaman terlambat</p>
             </>}
-      {!loading && !error && result && result.meta.totalPages > 1 ? <nav className={`${styles.pagination} ${styles.transactionPagination}`} aria-label="Halaman pinjaman terlambat"><Button variant="secondary" size="sm" disabled={page <= 1} onClick={() => setPage(value => value - 1)}>Sebelumnya</Button><span>Halaman {result.meta.page} dari {result.meta.totalPages}</span><Button variant="secondary" size="sm" disabled={page >= result.meta.totalPages} onClick={() => setPage(value => value + 1)}>Berikutnya</Button></nav> : null}
+      {!loading && !error && result && result.meta.total >= 0 ? <RecordPagination page={result.meta.page} pageSize={limit} total={result.meta.total}
+        totalPages={result.meta.totalPages} onPageChange={setPage}
+        onPageSizeChange={(next) => { setLimit(next); setPage(1); }}
+        label="Halaman pinjaman terlambat" /> : null}
     </section>
   </div>;
 }

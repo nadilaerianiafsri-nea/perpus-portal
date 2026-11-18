@@ -1,9 +1,9 @@
 'use client';
+import RecordPagination, { type RecordPageSize } from '@/components/RecordPagination';
 
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { FiBell, FiCheck, FiChevronLeft, FiChevronRight, FiSearch } from 'react-icons/fi';
-import AppSelect from '@/components/AppSelect';
+import { FiBell, FiCheck, FiSearch } from 'react-icons/fi';
 import PeriodSelector from '@/components/PeriodSelector';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { Button } from '@/components/Button';
@@ -34,7 +34,7 @@ export default function AdminNotificationsPage() {
   const [searchInput,setSearchInput] = useState(''), [search,setSearch] = useState('');
   const [channel,setChannel] = useState<NotificationChannel>('ALL');
   const [period,setPeriod] = useState(()=>createTransactionPeriod('all'));
-  const [page,setPage] = useState(1), [limit,setLimit] = useState(10), [revision,setRevision] = useState(0);
+  const [page,setPage] = useState(1), [limit,setLimit] = useState<RecordPageSize>(10), [revision,setRevision] = useState(0);
   const [state,setState] = useState<LoadState>({key:'',result:null,error:''});
   const [pending,setPending] = useState<string|null>(null), [feedback,setFeedback] = useState('');
   const [context,setContext] = useState<AdminNotificationRow|null>(null);
@@ -126,12 +126,18 @@ export default function AdminNotificationsPage() {
               </tr>)}</tbody></table></div>
               <div className={styles.mobileList}>{rows.map(row=><article data-record-card key={row.id} data-notification-id={row.id} className={`${styles.mobileCard} ${row.channel==='SYSTEM'&&!row.readAt?styles.unread:''}`} {...rowProps(row)}><NotificationText row={row} /><Recipient row={row} /><div className={styles.badges}><Channel row={row} /><Status row={row} /></div><time dateTime={row.time}>{formatAdminOperationDate(row.time)}</time></article>)}</div>
             </>}
-      {!loading&&!error&&result&&result.meta.total>0?<footer className={styles.footer}><span>Menampilkan {(result.meta.page-1)*result.meta.limit+1}–{Math.min(result.meta.page*result.meta.limit,result.meta.total)} dari {result.meta.total} notifikasi</span><div className={styles.pagination}>
-        <AppSelect aria-label="Jumlah notifikasi per halaman" value={String(limit)} onChange={event=>{setLimit(Number(event.target.value));setPage(1);}}><option value="10">10 / halaman</option><option value="20">20 / halaman</option><option value="50">50 / halaman</option></AppSelect>
-        <Button size="sm" variant="secondary" aria-label="Halaman sebelumnya" disabled={Boolean(pending)||page<=1} onClick={()=>setPage(value=>value-1)} icon={<FiChevronLeft />} />
-        <span>{result.meta.page} / {result.meta.totalPages}</span>
-        <Button size="sm" variant="secondary" aria-label="Halaman berikutnya" disabled={Boolean(pending)||page>=result.meta.totalPages} onClick={()=>setPage(value=>value+1)} icon={<FiChevronRight />} />
-      </div></footer>:null}
+      {!loading&&!error&&result&&result.meta.total>0?<footer className={styles.footer}>
+      <RecordPagination
+        page={result.meta.page}
+        pageSize={limit}
+        total={result.meta.total}
+        totalPages={result.meta.totalPages}
+        disabled={Boolean(pending)}
+        onPageChange={setPage}
+        onPageSizeChange={(next) => { setLimit(next); setPage(1); }}
+        label="Halaman notifikasi admin"
+      />
+      </footer>:null}
     </section>
     <ConfirmDialog open={Boolean(context)} title={context?.reminderType??'Rincian notifikasi'} description={context?.description || context?.bookTitle || 'Rincian pengiriman notifikasi.'} variant="info" onCancel={()=>setContext(null)}>
       {context?<dl className={styles.context}><div><dt>Penerima</dt><dd>{context.memberName}</dd></div><div><dt>Kanal</dt><dd>{notificationChannelLabel(context.channel)}</dd></div><div><dt>Status</dt><dd>{notificationStatusLabel(context)}</dd></div><div><dt>Waktu</dt><dd>{formatAdminOperationDate(context.time)}</dd></div></dl>:null}

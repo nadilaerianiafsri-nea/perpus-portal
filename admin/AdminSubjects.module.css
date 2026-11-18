@@ -260,3 +260,25 @@
     transform: none;
   }
 }
+
+
+/* Search belongs only to the categories listing, with the existing navy/sky palette. */
+.searchArea {
+  display: grid; gap: 7px; padding: 0 22px 14px;
+  font-family: "Outfit", var(--font-outfit), sans-serif;
+}
+.searchArea label { color: var(--navy); font-size: 13px; font-weight: 700; }
+.searchArea input {
+  width: 100%; min-width: 0; min-height: 45px;
+  background: var(--white); color: var(--navy);
+  border-radius: 11px; border: 1px solid var(--line);
+  padding: 10px 13px; font: inherit; font-size: 14px;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+.searchArea input:hover { border-color: var(--navy); }
+.searchArea input:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
+@media (max-width: 720px) {
+  .searchArea { padding-inline: 17px; }
+  .searchArea input { font-size: 16px; }
+}
+@media (prefers-reduced-motion: reduce) { .searchArea input { transition: none; } }

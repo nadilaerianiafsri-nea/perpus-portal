@@ -1,4 +1,5 @@
 "use client";
+import PagedItems from "@/components/PagedItems";
 
 import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import Image from "next/image";
@@ -91,8 +92,9 @@ export default function HistoryPage({
           </Link>
         </div>
       ) : (
+        <PagedItems items={history} label="Halaman riwayat peminjaman">{(rows) => (
         <ul className={styles.cards} aria-label="Riwayat peminjaman">
-          {history.map((item, index) => (
+          {rows.map((item, index) => (
             <li
               key={`${item.sourceType}-${item.id}`}
               style={{ animationDelay: `${Math.min(index, 5) * 45}ms` }}
@@ -143,6 +145,7 @@ export default function HistoryPage({
             </li>
           ))}
         </ul>
+        )}</PagedItems>
       )}
     </section>
   );

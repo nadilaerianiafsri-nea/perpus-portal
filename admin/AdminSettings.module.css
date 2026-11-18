@@ -244,7 +244,7 @@
 
 /* Shortcut to the standalone subject management page. */
 .pickerOptionLink { text-decoration: none; }
-.pickerOptionLink:hover .pickerOptionTitle { text-decoration: underline; text-underline-offset: 3px; }
+.pickerOptionLink:hover .pickerOptionTitle { text-decoration: none; }
 /* Keep the section selector aligned without the redundant "Pilih bagian" caption. */
 .workspaceHeader { align-items: center; }
 .pickerOptionLink:focus-visible { outline: 2px solid #ffd000; outline-offset: 3px; }
@@ -252,3 +252,7 @@
   .workspaceHeader { align-items: stretch; }
   .pickerWrap { width: 100%; }
 }
+
+/* The Subjek/Kategori dropdown item is not an underlined text link. */
+.pickerOptionLink, .pickerOptionLink:hover, .pickerOptionLink .pickerOptionTitle,
+.pickerOptionLink:hover .pickerOptionTitle { text-decoration: none !important; }

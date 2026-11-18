@@ -1,4 +1,5 @@
 "use client";
+import PagedItems from "@/components/PagedItems";
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -194,8 +195,9 @@ export default function LoansPage() {
               </Link>
             </div>
           ) : (
+            <PagedItems items={loans} label="Halaman pinjaman anggota">{(rows) => (
             <div className={styles.list}>
-              {loans.map((loan) => (
+              {rows.map((loan) => (
                 <LoanCard
                   key={loan.id}
                   loan={loan}
@@ -208,6 +210,7 @@ export default function LoansPage() {
                 />
               ))}
             </div>
+            )}</PagedItems>
           )}
         </section>
       ) : (

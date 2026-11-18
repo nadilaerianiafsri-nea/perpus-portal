@@ -2,6 +2,7 @@
 "use client";
 
 import AppSelect from "@/components/AppSelect";
+import RecordPagination, { type RecordPageSize } from "@/components/RecordPagination";
 import PeriodSelector from "@/components/PeriodSelector";
 import { Button, ButtonLink } from "@/components/Button";
 import { downloadTransactionCsv } from "./transactionCsv";
@@ -73,6 +74,7 @@ export default function AdminReservationsPage() {
   const [status, setStatus] = useState<StatusFilter>(readStatus(params.get("status")));
   const [memberType, setMemberType] = useState<MemberFilter>("ALL");
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState<RecordPageSize>(10);
   const [sortOrder, setSortOrder] = useState<ReservationSort>("newest");
   const [period, setPeriod] = useState(() => createTransactionPeriod("all"));
 
@@ -114,7 +116,7 @@ export default function AdminReservationsPage() {
       status,
       memberType,
       page: String(page),
-      limit: "20",
+      limit: String(limit),
     });
 
     if (search) {
@@ -157,7 +159,7 @@ export default function AdminReservationsPage() {
     } finally {
       if (version === loadVersion.current) setLoading(false);
     }
-  }, [memberType, page, revision, search, status]);
+  }, [limit, memberType, page, revision, search, status]);
 
   const pickup = useReservationPickup(id => {
     focusAfterPickup.current = id;
@@ -388,34 +390,16 @@ export default function AdminReservationsPage() {
           </table>
         </div>
 
-        {!loading && result.meta.totalPages > 1 ? (
-          <nav className={`${styles.pagination} ${styles.transactionPagination}`} aria-label="Halaman reservasi">
-            <button
-              data-button="secondary"
-              data-button-size="sm"
-              type="button"
-              disabled={page <= 1}
-              onClick={() => setPage((value) => Math.max(1, value - 1))}
-            >
-              Sebelumnya
-            </button>
-
-            <span>
-              Halaman {result.meta.page} dari {result.meta.totalPages}
-            </span>
-
-            <button
-              data-button="secondary"
-              data-button-size="sm"
-              type="button"
-              disabled={page >= result.meta.totalPages}
-              onClick={() =>
-                setPage((value) => Math.min(result.meta.totalPages, value + 1))
-              }
-            >
-              Berikutnya
-            </button>
-          </nav>
+        {!loading && result.meta.total >= 0 ? (
+          <RecordPagination
+            page={result.meta.page}
+            pageSize={limit}
+            total={result.meta.total}
+            totalPages={result.meta.totalPages}
+            onPageChange={setPage}
+            onPageSizeChange={(next) => { setLimit(next); setPage(1); }}
+            label="Halaman reservasi"
+          />
         ) : null}
       </section>
       <ReservationPickupDialog pickup={pickup} />

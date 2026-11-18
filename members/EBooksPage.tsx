@@ -1,4 +1,5 @@
 "use client";
+import PagedItems from "@/components/PagedItems";
 
 import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import Image from "next/image";
@@ -181,8 +182,9 @@ export default function EBooksPage() {
                 {!activeLoans.length ? (
                   <div className={styles.compactEmpty}>Belum ada E-Book yang sedang dipinjam.</div>
                 ) : (
+                  <PagedItems items={activeLoans} label="Halaman e-book sedang dipinjam">{(rows) => (
                   <div className={styles.grid}>
-                    {activeLoans.map((loan) => {
+                    {rows.map((loan) => {
                       const progress = progressValue(loan.reading?.progress);
                       return (
                         <article className={styles.card} data-record-card key={loan.id}>
@@ -207,6 +209,7 @@ export default function EBooksPage() {
                       );
                     })}
                   </div>
+                  )}</PagedItems>
                 )}
               </section>
             ) : null}
@@ -220,8 +223,9 @@ export default function EBooksPage() {
                 {!queues.length ? (
                   <div className={styles.compactEmpty}>Anda tidak sedang menunggu antrean E-Book.</div>
                 ) : (
+                  <PagedItems items={queues} label="Halaman antrean e-book">{(rows) => (
                   <div className={styles.grid}>
-                    {queues.map((queue) => {
+                    {rows.map((queue) => {
                       const offered = queue.status === "DITAWARKAN";
                       return (
                         <article className={styles.card} data-record-card key={queue.id}>
@@ -247,6 +251,7 @@ export default function EBooksPage() {
                       );
                     })}
                   </div>
+                  )}</PagedItems>
                 )}
               </section>
             ) : null}
@@ -265,8 +270,9 @@ export default function EBooksPage() {
                     <Link data-button="primary" className={styles.read} href="/dashboard/koleksi?type=EBOOK">Jelajahi E-Book</Link>
                   </div>
                 ) : (
+                  <PagedItems items={visibleHistory} label="Halaman e-book pernah dibaca">{(rows) => (
                   <div className={styles.grid}>
-                    {visibleHistory.map((ebook) => {
+                    {rows.map((ebook) => {
                       const progress = progressValue(ebook.progress);
                       return (
                         <article className={styles.card} data-record-card key={ebook.id} data-ebook-id={ebook.book.id}>
@@ -293,6 +299,7 @@ export default function EBooksPage() {
                       );
                     })}
                   </div>
+                  )}</PagedItems>
                 )}
               </section>
             ) : null}

@@ -4,6 +4,7 @@
 import Link from "next/link";
 
 import AppSelect from "@/components/AppSelect";
+import RecordPagination, { type RecordPageSize } from "@/components/RecordPagination";
 import PeriodSelector from "@/components/PeriodSelector";
 import { createTransactionPeriod, inTransactionPeriod } from "@/shared/transactionPeriod";
 
@@ -62,6 +63,7 @@ export default function AdminReturnsPage() {
   const [status, setStatus] = useState<StatusFilter>("ALL");
   const [memberType, setMemberType] = useState<MemberFilter>("ALL");
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState<RecordPageSize>(10);
   const [period, setPeriod] = useState(() => createTransactionPeriod("all"));
 
   const [result, setResult] = useState<ReturnsResponse>(emptyResult);
@@ -91,7 +93,7 @@ export default function AdminReturnsPage() {
       status,
       memberType,
       page: String(page),
-      limit: "20",
+      limit: String(limit),
     });
 
     if (search) {
@@ -132,7 +134,7 @@ export default function AdminReturnsPage() {
     } finally {
       setLoading(false);
     }
-  }, [memberType, page, revision, search, status]);
+  }, [limit, memberType, page, revision, search, status]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- Existing fetch lifecycle starts the loading state before requesting data.
@@ -393,34 +395,16 @@ export default function AdminReturnsPage() {
           </table>
         </div>
 
-        {!loading && result.meta.totalPages > 1 ? (
-          <nav className={`${styles.pagination} ${styles.transactionPagination}`} aria-label="Halaman pengembalian">
-            <button
-              data-button="secondary"
-              data-button-size="sm"
-              type="button"
-              disabled={page <= 1}
-              onClick={() => setPage((value) => Math.max(1, value - 1))}
-            >
-              Sebelumnya
-            </button>
-
-            <span>
-              Halaman {result.meta.page} dari {result.meta.totalPages}
-            </span>
-
-            <button
-              data-button="secondary"
-              data-button-size="sm"
-              type="button"
-              disabled={page >= result.meta.totalPages}
-              onClick={() =>
-                setPage((value) => Math.min(result.meta.totalPages, value + 1))
-              }
-            >
-              Berikutnya
-            </button>
-          </nav>
+        {!loading && result.meta.total >= 0 ? (
+          <RecordPagination
+            page={result.meta.page}
+            pageSize={limit}
+            total={result.meta.total}
+            totalPages={result.meta.totalPages}
+            onPageChange={setPage}
+            onPageSizeChange={(next) => { setLimit(next); setPage(1); }}
+            label="Halaman pengembalian"
+          />
         ) : null}
       </section>
 

@@ -2,6 +2,8 @@
 "use client";
 
 import AppSelect from "@/components/AppSelect";
+import RecordPagination, { type RecordPageSize } from "@/components/RecordPagination";
+import { usePagedRecords } from "@/components/usePagedRecords";
 import PeriodSelector from "@/components/PeriodSelector";
 import { createTransactionPeriod, inTransactionPeriod } from "@/shared/transactionPeriod";
 import { jakartaDateInput } from "@/shared/period";
@@ -77,6 +79,7 @@ export default function AdminLoansPage() {
   const [memberType, setMemberType] = useState<MemberFilter>("ALL");
   const [due, setDue] = useState<DueFilter>(readDue(params.get("due")));
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState<RecordPageSize>(10);
   const [period, setPeriod] = useState(() => createTransactionPeriod("all"));
 
   const [result, setResult] = useState<LoansResponse>(emptyResult);
@@ -115,7 +118,7 @@ export default function AdminLoansPage() {
       memberType,
       due,
       page: String(page),
-      limit: "20",
+      limit: String(limit),
     });
 
     if (search) {
@@ -156,7 +159,7 @@ export default function AdminLoansPage() {
     } finally {
       setLoading(false);
     }
-  }, [due, memberType, page, revision, search, status]);
+  }, [limit, due, memberType, page, revision, search, status]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- Existing fetch lifecycle starts the loading state before requesting data.
@@ -165,6 +168,7 @@ export default function AdminLoansPage() {
 
   const visibleLoans = result.data.filter((loan) => inTransactionPeriod(loan.borrowedAt, period));
   const visibleEbooks = result.ebooks.filter((ebook) => inTransactionPeriod(ebook.addedAt, period));
+  const ebookRows = usePagedRecords(visibleEbooks);
   const exportPending = loading || Boolean(error) || Boolean(searchError) || searchInput.trim() !== search;
 
   function exportLoans() {
@@ -405,34 +409,16 @@ export default function AdminLoansPage() {
           </table>
         </div>
 
-        {!loading && result.meta.totalPages > 1 ? (
-          <nav className={`${styles.pagination} ${styles.transactionPagination}`} aria-label="Halaman peminjaman">
-            <button
-              data-button="secondary"
-              data-button-size="sm"
-              type="button"
-              disabled={page <= 1}
-              onClick={() => setPage((value) => Math.max(1, value - 1))}
-            >
-              Sebelumnya
-            </button>
-
-            <span>
-              Halaman {result.meta.page} dari {result.meta.totalPages}
-            </span>
-
-            <button
-              data-button="secondary"
-              data-button-size="sm"
-              type="button"
-              disabled={page >= result.meta.totalPages}
-              onClick={() =>
-                setPage((value) => Math.min(result.meta.totalPages, value + 1))
-              }
-            >
-              Berikutnya
-            </button>
-          </nav>
+        {!loading && result.meta.total >= 0 ? (
+          <RecordPagination
+            page={result.meta.page}
+            pageSize={limit}
+            total={result.meta.total}
+            totalPages={result.meta.totalPages}
+            onPageChange={setPage}
+            onPageSizeChange={(next) => { setLimit(next); setPage(1); }}
+            label="Halaman peminjaman"
+          />
         ) : null}
       </section>
 
@@ -461,7 +447,7 @@ export default function AdminLoansPage() {
                   </td>
                 </tr>
               ) : visibleEbooks.length ? (
-                visibleEbooks.map((ebook) => (
+                ebookRows.items.map((ebook) => (
                   <tr key={ebook.id}>
                     <td data-mobile-header="true">
                       <div className={styles.memberCell}>
@@ -498,7 +484,17 @@ export default function AdminLoansPage() {
             </tbody>
           </table>
         </div>
-
+        {!loading && !error ? (
+          <RecordPagination
+            page={ebookRows.page}
+            pageSize={ebookRows.pageSize}
+            total={ebookRows.total}
+            totalPages={ebookRows.totalPages}
+            onPageChange={ebookRows.setPage}
+            onPageSizeChange={ebookRows.setPageSize}
+            label="Halaman akses E-Book aktif"
+          />
+        ) : null}
       </section>
     </div>
   );

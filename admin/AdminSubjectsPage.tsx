@@ -1,4 +1,5 @@
 "use client";
+import RecordPagination, { type RecordPageSize } from "@/components/RecordPagination";
 
 import { useCallback, useEffect, useState } from "react";
 import type { FormEvent } from "react";
@@ -10,7 +11,6 @@ import { cleanedSubject } from "./subjectCategories";
 import styles from "./AdminSubjects.module.css";
 
 type SubjectResult = { categories: ManagedSubject[] };
-const PAGE_SIZE = 10;
 
 async function apiMessage(response: Response, fallback: string) {
   try {
@@ -32,6 +32,8 @@ export default function AdminSubjectsPage() {
   const [updating, setUpdating] = useState(false);
   const [error, setError] = useState("");
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState<RecordPageSize>(10);
+  const [searchInput, setSearchInput] = useState("");
 
   const load = useCallback(async (signal?: AbortSignal) => {
     setLoading(true);
@@ -57,6 +59,7 @@ export default function AdminSubjectsPage() {
 
   useEffect(() => {
     const controller = new AbortController();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Existing API loader synchronizes fetch/loading status.
     void load(controller.signal);
     return () => controller.abort();
   }, [load]);
@@ -142,10 +145,13 @@ export default function AdminSubjectsPage() {
     }
   }
 
-  const total = categories?.length ?? 0;
-  const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const filtered = categories?.filter((category) =>
+    category.name.toLocaleLowerCase("id-ID").includes(searchInput.trim().toLocaleLowerCase("id-ID"))
+  ) ?? [];
+  const total = filtered.length;
+  const pageCount = Math.max(1, Math.ceil(total / limit));
   const currentPage = Math.min(page, pageCount);
-  const visible = categories?.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE) ?? [];
+  const visible = filtered.slice((currentPage - 1) * limit, currentPage * limit);
 
   return (
     <section className={styles.page} aria-label="Kelola subjek dan kategori">
@@ -192,6 +198,17 @@ export default function AdminSubjectsPage() {
           <h2>Daftar Kategori</h2>
           <span>{loading ? "Memuat..." : categories === null ? "Tidak tersedia" : total + " kategori"}</span>
         </div>
+        <div className={styles.searchArea}>
+          <label htmlFor="category-list-search">Cari subjek / kategori</label>
+          <input
+            id="category-list-search"
+            type="search"
+            value={searchInput}
+            placeholder="Cari nama kategori..."
+            onChange={(event) => { setSearchInput(event.target.value); setPage(1); }}
+            autoComplete="off"
+          />
+        </div>
         {loading ? (
           <p className={styles.state}>Memuat kategori...</p>
         ) : categories === null ? (
@@ -205,6 +222,9 @@ export default function AdminSubjectsPage() {
               <span>Koleksi</span>
               <span>Aksi</span>
             </div>
+            {filtered.length === 0 && (
+              <p className={styles.state}>Tidak ada kategori yang sesuai dengan pencarian.</p>
+            )}
             <ul className={styles.list}>
               {visible.map((category) => (
                 <li className={styles.item} key={category.id}>
@@ -275,30 +295,15 @@ export default function AdminSubjectsPage() {
               ))}
             </ul>
             <div className={styles.pagination}>
-              <p>
-                {((currentPage - 1) * PAGE_SIZE) + 1}–{Math.min(currentPage * PAGE_SIZE, total)} dari {total} kategori
-              </p>
-              <nav className={styles.pageControls} aria-label="Halaman kategori">
-                <button type="button" className={styles.pageNav} disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)}>
-                  Previous
-                </button>
-                {currentPage > 1 && (
-                  <button type="button" className={styles.pageNearby} onClick={() => setPage(currentPage - 1)} aria-label={"Halaman " + (currentPage - 1)}>
-                    {currentPage - 1}
-                  </button>
-                )}
-                <button type="button" className={styles.pageCurrent} aria-current="page" aria-label={"Halaman " + currentPage} disabled>
-                  {currentPage}
-                </button>
-                {currentPage < pageCount && (
-                  <button type="button" className={styles.pageNearby} onClick={() => setPage(currentPage + 1)} aria-label={"Halaman " + (currentPage + 1)}>
-                    {currentPage + 1}
-                  </button>
-                )}
-                <button type="button" className={styles.pageNav} disabled={currentPage >= pageCount} onClick={() => setPage(currentPage + 1)}>
-                  Next
-                </button>
-              </nav>
+              <RecordPagination
+                page={currentPage}
+                pageSize={limit}
+                total={total}
+                totalPages={pageCount}
+                onPageChange={setPage}
+                onPageSizeChange={(next) => { setLimit(next); setPage(1); }}
+                label="Halaman subjek atau kategori"
+              />
             </div>
             <p className={styles.hint}>
               Kategori yang masih digunakan tidak dapat dihapus. Mengedit nama akan memperbarui buku terkait.

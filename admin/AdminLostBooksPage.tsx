@@ -2,6 +2,7 @@
 "use client";
 
 import AppSelect from "@/components/AppSelect";
+import RecordPagination, { type RecordPageSize } from "@/components/RecordPagination";
 
 import AdminStatCard from "./AdminStatCard";
 import { FiBox as CardBox, FiUsers as CardUsers, FiRefreshCw as CardRefreshCw } from "react-icons/fi";
@@ -55,6 +56,7 @@ export default function AdminLostBooksPage() {
   const [memberType, setMemberType] = useState<MemberFilter>("ALL");
   const [extension, setExtension] = useState<ExtensionFilter>("ALL");
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState<RecordPageSize>(10);
 
   const [result, setResult] = useState<LostBooksResponse>(emptyResult);
   const [loading, setLoading] = useState(true);
@@ -88,7 +90,7 @@ export default function AdminLostBooksPage() {
       status,
       extension,
       page: String(page),
-      limit: "20",
+      limit: String(limit),
     });
 
     if (search) {
@@ -132,7 +134,7 @@ export default function AdminLostBooksPage() {
     } finally {
       if (!signal.aborted) setLoading(false);
     }
-  }, [extension, memberType, page, revision, search, status]);
+  }, [limit, extension, memberType, page, revision, search, status]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -323,34 +325,16 @@ export default function AdminLostBooksPage() {
           </table>
         </div>
 
-        {!loading && result.meta.totalPages > 1 ? (
-          <nav className={styles.pagination} aria-label="Halaman buku hilang">
-            <button
-              data-button="secondary"
-              data-button-size="sm"
-              type="button"
-              disabled={page <= 1}
-              onClick={() => setPage((value) => Math.max(1, value - 1))}
-            >
-              Sebelumnya
-            </button>
-
-            <span>
-              Halaman {result.meta.page} dari {result.meta.totalPages}
-            </span>
-
-            <button
-              data-button="secondary"
-              data-button-size="sm"
-              type="button"
-              disabled={page >= result.meta.totalPages}
-              onClick={() =>
-                setPage((value) => Math.min(result.meta.totalPages, value + 1))
-              }
-            >
-              Berikutnya
-            </button>
-          </nav>
+        {!loading && result.meta.total >= 0 ? (
+          <RecordPagination
+            page={result.meta.page}
+            pageSize={limit}
+            total={result.meta.total}
+            totalPages={result.meta.totalPages}
+            onPageChange={setPage}
+            onPageSizeChange={(next) => { setLimit(next); setPage(1); }}
+            label="Halaman buku hilang"
+          />
         ) : null}
       </section>
     </div>

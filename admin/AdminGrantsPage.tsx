@@ -1,6 +1,7 @@
 "use client";
 
 import AppSelect from "@/components/AppSelect";
+import RecordPagination, { type RecordPageSize } from "@/components/RecordPagination";
 
 import AdminStatCard from "./AdminStatCard";
 import { FiGift as CardGift, FiClock as CardClock, FiCheckCircle as CardCheckCircle, FiLayers as CardLayers } from "react-icons/fi";
@@ -47,6 +48,7 @@ export default function AdminGrantsPage() {
   const [year, setYear] = useState("");
 
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState<RecordPageSize>(10);
 
   const [result, setResult] = useState<AdminGrantsResponse>(emptyResult);
 
@@ -76,7 +78,7 @@ export default function AdminGrantsPage() {
 
     const query = new URLSearchParams({
       page: String(page),
-      limit: "10",
+      limit: String(limit),
     });
 
     if (search) {
@@ -122,7 +124,7 @@ export default function AdminGrantsPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, revision, search, status, year]);
+  }, [limit, page, revision, search, status, year]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- Existing fetch lifecycle starts the loading state before requesting data.
@@ -370,34 +372,16 @@ export default function AdminGrantsPage() {
             ))}
         </div>
 
-        {!loading && result.meta.totalPages > 1 ? (
-          <nav className={styles.pagination} aria-label="Halaman data hibah">
-            <button
-              data-button="secondary"
-              data-button-size="sm"
-              type="button"
-              disabled={page <= 1}
-              onClick={() => setPage((value) => Math.max(1, value - 1))}
-            >
-              Sebelumnya
-            </button>
-
-            <span>
-              Halaman {result.meta.page} dari {result.meta.totalPages}
-            </span>
-
-            <button
-              data-button="secondary"
-              data-button-size="sm"
-              type="button"
-              disabled={page >= result.meta.totalPages}
-              onClick={() =>
-                setPage((value) => Math.min(result.meta.totalPages, value + 1))
-              }
-            >
-              Berikutnya
-            </button>
-          </nav>
+        {!loading && result.meta.total >= 0 ? (
+          <RecordPagination
+            page={result.meta.page}
+            pageSize={limit}
+            total={result.meta.total}
+            totalPages={result.meta.totalPages}
+            onPageChange={setPage}
+            onPageSizeChange={(next) => { setLimit(next); setPage(1); }}
+            label="Halaman data hibah"
+          />
         ) : null}
       </section>
     </div>

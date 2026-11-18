@@ -1,4 +1,5 @@
 "use client";
+import PagedItems from "@/components/PagedItems";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -87,7 +88,7 @@ export default function NotificationsPage() {
     </section>
     {actionError ? <p className={styles.feedback} role="alert">{actionError}</p> : null}
     <section className={styles.list} aria-label="Daftar notifikasi" aria-busy={resource.loading || busy !== null}>
-      {resource.loading ? <LoadingCards /> : resource.error ? <ErrorState message="Notifikasi belum dapat dimuat." retry={resource.reload} /> : !notifications.length ? <EmptyState message={filtered ? "Tidak ada notifikasi yang sesuai dengan pencarian atau filter." : filter === "all" ? "Belum ada notifikasi." : "Semua notifikasi sudah dibaca."} /> : notifications.map(item => {
+      {resource.loading ? <LoadingCards /> : resource.error ? <ErrorState message="Notifikasi belum dapat dimuat." retry={resource.reload} /> : !notifications.length ? <EmptyState message={filtered ? "Tidak ada notifikasi yang sesuai dengan pencarian atau filter." : filter === "all" ? "Belum ada notifikasi." : "Semua notifikasi sudah dibaca."} /> : <PagedItems items={notifications} label="Halaman notifikasi anggota">{(rows) => rows.map(item => {
         const destination = memberNotificationTarget(item);
         const content = <>
           <NotificationIcon type={item.entityType} />
@@ -111,7 +112,7 @@ export default function NotificationsPage() {
           onNavigate={event => { if (!item.readAt) { event.preventDefault(); void openNotification(item); } }}
           onKeyDown={event => { if (event.key === " ") { event.preventDefault(); if (!event.repeat) event.currentTarget.click(); } }}
         >{content}</Link> : <article key={item.id} className={className} data-notification-id={item.id}>{content}</article>;
-      })}
+      })}</PagedItems>}
     </section>
   </div>;
 }

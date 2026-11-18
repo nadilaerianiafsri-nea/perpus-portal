@@ -1,4 +1,5 @@
 "use client";
+import RecordPagination, { type RecordPageSize } from "@/components/RecordPagination";
 
 import AdminStatCard from "./AdminStatCard";
 import PeriodSelector from "@/components/PeriodSelector";
@@ -32,13 +33,14 @@ export default function AdminEBookCirculationPage() {
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState<RecordPageSize>(10);
   const [period, setPeriod] = useState(() => createTransactionPeriod("all"));
   const [data, setData] = useState<Payload>(emptyPayload);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [revision, setRevision] = useState(0);
   const [loadedKey, setLoadedKey] = useState("");
-  const requestKey = `${section}:${page}:${search}:${revision}`;
+  const requestKey = `${section}:${page}:${limit}:${search}:${revision}`;
   const busy = loading || (!error && loadedKey !== requestKey);
 
   useEffect(() => {
@@ -53,7 +55,7 @@ export default function AdminEBookCirculationPage() {
     void revision;
     setLoading(true);
     setError("");
-    const query = new URLSearchParams({ page: String(page), limit: "30" });
+    const query = new URLSearchParams({ page: String(page), limit: String(limit) });
     if (search) query.set("search", search);
     try {
       const response = await fetch(`/api/admin/ebooks/circulation?${query}`, {
@@ -91,7 +93,7 @@ export default function AdminEBookCirculationPage() {
     } finally {
       if (!signal.aborted) setLoading(false);
     }
-  }, [page, revision, search, section, requestKey]);
+  }, [limit, page, revision, search, section, requestKey]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -231,12 +233,16 @@ export default function AdminEBookCirculationPage() {
           )}
         </div>
 
-        {!busy && !error && currentMeta.totalPages > 1 ? (
-          <nav className={styles.pagination} aria-label="Halaman monitoring E-Book">
-            <button data-button="secondary" data-button-size="sm" type="button" disabled={page <= 1} onClick={() => setPage((value) => Math.max(1, value - 1))}>Sebelumnya</button>
-            <span>Halaman {currentMeta.page} dari {currentMeta.totalPages}</span>
-            <button data-button="secondary" data-button-size="sm" type="button" disabled={page >= currentMeta.totalPages} onClick={() => setPage((value) => Math.min(currentMeta.totalPages, value + 1))}>Berikutnya</button>
-          </nav>
+        {!busy && !error && currentMeta.total >= 0 ? (
+          <RecordPagination
+            page={currentMeta.page}
+            pageSize={limit}
+            total={currentMeta.total}
+            totalPages={currentMeta.totalPages}
+            onPageChange={setPage}
+            onPageSizeChange={(next) => { setLimit(next); setPage(1); }}
+            label="Halaman monitoring E-Book"
+          />
         ) : null}
       </section>
 

@@ -20,6 +20,7 @@ import BookCard from "./BookCard";
 import SearchInput from "@/components/SearchField";
 
 import AppSelect from "@/components/AppSelect";
+import RecordPagination, { type RecordPageSize, isRecordPageSize } from "@/components/RecordPagination";
 
 import Filters from "./Filters";
 
@@ -153,6 +154,11 @@ export default function Catalog({
   const apiQuery = new URLSearchParams(query);
 
   apiQuery.delete("view");
+
+  if (member) {
+    const selected = Number(query.get("limit") ?? "10");
+    apiQuery.set("limit", String(isRecordPageSize(selected) ? selected : 10));
+  }
 
   if (!member) {
     apiQuery.set(
@@ -876,6 +882,18 @@ export default function Catalog({
                 ))}
               </div>
 
+              {member ? (
+                <RecordPagination
+                  page={currentPage}
+                  pageSize={(Number(query.get("limit") ?? "10") === 50 ? 50 : Number(query.get("limit") ?? "10") === 100 ? 100 : 10) as RecordPageSize}
+                  total={response.meta.total}
+                  totalPages={totalPages}
+                  disabled={loading}
+                  onPageChange={(next) => update({ page: String(next) })}
+                  onPageSizeChange={(next) => update({ limit: String(next) })}
+                  label="Halaman katalog anggota"
+                />
+              ) : (
               <nav className={styles.pagination} aria-label="Halaman katalog">
                 <button
                   data-button="secondary"
@@ -920,6 +938,7 @@ export default function Catalog({
                   Berikutnya
                 </button>
               </nav>
+              )}
             </>
           ) : (
             <div className={styles.state}>

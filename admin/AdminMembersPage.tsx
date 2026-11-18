@@ -1,6 +1,7 @@
 "use client";
 
 import AppSelect from "@/components/AppSelect";
+import RecordPagination, { type RecordPageSize } from "@/components/RecordPagination";
 
 import AdminStatCard from "./AdminStatCard";
 import { FiUsers as CardUsers, FiBookOpen as CardBookOpen, FiBriefcase as CardBriefcase } from "react-icons/fi";
@@ -46,6 +47,7 @@ export default function AdminMembersPage() {
   const [memberType, setMemberType] = useState<MemberTypeFilter>("ALL");
   const [verification, setVerification] = useState<VerificationFilter>("ALL");
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState<RecordPageSize>(10);
 
   const [result, setResult] = useState<AdminMembersResponse>(emptyResult);
   const [loading, setLoading] = useState(true);
@@ -78,7 +80,7 @@ export default function AdminMembersPage() {
       memberType,
       verified: verification,
       page: String(page),
-      limit: "20",
+      limit: String(limit),
     });
 
     if (search) {
@@ -116,7 +118,7 @@ export default function AdminMembersPage() {
     } finally {
       setLoading(false);
     }
-  }, [memberType, page, revision, search, verification]);
+  }, [limit, memberType, page, revision, search, verification]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- Existing fetch lifecycle starts the loading state before requesting data.
@@ -469,36 +471,16 @@ export default function AdminMembersPage() {
           )}
         </div>
 
-        {!loading && result.meta.totalPages > 1 ? (
-          <nav className={styles.pagination} aria-label="Halaman data anggota">
-            <button
-              data-button="secondary"
-              data-button-size="sm"
-              type="button"
-              disabled={page <= 1}
-              onClick={() => setPage((current) => Math.max(1, current - 1))}
-            >
-              Sebelumnya
-            </button>
-
-            <span>
-              Halaman {result.meta.page} dari {result.meta.totalPages}
-            </span>
-
-            <button
-              data-button="secondary"
-              data-button-size="sm"
-              type="button"
-              disabled={page >= result.meta.totalPages}
-              onClick={() =>
-                setPage((current) =>
-                  Math.min(result.meta.totalPages, current + 1),
-                )
-              }
-            >
-              Berikutnya
-            </button>
-          </nav>
+        {!loading && result.meta.total >= 0 ? (
+          <RecordPagination
+            page={result.meta.page}
+            pageSize={limit}
+            total={result.meta.total}
+            totalPages={result.meta.totalPages}
+            onPageChange={setPage}
+            onPageSizeChange={(next) => { setLimit(next); setPage(1); }}
+            label="Halaman data anggota"
+          />
         ) : null}
       </section>
       <ConfirmDialog

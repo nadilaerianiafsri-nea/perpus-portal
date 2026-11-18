@@ -5,9 +5,9 @@ import type { OverdueBucket } from '../shared/loanOverdue.cjs';
 
 export type OverdueLoan = LoanRow & { overdueDays: number };
 export type OverdueResponse = { data: OverdueLoan[]; overdueStats: { total: number; oneToThree: number; fourToFourteen: number; overFourteen: number }; meta: PageMeta };
-export type OverdueFilters = { search: string; bucket: OverdueBucket; memberType: string; sort: 'OLDEST' | 'NEWEST'; page: number; period: TransactionPeriodValue };
+export type OverdueFilters = { search: string; bucket: OverdueBucket; memberType: string; sort: 'OLDEST' | 'NEWEST'; page: number; limit?: number; period: TransactionPeriodValue };
 export function overdueQuery(filters: OverdueFilters) {
-  const query = new URLSearchParams({ status: 'OVERDUE', search: filters.search, bucket: filters.bucket, memberType: filters.memberType, sort: filters.sort, page: String(filters.page), limit: '20' });
+  const query = new URLSearchParams({ status: 'OVERDUE', search: filters.search, bucket: filters.bucket, memberType: filters.memberType, sort: filters.sort, page: String(filters.page), limit: String(filters.limit ?? 20) });
   if (!filters.search) query.delete('search');
   if (filters.period.preset !== 'all') { query.set('from', filters.period.from); query.set('to', filters.period.to); }
   return query;

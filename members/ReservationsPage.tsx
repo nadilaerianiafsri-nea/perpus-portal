@@ -1,4 +1,5 @@
 "use client";
+import PagedItems from "@/components/PagedItems";
 
 import Link from "next/link";
 import ConfirmDialog from "@/components/ConfirmDialog";
@@ -36,9 +37,9 @@ export default function ReservationsPage() {
   return <div className={styles.pageStack}><PageHeading title="Reservasi Saya" />
     {notice && <p className={styles.success} role="status">{notice}</p>}{actionError && !selectedReservation && <p className={styles.error} role="alert">{actionError}</p>}
     {resource.loading ? <LoadingCards /> : resource.error ? <ErrorState message={resource.error} retry={resource.reload} /> : <>
-      {!active.length ? <section className={reservationStyles.empty}><FiCalendar aria-hidden /><h2>Belum ada reservasi aktif.</h2><p>Buku yang Anda reservasi akan muncul di sini.</p><Link data-button="primary" className={styles.button} href="/dashboard/koleksi">Cari Koleksi</Link></section> : active.map(reservation => <ReservationCard key={reservation.id} reservation={reservation} onExpire={expired} onCancel={() => { setActionError(""); setSelectedReservation(reservation); }} busy={busy !== null} />)}
+      {!active.length ? <section className={reservationStyles.empty}><FiCalendar aria-hidden /><h2>Belum ada reservasi aktif.</h2><p>Buku yang Anda reservasi akan muncul di sini.</p><Link data-button="primary" className={styles.button} href="/dashboard/koleksi">Cari Koleksi</Link></section> : <PagedItems items={active} label="Halaman reservasi aktif">{(rows) => rows.map(reservation => <ReservationCard key={reservation.id} reservation={reservation} onExpire={expired} onCancel={() => { setActionError(""); setSelectedReservation(reservation); }} busy={busy !== null} />)}</PagedItems>}
       <aside className={reservationStyles.information}><FiInfo aria-hidden /><p>Jika buku tidak diambil dalam 24 jam, reservasi otomatis <strong>kedaluwarsa</strong> dan stok dilepas kembali. Reservasi tidak dihitung sebagai pinjaman 7 hari.</p></aside>
-      {!!finished.length && <details className={reservationStyles.history} open={historyOpen} onToggle={event => setHistoryOpen(event.currentTarget.open)}><summary>Riwayat reservasi <span>{finished.length}</span><FiChevronDown aria-hidden /></summary><div>{finished.map(reservation => <ReservationCard key={reservation.id} reservation={reservation} onExpire={expired} />)}</div></details>}
+      {!!finished.length && <details className={reservationStyles.history} open={historyOpen} onToggle={event => setHistoryOpen(event.currentTarget.open)}><summary>Riwayat reservasi <span>{finished.length}</span><FiChevronDown aria-hidden /></summary><PagedItems items={finished} label="Halaman riwayat reservasi">{(rows) => <div>{rows.map(reservation => <ReservationCard key={reservation.id} reservation={reservation} onExpire={expired} />)}</div>}</PagedItems></details>}
     </>}
     <ConfirmDialog
       open={selectedReservation !== null}

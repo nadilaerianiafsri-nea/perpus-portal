@@ -2,6 +2,7 @@
 "use client";
 
 import AppSelect from "@/components/AppSelect";
+import RecordPagination, { type RecordPageSize } from "@/components/RecordPagination";
 
 import AdminStatCard from "./AdminStatCard";
 import { FiBookOpen as CardBookOpen, FiCheckCircle as CardCheckCircle, FiArchive as CardArchive } from "react-icons/fi";
@@ -58,6 +59,7 @@ export default function AdminBooksPage() {
   const [stockMin, setStockMin] = useState(initialStockMin);
   const [stockMax, setStockMax] = useState(initialStockMax);
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState<RecordPageSize>(10);
   const [result, setResult] = useState<AdminBooksResponse>(emptyData);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -84,7 +86,7 @@ export default function AdminBooksPage() {
       status,
       availability,
       page: String(page),
-      limit: "20",
+      limit: String(limit),
     });
     if (search) query.set("search", search);
     if (stockMin) query.set("stockMin", stockMin);
@@ -112,7 +114,7 @@ export default function AdminBooksPage() {
     } finally {
       setLoading(false);
     }
-  }, [availability, page, search, status, stockMax, stockMin, revision]);
+  }, [limit, availability, page, search, status, stockMax, stockMin, revision]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- Existing fetch lifecycle starts the loading state before requesting data.
@@ -431,32 +433,16 @@ export default function AdminBooksPage() {
           </table>
         </div>
 
-        {!loading && result.meta.totalPages > 1 ? (
-          <nav className={styles.pagination} aria-label="Halaman data buku">
-            <button
-              data-button="secondary"
-              data-button-size="sm"
-              type="button"
-              disabled={page <= 1}
-              onClick={() => setPage((value) => Math.max(1, value - 1))}
-            >
-              Sebelumnya
-            </button>
-            <span>
-              Halaman {result.meta.page} dari {result.meta.totalPages}
-            </span>
-            <button
-              data-button="secondary"
-              data-button-size="sm"
-              type="button"
-              disabled={page >= result.meta.totalPages}
-              onClick={() =>
-                setPage((value) => Math.min(result.meta.totalPages, value + 1))
-              }
-            >
-              Berikutnya
-            </button>
-          </nav>
+        {!loading && result.meta.total >= 0 ? (
+          <RecordPagination
+            page={result.meta.page}
+            pageSize={limit}
+            total={result.meta.total}
+            totalPages={result.meta.totalPages}
+            onPageChange={setPage}
+            onPageSizeChange={(next) => { setLimit(next); setPage(1); }}
+            label="Halaman data buku"
+          />
         ) : null}
       </section>
       <ConfirmDialog
