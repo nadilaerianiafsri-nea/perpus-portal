@@ -26,6 +26,8 @@ import {
   PublicContentController,
 } from './public-content.controller';
 import { PublicContentService } from './public-content.service';
+import { AdminSubjectsController, PublicSubjectsController } from './subject-management.controller';
+import { SubjectManagementService } from './subject-management.service';
 
 @Module({
   imports: [AuthModule],
@@ -39,6 +41,8 @@ import { PublicContentService } from './public-content.service';
     PublicLibrarySettingsController,
     PublicContentController,
     AdminPublicContentController,
+    PublicSubjectsController,
+    AdminSubjectsController,
   ],
   providers: [
     ProfilePhotoService,
@@ -49,6 +53,7 @@ import { PublicContentService } from './public-content.service';
     AdminTransactionsService,
     AdminOperationsService,
     PublicContentService,
+    SubjectManagementService,
     MemberRoleGuard,
     ActiveBookGuard,
   ],
