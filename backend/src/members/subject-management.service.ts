@@ -98,6 +98,39 @@ export class SubjectManagementService {
     return { category: { id: Number(result[0].id), name: result[0].name } };
   }
 
+  async rename(rawId: string, input: unknown) {
+    const id = validateId(rawId);
+    const name = validateName(input);
+    const category = await this.prisma.$transaction(async (tx) => {
+      const rows = await tx.$queryRaw<{ id: number | bigint; name: string }[]>
+`
+        SELECT id, name FROM collection_subjects WHERE id = ${id} FOR UPDATE
+      `;
+      const current = rows[0];
+      if (!current) throw new NotFoundException('Subjek/kategori tidak ditemukan.');
+
+      const duplicates = await tx.$queryRaw<{ id: number | bigint }[]>
+`
+        SELECT id FROM collection_subjects
+        WHERE name = ${name} AND id <> ${id} LIMIT 1
+      `;
+      if (duplicates.length) throw new ConflictException('Nama kategori sudah digunakan.');
+
+      if (current.name !== name) {
+        // Keep book and e-book classifications consistent in the same transaction.
+        await tx.$executeRaw`
+          UPDATE collection_subjects SET name = ${name} WHERE id = ${id}
+        `;
+        await tx.$executeRaw`
+          UPDATE books SET subject = ${name}, updatedAt = CURRENT_TIMESTAMP(3)
+          WHERE subject = ${current.name}
+        `;
+      }
+      return { id: Number(current.id), name };
+    });
+    return { category, message: 'Nama subjek/kategori berhasil diperbarui.' };
+  }
+
   async remove(rawId: string) {
     const id = validateId(rawId);
     await this.prisma.$transaction(async (tx) => {

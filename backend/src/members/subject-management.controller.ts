@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   SetMetadata,
   UseGuards,
@@ -36,6 +37,11 @@ export class AdminSubjectsController {
   @Post()
   create(@Body() body: unknown) {
     return this.subjects.add(body);
+  }
+
+  @Patch(':id')
+  rename(@Param('id') id: string, @Body() body: unknown) {
+    return this.subjects.rename(id, body);
   }
 
   @Delete(':id')
