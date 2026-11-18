@@ -40,8 +40,8 @@ export default function RecordPagination({
   return (
     <div className={styles.wrapper}>
       <div className={styles.options}>
-        <span>Baris per halaman</span>
         <AppSelect
+          className={styles.sizeSelect}
           aria-label="Jumlah baris per halaman"
           value={String(pageSize)}
           size="sm"
@@ -51,9 +51,9 @@ export default function RecordPagination({
             if (isRecordPageSize(selected)) onPageSizeChange(selected);
           }}
         >
-          {sizes.map((n) => <option key={n} value={n}>{n} baris</option>)}
+          {sizes.map((n) => <option key={n} value={n}>{n}</option>)}
         </AppSelect>
-        <span className={styles.count}>Menampilkan {beginning}–{ending} dari {count}</span>
+        <span className={styles.unit}>baris</span>
       </div>
 
       <nav className={styles.nav} aria-label={label}>
@@ -95,6 +95,8 @@ export default function RecordPagination({
           Next
         </button>
       </nav>
+
+      <span className={styles.count}>Menampilkan {beginning}–{ending} dari {count}</span>
     </div>
   );
 }

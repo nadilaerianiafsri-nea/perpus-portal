@@ -282,3 +282,23 @@
   .searchArea input { font-size: 16px; }
 }
 @media (prefers-reduced-motion: reduce) { .searchArea input { transition: none; } }
+
+
+/* Reuse the exact membership table/mobile card components on this page. */
+.listSection {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding-bottom: 0;
+  overflow: visible;
+}
+.categoryTable th:first-child { width: auto; }
+.categoryTable th:nth-child(2) { width: 145px; }
+.categoryTable th:last-child { width: 135px; text-align: right; }
+.categoryTable td:last-child { text-align: right; }
+.categoryActions { justify-content: flex-end; }
+.categoryMobileEdit { padding: 12px 14px 14px; }
+.categoryMobileEdit .editActions { padding-bottom: 0; }
+@media (max-width: 700px) {
+  .categoryActions { justify-content: flex-start; }
+}

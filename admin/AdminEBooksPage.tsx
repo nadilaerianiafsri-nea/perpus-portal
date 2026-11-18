@@ -19,6 +19,8 @@ import {
   type AdminEBooksResponse,
 } from "./adminEBooks";
 import styles from "./AdminBooks.module.css";
+import memberStyles from "./AdminMembers.module.css";
+import memberResponsive from "./AdminMembersResponsiveFix.module.css";
 import fixes from "./AdminCollectionFixes.module.css";
 import EBookYearFilter, { createEBookYearRange } from "./EBookYearFilter";
 
@@ -248,7 +250,7 @@ export default function AdminEBooksPage() {
       ) : null}
 
       <section className={styles.tableCard} aria-busy={loading}>
-        <div className={styles.tableScroller}>
+        <div className={`${styles.tableScroller} ${memberResponsive.memberTableScroller}`}>
           <table className={`${styles.table} ${styles.ebookTable}`} data-record-list data-record-scroll>
             <thead>
               <tr>
@@ -314,6 +316,83 @@ export default function AdminEBooksPage() {
               )}
             </tbody>
           </table>
+        </div>
+
+        <div className={`${memberStyles.mobileList} ${memberResponsive.mobileMemberList}`}>
+          {loading ? (
+            <div className={memberStyles.mobileState}>Memuat data E-Book...</div>
+          ) : result.data.length ? (
+            result.data.map((book) => (
+              <article
+                key={book.id}
+                className={`${memberStyles.mobileMemberCard} ${memberResponsive.mobileMemberCard}`}
+                data-record-card
+              >
+                <div className={`${memberStyles.mobileCardHeading} ${memberResponsive.mobileCardHeading}`}>
+                  <div>
+                    <strong data-record-primary>{book.title}</strong>
+                    <small>{book.author}</small>
+                  </div>
+                </div>
+                <dl className={`${memberStyles.mobileInfo} ${memberResponsive.mobileInfo}`}>
+                  <div>
+                    <dt>Mode Akses</dt>
+                    <dd data-record-primary>{accessModeLabel(book.accessMode)}</dd>
+                  </div>
+                  <div>
+                    <dt>Status</dt>
+                    <dd data-record-primary>{book.isActive ? "Aktif" : "Nonaktif"}</dd>
+                  </div>
+                </dl>
+                <div className={`${memberStyles.mobileActions} ${memberResponsive.mobileActions}`} data-record-action-group>
+                  <Link
+                    data-button-shape="square"
+                    data-button="secondary"
+                    data-button-size="sm"
+                    data-row-action="neutral"
+                    className={memberStyles.detailAction}
+                    href={`/admin/koleksi/e-book/${book.id}`}
+                    title="Lihat detail E-Book"
+                    aria-label={`Lihat detail E-Book ${book.title}`}
+                  >
+                    <FiEye aria-hidden="true" />
+                  </Link>
+                  <Link
+                    data-button-shape="square"
+                    data-button="warning"
+                    data-button-size="sm"
+                    data-row-action="warning"
+                    className={memberStyles.editAction}
+                    href={`/admin/koleksi/e-book/${book.id}/edit`}
+                    title="Edit E-Book"
+                    aria-label={`Edit E-Book ${book.title}`}
+                  >
+                    <FiEdit2 aria-hidden="true" />
+                  </Link>
+                  <button
+                    type="button"
+                    data-button-shape="square"
+                    data-button={book.isActive ? "danger" : "success"}
+                    data-button-size="sm"
+                    data-row-action={book.isActive ? "danger-soft" : "success"}
+                    data-button-loading={changingId === book.id}
+                    aria-busy={changingId === book.id}
+                    className={book.isActive ? memberStyles.disableAction : memberStyles.enableAction}
+                    title={book.isActive ? "Nonaktifkan E-Book" : "Aktifkan E-Book"}
+                    aria-label={`${book.isActive ? "Nonaktifkan" : "Aktifkan"} E-Book ${book.title}`}
+                    disabled={changingId === book.id}
+                    onClick={() => requestStatus(book.id, book.isActive, book.title)}
+                  >
+                    <FiPower aria-hidden="true" />
+                  </button>
+                </div>
+              </article>
+            ))
+          ) : (
+            <div className={memberStyles.mobileState}>
+              Tidak ada E-Book yang sesuai dengan pencarian atau filter.
+            </div>
+          )}
         </div>
 
         {!loading && result.meta.total >= 0 ? (

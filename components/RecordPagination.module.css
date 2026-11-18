@@ -1,20 +1,52 @@
 .wrapper {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px 20px;
+  column-gap: 14px;
+  row-gap: 12px;
   padding: 16px 0 8px;
   color: var(--navy);
   font-family: "Outfit", var(--font-outfit), sans-serif;
   font-size: 13px;
   animation: recordPagerIn 220ms ease-out both;
 }
-.options { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; min-width: 0; }
-.options > span:first-child { font-weight: 650; }
-.options > span:nth-child(2) { min-width: 110px; }
-.count { color: color-mix(in srgb, var(--navy) 63%, var(--white)); font-size: 12px; }
-.nav { display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; }
+.options {
+  display: flex;
+  align-items: center;
+  justify-self: start;
+  gap: 8px;
+  min-width: 0;
+}
+.sizeSelect {
+  width: 86px;
+  min-width: 86px;
+  flex: 0 0 86px;
+}
+.sizeSelect [data-select-trigger] {
+  width: 100%;
+  min-width: 0;
+}
+.unit {
+  color: var(--navy);
+  font-size: 13px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.count {
+  justify-self: end;
+  text-align: right;
+  color: color-mix(in srgb, var(--navy) 63%, var(--white));
+  font-size: 12px;
+  white-space: nowrap;
+}
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
 .nav button, .current {
   min-width: 35px;
   min-height: 36px;
@@ -64,16 +96,26 @@
   from { opacity: 0; transform: translateY(5px); }
   to { opacity: 1; transform: translateY(0); }
 }
-@media (max-width: 720px) {
-  .wrapper { gap: 14px; align-items: stretch; }
-  .options { width: 100%; }
-  .nav { width: 100%; }
-  .nav .step { flex: 1 1 auto; }
+@media (max-width: 920px) {
+  .wrapper {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    row-gap: 14px;
+  }
+  .options { grid-column: 1; grid-row: 1; }
+  .count { grid-column: 2; grid-row: 1; }
+  .nav {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+  }
 }
-@media (max-width: 390px) {
+@media (max-width: 480px) {
+  .wrapper { column-gap: 8px; row-gap: 12px; }
+  .options { gap: 6px; }
+  .sizeSelect { width: 76px; min-width: 76px; flex-basis: 76px; }
+  .count { font-size: 11px; white-space: normal; }
   .nav { gap: 4px; }
   .nav .step { padding: 6px 8px; }
-  .count { flex-basis: 100%; }
 }
 @media (prefers-reduced-motion: reduce) {
   .wrapper { animation: none; }
