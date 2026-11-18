@@ -56,3 +56,27 @@
     transition: none;
   }
 }
+
+/* Tombol kembali pada detail anggota memakai warna dan gaya aksi proyek. */
+.backButton {
+  font-family: var(--font-outfit), "Outfit", sans-serif;
+  white-space: nowrap;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+.backButton[data-button="back"]:hover {
+  transform: scale(1.03);
+}
+.backButton[data-button="back"]:focus-visible {
+  outline: 2px solid var(--navy);
+  outline-offset: 2px;
+}
+@media (max-width: 850px) {
+  .backButton { text-align: center; justify-content: center; }
+}
+@media (max-width: 460px) {
+  .backButton { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .backButton { transition: none; }
+  .backButton[data-button="back"]:hover { transform: none; }
+}

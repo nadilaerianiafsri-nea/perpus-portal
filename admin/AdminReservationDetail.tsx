@@ -9,7 +9,7 @@ import ReservationPickupDialog from "./ReservationPickupDialog";
 import { useReservationPickup } from "./useReservationPickup";
 import { safeCoverUrl } from "../shared/displayUrls.cjs";
 import type { AdminBookDetailResponse } from "./adminBooks";
-import { loadReservation, reservationFinalNotice, reservationStatusLabel } from "./adminReservations";
+import { loadReservation, reservationStatusLabel } from "./adminReservations";
 import { useCountdown } from "@/members/useCountdown";
 import {
   formatTransactionDateTime,
@@ -191,17 +191,15 @@ export default function AdminReservationDetail({ id, memberId }: { id: number; m
             </dl>
           </section>
 
-          <section className={styles.actionPanel} aria-label="Pengambilan reservasi">
+          {waiting ? <section className={styles.actionPanel} aria-label="Pengambilan reservasi">
             {pickup.error && !pickup.target ? <p className={styles.mutationError} role="alert">{pickup.error}</p> : null}
             <div className={styles.note}>
               <FiInfo aria-hidden="true" />
-              <p>{waiting
-                ? "Pastikan buku sudah diserahkan kepada anggota. Konfirmasi pengambilan akan membuat pinjaman aktif dan memulai masa peminjaman."
-                : reservationFinalNotice(reservation.status)}</p>
+              <p>Pastikan buku sudah diserahkan kepada anggota. Konfirmasi pengambilan akan membuat pinjaman aktif dan memulai masa peminjaman.</p>
             </div>
             <div className={styles.actions}>
-              <Link href={backHref} data-button="secondary" data-button-size="md">{waiting ? "Batal" : "Kembali ke Daftar"}</Link>
-              {waiting && !loading && !loadError ? (
+              <Link href={backHref} data-button="secondary" data-button-size="md">Batal</Link>
+              {!loading && !loadError ? (
                 <Button
                   className={styles.confirmButton}
                   variant="primary"
@@ -214,7 +212,7 @@ export default function AdminReservationDetail({ id, memberId }: { id: number; m
                 >Sudah Diambil</Button>
               ) : null}
             </div>
-          </section>
+          </section> : null}
         </>
       )}
 

@@ -15,6 +15,7 @@ import {
   type AdminEBookPayload,
 } from "./adminEBooks";
 import SubjectCategorySelect from "./SubjectCategorySelect";
+import { cleanedSubject, loadSubjectCategories, registerSubjectIfNew } from "./subjectCategories";
 import styles from "./AdminBooks.module.css";
 import enhancements from "./AdminBooksEnhancements.module.css";
 
@@ -26,27 +27,6 @@ type FormState = Omit<AdminEBookPayload, "year" | "accessDurationDays"> & {
 const MAX_COVER_BYTES = 5 * 1024 * 1024;
 const MAX_EBOOK_BYTES = 50 * 1024 * 1024;
 const COVER_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const SUBJECT_CATEGORIES = [
-  "Hukum",
-  "Perundang-undangan",
-  "Novel",
-  "Pendidikan",
-  "Sejarah",
-  "Agama",
-  "Teknologi",
-  "Sosial",
-  "Ekonomi",
-  "Politik",
-  "Pemerintahan",
-  "Administrasi Kependudukan",
-  "Kependudukan",
-  "Biografi",
-  "Sastra",
-  "Referensi",
-  "Anak",
-  "Umum",
-] as const;
-
 const privateEBookSource =
   /^\/private-ebooks\/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.pdf$/;
 const legacyPdfSource = /^\/ebooks\/[A-Za-z0-9_-]+\.pdf$/;
@@ -131,6 +111,19 @@ export default function AdminEBookForm({
   const [loading, setLoading] = useState(mode === "edit");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [subjectCategories, setSubjectCategories] = useState<string[]>([]);
+  const [subjectsReady, setSubjectsReady] = useState(false);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    void loadSubjectCategories(controller.signal)
+      .then((subjects) => { if (!controller.signal.aborted) setSubjectCategories(subjects); })
+      .catch((reason) => {
+        if (!controller.signal.aborted) setError(reason instanceof Error ? reason.message : "Kategori belum dapat dimuat.");
+      })
+      .finally(() => { if (!controller.signal.aborted) setSubjectsReady(true); });
+    return () => controller.abort();
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -252,12 +245,13 @@ export default function AdminEBookForm({
       setError(textError);
       return;
     }
-    if (
-      !SUBJECT_CATEGORIES.includes(
-        form.subject.trim() as (typeof SUBJECT_CATEGORIES)[number],
-      )
-    ) {
-      setError("Pilih Subjek / Kategori dari daftar yang tersedia.");
+    if (!subjectsReady) {
+      setError("Daftar subjek/kategori sedang dimuat. Silakan coba lagi.");
+      return;
+    }
+    try { cleanedSubject(form.subject); }
+    catch (reason) {
+      setError(reason instanceof Error ? reason.message : "Subjek/kategori tidak valid.");
       return;
     }
 
@@ -290,6 +284,7 @@ export default function AdminEBookForm({
     setSaving(true);
     setError("");
     try {
+      const subject = await registerSubjectIfNew(form.subject, subjectCategories);
       const coverUrl = coverFile ? await uploadCover(coverFile) : form.coverUrl;
       const ebookUrl = ebookFile
         ? await uploadEBook(ebookFile)
@@ -297,6 +292,7 @@ export default function AdminEBookForm({
 
       const payload: AdminEBookPayload = {
         ...form,
+        subject,
         year,
         accessDurationDays,
         coverUrl,
@@ -341,13 +337,10 @@ export default function AdminEBookForm({
     mode === "edit" && id
       ? `/admin/koleksi/e-book/${id}`
       : "/admin/koleksi/e-book";
-  const subjectCategories =
-    form.subject &&
-    !SUBJECT_CATEGORIES.includes(
-      form.subject as (typeof SUBJECT_CATEGORIES)[number],
-    )
-      ? [form.subject, ...SUBJECT_CATEGORIES]
-      : SUBJECT_CATEGORIES;
+  const subjectOptions = form.subject &&
+    !subjectCategories.some((item) => item.toLocaleLowerCase("id-ID") === form.subject.toLocaleLowerCase("id-ID"))
+      ? [form.subject, ...subjectCategories]
+      : subjectCategories;
 
   if (loading) {
     return <div className={styles.statePanel}>Memuat data E-Book...</div>;
@@ -492,7 +485,7 @@ export default function AdminEBookForm({
                 </span>
                 <SubjectCategorySelect
                   value={form.subject}
-                  options={subjectCategories}
+                  options={subjectOptions}
                   onChange={(value) => update("subject", value)}
                 />
               </div>

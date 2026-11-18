@@ -180,6 +180,14 @@ export default function AdminMemberDetail({ id }: Props) {
 
         <div className={styles.headingActions}>
           <Link
+            href="/admin/keanggotaan"
+            data-button="back"
+            data-button-size="md"
+            className={detailStyles.backButton}
+          >
+            Kembali
+          </Link>
+          <Link
             data-button="secondary"
             data-button-size="md"
             href={`/admin/keanggotaan/${member.id}/edit`}

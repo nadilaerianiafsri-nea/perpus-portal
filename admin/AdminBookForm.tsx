@@ -15,6 +15,7 @@ import {
   type AdminBookPayload,
 } from "./adminBooks";
 import SubjectCategorySelect from "./SubjectCategorySelect";
+import { cleanedSubject, loadSubjectCategories, registerSubjectIfNew } from "./subjectCategories";
 import styles from "./AdminBooks.module.css";
 import enhancements from "./AdminBooksEnhancements.module.css";
 import fixes from "./AdminCollectionFixes.module.css";
@@ -26,27 +27,6 @@ type FormState = Omit<AdminBookPayload, "year" | "totalStock"> & {
 
 const MAX_COVER_BYTES = 5 * 1024 * 1024;
 const COVER_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const SUBJECT_CATEGORIES = [
-  "Hukum",
-  "Perundang-undangan",
-  "Novel",
-  "Pendidikan",
-  "Sejarah",
-  "Agama",
-  "Teknologi",
-  "Sosial",
-  "Ekonomi",
-  "Politik",
-  "Pemerintahan",
-  "Administrasi Kependudukan",
-  "Kependudukan",
-  "Biografi",
-  "Sastra",
-  "Referensi",
-  "Anak",
-  "Umum",
-] as const;
-
 const emptyForm: FormState = {
   code: "",
   title: "",
@@ -102,6 +82,19 @@ export default function AdminBookForm({
   const [loading, setLoading] = useState(mode === "edit");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [subjectCategories, setSubjectCategories] = useState<string[]>([]);
+  const [subjectsReady, setSubjectsReady] = useState(false);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    void loadSubjectCategories(controller.signal)
+      .then((subjects) => { if (!controller.signal.aborted) setSubjectCategories(subjects); })
+      .catch((reason) => {
+        if (!controller.signal.aborted) setError(reason instanceof Error ? reason.message : "Kategori belum dapat dimuat.");
+      })
+      .finally(() => { if (!controller.signal.aborted) setSubjectsReady(true); });
+    return () => controller.abort();
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -198,12 +191,13 @@ export default function AdminBookForm({
       setError(textError);
       return;
     }
-    if (
-      !SUBJECT_CATEGORIES.includes(
-        form.subject.trim() as (typeof SUBJECT_CATEGORIES)[number],
-      )
-    ) {
-      setError("Pilih Subjek / Kategori dari daftar yang tersedia.");
+    if (!subjectsReady) {
+      setError("Daftar subjek/kategori sedang dimuat. Silakan coba lagi.");
+      return;
+    }
+    try { cleanedSubject(form.subject); }
+    catch (reason) {
+      setError(reason instanceof Error ? reason.message : "Subjek/kategori tidak valid.");
       return;
     }
 
@@ -229,9 +223,11 @@ export default function AdminBookForm({
     setSaving(true);
     setError("");
     try {
+      const subject = await registerSubjectIfNew(form.subject, subjectCategories);
       const coverUrl = coverFile ? await uploadCover(coverFile) : form.coverUrl;
       const payload: AdminBookPayload = {
         ...form,
+        subject,
         year,
         totalStock,
         coverUrl,
@@ -275,13 +271,10 @@ export default function AdminBookForm({
     mode === "edit" && id
       ? `/admin/koleksi/data-buku/${id}`
       : "/admin/koleksi/data-buku";
-  const subjectCategories =
-    form.subject &&
-    !SUBJECT_CATEGORIES.includes(
-      form.subject as (typeof SUBJECT_CATEGORIES)[number],
-    )
-      ? [form.subject, ...SUBJECT_CATEGORIES]
-      : SUBJECT_CATEGORIES;
+  const subjectOptions = form.subject &&
+    !subjectCategories.some((item) => item.toLocaleLowerCase("id-ID") === form.subject.toLocaleLowerCase("id-ID"))
+      ? [form.subject, ...subjectCategories]
+      : subjectCategories;
 
   if (loading) {
     return <div className={styles.statePanel}>Memuat data buku...</div>;
@@ -426,7 +419,7 @@ export default function AdminBookForm({
                 </span>
                 <SubjectCategorySelect
                   value={form.subject}
-                  options={subjectCategories}
+                  options={subjectOptions}
                   onChange={(value) => update("subject", value)}
                 />
               </div>

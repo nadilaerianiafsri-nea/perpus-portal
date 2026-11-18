@@ -3,11 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import AdminPublicContentPage from "@/admin/AdminPublicContentPage";
 import AdminSettingsPage from "@/admin/AdminSettingsPage";
+import AdminSubjectsPage from "@/admin/AdminSubjectsPage";
 import styles from "@/admin/AdminSettings.module.css";
 
 type ServiceSection = "identitas" | "reservasi" | "pinjaman";
 type ContentSection = "home" | "about" | "guide" | "faq" | "contact";
-type Section = ServiceSection | ContentSection;
+type Section = ServiceSection | ContentSection | "subjects";
 
 const sections: { group: string; items: { key: Section; label: string }[] }[] = [
   {
@@ -16,6 +17,7 @@ const sections: { group: string; items: { key: Section; label: string }[] }[] = 
       { key: "identitas", label: "Informasi Perpustakaan" },
       { key: "reservasi", label: "Reservasi" },
       { key: "pinjaman", label: "Peminjaman" },
+      { key: "subjects", label: "Subjek / Kategori" },
     ],
   },
   {
@@ -32,6 +34,10 @@ const sections: { group: string; items: { key: Section; label: string }[] }[] = 
 
 function isService(section: Section): section is ServiceSection {
   return section === "identitas" || section === "reservasi" || section === "pinjaman";
+}
+
+function isContent(section: Section): section is ContentSection {
+  return section === "home" || section === "about" || section === "guide" || section === "faq" || section === "contact";
 }
 
 export default function Page() {
@@ -112,8 +118,11 @@ export default function Page() {
       <div className={styles.tabPanel} hidden={!isService(section)}>
         <AdminSettingsPage activePanel={isService(section) ? section : "identitas"} />
       </div>
-      <div className={styles.tabPanel} hidden={isService(section)}>
-        <AdminPublicContentPage activeSection={!isService(section) ? section : "home"} />
+      <div className={styles.tabPanel} hidden={!isContent(section)}>
+        <AdminPublicContentPage activeSection={isContent(section) ? section : "home"} />
+      </div>
+      <div className={styles.tabPanel} hidden={section !== "subjects"}>
+        <AdminSubjectsPage />
       </div>
     </div>
   );

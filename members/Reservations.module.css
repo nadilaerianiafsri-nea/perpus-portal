@@ -55,3 +55,44 @@
   .card[data-record-card] .cover { width: 64px; height: 90px; }
   .card[data-record-card] .countdown { grid-column: 1 / -1; min-height: 116px; }
 }
+
+/* Tombol pembatalan reservasi anggota: ganti ikon kecil dengan label jelas. */
+.card[data-record-card] .cancelButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  width: auto;
+  padding: 9px 16px;
+  border-radius: 9px;
+  font-family: var(--font-outfit), "Outfit", sans-serif;
+  font-size: var(--text-button);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+.card[data-record-card] .cancelButton:not(:disabled):hover {
+  transform: scale(1.03);
+  box-shadow: 0 3px 9px #00063312;
+}
+.card[data-record-card] .cancelButton:disabled {
+  cursor: wait;
+  transform: none;
+}
+.card[data-record-card] {
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+.card[data-record-card]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 14px #00063312;
+}
+@media (max-width: 600px) {
+  .card[data-record-card] .footer { width: 100%; }
+  .card[data-record-card] .cancelButton { width: 100%; min-height: 42px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card[data-record-card],
+  .card[data-record-card] .cancelButton { transition: none; }
+  .card[data-record-card]:hover,
+  .card[data-record-card] .cancelButton:not(:disabled):hover { transform: none; }
+}

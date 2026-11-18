@@ -371,3 +371,30 @@
     transition: none;
   }
 }
+
+/* Custom subject entry; use the existing selector tokens and mobile layout. */
+.subjectOtherOption {
+  margin-top: 8px;
+  border-top: 1px solid var(--select-panel-border);
+  font-weight: 750;
+}
+.subjectCustomField {
+  display: grid;
+  gap: 6px;
+  padding-top: 12px;
+  font-family: var(--font-outfit), Outfit, sans-serif;
+}
+.subjectCustomField label { font-size: var(--text-form-label); font-weight: 650; color: var(--navy); }
+.subjectCustomField input {
+  width: 100%; min-height: 44px; box-sizing: border-box; padding: 9px 12px;
+  border: 1px solid var(--line); border-radius: 9px;
+  background: var(--white); color: var(--navy); font: inherit; font-size: var(--text-input);
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+.subjectCustomField input:hover { border-color: var(--navy-soft); }
+.subjectCustomField input:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
+.subjectCustomField small { color: var(--text-secondary-color); font-size: var(--text-helper); }
+@media (max-width: 600px) {
+  .subjectCustomField { padding-top: 10px; }
+}
+@media (prefers-reduced-motion: reduce) { .subjectCustomField input { transition: none; } }

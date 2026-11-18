@@ -8,12 +8,13 @@ import { NextResponse } from 'next/server';
 import { API_URL } from '@/catalog/serverApi';
 
 const allowed: Record<string, RegExp> = {
-  GET: /^(?:me\/(dashboard|profile|reservations|loans(?:\/(?:history|\d+))?|notifications|ebooks(?:\/\d+\/(?:status|file\.pdf))?|books\/\d+\/borrowing-status|catalog(?:\/filters|\/\d+)?)|admin\/members(?:\/\d+)?|admin\/transactions\/(reservations|loans(?:\/\d+)?|ebook-access\/\d+|returns|lost-books(?:\/\d+)?)|admin\/operations\/(dashboard|notifications(?:\/unread-count)?|reports|settings)|admin\/public-content|public\/(?:content|summary|settings))$/,
+  GET: /^(?:me\/(dashboard|profile|reservations|loans(?:\/(?:history|\d+))?|notifications|ebooks(?:\/\d+\/(?:status|file\.pdf))?|books\/\d+\/borrowing-status|catalog(?:\/filters|\/\d+)?)|admin\/members(?:\/\d+)?|admin\/transactions\/(reservations|loans(?:\/\d+)?|ebook-access\/\d+|returns|lost-books(?:\/\d+)?)|admin\/operations\/(dashboard|notifications(?:\/unread-count)?|reports|settings)|admin\/public-content|admin\/subjects|public\/(?:content|summary|settings|subjects))$/,
 
-  POST: /^(?:me\/(reservations|loans\/\d+\/(?:extend|lost-report)|ebooks(?:\/\d+\/(?:borrow|return|queue(?:\/cancel)?|open))?)|admin\/(?:reservations\/\d+\/pickup|loans\/\d+\/(?:return|lost(?:\/complete)?)))$/,
+  POST: /^(?:me\/(reservations|loans\/\d+\/(?:extend|lost-report)|ebooks(?:\/\d+\/(?:borrow|return|queue(?:\/cancel)?|open))?)|admin\/(?:reservations\/\d+\/pickup|loans\/\d+\/(?:return|lost(?:\/complete)?)|subjects))$/,
 
   PATCH:
     /^(?:me\/(profile|reservations\/\d+\/cancel|notifications\/(read-all|\d+\/read)|ebooks\/\d+\/progress)|admin\/members\/\d+(?:\/status)?|admin\/operations\/(settings|notifications\/(?:read-all|\d+\/read))|admin\/public-content)$/,
+  DELETE: /^admin\/subjects\/\d+$/,
 };
 
 export async function memberProxy(request: Request, path: string) {

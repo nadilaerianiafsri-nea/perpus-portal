@@ -1,7 +1,7 @@
 import "server-only";
 
 import { API_URL } from "@/catalog/serverApi";
-import type { Book, CatalogResponse, FilterOptions } from "@/catalog/types";
+import type { Book, CatalogResponse } from "@/catalog/types";
 import type { BookGrant, GrantsResponse } from "./grantTypes";
 
 export type HomeData = {
@@ -27,7 +27,7 @@ export async function getHomeData(): Promise<HomeData> {
   const [latest, summary, filters, grants] = await Promise.allSettled([
     json<CatalogResponse>("/collections?limit=6&sort=newest"),
     json<{ physicalTitles: number; ebooks: number }>("/members/public/summary"),
-    json<FilterOptions>("/collections/filters"),
+    json<{ subjects: string[] }>("/members/public/subjects"),
     json<GrantsResponse>("/grants?limit=3&page=1"),
   ]);
 

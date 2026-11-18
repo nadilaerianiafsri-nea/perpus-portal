@@ -22,8 +22,11 @@ export default function SubjectCategorySelect({
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
+  const customRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [customOpen, setCustomOpen] = useState(false);
+  const customVisible = customOpen || (Boolean(value) && options.length > 0 && !options.some((item) => item.toLocaleLowerCase("id-ID") === value.toLocaleLowerCase("id-ID")));
 
   const filteredOptions = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase("id-ID");
@@ -57,6 +60,7 @@ export default function SubjectCategorySelect({
   }
 
   function chooseSubject(subject: string) {
+    setCustomOpen(false);
     onChange(subject);
     closeDropdown();
     triggerRef.current?.focus();
@@ -148,6 +152,35 @@ export default function SubjectCategorySelect({
               </p>
             )}
           </div>
+          <button
+            type="button"
+            className={`${enhancements.subjectOption} ${enhancements.subjectOtherOption}`}
+            onClick={() => {
+              setCustomOpen(true);
+              onChange("");
+              closeDropdown();
+              requestAnimationFrame(() => customRef.current?.focus());
+            }}
+          >
+            Lainnya
+          </button>
+        </div>
+      ) : null}
+      {customVisible ? (
+        <div className={enhancements.subjectCustomField}>
+          <label htmlFor={`${generatedId}-custom`}>Subjek / Kategori Baru</label>
+          <input
+            id={`${generatedId}-custom`}
+            ref={customRef}
+            type="text"
+            value={value}
+            onChange={(event) => onChange(event.target.value)}
+            maxLength={100}
+            placeholder="Masukkan subjek baru"
+            autoComplete="off"
+            required
+          />
+          <small>Kategori baru tersimpan ketika buku disimpan.</small>
         </div>
       ) : null}
     </div>
