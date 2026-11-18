@@ -18,15 +18,17 @@ async function apiMessage(response: Response, fallback: string) {
 }
 
 export default function AdminSubjectsPage() {
-  const [categories, setCategories] = useState<ManagedSubject[]>([]);
+  const [categories, setCategories] = useState<ManagedSubject[] | null>(null);
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [removingId, setRemovingId] = useState<number | null>(null);
   const [error, setError] = useState('');
+  const [listOpen, setListOpen] = useState(false);
 
   const load = useCallback(async (signal?: AbortSignal) => {
     setLoading(true);
+    setError('');
     try {
       const response = await fetch('/api/members/admin/subjects', { cache: 'no-store', signal });
       if (!response.ok) throw new Error(await apiMessage(response, 'Daftar kategori belum dapat dimuat.'));
@@ -37,7 +39,10 @@ export default function AdminSubjectsPage() {
         setError('');
       }
     } catch (reason) {
-      if (!signal?.aborted) setError(reason instanceof Error ? reason.message : 'Gagal memuat kategori.');
+      if (!signal?.aborted) {
+        setCategories(null);
+        setError(reason instanceof Error ? reason.message : 'Gagal memuat kategori.');
+      }
     } finally {
       if (!signal?.aborted) setLoading(false);
     }
@@ -89,17 +94,18 @@ export default function AdminSubjectsPage() {
     <section className={styles.page} aria-label="Kelola subjek dan kategori">
       <div className={styles.heading}>
         <h2>Subjek / Kategori</h2>
-        <p>Kelola kategori yang digunakan oleh buku fisik, e-book, dan Beranda.</p>
+        <p>Kelola kategori buku fisik, e-book, dan Beranda.</p>
       </div>
+
       <form className={styles.addForm} onSubmit={add}>
-        <label htmlFor="new-subject-name">Kategori baru</label>
+        <label htmlFor="new-subject-name">Tambah kategori</label>
         <div className={styles.addRow}>
           <input
             id="new-subject-name"
             value={name}
             onChange={(event) => setName(event.target.value)}
             maxLength={100}
-            placeholder="Masukkan nama subjek"
+            placeholder="Nama kategori baru"
             autoComplete="off"
             required
           />
@@ -108,34 +114,64 @@ export default function AdminSubjectsPage() {
           </button>
         </div>
       </form>
-      {error ? <div className={styles.error} role="alert">{error}</div> : null}
-      <div className={styles.listSection}>
-        <div className={styles.listHeading}>
-          <h3>Daftar Kategori</h3>
-          <span>{categories.length} kategori</span>
+
+      {error ? (
+        <div className={styles.error} role="alert">
+          <span>{error}</span>
+          <button type="button" onClick={() => void load()} disabled={loading}>
+            Coba Lagi
+          </button>
         </div>
-        {loading ? <p className={styles.state}>Memuat kategori...</p> : categories.length ? (
-          <ul className={styles.list}>
-            {categories.map((category) => (
-              <li className={styles.item} key={category.id}>
-                <div className={styles.itemInfo}>
-                  <strong>{category.name}</strong>
-                  <span>{category.usageCount} koleksi menggunakan kategori ini</span>
-                </div>
-                <button
-                  type="button"
-                  className={styles.remove}
-                  disabled={category.usageCount > 0 || removingId !== null}
-                  title={category.usageCount ? 'Ubah kategori pada buku yang terkait sebelum menghapus.' : `Hapus ${category.name}`}
-                  onClick={() => void remove(category)}
-                >
-                  {removingId === category.id ? 'Menghapus...' : category.usageCount ? 'Digunakan' : 'Hapus'}
-                </button>
-              </li>
-            ))}
-          </ul>
-        ) : <p className={styles.state}>Belum ada kategori. Tambahkan kategori di atas.</p>}
-        <p className={styles.hint}>Kategori yang masih dipakai buku tidak dapat dihapus. Ubah kategori bukunya terlebih dahulu.</p>
+      ) : null}
+
+      <div className={styles.listSection}>
+        <button
+          type="button"
+          className={styles.listToggle}
+          aria-expanded={listOpen}
+          aria-controls="managed-subject-list"
+          onClick={() => setListOpen((current) => !current)}
+        >
+          <span className={styles.listToggleTitle}>Daftar Kategori</span>
+          <span className={styles.listToggleMeta}>
+            {loading ? 'Memuat...' : categories === null ? 'Tidak tersedia' : `${categories.length} kategori`}
+          </span>
+          <span className={`${styles.chevron} ${listOpen ? styles.chevronOpen : ''}`} aria-hidden="true" />
+        </button>
+        {listOpen ? (
+          <div className={styles.listBody} id="managed-subject-list">
+            {loading ? (
+              <p className={styles.state}>Memuat kategori...</p>
+            ) : categories === null ? (
+              <p className={styles.state}>Kategori belum bisa dimuat. Periksa pesan di atas, lalu tekan Coba Lagi.</p>
+            ) : categories.length ? (
+              <>
+                <ul className={styles.list}>
+                  {categories.map((category) => (
+                    <li className={styles.item} key={category.id}>
+                      <div className={styles.itemInfo}>
+                        <strong>{category.name}</strong>
+                        <span>{category.usageCount} koleksi menggunakan kategori ini</span>
+                      </div>
+                      <button
+                        type="button"
+                        className={styles.remove}
+                        disabled={category.usageCount > 0 || removingId !== null}
+                        title={category.usageCount ? 'Ubah kategori pada buku yang terkait sebelum menghapus.' : `Hapus ${category.name}`}
+                        onClick={() => void remove(category)}
+                      >
+                        {removingId === category.id ? 'Menghapus...' : category.usageCount ? 'Digunakan' : 'Hapus'}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+                <p className={styles.hint}>Kategori yang masih dipakai buku tidak dapat dihapus. Ubah kategori buku terlebih dahulu.</p>
+              </>
+            ) : (
+              <p className={styles.state}>Belum ada kategori. Tambahkan melalui formulir di atas.</p>
+            )}
+          </div>
+        ) : null}
       </div>
     </section>
   );

@@ -6,18 +6,16 @@ import AdminSettingsPage from "@/admin/AdminSettingsPage";
 import AdminSubjectsPage from "@/admin/AdminSubjectsPage";
 import styles from "@/admin/AdminSettings.module.css";
 
-type ServiceSection = "identitas" | "reservasi" | "pinjaman";
+type ServiceSection = "identitas" | "sirkulasi";
 type ContentSection = "home" | "about" | "guide" | "faq" | "contact";
-type Section = ServiceSection | ContentSection | "subjects";
+type Section = ServiceSection | ContentSection;
 
 const sections: { group: string; items: { key: Section; label: string }[] }[] = [
   {
     group: "Pengaturan Layanan",
     items: [
       { key: "identitas", label: "Informasi Perpustakaan" },
-      { key: "reservasi", label: "Reservasi" },
-      { key: "pinjaman", label: "Peminjaman" },
-      { key: "subjects", label: "Subjek / Kategori" },
+      { key: "sirkulasi", label: "Sirkulasi & Kategori" },
     ],
   },
   {
@@ -33,7 +31,7 @@ const sections: { group: string; items: { key: Section; label: string }[] }[] = 
 ];
 
 function isService(section: Section): section is ServiceSection {
-  return section === "identitas" || section === "reservasi" || section === "pinjaman";
+  return section === "identitas" || section === "sirkulasi";
 }
 
 function isContent(section: Section): section is ContentSection {
@@ -121,9 +119,11 @@ export default function Page() {
       <div className={styles.tabPanel} hidden={!isContent(section)}>
         <AdminPublicContentPage activeSection={isContent(section) ? section : "home"} />
       </div>
-      <div className={styles.tabPanel} hidden={section !== "subjects"}>
-        <AdminSubjectsPage />
-      </div>
+      {section === "sirkulasi" ? (
+        <div className={styles.subjectsWorkspace}>
+          <AdminSubjectsPage />
+        </div>
+      ) : null}
     </div>
   );
 }

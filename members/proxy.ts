@@ -30,6 +30,8 @@ export async function memberProxy(request: Request, path: string) {
     );
   }
 
+  const isSubjectRoute = /^(?:admin|public)\/subjects(?:\/\d+)?$/.test(path);
+
   const isEBookFile =
     request.method === 'GET' && /^me\/ebooks\/\d+\/file\.pdf$/.test(path);
 
@@ -88,6 +90,12 @@ export async function memberProxy(request: Request, path: string) {
     }
 
     if (response.status >= 500 && path !== 'admin/public-content') {
+      if (isSubjectRoute) {
+        return NextResponse.json(
+          { message: 'Layanan kategori tidak tersedia. Periksa backend dan tabel collection_subjects pada database aktif, kemudian coba lagi.' },
+          { status: 503, headers },
+        );
+      }
       throw new Error('Backend unavailable');
     }
 
@@ -118,7 +126,9 @@ export async function memberProxy(request: Request, path: string) {
     return NextResponse.json(
       { message: path === 'admin/public-content'
           ? 'Layanan konten publik belum dapat dihubungi. Periksa koneksi backend dan coba lagi.'
-          : 'Layanan anggota belum dapat dihubungi. Silakan coba lagi.' },
+          : isSubjectRoute
+            ? 'Layanan kategori belum dapat dihubungi. Periksa koneksi backend dan tabel collection_subjects pada database aktif.'
+            : 'Layanan anggota belum dapat dihubungi. Silakan coba lagi.' },
       { status: 503, headers },
     );
   }

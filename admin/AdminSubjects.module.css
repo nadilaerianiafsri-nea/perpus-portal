@@ -24,7 +24,7 @@
   color: var(--navy); background: var(--white);
 }
 .addRow input:hover { border-color: var(--navy-soft); }
-.addRow input:focus-visible, .addRow button:focus-visible, .remove:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
+.addRow input:focus-visible, .addRow button:focus-visible, .remove:focus-visible, .listToggle:focus-visible, .error button:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
 .addRow button, .remove {
   min-height: 42px; padding: 8px 16px; border: 1px solid var(--navy);
   border-radius: 9px; color: var(--white); background: var(--navy);
@@ -34,10 +34,33 @@
 .addRow button:hover:not(:disabled), .remove:hover:not(:disabled) { background: var(--yellow); color: var(--navy); transform: scale(1.025); }
 .addRow button:disabled, .remove:disabled { opacity: .48; cursor: not-allowed; }
 .error { padding: 12px 14px; color: #bc241c; background: #ffebea; border: 1px solid #ff5c59; border-radius: 10px; font-size: 13px; }
-.listSection { display: grid; gap: 12px; }
-.listHeading { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-.listHeading h3 { font-size: 16px; }
-.listHeading span { color: var(--text-secondary-color); font-size: 12px; }
+.listSection { display: block; padding: 0; overflow: hidden; }
+.listToggle {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%; min-height: 64px; padding: 16px 20px;
+  border: 0; background: var(--white); color: var(--navy);
+  font: inherit; cursor: pointer; text-align: left;
+  transition: background-color 180ms ease, transform 180ms ease;
+}
+.listToggle:hover { background: var(--button-soft); }
+.listToggleTitle { margin-right: auto; font-size: 16px; font-weight: 700; }
+.listToggleMeta { color: var(--text-secondary-color); font-size: 12px; white-space: nowrap; }
+.chevron {
+  display: block; flex: 0 0 9px; width: 9px; height: 9px;
+  border-right: 2px solid var(--navy); border-bottom: 2px solid var(--navy);
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 180ms ease;
+}
+.chevronOpen { transform: translateY(2px) rotate(225deg); }
+.listBody { display: grid; gap: 12px; padding: 0 20px 20px; animation: subjectEnter 200ms ease-out both; }
+.error { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.error button {
+  padding: 8px 12px; border: 1px solid currentColor; border-radius: 8px;
+  color: inherit; background: var(--white); font: inherit; font-weight: 700;
+  cursor: pointer; transition: background-color 160ms ease, transform 160ms ease;
+}
+.error button:hover:not(:disabled) { background: var(--button-soft); transform: scale(1.025); }
+.error button:disabled { opacity: .5; cursor: not-allowed; }
 .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .item {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
@@ -53,7 +76,10 @@
 @keyframes subjectEnter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 @media (max-width: 600px) {
   .page { gap: 14px; }
-  .addForm, .listSection { padding: 14px; }
+  .addForm { padding: 14px; }
+  .listToggle { min-height: 58px; padding: 14px; }
+  .listBody { padding: 0 14px 14px; }
+  .listToggleTitle { font-size: 14px; }
   .addRow { flex-direction: column; }
   .addRow button { width: 100%; }
   .item { padding: 12px; }
@@ -61,6 +87,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .page { animation: none; }
-  .item, .addRow button, .remove { transition: none; }
+  .item, .addRow button, .remove, .listToggle, .chevron, .error button { transition: none; }
+  .listBody { animation: none; }
   .item:hover { transform: none; }
 }

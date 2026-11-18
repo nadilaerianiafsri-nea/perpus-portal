@@ -19,7 +19,7 @@ type FormState = {
   extensionDurationDays: string;
   maxExtensions: string;
 };
-export type Panel = "identitas" | "reservasi" | "pinjaman";
+export type Panel = "identitas" | "sirkulasi";
 
 function toForm(settings: LibrarySettings): FormState {
   return {
@@ -214,7 +214,7 @@ export default function AdminSettingsPage({ activePanel }: { activePanel: Panel 
             </section>
           ) : null}
 
-          {activePanel === "reservasi" ? (
+          {activePanel === "sirkulasi" ? (
             <section className={`${styles.card} ${styles.animatedCard}`}>
               <div className={styles.cardHeading}>
                 <h2>Aturan Reservasi</h2>
@@ -231,7 +231,7 @@ export default function AdminSettingsPage({ activePanel }: { activePanel: Panel 
             </section>
           ) : null}
 
-          {activePanel === "pinjaman" ? (
+          {activePanel === "sirkulasi" ? (
             <section className={`${styles.card} ${styles.animatedCard}`}>
               <div className={styles.cardHeading}>
                 <h2>Aturan Peminjaman</h2>
@@ -261,7 +261,11 @@ export default function AdminSettingsPage({ activePanel }: { activePanel: Panel 
           ) : null}
 
           <div className={styles.actions}>
-            <span className={styles.saveHint}>Seluruh kategori tersimpan bersama dalam satu pengaturan.</span>
+            <span className={styles.saveHint}>
+              {activePanel === "sirkulasi"
+                ? "Aturan berlaku untuk transaksi berikutnya."
+                : "Perubahan identitas ditampilkan setelah disimpan."}
+            </span>
             <button data-button="primary" data-button-size="md" data-button-loading={saving || loading}
               type="submit" disabled={saving || loading}>
               <ButtonLabel loading={saving} pending="Menyimpan...">Simpan Pengaturan</ButtonLabel>
