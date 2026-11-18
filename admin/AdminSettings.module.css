@@ -241,3 +241,14 @@
 @media (max-width: 700px) {
   .subjectsWorkspace { width: 100%; }
 }
+
+/* Shortcut to the standalone subject management page. */
+.pickerOptionLink { text-decoration: none; }
+.pickerOptionLink:hover .pickerOptionTitle { text-decoration: underline; text-underline-offset: 3px; }
+/* Keep the section selector aligned without the redundant "Pilih bagian" caption. */
+.workspaceHeader { align-items: center; }
+.pickerOptionLink:focus-visible { outline: 2px solid #ffd000; outline-offset: 3px; }
+@media (max-width: 700px) {
+  .workspaceHeader { align-items: stretch; }
+  .pickerWrap { width: 100%; }
+}

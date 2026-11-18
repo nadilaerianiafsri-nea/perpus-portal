@@ -1,93 +1,262 @@
 .page {
   display: grid;
   gap: 18px;
+  min-width: 0;
   font-family: var(--font-outfit), Outfit, sans-serif;
   color: var(--navy);
-  animation: subjectEnter 220ms ease-out both;
+  animation: categoryEnter 220ms ease-out both;
 }
-.heading h2, .listHeading h3 { margin: 0; color: var(--navy); }
-.heading h2 { font-size: var(--text-section); }
-.heading p, .hint, .state { margin: 6px 0 0; color: var(--text-secondary-color); font-size: 13px; line-height: 1.55; }
+.heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+.heading h1 {
+  margin: 0;
+  color: var(--navy);
+  font-size: var(--text-section);
+  font-weight: 750;
+}
+.heading p, .hint, .state {
+  margin: 6px 0 0;
+  color: var(--text-secondary-color);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.heading a { flex-shrink: 0; }
 .addForm, .listSection {
-  padding: 20px;
-  border: 1px solid var(--line);
-  border-radius: 14px;
   background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--navy) 3%, transparent);
 }
-.addForm { display: grid; gap: 10px; }
-.addForm label { font-size: var(--text-form-label); font-weight: 650; }
-.addRow { display: flex; gap: 10px; align-items: stretch; }
-.addRow input {
-  flex: 1; min-width: 0; min-height: 44px; padding: 9px 12px;
-  border: 1px solid var(--line); border-radius: 9px;
-  font: inherit; font-size: var(--text-input);
-  color: var(--navy); background: var(--white);
+.addForm {
+  display: grid;
+  gap: 11px;
+  padding: 20px 22px;
 }
-.addRow input:hover { border-color: var(--navy-soft); }
-.addRow input:focus-visible, .addRow button:focus-visible, .remove:focus-visible, .listToggle:focus-visible, .error button:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
-.addRow button, .remove {
-  min-height: 42px; padding: 8px 16px; border: 1px solid var(--navy);
-  border-radius: 9px; color: var(--white); background: var(--navy);
-  font: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
-  transition: background-color 180ms ease, color 180ms ease, transform 180ms ease;
+.addForm label, .editField label {
+  font-weight: 700;
+  font-size: var(--text-form-label);
 }
-.addRow button:hover:not(:disabled), .remove:hover:not(:disabled) { background: var(--yellow); color: var(--navy); transform: scale(1.025); }
-.addRow button:disabled, .remove:disabled { opacity: .48; cursor: not-allowed; }
-.error { padding: 12px 14px; color: #bc241c; background: #ffebea; border: 1px solid #ff5c59; border-radius: 10px; font-size: 13px; }
-.listSection { display: block; padding: 0; overflow: hidden; }
-.listToggle {
-  display: flex; align-items: center; gap: 12px;
-  width: 100%; min-height: 64px; padding: 16px 20px;
-  border: 0; background: var(--white); color: var(--navy);
-  font: inherit; cursor: pointer; text-align: left;
+.addRow {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+}
+.addRow input, .editField input {
+  flex: 1;
+  min-width: 0;
+  min-height: 46px;
+  padding: 10px 13px;
+  border-radius: 11px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  color: var(--navy);
+  font: inherit;
+  font-size: var(--text-input);
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+.addRow input:hover, .editField input:hover { border-color: var(--navy-soft); }
+.addRow input:focus-visible, .editField input:focus-visible {
+  outline: 2px solid var(--select-focus);
+  outline-offset: 2px;
+}
+.addRow button, .editActions button {
+  flex-shrink: 0;
+  font-family: var(--font-outfit), Outfit, sans-serif;
+}
+.addRow [data-button]:hover:not(:disabled),
+.editActions [data-button]:hover:not(:disabled),
+.actionButton:hover:not(:disabled) {
+  transform: scale(1.025);
+}
+.error {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 15px;
+  border: 1px solid var(--button-error);
+  border-radius: 12px;
+  background: var(--action-danger-soft-bg);
+  color: var(--action-danger-fg);
+  font-size: 13px;
+}
+.listSection { overflow: hidden; padding: 0 0 15px; }
+.listHeading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 22px 16px;
+}
+.listHeading h2 { margin: 0; font-size: var(--text-section); font-weight: 700; }
+.listHeading span { color: var(--text-secondary-color); font-size: 13px; }
+.tableHeading, .item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(85px, 130px) minmax(175px, 215px);
+  align-items: center;
+  gap: 14px;
+}
+.tableHeading {
+  margin-inline: 22px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  background: var(--button-soft);
+  color: var(--text-secondary-color);
+  font-size: 12px;
+  font-weight: 700;
+}
+.tableHeading span:last-child { text-align: right; }
+.list {
+  display: grid;
+  gap: 0;
+  padding: 0 22px;
+  margin: 0;
+  list-style: none;
+}
+.item {
+  padding: 13px 14px;
+  border-bottom: 1px solid var(--line);
+  min-width: 0;
   transition: background-color 180ms ease, transform 180ms ease;
 }
-.listToggle:hover { background: var(--button-soft); }
-.listToggleTitle { margin-right: auto; font-size: 16px; font-weight: 700; }
-.listToggleMeta { color: var(--text-secondary-color); font-size: 12px; white-space: nowrap; }
-.chevron {
-  display: block; flex: 0 0 9px; width: 9px; height: 9px;
-  border-right: 2px solid var(--navy); border-bottom: 2px solid var(--navy);
-  transform: translateY(-2px) rotate(45deg);
-  transition: transform 180ms ease;
+.item:last-child { border-bottom: 0; }
+.item:hover {
+  background: var(--select-option-hover-bg);
+  transform: translateY(-1px);
 }
-.chevronOpen { transform: translateY(2px) rotate(225deg); }
-.listBody { display: grid; gap: 12px; padding: 0 20px 20px; animation: subjectEnter 200ms ease-out both; }
-.error { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
-.error button {
-  padding: 8px 12px; border: 1px solid currentColor; border-radius: 8px;
-  color: inherit; background: var(--white); font: inherit; font-weight: 700;
-  cursor: pointer; transition: background-color 160ms ease, transform 160ms ease;
+.itemInfo { display: grid; min-width: 0; }
+.itemInfo strong { font-size: 14px; font-weight: 700; overflow-wrap: anywhere; }
+.usage { color: var(--text-secondary-color); font-size: 13px; }
+.actions { display: flex; justify-content: flex-end; gap: 7px; flex-wrap: wrap; }
+.actionButton {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  min-width: 80px;
+  justify-content: center;
+  font-family: var(--font-outfit), Outfit, sans-serif;
 }
-.error button:hover:not(:disabled) { background: var(--button-soft); transform: scale(1.025); }
-.error button:disabled { opacity: .5; cursor: not-allowed; }
-.list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
-.item {
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px;
-  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+.actionButton svg { width: 15px; height: 15px; }
+.editForm {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: end;
+  gap: 12px;
+  min-width: 0;
 }
-.item:hover { border-color: var(--navy-soft); transform: translateY(-1px); box-shadow: 0 5px 15px #00063312; }
-.itemInfo { display: grid; gap: 4px; min-width: 0; }
-.itemInfo strong { font-size: 14px; overflow-wrap: anywhere; }
-.itemInfo span { color: var(--text-secondary-color); font-size: 12px; }
-.remove { background: var(--white); color: var(--navy); }
-.hint { margin-top: 0; }
-@keyframes subjectEnter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.editField {
+  display: grid;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+.editField small { color: var(--text-secondary-color); font-size: 12px; line-height: 1.4; }
+.editActions { display: flex; gap: 8px; padding-bottom: 22px; }
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px 22px 9px;
+  border-top: 1px solid var(--line);
+}
+.pagination p { margin: 0; color: var(--text-secondary-color); font-size: 12px; }
+.pageControls { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.pageControls button {
+  min-width: 34px;
+  min-height: 36px;
+  padding: 7px 11px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--white);
+  color: var(--navy);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+.pageControls button:hover:not(:disabled):not([aria-current="page"]) {
+  background: var(--select-option-hover-bg);
+  border-color: var(--navy-soft);
+  transform: scale(1.035);
+}
+.pageControls button:focus-visible {
+  outline: 2px solid var(--select-focus);
+  outline-offset: 2px;
+}
+.pageControls .pageCurrent {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: var(--white);
+  cursor: default;
+  font-size: 14px;
+  font-weight: 800;
+}
+.pageControls .pageNearby {
+  color: var(--text-secondary-color);
+  opacity: .64;
+  font-size: 12px;
+}
+.pageControls button:disabled { cursor: not-allowed; opacity: .38; }
+.hint { margin: 2px 22px 0; }
+.state { padding: 12px 22px 20px; }
+@keyframes categoryEnter {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 750px) {
+  .heading { flex-wrap: wrap; }
+  .heading a { margin-left: 0; }
+  .tableHeading { display: none; }
+  .item { grid-template-columns: 1fr; gap: 9px; padding: 13px 0; }
+  .actions { justify-content: flex-start; }
+  .list { padding-inline: 17px; }
+  .listHeading { padding: 17px; }
+  .pagination { padding-inline: 17px; }
+  .hint { margin-inline: 17px; }
+  .editForm { flex-wrap: wrap; }
+  .editActions { padding-bottom: 0; }
+}
 @media (max-width: 600px) {
   .page { gap: 14px; }
-  .addForm { padding: 14px; }
-  .listToggle { min-height: 58px; padding: 14px; }
-  .listBody { padding: 0 14px 14px; }
-  .listToggleTitle { font-size: 14px; }
+  .addForm { padding: 15px; }
   .addRow { flex-direction: column; }
   .addRow button { width: 100%; }
-  .item { padding: 12px; }
-  .remove { padding: 8px 10px; }
+  .heading a { width: 100%; }
+  .listHeading h2 { font-size: 17px; }
+  .pagination { flex-direction: column; align-items: flex-start; }
+  .pageControls { width: 100%; }
+  .pageControls button { flex: 1 1 auto; }
+  .pageControls .pageCurrent { flex: 0 0 37px; }
+  .editForm { flex-direction: column; align-items: stretch; }
+  .editField, .editActions { width: 100%; }
+  .editActions button { flex: 1; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .page { animation: none; }
-  .item, .addRow button, .remove, .listToggle, .chevron, .error button { transition: none; }
-  .listBody { animation: none; }
+  .page, .item { animation: none; transition: none; }
   .item:hover { transform: none; }
+  .pageControls button, .actionButton { transition: none; }
+  .pageControls button:hover, .actionButton:hover { transform: none; }
+}
+
+/* Match the subtle scaling of existing action buttons without altering other pages. */
+.page .addForm .addRow [data-button][data-button]:hover:not(:disabled),
+.page .editForm .editActions [data-button][data-button]:hover:not(:disabled),
+.page .actions [data-button][data-button]:hover:not(:disabled) {
+  transform: scale(1.025);
+}
+.pageControls .pageCurrent:disabled { opacity: 1; cursor: default; }
+@media (prefers-reduced-motion: reduce) {
+  .page .addForm .addRow [data-button][data-button]:hover:not(:disabled),
+  .page .editForm .editActions [data-button][data-button]:hover:not(:disabled),
+  .page .actions [data-button][data-button]:hover:not(:disabled) {
+    transform: none;
+  }
 }

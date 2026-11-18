@@ -6,3 +6,4 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
 export const GET = handle;
 export const POST = handle;
 export const PATCH = handle;
+export const DELETE = handle;

@@ -487,6 +487,9 @@ export default function AdminEBookForm({
                   value={form.subject}
                   options={subjectOptions}
                   onChange={(value) => update("subject", value)}
+                  onCategoryAdded={(value) => setSubjectCategories((items) =>
+                    items.some((item) => item.toLocaleLowerCase("id-ID") === value.toLocaleLowerCase("id-ID"))
+                      ? items : [value, ...items])}
                 />
               </div>
             </div>

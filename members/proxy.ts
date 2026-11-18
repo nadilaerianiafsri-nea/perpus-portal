@@ -13,7 +13,7 @@ const allowed: Record<string, RegExp> = {
   POST: /^(?:me\/(reservations|loans\/\d+\/(?:extend|lost-report)|ebooks(?:\/\d+\/(?:borrow|return|queue(?:\/cancel)?|open))?)|admin\/(?:reservations\/\d+\/pickup|loans\/\d+\/(?:return|lost(?:\/complete)?)|subjects))$/,
 
   PATCH:
-    /^(?:me\/(profile|reservations\/\d+\/cancel|notifications\/(read-all|\d+\/read)|ebooks\/\d+\/progress)|admin\/members\/\d+(?:\/status)?|admin\/operations\/(settings|notifications\/(?:read-all|\d+\/read))|admin\/public-content)$/,
+    /^(?:me\/(profile|reservations\/\d+\/cancel|notifications\/(read-all|\d+\/read)|ebooks\/\d+\/progress)|admin\/members\/\d+(?:\/status)?|admin\/operations\/(settings|notifications\/(?:read-all|\d+\/read))|admin\/public-content|admin\/subjects\/\d+)$/,
   DELETE: /^admin\/subjects\/\d+$/,
 };
 

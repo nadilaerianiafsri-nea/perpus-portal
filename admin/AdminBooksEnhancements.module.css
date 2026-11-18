@@ -372,29 +372,116 @@
   }
 }
 
-/* Custom subject entry; use the existing selector tokens and mobile layout. */
+
+/* The Lainnya choice opens a modal independent of book form overflow. */
 .subjectOtherOption {
   margin-top: 8px;
   border-top: 1px solid var(--select-panel-border);
   font-weight: 750;
 }
-.subjectCustomField {
+.subjectModalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: color-mix(in srgb, var(--navy) 42%, transparent);
+  animation: subjectModalIn 180ms ease-out both;
+}
+.subjectModal {
+  width: min(100%, 470px);
+  max-height: min(92dvh, 700px);
+  overflow-y: auto;
   display: grid;
-  gap: 6px;
-  padding-top: 12px;
+  gap: 12px;
+  border: 1px solid var(--select-panel-border);
+  border-radius: 18px;
+  padding: 25px;
+  background: var(--white);
+  color: var(--navy);
+  box-shadow: var(--select-panel-shadow);
+  font-family: var(--font-outfit), Outfit, sans-serif;
+  animation: subjectDialogIn 200ms ease-out both;
+}
+.subjectModal h2 {
+  margin: 0;
+  color: var(--navy);
+  font-size: var(--text-section);
+  font-weight: 750;
+}
+.subjectModal p {
+  margin: 0;
+  color: var(--text-secondary-color);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.subjectModal label {
+  margin-top: 4px;
+  color: var(--navy);
+  font-size: var(--text-form-label);
+  font-weight: 700;
+}
+.subjectModal input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 13px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--white);
+  color: var(--navy);
+  font: inherit;
+  font-size: var(--text-input);
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+.subjectModal input:hover { border-color: var(--navy-soft); }
+.subjectModal input:focus-visible {
+  outline: 2px solid var(--select-focus);
+  outline-offset: 3px;
+}
+.subjectModal .subjectModalError {
+  padding: 10px 12px;
+  color: var(--action-danger-fg);
+  background: var(--action-danger-soft-bg);
+  border-radius: 10px;
+}
+.subjectModalActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 7px;
+}
+.subjectModalActions button {
+  flex: 1 1 0;
   font-family: var(--font-outfit), Outfit, sans-serif;
 }
-.subjectCustomField label { font-size: var(--text-form-label); font-weight: 650; color: var(--navy); }
-.subjectCustomField input {
-  width: 100%; min-height: 44px; box-sizing: border-box; padding: 9px 12px;
-  border: 1px solid var(--line); border-radius: 9px;
-  background: var(--white); color: var(--navy); font: inherit; font-size: var(--text-input);
-  transition: border-color 180ms ease, box-shadow 180ms ease;
+.subjectModalActions button:hover:not(:disabled) { transform: scale(1.025); }
+@keyframes subjectModalIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
-.subjectCustomField input:hover { border-color: var(--navy-soft); }
-.subjectCustomField input:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
-.subjectCustomField small { color: var(--text-secondary-color); font-size: var(--text-helper); }
+@keyframes subjectDialogIn {
+  from { opacity: 0; transform: translateY(8px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
 @media (max-width: 600px) {
-  .subjectCustomField { padding-top: 10px; }
+  .subjectModalBackdrop { padding: 12px; align-items: center; }
+  .subjectModal { padding: 19px 16px; border-radius: 15px; }
+  .subjectModalActions { flex-direction: column; }
+  .subjectModalActions button { width: 100%; }
 }
-@media (prefers-reduced-motion: reduce) { .subjectCustomField input { transition: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .subjectModalBackdrop, .subjectModal { animation: none; }
+  .subjectModal input, .subjectModalActions button { transition: none; }
+  .subjectModalActions button:hover { transform: none; }
+}
+
+/* Modal CTAs use the same slight hover scaling as existing page actions. */
+.subjectModalBackdrop .subjectModal .subjectModalActions [data-button][data-button]:hover:not(:disabled) {
+  transform: scale(1.025);
+}
+@media (prefers-reduced-motion: reduce) {
+  .subjectModalBackdrop .subjectModal .subjectModalActions [data-button][data-button]:hover:not(:disabled) { transform: none; }
+}
