@@ -109,7 +109,7 @@ export default function AdminSubjectsPage() {
             autoComplete="off"
             required
           />
-          <button type="submit" disabled={saving || loading}>
+          <button type="submit" data-button="primary" data-button-size="md" disabled={saving || loading}>
             {saving ? 'Menyimpan...' : 'Tambah Kategori'}
           </button>
         </div>

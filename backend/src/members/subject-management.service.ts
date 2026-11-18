@@ -7,7 +7,8 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 
 type SubjectRow = {
-  id: number;
+  // Prisma $queryRaw mengembalikan INT UNSIGNED sebagai BigInt.
+  id: number | bigint;
   name: string;
   createdAt: Date;
   usageCount: bigint | number;
@@ -56,7 +57,7 @@ export class SubjectManagementService {
     `;
     return {
       categories: rows.map((row) => ({
-        id: row.id,
+        id: Number(row.id),
         name: row.name,
         createdAt: row.createdAt,
         usageCount: Number(row.usageCount),
@@ -71,7 +72,7 @@ export class SubjectManagementService {
 
   async add(input: unknown) {
     const name = validateName(input);
-    const duplicate = await this.prisma.$queryRaw<{ id: number }[]>`
+    const duplicate = await this.prisma.$queryRaw<{ id: number | bigint }[]>`
       SELECT id FROM collection_subjects WHERE name = ${name} LIMIT 1
     `;
     if (duplicate.length) {
@@ -83,7 +84,7 @@ export class SubjectManagementService {
       `;
     } catch (error) {
       // Simultaneous requests may race on the unique name constraint.
-      const competing = await this.prisma.$queryRaw<{ id: number }[]>`
+      const competing = await this.prisma.$queryRaw<{ id: number | bigint }[]>`
         SELECT id FROM collection_subjects WHERE name = ${name} LIMIT 1
       `;
       if (competing.length) {
@@ -91,16 +92,16 @@ export class SubjectManagementService {
       }
       throw error;
     }
-    const result = await this.prisma.$queryRaw<{ id: number; name: string }[]>`
+    const result = await this.prisma.$queryRaw<{ id: number | bigint; name: string }[]>`
       SELECT id, name FROM collection_subjects WHERE name = ${name} LIMIT 1
     `;
-    return { category: result[0] };
+    return { category: { id: Number(result[0].id), name: result[0].name } };
   }
 
   async remove(rawId: string) {
     const id = validateId(rawId);
     await this.prisma.$transaction(async (tx) => {
-      const rows = await tx.$queryRaw<{ id: number; name: string }[]>`
+      const rows = await tx.$queryRaw<{ id: number | bigint; name: string }[]>`
         SELECT id, name FROM collection_subjects WHERE id = ${id} FOR UPDATE
       `;
       const row = rows[0];
