@@ -21,15 +21,19 @@ export default function LoanCard({ loan, now, busy, extending, onExtend, onRepla
   const label = loan.lostReport ? lostReportLabel(loan.lostReport.status) : lost ? "Buku Hilang" : state.label === "Aktif" ? "Pinjaman Aktif" : state.label === "Jatuh Tempo Besok" ? "H-1 Jatuh Tempo" : state.label;
   const warning = loan.lostReport?.status === "SELESAI" ? "Penggantian telah dicatat selesai oleh petugas." : loan.lostReport?.status === "MENUNGGU_VERIFIKASI" ? "Laporan kehilangan menunggu verifikasi petugas." : lost ? "Buku dinyatakan hilang — mohon lakukan penggantian (tanpa denda uang)" : state.tone === "red" ? "Pinjaman telah melewati jatuh tempo" : state.tone === "orange" ? state.label === "Jatuh Tempo Hari Ini" ? "Pinjaman jatuh tempo hari ini" : "Jatuh tempo dalam waktu dekat" : "";
   const Icon = completed ? FiCheck : lost ? FiXCircle : tone === "green" ? FiCheck : FiAlertTriangle;
-  return <article className={`${styles.card} ${styles[tone]}`} data-record-card data-loan-id={loan.id}>
+  return <article className={`${styles.card} ${styles[tone]}`} data-member-mobile-card="loan" data-record-card data-loan-id={loan.id}>
+    <header data-member-card-header className="member-unified-mobile-header">
+      <strong><Link href={`/dashboard/koleksi/${loan.book.id}`}>{loan.book.title}</Link></strong>
+      <small>{label}</small>
+    </header>
     {warning && <div className={styles.warning}><FiAlertTriangle aria-hidden /><span>{warning}</span></div>}
-    <div className={styles.body}>
-      <Link className={styles.cover} href={`/dashboard/koleksi/${loan.book.id}`} aria-label={`Lihat detail ${loan.book.title}`}>
+    <div className={styles.body} data-member-card-body>
+      <Link data-member-card-cover className={styles.cover} href={`/dashboard/koleksi/${loan.book.id}`} aria-label={`Lihat detail ${loan.book.title}`}>
         <Image src={safeCoverUrl(loan.book.coverUrl)} alt={`Sampul ${loan.book.title}`} fill sizes="(max-width: 600px) 72px, 104px" unoptimized />
       </Link>
       <div className={styles.information}>
         <span className={styles.badge} data-record-badge><Icon aria-hidden />{label}</span>
-        <h2 data-record-primary><Link href={`/dashboard/koleksi/${loan.book.id}`}>{loan.book.title}</Link></h2>
+        <h2 data-member-mobile-duplicate-title data-record-primary><Link href={`/dashboard/koleksi/${loan.book.id}`}>{loan.book.title}</Link></h2>
         <p className={styles.author} data-record-secondary>{loan.book.author}</p>
         <dl className={styles.metadata}>
           <div><dt>Dipinjam</dt><dd><time dateTime={loan.borrowedAt}>{memberDate(loan.borrowedAt)}</time></dd></div>

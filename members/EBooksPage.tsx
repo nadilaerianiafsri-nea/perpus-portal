@@ -187,14 +187,17 @@ export default function EBooksPage() {
                     {rows.map((loan) => {
                       const progress = progressValue(loan.reading?.progress);
                       return (
-                        <article className={styles.card} data-record-card key={loan.id}>
-                          <div className={styles.header} data-record-badge><FiMonitor aria-hidden />Pinjaman Aktif</div>
-                          <div className={styles.body}>
-                            <Link className={styles.cover} href={`/dashboard/koleksi/${loan.book.id}`} aria-label={`Lihat detail ${loan.book.title}`}>
+                        <article className={styles.card} data-record-card data-member-mobile-card="ebook" key={loan.id}>
+                          <div className={styles.header} data-record-badge data-member-card-header>
+                    <span data-member-desktop-header><FiMonitor aria-hidden />Pinjaman Aktif</span>
+                    <strong className="member-unified-mobile-title">{loan.book.title}</strong>
+                  </div>
+                          <div className={styles.body} data-member-card-body>
+                            <Link data-member-card-cover className={styles.cover} href={`/dashboard/koleksi/${loan.book.id}`} aria-label={`Lihat detail ${loan.book.title}`}>
                               <Image src={safeCoverUrl(loan.book.coverUrl)} alt={`Sampul ${loan.book.title}`} fill sizes="80px" unoptimized />
                             </Link>
                             <div className={styles.information}>
-                              <h3 data-record-primary>{loan.book.title}</h3>
+                              <h3 data-member-mobile-duplicate-title data-record-primary>{loan.book.title}</h3>
                               <p className={styles.deadline}><FiClock aria-hidden />Akses sampai {formatDate(loan.dueAt)} WIB</p>
                               <p data-record-secondary>Progres membaca</p>
                               <progress className={styles.progress} value={progress} max={100} aria-label={`Progres membaca ${loan.book.title}: ${progress}%`} />
@@ -228,14 +231,17 @@ export default function EBooksPage() {
                     {rows.map((queue) => {
                       const offered = queue.status === "DITAWARKAN";
                       return (
-                        <article className={styles.card} data-record-card key={queue.id}>
-                          <div className={`${styles.header} ${offered ? styles.offerHeader : ""}`} data-record-badge><FiClock aria-hidden />{offered ? "Giliran Anda" : `Antrean #${queue.position ?? "-"}`}</div>
-                          <div className={styles.body}>
-                            <Link className={styles.cover} href={`/dashboard/koleksi/${queue.book.id}`} aria-label={`Lihat detail ${queue.book.title}`}>
+                        <article className={styles.card} data-record-card data-member-mobile-card="ebook" key={queue.id}>
+                          <div className={`${styles.header} ${offered ? styles.offerHeader : ""}`} data-record-badge data-member-card-header>
+                    <span data-member-desktop-header><FiClock aria-hidden />{offered ? "Giliran Anda" : `Antrean #${queue.position ?? "-"}`}</span>
+                    <strong className="member-unified-mobile-title">{queue.book.title}</strong>
+                  </div>
+                          <div className={styles.body} data-member-card-body>
+                            <Link data-member-card-cover className={styles.cover} href={`/dashboard/koleksi/${queue.book.id}`} aria-label={`Lihat detail ${queue.book.title}`}>
                               <Image src={safeCoverUrl(queue.book.coverUrl)} alt={`Sampul ${queue.book.title}`} fill sizes="80px" unoptimized />
                             </Link>
                             <div className={styles.information}>
-                              <h3 data-record-primary>{queue.book.title}</h3>
+                              <h3 data-member-mobile-duplicate-title data-record-primary>{queue.book.title}</h3>
                               {offered ? (
                                 <p className={styles.offerText}>Prioritas Anda tersisa <strong>{remaining(queue.claimExpiresAt, now)}</strong>. Jika tidak diambil, giliran otomatis diteruskan.</p>
                               ) : (
@@ -275,14 +281,17 @@ export default function EBooksPage() {
                     {rows.map((ebook) => {
                       const progress = progressValue(ebook.progress);
                       return (
-                        <article className={styles.card} data-record-card key={ebook.id} data-ebook-id={ebook.book.id}>
-                          <div className={styles.header} data-record-badge><FiMonitor aria-hidden />Pernah Dibaca</div>
-                          <div className={styles.body}>
-                            <Link className={styles.cover} href={`/dashboard/koleksi/${ebook.book.id}`} aria-label={`Lihat detail ${ebook.book.title}`}>
+                        <article className={styles.card} data-record-card data-member-mobile-card="ebook" key={ebook.id} data-ebook-id={ebook.book.id}>
+                          <div className={styles.header} data-record-badge data-member-card-header>
+                    <span data-member-desktop-header><FiMonitor aria-hidden />Pernah Dibaca</span>
+                    <strong className="member-unified-mobile-title">{ebook.book.title}</strong>
+                  </div>
+                          <div className={styles.body} data-member-card-body>
+                            <Link data-member-card-cover className={styles.cover} href={`/dashboard/koleksi/${ebook.book.id}`} aria-label={`Lihat detail ${ebook.book.title}`}>
                               <Image src={safeCoverUrl(ebook.book.coverUrl)} alt={`Sampul ${ebook.book.title}`} fill sizes="80px" unoptimized />
                             </Link>
                             <div className={styles.information}>
-                              <h3 data-record-primary>{ebook.book.title}</h3>
+                              <h3 data-member-mobile-duplicate-title data-record-primary>{ebook.book.title}</h3>
                               <p data-record-secondary>Progres terakhir</p>
                               <progress className={styles.progress} value={progress} max={100} aria-label={`Progres membaca ${ebook.book.title}: ${progress}%`} />
                               <span className={styles.percentage} data-record-secondary>{progress}%</span>

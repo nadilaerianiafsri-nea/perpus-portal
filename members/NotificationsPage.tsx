@@ -91,16 +91,20 @@ export default function NotificationsPage() {
       {resource.loading ? <LoadingCards /> : resource.error ? <ErrorState message="Notifikasi belum dapat dimuat." retry={resource.reload} /> : !notifications.length ? <EmptyState message={filtered ? "Tidak ada notifikasi yang sesuai dengan pencarian atau filter." : filter === "all" ? "Belum ada notifikasi." : "Semua notifikasi sudah dibaca."} /> : <PagedItems items={notifications} label="Halaman notifikasi anggota">{(rows) => rows.map(item => {
         const destination = memberNotificationTarget(item);
         const content = <>
+          <div data-member-card-header className="member-unified-mobile-header">
+            <strong>{item.title}</strong>
+            <small>{item.readAt ? "Dibaca" : "Belum Dibaca"}</small>
+          </div>
           <NotificationIcon type={item.entityType} />
-          <div className={styles.body}>
-            <h2>{item.title}</h2>
+          <div className={styles.body} data-member-card-body>
+            <h2 data-member-mobile-duplicate-title>{item.title}</h2>
             <p>{item.message}</p>
             <div className={styles.meta}><time dateTime={item.createdAt}>{memberDate(item.createdAt, true)}</time><span className={`${styles.status} ${!item.readAt ? styles.statusUnread : ""}`}>{item.readAt ? "Dibaca" : "Belum Dibaca"}</span></div>
           </div>
           {destination ? <FiChevronRight className={styles.chevron} aria-hidden="true" /> : null}
         </>;
         const className = `${styles.row} ${!item.readAt ? styles.unread : ""}`;
-        return destination ? <Link key={item.id} href={destination} className={className} data-notification-id={item.id}
+        return destination ? <Link key={item.id} href={destination} className={className} data-member-mobile-card="notification" data-notification-id={item.id}
           aria-label={`Buka detail: ${item.title}. ${item.message}`}
           aria-busy={busy === String(item.id)} aria-disabled={!item.readAt && busy !== null}
           onClick={event => {
@@ -111,7 +115,7 @@ export default function NotificationsPage() {
           }}
           onNavigate={event => { if (!item.readAt) { event.preventDefault(); void openNotification(item); } }}
           onKeyDown={event => { if (event.key === " ") { event.preventDefault(); if (!event.repeat) event.currentTarget.click(); } }}
-        >{content}</Link> : <article key={item.id} className={className} data-notification-id={item.id}>{content}</article>;
+        >{content}</Link> : <article key={item.id} className={className} data-member-mobile-card="notification" data-notification-id={item.id}>{content}</article>;
       })}</PagedItems>}
     </section>
   </div>;

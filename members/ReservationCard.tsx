@@ -30,12 +30,12 @@ export default function ReservationCard({ reservation, onExpire, onCancel, busy 
   reservation: Reservation; onExpire: () => void; onCancel?: () => void; busy?: boolean;
 }) {
   const active = reservation.status === "MENUNGGU_PENGAMBILAN";
-  return <article className={`${styles.card} ${!active ? styles.finished : ""}`} data-record-card data-reservation-id={reservation.id}>
-    <header className={styles.header}><FiCalendar aria-hidden /><strong>{active ? "Reservasi Aktif" : "Reservasi Selesai"}</strong><span data-record-badge><FiClock aria-hidden />{labels[reservation.status]}</span></header>
-    <div className={styles.body}>
-      <Link href={`/dashboard/koleksi/${reservation.book.id}`} className={styles.cover}><Image src={safeCoverUrl(reservation.book.coverUrl)} alt={`Sampul ${reservation.book.title}`} fill sizes="96px" unoptimized /></Link>
+  return <article className={`${styles.card} ${!active ? styles.finished : ""}`} data-record-card data-member-mobile-card="reservation" data-reservation-id={reservation.id}>
+    <header className={styles.header} data-member-card-header><FiCalendar aria-hidden /><strong data-member-desktop-header>{active ? "Reservasi Aktif" : "Reservasi Selesai"}</strong><strong className="member-unified-mobile-title">{reservation.book.title}</strong><span data-record-badge><FiClock aria-hidden />{labels[reservation.status]}</span></header>
+    <div className={styles.body} data-member-card-body>
+      <Link data-member-card-cover href={`/dashboard/koleksi/${reservation.book.id}`} className={styles.cover}><Image src={safeCoverUrl(reservation.book.coverUrl)} alt={`Sampul ${reservation.book.title}`} fill sizes="96px" unoptimized /></Link>
       <div className={styles.info}>
-        <Link href={`/dashboard/koleksi/${reservation.book.id}`}><h2 data-record-primary>{reservation.book.title}</h2></Link>
+        <Link href={`/dashboard/koleksi/${reservation.book.id}`}><h2 data-member-mobile-duplicate-title data-record-primary>{reservation.book.title}</h2></Link>
         <p className={styles.author} data-record-secondary>{reservation.book.author}</p>
         <dl className={styles.metadata}>
           <div><FiMapPin aria-hidden /><dt className={styles.srOnly}>Lokasi pengambilan</dt><dd>{reservation.pickupLocation}</dd></div>

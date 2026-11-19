@@ -99,11 +99,15 @@ export default function HistoryPage({
               key={`${item.sourceType}-${item.id}`}
               style={{ animationDelay: `${Math.min(index, 5) * 45}ms` }}
             >
-              <article className={styles.card} data-record-card>
-                <div className={styles.cardContent}>
+              <article className={styles.card} data-record-card data-member-mobile-card="history">
+                <header data-member-card-header className="member-unified-mobile-header">
+                  <strong><Link href={`/dashboard/koleksi/${item.bookId}`}>{item.title}</Link></strong>
+                  <small>Riwayat Pinjaman</small>
+                </header>
+                <div className={styles.cardContent} data-member-card-body>
                   <div className={styles.cardHeading}>
                     <div>
-                      <h3 data-record-primary>
+                      <h3 data-member-mobile-duplicate-title data-record-primary>
                         <Link
                           className={styles.title}
                           href={`/dashboard/koleksi/${item.bookId}`}
@@ -130,6 +134,7 @@ export default function HistoryPage({
 
                 <Link
                   className={styles.cover}
+                  data-member-card-cover
                   href={`/dashboard/koleksi/${item.bookId}`}
                   aria-label={`Lihat detail ${item.title}`}
                 >

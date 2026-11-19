@@ -1,0 +1,311 @@
+/*
+ * Mobile listing pattern shared by the MEMBER dashboard.
+ * Reference: AdminMembersResponsiveFix.module.css.
+ * Deliberately scoped to data-member-mobile-card and <=600px:
+ * desktop and administrator layouts are not affected.
+ */
+.member-unified-mobile-header,
+.member-unified-mobile-title {
+  display: none;
+}
+
+[data-member-mobile-card] [data-member-desktop-header] {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (max-width: 600px) {
+  [data-member-mobile-card] {
+    box-sizing: border-box;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--line) !important;
+    border-radius: 11px !important;
+    background: var(--white) !important;
+    box-shadow: 0 2px 7px color-mix(in srgb, var(--navy) 6%, transparent);
+    font-family: "Outfit", var(--font-outfit), sans-serif;
+    animation: memberUnifiedEnter 220ms ease-out both;
+    transition: border-color 180ms ease, box-shadow 180ms ease,
+      transform 180ms ease;
+  }
+
+  [data-member-mobile-card] > [data-member-card-header] {
+    box-sizing: border-box;
+    display: flex !important;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px 9px;
+    width: 100%;
+    min-height: 51px;
+    margin: 0 !important;
+    padding: 13px 14px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: var(--navy) !important;
+    color: var(--white) !important;
+    line-height: 1.45;
+  }
+
+  [data-member-mobile-card] [data-member-card-header] strong,
+  [data-member-mobile-card] [data-member-card-header] a {
+    color: var(--white) !important;
+    font-size: 14px;
+    font-weight: 750;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+    text-decoration: none;
+  }
+
+  [data-member-mobile-card] [data-member-card-header] a {
+    cursor: pointer;
+  }
+
+  [data-member-mobile-card] [data-member-card-header] a:hover,
+  [data-member-mobile-card] [data-member-card-header] a:focus-visible {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  [data-member-mobile-card] [data-member-card-header] small {
+    flex-basis: 100%;
+    color: var(--white) !important;
+    font-size: 12px;
+    line-height: 1.35;
+    opacity: 0.78;
+  }
+
+  [data-member-mobile-card] [data-member-card-header] > svg {
+    flex-shrink: 0;
+    color: var(--white) !important;
+    width: 16px;
+    height: 16px;
+  }
+
+  [data-member-mobile-card] [data-member-card-header] > [data-record-badge] {
+    flex-basis: 100%;
+    width: fit-content;
+    margin-left: 0 !important;
+    padding: 3px 8px;
+    border-radius: 8px;
+    color: var(--white) !important;
+    background: color-mix(in srgb, var(--white) 18%, transparent) !important;
+  }
+
+  [data-member-mobile-card] [data-member-card-header] > [data-record-badge] svg {
+    color: var(--white);
+  }
+
+  [data-member-mobile-card] [data-member-desktop-header] {
+    display: none !important;
+  }
+
+  /* Keep loan/queue/reservation status visible under the navy title. */
+  [data-member-mobile-card="ebook"] [data-member-desktop-header],
+  [data-member-mobile-card="reservation"] [data-member-desktop-header] {
+    display: inline-flex !important;
+    flex-basis: 100%;
+    order: 2;
+    gap: 6px;
+    color: var(--white) !important;
+    font-size: 12px;
+    font-weight: 550;
+    line-height: 1.35;
+    opacity: .84;
+  }
+
+  [data-member-mobile-card] .member-unified-mobile-title {
+    display: block !important;
+    min-width: 0;
+    flex: 1 1 150px;
+    margin: 0;
+  }
+
+  [data-member-mobile-card] [data-member-mobile-duplicate-title] {
+    display: none !important;
+  }
+
+  [data-member-mobile-card] [data-member-card-body] {
+    min-width: 0;
+    color: var(--navy);
+  }
+
+  [data-member-mobile-card] [data-member-card-body] :where(p, dl, dd) {
+    overflow-wrap: anywhere;
+  }
+
+  [data-member-mobile-card] [data-member-card-cover] {
+    border-radius: 8px;
+  }
+
+  [data-member-mobile-card] [data-record-action-group] {
+    gap: 8px;
+  }
+
+  [data-member-mobile-card] [data-record-action-group] :is(button, a) {
+    cursor: pointer;
+  }
+
+  [data-member-mobile-card="loan"] [data-member-card-body] {
+    gap: 12px;
+    padding: 14px;
+  }
+
+  [data-member-mobile-card="loan"] [data-record-action-group] {
+    grid-column: 1 / -1;
+    width: 100%;
+    margin-top: 2px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+
+  [data-member-mobile-card="loan"] [data-member-card-body] [data-record-badge] {
+    margin-bottom: 6px;
+  }
+
+  [data-member-mobile-card="reservation"] [data-member-card-body] {
+    padding: 14px;
+    gap: 12px;
+  }
+
+  [data-member-mobile-card="reservation"] [data-record-action-group] {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+
+  [data-member-mobile-card="reservation"] [data-record-action-group]:empty {
+    display: none;
+  }
+
+  [data-member-mobile-card="history"] {
+    grid-template-columns: minmax(0, 1fr) 72px !important;
+    align-items: start;
+    gap: 10px 12px !important;
+    padding: 0 !important;
+  }
+
+  [data-member-mobile-card="history"] > [data-member-card-header] {
+    grid-column: 1 / -1;
+  }
+
+  [data-member-mobile-card="history"] [data-member-card-body] {
+    padding: 4px 0 14px 14px;
+  }
+
+  [data-member-mobile-card="history"] [data-member-card-cover] {
+    align-self: start;
+    margin: 4px 14px 14px 0;
+  }
+
+  [data-member-mobile-card="history"] [data-member-card-body] dl {
+    margin-top: 8px;
+  }
+
+  [data-member-mobile-card="ebook"] > [data-member-card-header] {
+    display: flex !important;
+  }
+
+  [data-member-mobile-card="ebook"] [data-member-card-body] {
+    padding: 14px;
+    gap: 12px;
+  }
+
+  [data-member-mobile-card="ebook"] [data-record-action-group] {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+
+  [data-member-mobile-card="notification"] {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr) 28px !important;
+    gap: 10px !important;
+    padding: 0 0 14px !important;
+    border-left: 1px solid var(--line) !important;
+    background: var(--white) !important;
+  }
+
+  [data-member-mobile-card="notification"] > [data-member-card-header] {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  [data-member-mobile-card="notification"] > span:first-of-type {
+    margin-left: 14px;
+  }
+
+  [data-member-mobile-card="notification"] [data-member-card-body] {
+    padding-top: 3px;
+  }
+
+  [data-member-mobile-card="notification"] > svg:last-child {
+    margin-right: 10px;
+  }
+
+  [data-member-mobile-card="catalog"] {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch;
+    gap: 0 !important;
+  }
+
+  [data-member-mobile-card="catalog"] > [data-member-card-header] {
+    order: -1;
+  }
+
+  [data-member-mobile-card="catalog"] > [data-member-card-cover] {
+    box-sizing: border-box;
+    display: block;
+    flex: 0 0 154px;
+    width: 100% !important;
+    height: 154px !important;
+    min-height: 154px !important;
+    margin: 0;
+    border-radius: 0;
+    background: var(--white);
+  }
+
+  [data-member-mobile-card="catalog"] > [data-member-card-cover] img {
+    object-fit: contain !important;
+    padding: 9px;
+  }
+
+  [data-member-mobile-card="catalog"] [data-member-card-body] {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 12px 14px 14px !important;
+    flex: 1 1 auto;
+  }
+
+  [data-member-mobile-card="catalog"] [data-member-card-copy] {
+    min-height: 0;
+  }
+
+  [data-member-mobile-card="catalog"] [data-member-card-body] [data-button] {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 600px) and (hover: hover) {
+  [data-member-mobile-card]:hover {
+    border-color: var(--navy) !important;
+    box-shadow: 0 5px 14px color-mix(in srgb, var(--navy) 10%, transparent);
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes memberUnifiedEnter {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-member-mobile-card] {
+    animation: none !important;
+    transition: none !important;
+  }
+  [data-member-mobile-card]:hover {
+    transform: none !important;
+  }
+}

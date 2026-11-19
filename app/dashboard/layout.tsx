@@ -1,3 +1,4 @@
+import "@/members/MemberUnifiedMobile.css";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/auth/serverAuth";
 

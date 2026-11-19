@@ -52,7 +52,7 @@ export default function BookCard({
   const detailHref = `${basePath}/${book.id}`;
   const details = (
     <>
-      <h2>
+      <h2 data-member-mobile-duplicate-title>
         <Link href={detailHref} title={member ? book.title : undefined}>
           {book.title}
         </Link>
@@ -111,8 +111,10 @@ export default function BookCard({
       className={`${styles.card}${compact ? ` ${styles.relatedCard}` : ""}`}
       data-catalog-view={rowAction ? "list" : "grid"}
       data-member-catalog-card={memberCatalog || undefined}
+      data-member-mobile-card={memberCatalog ? "catalog" : undefined}
     >
       <Link
+        data-member-card-cover={memberCatalog || undefined}
         href={detailHref}
         className={styles.cover}
         aria-label={`Lihat detail ${book.title}`}
@@ -131,9 +133,15 @@ export default function BookCard({
         />
         {member || !rowAction ? typeBadge : null}
       </Link>
-      <div className={styles.cardBody}>
+      {memberCatalog ? (
+        <header data-member-card-header className="member-unified-mobile-header">
+          <strong><Link href={detailHref}>{book.title}</Link></strong>
+          <small>{typeLabels[book.type]}</small>
+        </header>
+      ) : null}
+      <div className={styles.cardBody} data-member-card-body={memberCatalog || undefined}>
         {member ? (
-          <div className={styles.memberCardCopy}>{details}</div>
+          <div className={styles.memberCardCopy} data-member-card-copy>{details}</div>
         ) : (
           details
         )}
